@@ -1,0 +1,53 @@
+
+> @college-connect/web@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.33
+  - Local:        http://localhost:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 3.2s
+ ○ Compiling / ...
+ ✓ Compiled / in 9.9s (1092 modules)
+ ✓ Compiled in 987ms (553 modules)
+ GET / 200 in 10962ms
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'tslib/package.json' in F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'F:\kannan\projects\unoffical\node_modules\tslib\package.json', but to 'F:\kannan\projects\unoffical\apps\web\node_modules\tslib\package.json' instead. Resolving dependencies are ignored for this path.
+<w>  at unknown 4 tslib/package.json
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'tslib/package.json' in F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'F:\kannan\projects\unoffical\node_modules\tslib\package.json', but to 'F:\kannan\projects\unoffical\apps\web\node_modules\tslib\package.json' instead. Resolving dependencies are ignored for this path.
+<w>  at unknown 4 tslib/package.json
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+ GET / 200 in 74ms
+ ✓ Compiled in 677ms (553 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 904ms (1092 modules)
+ GET / 200 in 297ms
+ ✓ Compiled in 543ms (1092 modules)
+ GET / 200 in 183ms
+ GET / 200 in 145ms
+ ✓ Compiled in 667ms (553 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 759ms (1092 modules)
+ GET / 200 in 217ms
+ ✓ Compiled in 1126ms (1106 modules)
+ ✓ Compiled in 1089ms (1106 modules)
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1161ms (1095 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1543ms
+ ✓ Compiled in 1489ms (1106 modules)
+ ✓ Compiled in 466ms (559 modules)
+ ✓ Compiled in 1166ms (1108 modules)
+ GET / 200 in 4958ms
+ ○ Compiling /_not-found ...
+ GET / 200 in 1606ms
+ ✓ Compiled /_not-found in 2.6s (1111 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 2929ms

@@ -1,0 +1,83 @@
+var canvas = document.createElement('canvas');
+canvas.width = 1000;
+canvas.height = 1000;
+var ctx = canvas.getContext('2d');
+
+// Draw doodles
+ctx.strokeStyle = '#2C3E50';
+ctx.lineWidth = 2;
+
+// Stars
+drawStar(100, 100);
+drawStar(800, 200);
+drawStar(300, 800);
+
+// Hearts
+drawHeart(200, 300);
+drawHeart(700, 600);
+
+// Books
+drawBook(600, 400);
+drawBook(620, 400);
+
+// Music Notes
+drawMusicNote(150, 500);
+drawMusicNote(850, 300);
+
+// Save as PNG
+canvas.toBlob(function(blob) {
+  var url = URL.createObjectURL(blob);
+  // Download
+  var a = document.createElement('a');
+  a.download = 'notebook-doodles.png';
+  a.href = url;
+  a.click();
+});
+
+// Helper functions
+function drawStar(x, y) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + 10, y);
+  ctx.lineTo(x + 2, y + 6);
+  ctx.lineTo(x + 5, y - 3);
+  ctx.lineTo(x + 8, y + 6);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+}
+
+function drawHeart(x, y) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(x - 10, y - 10, x - 10, y + 10, x, y + 20);
+  ctx.bezierCurveTo(x + 10, y + 10, x + 10, y - 10, x, y);
+  ctx.stroke();
+}
+
+function drawBook(x, y) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + 40, y);
+  ctx.lineTo(x + 40, y + 60);
+  ctx.lineTo(x, y + 60);
+  ctx.lineTo(x, y);
+  ctx.moveTo(x, y + 10);
+  ctx.lineTo(x + 40, y + 10);
+  ctx.moveTo(x, y + 20);
+  ctx.lineTo(x + 40, y + 20);
+  ctx.stroke();
+}
+
+function drawMusicNote(x, y) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y - 30);
+  ctx.lineTo(x + 10, y - 30);
+  ctx.lineTo(x + 10, y);
+  ctx.moveTo(x + 10, y - 30);
+  ctx.lineTo(x + 20, y - 30);
+  ctx.lineTo(x + 20, y);
+  ctx.moveTo(x, y - 15);
+  ctx.lineTo(x + 20, y - 15);
+  ctx.stroke();
+}

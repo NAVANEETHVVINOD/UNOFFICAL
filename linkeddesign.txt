@@ -1,0 +1,954 @@
+FULL WEBSITE DESIGN — LINKER (Retro Newspaper Aesthetic)
+
+(Created as a professional Senior Designer)
+
+🌐 1. GLOBAL ART DIRECTION
+Theme
+
+Newspaper × Retro Indie × Doodle × College Chaos
+
+Materials
+
+Paper texture (use the file you uploaded: /mnt/data/paper.png)
+
+Tape strips (drawn, not photo-realistic)
+
+Hand-drawn doodles (Scott Pilgrim vibe)
+
+Retro swirls, grids, halftone dots
+
+Thick black frames & newspaper dividers
+
+Cut-out collage shapes
+
+Color System
+
+#000000 — Primary
+
+#FFFFFF — Contrast
+
+#FFE14D — Accent Yellow
+
+#4DB0FF — Accent Blue
+
+Paper Beige — Background
+
+Typography
+
+Use 3 families:
+
+Display (Retro / Comic / Funky)
+For titles, large words, big panels.
+
+Sans Serif Modern
+For body text, readable parts.
+
+Handwritten / Doodle Font
+For labels, stickers, annotations.
+
+General Look
+
+Everything must look like:
+
+A printed newspaper
+
+A school zine
+
+Connected pieces of paper
+
+Sketch culture
+
+Artistic but functional
+
+🧱 2. WEBSITE STRUCTURE (PAGES)
+
+Home Page (Newspaper Hero)
+
+Events
+
+Marketplace
+
+Clubs
+
+Notes & Materials
+
+Dashboard
+
+Profile
+
+Login / Signup
+
+Error / Empty States
+
+Every page follows the theme, but each has its own
+newspaper layout style.
+
+🧭 3. HOME PAGE — FULL DESIGN
+Hero Section
+
+Layout:
+
+Paper background
+
+Giant broken retro type:
+LINKER
+
+Under it, newspaper subtitle:
+“The Campus Collective.”
+
+Two doodle students on each side
+
+A taped polaroid-style card with:
+“College Life → Organized (…finally)”
+
+Animation (Framer Motion):
+
+Title slides from left
+
+Doodles bounce slightly
+
+Tape sticks with delay
+
+Why LINKER Exists Panel (Newspaper column)
+
+Two-column layout with newspaper lines:
+
+Left:
+The Chaos We Fix:
+
+Lost notes
+
+Events no one hears about
+
+Clubs without identity
+
+Too many WhatsApp groups
+
+Right:
+A messy illustration → a tidy board titled "LINKER"
+
+Yellow/Blue headlines
+Tape corners
+
+Feature Strip (Horizontal Newspaper Belt)
+
+4 Boxes like comic panels:
+
+Events
+Poster-style design + doodle confetti
+
+Clubs
+A black frame with club icons sketched
+
+Marketplace
+A thrift-sale vibe card with doodled objects
+
+Notes & Materials
+Torn paper + binder holes on side
+
+Each animates upward on scroll.
+
+Campus Voice Panel
+
+Student doodle holding megaphone.
+Large text:
+“Your campus… but in one place.”
+
+🗂️ 4. EVENTS PAGE — DESIGN
+Layout
+
+2 or 3 column layout like a classified newspaper
+
+Each event is a newspaper card
+
+Bold title
+
+Small date circles
+
+Doodle sticker (⚡, 🎞️, starburst)
+
+Tape holding the event photo
+
+Filters
+
+Styled like retro coupon tabs.
+
+Event Detail
+
+A torn paper line separating title & content
+
+Scroll effects: elements pop like comic frames
+
+💸 5. MARKETPLACE — DESIGN
+Listing Layout
+
+Printed catalogue vibe
+
+Imperfect grid
+
+Each item:
+
+Price in big retro bubble
+
+Product image clipped with tape
+
+Handwritten note: "Good condition bro"
+
+Product Detail
+
+Polaroid–style photo
+
+Side column with retro checkboxes for condition, price, seller
+
+🎭 6. CLUBS PAGE — DESIGN
+Directory
+
+Giant bold newspaper headings:
+CLUBS DIRECTORY
+
+Each club card looks like
+
+a newspaper ad
+
+with a mascot doodle
+
+bold black bars
+
+retro shapes
+
+Club Profile
+
+Hero banner: torn sheet
+
+Sections:
+ABOUT / EVENTS / MEMBERS / POSTS
+
+Tabs look hand-cut
+
+📚 7. NOTES PAGE — DESIGN
+Layout
+
+Binder notebook aesthetic
+
+Paper rings on side
+
+Every note card looks like a sticky note
+
+Yellow/blue highlighter streaks on headings
+
+Doodle arrows pointing to downloads
+
+🧍‍♂️ 8. PROFILE PAGE — DESIGN
+Layout
+
+Half newspaper, half comic bio
+
+Portrait space (or doodle avatar)
+
+Boxes for:
+
+Saved Events
+
+Saved Notes
+
+Marketplace Posts
+
+Clubs Joined
+
+Sticky-note style reminders
+
+🔐 9. LOGIN PAGE — DESIGN
+Layout
+
+Minimal newspaper box
+
+WELCOME TO LINKER
+
+Doodle student waving
+
+Input fields look like form boxes cut from magazines
+
+Submit button looks like a stamp
+
+⚙️ 10. COMPONENT SYSTEM
+Buttons
+
+Black with white text
+
+Bold and boxy
+
+Hover: slight skew + shadow + ripple
+
+Cards
+
+Torn edges
+
+Tape
+
+Doodles
+
+Halftone shading
+
+Dividers
+
+Newspaper lines
+
+Big black bars
+
+Dashed comic strokes
+
+Modals
+
+Look like pop-out newspaper inserts
+
+🎞️ 11. ANIMATIONS (Framer Motion)
+
+Soft slide-ins
+
+Fade with slight rotation
+
+Tape “sticking” animation
+
+Polaroid tilt
+
+Doodles that wiggle when hovered
+
+Keep animations light, not distracting.
+
+📱 12. RESPONSIVE ADAPTATION
+
+On mobile:
+
+All newspaper columns collapse to single-column
+
+Panels become stacked cards
+
+Doodles reduce in size
+
+Buttons become full-width
+
+Tape is repositioned but preserved
+
+🎯 13. FINAL NOTES AS A SENIOR DESIGNER
+
+Your website will look like
+a digital campus newspaper that comes alive.
+
+LINKER — Senior UI/UX Engineer Deliverable
+
+What you asked: a complete frontend feature idea, full visual design + SRS (software requirements specification) for the Retro-Newspaper redesign, and code-level starters. I used your new design brief (linkeddesign.txt) and the paper texture you uploaded.
+
+Design reference & assets (local paths — use these as URLs in your build):
+
+Design brief: ./linkeddesign.txt
+
+Paper texture (background): apps/web/public/paper.png
+
+1 — Executive Summary (One-line)
+
+Redesign the LINKER web app into a single cohesive Retro Newspaper experience — a readable, tactile, doodle-driven campus platform that’s playful yet highly usable, mobile-first, accessible, and production-ready.
+
+2 — Stakeholders & Users
+
+Stakeholders: Project Lead (you), Students, Club Leads, Teachers, College Admin, Developers, Designers.
+Primary Users / Personas:
+
+Student Sam (18–22) — Wants quick event discovery, notes, marketplace.
+
+Club Leader Lina — Needs to post events, recruit members.
+
+Teacher Tara — Uploads materials, posts announcements.
+
+Admin Ajay — Manages approvals and college settings.
+
+3 — High-Level Goals & Success Metrics
+
+Goals
+
+Single hub for events, clubs, marketplace, notes; reduce reliance on WhatsApp.
+
+Deliver a memorable brand: retro paper + doodles.
+
+Mobile-friendly with quick discoverability.
+
+Success metrics
+
+DAU/MAU from pilot college (target 20% students in 1 month)
+
+Time to find next event < 30s (first-time user)
+
+Upload & publish workflow completion time < 2 minutes
+
+4 — Scope & Constraints
+
+In scope (MVP):
+
+Home (newspaper hero), Events, Clubs, Marketplace, Notes, Profile, Login/Register, Dashboard.
+
+Responsive (desktop/tablet/mobile).
+
+Supabase/Postgres backend + Next.js frontend (as discussed) — backend API spec included below.
+
+Paper texture background and doodle assets in public/doodles/.
+
+Out of scope (phase 1):
+
+Multi-tenant/white-label onboarding (phase 2).
+
+Payment processing (optional later).
+
+Realtime chat (phase 2).
+
+5 — Functional Requirements (condensed)
+5.1 Authentication & Roles
+
+Sign up / sign in (email/password + college email verification via Supabase).
+
+Roles: Student, Teacher, ClubAdmin, CollegeAdmin.
+
+Role based content & admin approval flows.
+
+5.2 Home (Hero + Highlights)
+
+Newspaper hero with big title, tagline, CTA buttons (Explore Events, Clubs).
+
+Feature strip (Events | Clubs | Marketplace | Notes) — interactive cards.
+
+Campus Voice — pinned announcements.
+
+5.3 Events
+
+List (classified newspaper layout), event detail with date/time/location, RSVP/Bookmark.
+
+Create/Edit event (ClubAdmin/Teacher).
+
+5.4 Clubs
+
+Directory grid/ads (newspaper ad style).
+
+Club profile with description, upcoming events, member list, join button.
+
+5.5 Marketplace
+
+Listing CRUD (title, images, price, condition, contact).
+
+Category filters, search, listing detail.
+
+5.6 Notes & Materials
+
+Upload PDFs/images, tag semester/department.
+
+Search & download.
+
+5.7 Dashboard / Profile
+
+Personal feed (saved events, notes, postings).
+
+Points/karma (optional later).
+
+5.8 UX/UI Requirements
+
+Paper texture global overlay (fixed) — small noise/halftone.
+
+Doodles, tape, torn edges for cards.
+
+Accessible color contrast and reduced-motion support.
+
+6 — Non-Functional Requirements
+
+Performance: Home LCP < 2.5s on mobile 3G simulated network (optimize images & lazy load).
+
+Accessibility: WCAG AA for core flows; support keyboard and screen readers.
+
+Security: Auth via Supabase; role checks server-side.
+
+Maintainability: Single Next.js monorepo; component folder and tokenized Tailwind theme.
+
+Scalability: Start single-tenant; database schemas support college_id for future multi-tenant.
+
+7 — UI Design System (tokens + patterns)
+Colors
+
+ink: #000000
+
+paper: #f9f4e8 (paper beige)
+
+accentYellow: #FFE14D
+
+accentBlue: #4DB0FF
+
+Typography
+
+Display: playful retro (Google: Permanent Marker or Freckle Face as fallback).
+
+Body: Inter / DM Sans (readable).
+
+Handwritten: Patrick Hand / Gloria Hallelujah for annotations & stamps.
+
+Spacing / Grid
+
+Container max width 1200px, gutter px-4.
+
+12-column grid for desktop; collapse to single column at ≤ 768px.
+
+Components (visual)
+
+NewspaperCard — white panel, border: 4px solid #000, optional torn-edge.
+
+Tape — static SVG overlay placed top/side.
+
+RetroButton — black rectangle, white text, skew hover.
+
+Doodle — SVG scanning with position props.
+
+FeatureStrip — 4 panel horizontal band; mobile becomes horizontal scroll.
+
+8 — Interaction & Motion
+
+Use Framer Motion for gentle transitions: page enter fade+rotate, card hover rotate ±2°.
+
+Tape wiggle: small rotation animation on mount and hover.
+
+Respect prefers-reduced-motion.
+
+9 — Accessibility rules (must)
+
+Text contrast: base text on paper area must have sufficient contrast; avoid using yellow or blue for small body text.
+
+Focus styles visible (thick black outline cut-style).
+
+All interactive items should be reachable by keyboard (tab order logical).
+
+Provide ARIA labels for cards/controls.
+
+10 — Mobile Behavior
+
+Columns collapse to stacked cards.
+
+FeatureStrip becomes horizontally scrollable (snap).
+
+Doodles scale down to 70% and become non-interactive.
+
+Paper overlay blur slightly on mobile to improve text legibility.
+
+11 — Content Strategy & Copy
+
+Short, direct headlines (newspaper style).
+
+Microcopy with handwritten feel for CTAs and tooltips (e.g., “Save this”, “Post this!”).
+
+Use stickers/tape labels for statuses (New, Popular, Closing soon).
+
+12 — ER / Data Model (simplified)
+
+Tables (Postgres)
+
+colleges — id, name, code, brand_meta
+
+users — id, name, email, role, college_id, avatar, bio
+
+events — id, title, body, start_at, end_at, location, tags, created_by, college_id
+
+clubs — id, name, description, lead_id, college_id
+
+notes — id, title, file_url, semester, department, uploaded_by, college_id
+
+market_items — id, title, description, price, images[], condition, seller_id, college_id
+
+bookmarks — id, user_id, target_type, target_id
+
+Indexes: index on college_id, tags, start_at for events.
+
+13 — API Spec (REST example)
+
+Base URL: /api/v1
+
+Auth: Authorization: Bearer <token>
+
+POST /api/v1/auth/signup — {name,email,password,college_code}
+
+POST /api/v1/auth/login — {email,password} -> token
+
+GET /api/v1/events?college=xyz&tag=workshop — list events
+
+GET /api/v1/events/:id — event detail
+
+POST /api/v1/events — create (role check)
+
+GET /api/v1/clubs?college=xyz
+
+POST /api/v1/market — create listing
+
+GET /api/v1/notes?department=CE&semester=3
+
+POST /api/v1/upload — file upload (Supabase signed URL or S3)
+
+Include server-side role validation for create/approve endpoints.
+
+14 — Folder Structure (final monorepo focused on apps/web)
+apps/web/
+ ├─ app/
+ │   ├─ (auth)/login/page.tsx
+ │   ├─ (auth)/register/page.tsx
+ │   ├─ components/
+ │   │   ├─ ui/
+ │   │   │   ├─ Container.tsx
+ │   │   │   ├─ Doodle.tsx
+ │   │   │   ├─ NewspaperUI.tsx
+ │   │   │   └─ RetroButton.tsx
+ │   │   ├─ sections/
+ │   │   └─ cards/
+ │   ├─ page.tsx
+ │   ├─ events/page.tsx
+ │   ├─ clubs/page.tsx
+ │   └─ marketplace/page.tsx
+ ├─ public/
+ │   ├─ paper.png
+ │   └─ doodles/
+ ├─ styles/
+ ├─ globals.css
+ └─ tailwind.config.js
+
+15 — Code-level Starters (drop-in)
+
+Use Next.js App Router. These are the core snippets I recommend you paste into the repo (I used local paths above so you already have paper.png in apps/web/public).
+
+globals.css (core excerpt)
+:root {
+  --ink: #000;
+  --paper: #f9f4e8;
+  --accent-yellow: #FFE14D;
+  --accent-blue: #4DB0FF;
+  --newspaper-border: 4px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url('/paper.png'); /* local: apps/web/public/paper.png */
+  background-size: cover;
+  opacity: 0.92;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.h1-display { font-family: 'Permanent Marker', Inter, sans-serif; font-size: 3.5rem; }
+.torn-edge { box-shadow: inset 0 -8px 6px -6px rgba(0,0,0,0.08); }
+.halftone-shadow { box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+
+tailwind.config.js (core excerpt)
+module.exports = {
+  content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        ink: '#000000',
+        paper: '#f9f4e8',
+        accentYellow: '#FFE14D',
+        accentBlue: '#4DB0FF',
+      },
+      borderWidth: { newspaper: '4px' },
+      fontFamily: {
+        display: ["'Permanent Marker'", 'Inter', 'sans-serif'],
+        handwritten: ["'Patrick Hand'", 'Inter', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'display-xl': ['3.5rem',{lineHeight:1}],
+        'comic-lg': ['1.5rem',{lineHeight:1.2}],
+        'stamp-sm': ['0.9rem',{lineHeight:1}],
+      },
+    },
+  },
+  plugins: [],
+}
+
+components/ui/Container.tsx
+export default function Container({ children }: { children: React.ReactNode }) {
+  return <div className="max-w-[1200px] mx-auto px-4">{children}</div>;
+}
+
+components/ui/Doodle.tsx
+export default function Doodle({ src, style = {}, className = '' }: { src:string; style?:any; className?:string }) {
+  return <img src={src} className={`pointer-events-none select-none ${className}`} style={style} alt="doodle" />;
+}
+
+components/ui/NewspaperUI.tsx (small)
+export function NewspaperCard({ children, torn=false }: any) {
+  return (
+    <div className={`bg-white text-black p-4 ${torn ? 'torn-edge' : ''} border-[4px] border-black`}>
+      {children}
+    </div>
+  );
+}
+export function RetroButton({children, ...props}: any) {
+  return <button className="bg-black text-white px-4 py-2 font-bold hover:-skew-x-6 active:translate-y-1">{children}</button>;
+}
+
+providers/AnimationProvider.tsx
+'use client';
+import { motion } from 'framer-motion';
+export function PageTransition({ children }: any) {
+  return (
+    <motion.div initial={{ opacity:0, rotate:-1, y:6 }} animate={{ opacity:1, rotate:0, y:0 }} exit={{ opacity:0 }} transition={{ duration:0.45 }}>
+      {children}
+    </motion.div>
+  );
+}
+
+16 — Implementation Roadmap (week by week, 8 weeks MVP)
+
+Week 0 — Setup & Clean Repo: remove unwanted files, add public/doodles/, wire globals.css and tailwind tokens.
+
+Week 1 — Core UI system: Container, NewspaperCard, Doodle, RetroButton, basic hero layout.
+
+Week 2 — Pages shell: Events list, Clubs list, Marketplace skeleton, Notes skeleton.
+
+Week 3 — Auth & DB: Supabase integration, login/register UI.
+
+Week 4 — CRUD: Events create/edit, Marketplace create, Notes upload.
+
+Week 5 — Polishing: animations, tape/doodle placements, mobile optimization.
+
+Week 6 — Accessibility & QA: contrast, keyboard nav, reduced motion tests.
+
+Week 7 — Pilot Deploy & Feedback: deploy to Vercel; onboard small test group.
+
+Week 8 — Iterate: fix issues, polish UX, prepare for phase 2.
+
+17 — QA / Verification Checklist
+
+Paper overlay loads and is fixed across breakpoints. (body::before)
+
+Container prevents full-bleed on wide screens.
+
+FeatureStrip horizontal scroll works on mobile, snap disabled for keyboard accessibility.
+
+Doodles are SVGs and scale/position correctly.
+
+Color contrast passes checks; yellow used for accents only.
+
+prefers-reduced-motion respected.
+
+Empty states use doodle + handwritten microcopy.
+
+18 — Deliverables I’ll Provide If You Want (select any)
+
+Full SRS PDF (formatted)
+
+Figma file / wireframes (artboards for desktop/tablet/mobile)
+
+Component library: full TSX files for all components & pages (ready to paste)
+
+Doodle & tape SVG pack (black & white sketch style)
+
+Demo preview (static deployable HTML + CSS on Vercel preview)
+
+19 — Next Immediate Steps I recommend (I can do them now)
+
+I can generate the complete component files for apps/web/app/components/ui/* and pages (Events, Clubs, Marketplace, Notes, Home) — ready for dev to paste.
+
+I can create Figma-ready wireframes and a small doodle pack.
+
+I can produce a single static preview page (deployable) showing the hero, feature strip, and one card style.
+
+If you want me to start immediately, say which deliverables to generate first (pick any combination):
+
+A — Component files (TSX)
+
+B — Figma wireframes (SVG + layout)
+
+C — Doodle & tape SVG pack
+
+D — Static preview deploy page
+
+"use client"
+
+import Container from './components/ui/Container';
+import { NewspaperCard, RetroButton, Badge, Staple, EventRow, Marquee, Tape } from './components/ui/NewspaperUI';
+import Doodle from './components/ui/Doodle';
+import { PageTransition } from './providers/AnimationProvider';
+import { motion } from 'framer-motion';
+
+export default function Home() {
+  return (
+    <PageTransition>
+      <Container>
+        <div className="py-8">
+
+          {/* Navbar */}
+          <nav className="flex justify-between items-center mb-16 px-4">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold text-xl">L</div>
+              <span className="font-pixel text-2xl tracking-widest">LINKER_OS</span>
+            </div>
+            <div className="hidden md:flex gap-2">
+              <RetroButton variant="ghost">Events</RetroButton>
+              <RetroButton variant="ghost">Clubs</RetroButton>
+              <RetroButton variant="ghost">Market</RetroButton>
+              <RetroButton variant="primary" className="ml-2">Login</RetroButton>
+            </div>
+          </nav>
+
+          {/* Hero Section */}
+          <div className="mb-24 relative">
+            <div className="text-center max-w-4xl mx-auto relative z-10">
+              <Badge className="mb-6 bg-white text-black border-gray-200">v2.0.4 • PUBLIC BETA</Badge>
+
+              <h1 className="text-7xl md:text-9xl leading-[0.9] mb-8 tracking-tight">
+                <span className="font-pixel block text-gray-400 text-5xl md:text-6xl mb-2">THE_CAMPUS</span>
+                <span className="font-display font-black block">COLLECTIVE</span>
+              </h1>
+
+              <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+                The operating system for your college life.
+                <span className="bg-accent-yellow/30 px-2 rounded-md mx-1">Organize chaos</span>,
+                find your people, and actually know what's happening.
+              </p>
+
+              <div className="flex flex-wrap justify-center gap-4">
+                <RetroButton className="px-10 py-4 text-base">Get Started</RetroButton>
+                <RetroButton variant="outline" className="px-10 py-4 text-base">View Roadmap</RetroButton>
+              </div>
+            </div>
+
+            {/* Floating Elements */}
+            <motion.div
+              animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+              transition={{ duration: 6, repeat: Infinity }}
+              className="absolute top-20 left-0 hidden lg:block"
+            >
+              <NewspaperCard variant="curved" className="w-64 p-6 bg-accent-purple text-white border-none shadow-xl rotate-[-6deg]">
+                <Doodle src="/doodles/sparkle.svg" className="w-12 h-12 mb-4 text-white" />
+                <p className="font-serif italic text-2xl leading-tight">"Finally, an app that doesn't suck."</p>
+                <p className="text-sm mt-4 opacity-80 font-mono">— EVERY STUDENT EVER</p>
+              </NewspaperCard>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
+              transition={{ duration: 7, repeat: Infinity }}
+              className="absolute bottom-0 right-0 hidden lg:block"
+            >
+              <NewspaperCard variant="curved" className="w-56 p-4 bg-white rotate-[6deg]">
+                <div className="aspect-square bg-gray-100 rounded-2xl mb-4 overflow-hidden border border-gray-200">
+                  <Doodle src="/doodles/students-hero.svg" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-sm">CAMPUS_LIFE.JPG</span>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+              </NewspaperCard>
+            </motion.div>
+          </div>
+
+          {/* Marquee Section */}
+          <div className="mb-24 -mx-4 md:-mx-8 transform -rotate-1">
+            <div className="bg-black py-4 border-y-4 border-accent-yellow shadow-xl">
+              <Marquee speed={30}>
+                <span className="text-white font-pixel text-3xl mx-8">/// BREAKING_NEWS: HACKATHON REGISTRATIONS OPEN ///</span>
+                <span className="text-accent-yellow font-serif italic text-3xl mx-8">Don't miss out!</span>
+                <span className="text-white font-pixel text-3xl mx-8">/// NEW_CLUB_ALERT: ROBOTICS ///</span>
+                <span className="text-accent-blue font-serif italic text-3xl mx-8">Join the revolution</span>
+                <span className="text-white font-pixel text-3xl mx-8">/// EXAM_SCHEDULE_RELEASED ///</span>
+                <span className="text-accent-pink font-serif italic text-3xl mx-8">Panic mode: ON</span>
+              </Marquee>
+            </div>
+          </div>
+
+          {/* Content Grid */}
+          <div className="grid md:grid-cols-12 gap-8 mb-24">
+
+            {/* About Section */}
+            <div className="md:col-span-7">
+              <NewspaperCard variant="curved" className="h-full p-8 md:p-12 bg-white relative overflow-hidden">
+                <Tape className="absolute -top-3 left-1/2 -translate-x-1/2" />
+                <Badge className="mb-6">ABOUT LINKER</Badge>
+                <h2 className="font-display text-4xl md:text-5xl font-black mb-6">
+                  NOT JUST ANOTHER<br />
+                  <span className="text-accent-blue">NOTICE BOARD.</span>
+                </h2>
+                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                  We built Linker because we were tired of missing events, losing notes in WhatsApp groups, and generally having no clue what was happening on campus.
+                  It's a community-driven platform designed to bridge the gap between dreamers, doers, and the deadline-dreaders.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <h4 className="font-bold mb-1">Open Source</h4>
+                    <p className="text-sm text-gray-500">Built by students, for students.</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <h4 className="font-bold mb-1">Privacy First</h4>
+                    <p className="text-sm text-gray-500">No creepiness. Just vibes.</p>
+                  </div>
+                </div>
+              </NewspaperCard>
+            </div>
+
+            {/* Stats / Features */}
+            <div className="md:col-span-5 flex flex-col gap-6">
+              <NewspaperCard variant="curved" className="flex-1 bg-accent-yellow p-8 flex flex-col justify-center relative overflow-hidden group">
+                <Doodle src="/doodles/megaphone.svg" className="absolute -right-8 -bottom-8 w-48 h-48 opacity-20 group-hover:scale-110 transition-transform" />
+                <h3 className="font-display text-6xl font-black mb-2">500+</h3>
+                <p className="font-serif italic text-2xl">Students Connected</p>
+              </NewspaperCard>
+
+              <NewspaperCard variant="curved" className="flex-1 bg-black text-white p-8 flex flex-col justify-center relative overflow-hidden">
+                <div className="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <h3 className="font-pixel text-4xl mb-2">LIVE_FEED</h3>
+                <p className="text-gray-400">Real-time updates from every club and department.</p>
+              </NewspaperCard>
+            </div>
+          </div>
+
+          {/* Upcoming Events List */}
+          <div className="max-w-5xl mx-auto mb-24">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-accent-pink rounded-full border-2 border-black flex items-center justify-center">
+                <Doodle src="/doodles/calendar.svg" className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="font-display text-4xl font-black">UPCOMING EVENTS</h2>
+            </div>
+
+            <NewspaperCard variant="curved" className="p-0" noShadow>
+              <EventRow
+                date="Dec 01"
+                time="9:00 AM"
+                title="Hackathon: Code Chaos (24h)"
+                icon="/doodles/book.svg"
+                color="bg-accent-blue"
+              />
+              <EventRow
+                date="Dec 02"
+                time="4:00 PM"
+                title="Debate Club: Is Cereal Soup?"
+                icon="/doodles/megaphone.svg"
+                color="bg-accent-pink"
+              />
+              <EventRow
+                date="Dec 05"
+                time="2:00 PM"
+                title="Robotics Workshop: Building Bots"
+                icon="/doodles/group.svg"
+                color="bg-accent-purple"
+              />
+              <EventRow
+                date="Dec 10"
+                time="10:00 AM"
+                title="Campus Market Day"
+                icon="/doodles/shopping-bag.svg"
+                color="bg-accent-yellow"
+              />
+            </NewspaperCard>
+
+            <div className="text-center mt-8">
+              <RetroButton variant="outline">View Full Calendar</RetroButton>
+            </div>
+          </div>
+
+        </div>
+      </Container>
+    </PageTransition>
+  );
+}
