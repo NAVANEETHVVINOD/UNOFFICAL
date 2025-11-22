@@ -13,11 +13,10 @@ export default function BottomNav() {
                     <Doodle src="/doodles/calendar.svg" className="w-6 h-6" />
                     <span className="text-[10px] font-bold uppercase">Events</span>
                 </button>
-                <div className="relative -top-6">
-                    <button className="w-14 h-14 bg-accent-yellow border-2 border-black rounded-full flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <span className="text-2xl font-bold">+</span>
-                    </button>
-                </div>
+                <button className="flex flex-col items-center gap-1 p-2 opacity-50 hover:opacity-100">
+                    <div className="w-6 h-6 bg-accent-yellow rounded-full border border-black flex items-center justify-center text-xs font-bold">$</div>
+                    <span className="text-[10px] font-bold uppercase">Market</span>
+                </button>
                 <button className="flex flex-col items-center gap-1 p-2 opacity-50 hover:opacity-100">
                     <Doodle src="/doodles/group.svg" className="w-6 h-6" />
                     <span className="text-[10px] font-bold uppercase">Clubs</span>
