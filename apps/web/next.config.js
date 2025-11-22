@@ -13,8 +13,6 @@ const nextConfig = {
       allowedOrigins: ["*"],
     },
   },
-
-  output: "standalone",
 };
 
 module.exports = nextConfig;
