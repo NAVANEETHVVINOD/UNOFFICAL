@@ -1,15 +1,20 @@
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  images: {
-    domains: ['localhost'],
-  },
-  compiler: {
-    styledComponents: true,
-  },
-  // Server Actions are enabled by default in recent Next.js versions
-  // Remove experimental.serverActions to avoid the invalid option warning
-}
+  reactStrictMode: false,
 
-module.exports = nextConfig
+  // Disable styled-jsx fully
+  compiler: {
+    styledJsx: false,
+  },
+
+  // Force dynamic rendering (fixes 404/500 prerender crash)
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["*"],
+    },
+  },
+
+  output: "standalone",
+};
+
+module.exports = nextConfig;

@@ -7,63 +7,41 @@
   - Environments: .env
 
  ✓ Starting...
- ✓ Ready in 6.6s
+ ✓ Ready in 4.6s
  ○ Compiling / ...
- ✓ Compiled / in 8.3s (1053 modules)
- GET / 200 in 9270ms
- ✓ Compiled in 976ms (534 modules)
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 915ms (1042 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1260ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 152ms
- ✓ Compiled in 3.3s (1061 modules)
- GET / 200 in 394ms
- ✓ Compiled /_not-found in 498ms (1050 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 778ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 93ms
- ✓ Compiled in 4.5s (1064 modules)
- GET / 200 in 373ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 50ms
- ⨯ ./app/page.tsx
-Error: 
-  [31mx[0m Unexpected token `PageTransition`. Expected jsx identifier
-    ,-[[36;1;4mF:\kannan\projects\unoffical\apps\web\app\page.tsx[0m:9:1]
- [2m 9[0m | 
- [2m10[0m | export default function Home() {
- [2m11[0m |   return (
- [2m12[0m |     <PageTransition>
-    : [31;1m     ^^^^^^^^^^^^^^[0m
- [2m13[0m |       <Container>
- [2m14[0m |         <div className="py-8 pb-24 md:pb-8">
- [2m14[0m | 
-    `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/page.tsx
+ ✓ Compiled / in 18.8s (1108 modules)
+ ⨯ Error: Cannot find module 'F:\kannan\projects\unoffical\apps\web\.next\server\middleware-manifest.json'
+Require stack:
+- F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\next-server.js
+- F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\dev\next-dev-server.js
+- F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\next.js
+- F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\lib\start-server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
+    at F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\require-hook.js:55:36
+    at Module._load (node:internal/modules/cjs/loader:1043:27)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+    at mod.require (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:182:18)
+    at DevServer.getMiddlewareManifest (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\next-server.js:938:26)
+    at DevServer.getEdgeFunctionsPages (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\next-server.js:954:31)
+    at NextNodeServer.handleCatchallRenderRequest (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\next-server.js:238:49)
+    at async DevServer.handleRequestImpl (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\base-server.js:818:17)
+    at async F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'F:\\kannan\\projects\\unoffical\\apps\\web\\node_modules\\next\\dist\\server\\next-server.js',
+    'F:\\kannan\\projects\\unoffical\\apps\\web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js',
+    'F:\\kannan\\projects\\unoffical\\apps\\web\\node_modules\\next\\dist\\server\\next.js',
+    'F:\\kannan\\projects\\unoffical\\apps\\web\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
  ○ Compiling /_error ...
- ⨯ ./app/page.tsx
-Error: 
-  [31mx[0m Unexpected token `PageTransition`. Expected jsx identifier
-    ,-[[36;1;4mF:\kannan\projects\unoffical\apps\web\app\page.tsx[0m:9:1]
- [2m 9[0m | 
- [2m10[0m | export default function Home() {
- [2m11[0m |   return (
- [2m12[0m |     <PageTransition>
-    : [31;1m     ^^^^^^^^^^^^^^[0m
- [2m13[0m |       <Container>
- [2m14[0m |         <div className="py-8 pb-24 md:pb-8">
- [2m14[0m | 
-    `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/page.tsx
- GET / 500 in 149ms
 <w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'tslib/package.json' in F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'F:\kannan\projects\unoffical\node_modules\tslib\package.json', but to 'F:\kannan\projects\unoffical\apps\web\node_modules\tslib\package.json' instead. Resolving dependencies are ignored for this path.
 <w>  at unknown 4 tslib/package.json
 <w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
@@ -71,152 +49,9 @@ Import trace for requested module:
 <w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
 <w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
 <w>  at resolve commonjs F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
- ✓ Compiled /_not-found in 5.7s (1277 modules)
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /_next/static/webpack/ecac89702c46b9c6.webpack.hot-update.json 404 in 6702ms
- GET / 200 in 713ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 41ms
- GET / 200 in 119ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 86ms
- ⨯ ./app/page.tsx
-Error: 
-  [31mx[0m Unexpected token `PageTransition`. Expected jsx identifier
-    ,-[[36;1;4mF:\kannan\projects\unoffical\apps\web\app\page.tsx[0m:9:1]
- [2m 9[0m | 
- [2m10[0m | export default function Home() {
- [2m11[0m |   return (
- [2m12[0m |     <PageTransition>
-    : [31;1m     ^^^^^^^^^^^^^^[0m
- [2m13[0m |       <Container>
- [2m14[0m |         <div className="py-8 pb-24 md:pb-8">
- [2m14[0m | 
-    `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/page.tsx
- GET / 500 in 100ms
- GET /.well-known/appspecific/com.chrome.devtools.json 500 in 492ms
- ⨯ ./app/page.tsx
-Error: 
-  [31mx[0m Unexpected token `PageTransition`. Expected jsx identifier
-    ,-[[36;1;4mF:\kannan\projects\unoffical\apps\web\app\page.tsx[0m:9:1]
- [2m 9[0m | 
- [2m10[0m | export default function Home() {
- [2m11[0m |   return (
- [2m12[0m |     <PageTransition>
-    : [31;1m     ^^^^^^^^^^^^^^[0m
- [2m13[0m |       <Container>
- [2m14[0m |         <div className="py-8 pb-24 md:pb-8">
- [2m14[0m | 
-    `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/page.tsx
- GET /_next/static/webpack/ecac89702c46b9c6.webpack.hot-update.json 500 in 6279ms
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET / 500 in 141ms
- GET /.well-known/appspecific/com.chrome.devtools.json 500 in 30ms
- ⨯ ./app/page.tsx
-Error: 
-  [31mx[0m Unexpected token `PageTransition`. Expected jsx identifier
-    ,-[[36;1;4mF:\kannan\projects\unoffical\apps\web\app\page.tsx[0m:9:1]
- [2m 9[0m | 
- [2m10[0m | export default function Home() {
- [2m11[0m |   return (
- [2m12[0m |     <PageTransition>
-    : [31;1m     ^^^^^^^^^^^^^^[0m
- [2m13[0m |       <Container>
- [2m14[0m |         <div className="py-8 pb-24 md:pb-8">
- [2m14[0m | 
-    `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/page.tsx
- GET /_next/static/webpack/ecac89702c46b9c6.webpack.hot-update.json 500 in 1772ms
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET / 500 in 54ms
- GET /.well-known/appspecific/com.chrome.devtools.json 500 in 30ms
- ⨯ ./app/page.tsx
-Error: 
-  [31mx[0m Unexpected token `PageTransition`. Expected jsx identifier
-    ,-[[36;1;4mF:\kannan\projects\unoffical\apps\web\app\page.tsx[0m:9:1]
- [2m 9[0m | 
- [2m10[0m | export default function Home() {
- [2m11[0m |   return (
- [2m12[0m |     <PageTransition>
-    : [31;1m     ^^^^^^^^^^^^^^[0m
- [2m13[0m |       <Container>
- [2m14[0m |         <div className="py-8 pb-24 md:pb-8">
- [2m14[0m | 
-    `----
-
-Caused by:
-    Syntax Error
-
-Import trace for requested module:
-./app/page.tsx
- GET /_next/static/webpack/ecac89702c46b9c6.webpack.hot-update.json 500 in 1224ms
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET / 500 in 25ms
- GET /.well-known/appspecific/com.chrome.devtools.json 500 in 26ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 9.8s (1277 modules)
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /_next/static/webpack/ecac89702c46b9c6.webpack.hot-update.json 404 in 9893ms
- GET / 200 in 6112ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 167ms
- GET / 200 in 371ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 74ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 77ms
- ✓ Compiled in 8.3s (1291 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 408ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 43ms
- ✓ Compiled in 2.2s (1288 modules)
- GET / 200 in 561ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 3.2s (1277 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 3986ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 108ms
- GET / 200 in 505ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 71ms
- ✓ Compiled in 3.2s (1280 modules)
- ✓ Compiled in 3.1s (1288 modules)
- GET / 200 in 2563ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 1362ms (1277 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 2000ms
- ✓ Compiled in 5.9s (1288 modules)
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 1102ms (1277 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1586ms
- GET / 200 in 414ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 57ms
- GET / 200 in 328ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 173ms
- ✓ Compiled in 4.4s (1291 modules)
- ✓ Compiled in 6.9s (1288 modules)
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 1019ms (1277 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 2578ms
- ✓ Compiled in 1320ms (1291 modules)
- GET / 200 in 904ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 123ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 78ms
- ✓ Compiled in 5.4s (1291 modules)
- GET / 200 in 631ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 104ms
- ✓ Compiled in 7s (1288 modules)
- GET / 200 in 744ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 711ms (1277 modules)
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1167ms
- ✓ Compiled in 6.5s (1291 modules)
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'tslib/package.json' in F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'F:\kannan\projects\unoffical\node_modules\tslib\package.json', but to 'F:\kannan\projects\unoffical\apps\web\node_modules\tslib\package.json' instead. Resolving dependencies are ignored for this path.
+<w>  at unknown 4 tslib/package.json
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js

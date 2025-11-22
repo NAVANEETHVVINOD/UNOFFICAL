@@ -1,16 +1,13 @@
-"use client"
+﻿"use client"
 
 import Container from './components/ui/Container';
 import { NewspaperCard, RetroButton, Badge, Staple, EventRow, Marquee, Tape, HangingCard, Sticker } from './components/ui/NewspaperUI';
 import Doodle from './components/ui/Doodle';
 import BottomNav from './components/ui/BottomNav';
-import { PageTransition } from './providers/AnimationProvider';
-import { motion } from 'framer-motion';
 
 export default function Home() {
   return (
-    <PageTransition>
-      {/* Van Gogh Header Background - Full Width */}
+    <>
       <div className="absolute top-0 left-0 w-full h-[80vh] overflow-hidden -z-10">
         <img
           src="/doodles/header-vangof.jpg"
@@ -49,7 +46,7 @@ export default function Home() {
               <h1 className="text-4xl md:text-7xl leading-[0.9] mb-8 tracking-tight mx-auto max-w-3xl">
                 <span className="font-pixel block text-gray-400 text-2xl md:text-4xl mb-4 tracking-widest uppercase">Link. Learn. Live.</span>
                 <span className="font-display font-black block text-white drop-shadow-[4px_4px_0px_#FACC15] uppercase text-stroke-indigo text-stroke-2 md:text-stroke-3" style={{ WebkitTextStroke: '2px #4F46E5' }}>
-                  Campus Chaos — Organized.
+                  Campus Chaos â€” Organized.
                 </span>
               </h1>
 
@@ -94,17 +91,6 @@ export default function Home() {
             {/* Right Card - CD Album Style */}
             <div className="absolute top-24 -right-10 md:top-32 md:right-4 z-20 scale-[0.6] md:scale-100 origin-top-right">
               <HangingCard className="w-48 p-4 bg-gradient-to-br from-gray-800 to-black text-white rotate-[6deg] border-4 border-accent-yellow animate-border-color relative overflow-visible rounded-3xl shadow-xl">
-                <style jsx>{`
-                  @keyframes border-color-change {
-                    0% { border-color: #FACC15; } /* Yellow */
-                    33% { border-color: #4F46E5; } /* Indigo */
-                    66% { border-color: #F472B6; } /* Pink */
-                    100% { border-color: #FACC15; } /* Yellow */
-                  }
-                  .animate-border-color {
-                    animation: border-color-change 3s infinite linear;
-                  }
-                `}</style>
                 <Sticker className="-bottom-3 -left-3 bg-accent-green text-black font-black" rotate={-5}>LIVE</Sticker>
 
                 <div className="aspect-square rounded-full mb-3 overflow-hidden border-4 border-accent-yellow flex items-center justify-center relative shadow-[0_0_20px_rgba(255,215,0,0.3)]">
@@ -260,19 +246,19 @@ export default function Home() {
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Automatic sorting by date</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Registration/RSVP system</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Event details & attachments</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Save & bookmark events</span>
                   </li>
                 </ul>
@@ -290,14 +276,14 @@ export default function Home() {
                         <div className="w-12 h-12 bg-accent-yellow rounded-full flex items-center justify-center font-bold border border-black">24</div>
                         <div>
                           <h4 className="font-bold">Freshers' Night</h4>
-                          <p className="text-xs text-gray-500">Auditorium • 6 PM</p>
+                          <p className="text-xs text-gray-500">Auditorium â€¢ 6 PM</p>
                         </div>
                       </div>
                       <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-4">
                         <div className="w-12 h-12 bg-accent-pink rounded-full flex items-center justify-center font-bold border border-black text-white">01</div>
                         <div>
                           <h4 className="font-bold">Code Chaos</h4>
-                          <p className="text-xs text-gray-500">CS Lab • 9 AM</p>
+                          <p className="text-xs text-gray-500">CS Lab â€¢ 9 AM</p>
                         </div>
                       </div>
                     </div>
@@ -336,19 +322,19 @@ export default function Home() {
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Club profiles & descriptions</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Club-specific announcements</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Easy join requests</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Member management for leaders</span>
                   </li>
                 </ul>
@@ -368,19 +354,19 @@ export default function Home() {
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Department & semester organization</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">PDF viewer & download system</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Teacher & student uploads</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Previous year question papers</span>
                   </li>
                 </ul>
@@ -406,7 +392,7 @@ export default function Home() {
                     </div>
                     <div className="mt-6 flex justify-between items-center">
                       <span className="text-xs font-bold text-gray-400">2.4 MB</span>
-                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white">↓</div>
+                      <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white">â†“</div>
                     </div>
                   </div>
                 </NewspaperCard>
@@ -438,19 +424,19 @@ export default function Home() {
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Secure campus-only environment</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Chat/contact system for sellers</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Buy/sell books, lab coats, etc.</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
                     <span className="font-bold">Search & category filtering</span>
                   </li>
                 </ul>
@@ -504,11 +490,12 @@ export default function Home() {
             </div>
           </div>
 
+
         </div>
 
         {/* Mobile Bottom Navigation */}
         <BottomNav />
       </Container >
-    </PageTransition >
+    </>
   );
 }

@@ -1,0 +1,28 @@
+
+> @college-connect/web@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving 'tslib/package.json' in F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'F:\kannan\projects\unoffical\node_modules\tslib\package.json', but to 'F:\kannan\projects\unoffical\apps\web\node_modules\tslib\package.json' instead. Resolving dependencies are ignored for this path.
+<w>  at unknown 4 tslib/package.json
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack-config.js
+<w>  at file dependencies F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+uncaughtException [Error: EPERM: operation not permitted, open 'F:\kannan\projects\unoffical\apps\web\.next\trace'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'F:\\kannan\\projects\\unoffical\\apps\\web\\.next\\trace'
+}
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path F:\kannan\projects\unoffical\apps\web
+npm error workspace @college-connect/web@0.1.0
+npm error location F:\kannan\projects\unoffical\apps\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build
