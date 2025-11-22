@@ -1,6 +1,5 @@
 {
-    "buildCommand": "turbo run build --filter=@college-connect/web",
-    "installCommand": "npm install --legacy-peer-deps",
-    "framework": null,
-    "outputDirectory": "apps/web/.next"
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "framework": "nextjs"
 }
