@@ -5,7 +5,22 @@ import { NewspaperCard, RetroButton, Badge, Staple } from '../components/ui/News
 import Doodle from '../components/ui/Doodle';
 import { PageTransition } from '../providers/AnimationProvider';
 
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function DashboardPage() {
+    const { isAuthenticated } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.push('/login');
+        }
+    }, [isAuthenticated, router]);
+
+    if (!isAuthenticated) return null;
+
     return (
         <PageTransition>
             <Container>

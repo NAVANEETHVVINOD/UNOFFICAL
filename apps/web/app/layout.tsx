@@ -1,4 +1,6 @@
 import './globals.css'
+import BottomNav from './components/ui/BottomNav'
+import { AuthProvider } from './context/AuthContext'
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
@@ -16,7 +18,12 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                {children}
+                <AuthProvider>
+                    <div className="min-h-screen pb-16 md:pb-0">
+                        {children}
+                    </div>
+                    <BottomNav />
+                </AuthProvider>
             </body>
         </html>
     )

@@ -1,198 +1,180 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// User and Authentication
-enum UserRole {
-  ADMIN
-  STUDENT
-  FACULTY
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String?
-  role          UserRole  @default(STUDENT)
-  verified      Boolean   @default(false)
-  profile       Profile?
-  clubMembers   ClubMember[]
-  eventAttendees EventAttendee[]
-  listings      Listing[]
-  messages      Message[]
-  materials     StudyMaterial[]
-  materialVersions MaterialVersion[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String   // hashed
+  role        Role     @default(STUDENT)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  profile     Profile?
+  memberships ClubMember[]
+  events      EventParticipant[]
+  createdEvents Event[]
+  listings    MarketplaceListing[] @relation("ListingOwner")
+  notes       Note[]               @relation("AuthorNotes")
+  likes       NoteLike[]
 }
 
 model Profile {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id])
-  college       String
-  year          Int
-  major         String
-  bio           String?
-  avatar        String?
-  social        Json?
-  interests     String[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  fullName    String
+  collegeId   String?
+  bio         String?
+  avatarUrl   String?
+  tags        String[] // JSON array: ["web dev", "volunteering"]
+  githubUrl   String?
+  instagram   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User    @relation(fields: [userId], references: [id])
+  college     College? @relation(fields: [collegeId], references: [id])
 }
 
-// Clubs Module
-enum ClubRole {
-  ADMIN
-  MODERATOR
-  MEMBER
+model College {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  city      String?
+  state     String?
+  createdAt DateTime @default(now())
+
+  clubs     Club[]
+  profiles  Profile[]
+  events    Event[]
+  listings  MarketplaceListing[]
+  notes     Note[]
 }
 
 model Club {
-  id          String    @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
-  description String
-  cover       String?
+  slug        String        @unique
+  description String?
+  collegeId   String
+  createdAt   DateTime      @default(now())
+
+  college     College       @relation(fields: [collegeId], references: [id])
   members     ClubMember[]
   events      Event[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
 }
 
 model ClubMember {
-  id          String    @id @default(cuid())
-  userId      String
-  clubId      String
-  role        ClubRole  @default(MEMBER)
-  joinedAt    DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
-  club        Club      @relation(fields: [clubId], references: [id])
+  id        String   @id @default(cuid())
+  userId    String
+  clubId    String
+  role      ClubRole @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  club      Club     @relation(fields: [clubId], references: [id])
 
   @@unique([userId, clubId])
 }
 
-// Events Module
-enum RSVPStatus {
-  GOING
-  MAYBE
-  NOT_GOING
-}
-
 model Event {
-  id          String    @id @default(cuid())
+  id          String              @id @default(cuid())
   title       String
-  description String
-  startDate   DateTime
-  endDate     DateTime
-  location    String?
+  description String?
+  startsAt    DateTime
+  endsAt      DateTime
+  venue       String?
   clubId      String?
-  club        Club?     @relation(fields: [clubId], references: [id])
-  attendees   EventAttendee[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  collegeId   String?
+  createdById String
+
+  club        Club?               @relation(fields: [clubId], references: [id])
+  college     College?            @relation(fields: [collegeId], references: [id])
+  createdBy   User                @relation(fields: [createdById], references: [id])
+  participants EventParticipant[]
 }
 
-model EventAttendee {
-  id          String    @id @default(cuid())
-  userId      String
-  eventId     String
-  status      RSVPStatus
-  user        User      @relation(fields: [userId], references: [id])
-  event       Event     @relation(fields: [eventId], references: [id])
+model EventParticipant {
+  id       String   @id @default(cuid())
+  eventId  String
+  userId   String
+  status   EventStatus @default(GOING)
 
-  @@unique([userId, eventId])
+  event    Event    @relation(fields: [eventId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
 }
 
-// Marketplace Module
-enum Condition {
-  NEW
-  LIKE_NEW
-  GOOD
-  FAIR
-  POOR
+model MarketplaceListing {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Int      // in rupees
+  imageUrl    String?
+  ownerId     String
+  collegeId   String?
+  status      ListingStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+
+  owner       User     @relation("ListingOwner", fields: [ownerId], references: [id])
+  college     College? @relation(fields: [collegeId], references: [id])
 }
 
-enum Category {
-  TEXTBOOKS
-  ELECTRONICS
-  FURNITURE
-  SUPPLIES
-  OTHER
+model Note {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  fileUrl     String
+  subject     String
+  semester    Int
+  authorId    String
+  collegeId   String?
+  createdAt   DateTime @default(now())
+
+  author      User     @relation("AuthorNotes", fields: [authorId], references: [id])
+  college     College? @relation(fields: [collegeId], references: [id])
+  likes       NoteLike[]
+}
+
+model NoteLike {
+  id     String @id @default(cuid())
+  noteId String
+  userId String
+
+  note   Note   @relation(fields: [noteId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([noteId, userId])
+}
+
+enum Role {
+  STUDENT
+  MODERATOR
+  ADMIN
+  SUPERADMIN
+}
+
+enum ClubRole {
+  MEMBER
+  LEAD
+  STAFF
+}
+
+enum EventStatus {
+  GOING
+  INTERESTED
+  NOT_GOING
 }
 
 enum ListingStatus {
   ACTIVE
   SOLD
-  RESERVED
-  DELETED
-}
-
-model Listing {
-  id          String    @id @default(cuid())
-  title       String
-  description String
-  price       Float
-  condition   Condition
-  category    Category
-  images      String[]
-  sellerId    String
-  seller      User      @relation(fields: [sellerId], references: [id])
-  messages    Message[]
-  status      ListingStatus @default(ACTIVE)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Message {
-  id          String    @id @default(cuid())
-  content     String
-  senderId    String
-  listingId   String
-  sender      User      @relation(fields: [senderId], references: [id])
-  listing     Listing   @relation(fields: [listingId], references: [id])
-  createdAt   DateTime  @default(now())
-}
-
-// Study Materials Module
-enum MaterialType {
-  NOTES
-  ASSIGNMENT
-  PAPER
-  BOOK
-  OTHER
-}
-
-model StudyMaterial {
-  id          String    @id @default(cuid())
-  title       String
-  description String
-  subject     String
-  type        MaterialType
-  file        String
-  versions    MaterialVersion[]
-  uploaderId  String
-  uploader    User      @relation(fields: [uploaderId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model MaterialVersion {
-  id          String    @id @default(cuid())
-  version     Int
-  file        String
-  materialId  String
-  material    StudyMaterial @relation(fields: [materialId], references: [id])
-  uploaderId  String
-  uploader    User      @relation(fields: [uploaderId], references: [id])
-  createdAt   DateTime  @default(now())
+  HIDDEN
 }

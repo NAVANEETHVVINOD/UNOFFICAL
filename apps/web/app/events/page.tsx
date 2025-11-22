@@ -5,7 +5,22 @@ import { NewspaperCard, RetroButton, Staple, EventRow } from '../components/ui/N
 import Doodle from '../components/ui/Doodle';
 import { PageTransition } from '../providers/AnimationProvider';
 
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function EventsPage() {
+    const { isAuthenticated } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.push('/login');
+        }
+    }, [isAuthenticated, router]);
+
+    if (!isAuthenticated) return null;
+
     return (
         <PageTransition>
             <Container>

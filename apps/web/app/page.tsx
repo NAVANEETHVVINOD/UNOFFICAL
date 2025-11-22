@@ -1,9 +1,12 @@
 ﻿"use client"
 
+import Link from 'next/link';
 import Container from './components/ui/Container';
 import { NewspaperCard, RetroButton, Badge, Staple, EventRow, Marquee, Tape, HangingCard, Sticker } from './components/ui/NewspaperUI';
 import Doodle from './components/ui/Doodle';
 import BottomNav from './components/ui/BottomNav';
+
+
 
 export default function Home() {
   return (
@@ -18,24 +21,25 @@ export default function Home() {
       </div>
       <Container>
         <div className="py-8 pb-24 md:pb-8">
-
           {/* Navbar */}
           <nav className="flex justify-between items-center mb-16 px-4">
-            <div className="flex items-center gap-2 transform -rotate-2 hover:rotate-0 transition-transform cursor-pointer">
+            <Link href="/" className="flex items-center gap-2 transform -rotate-2 hover:rotate-0 transition-transform cursor-pointer">
               <div className="w-12 h-12 bg-accent-yellow border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-black font-black text-2xl font-display">L</div>
               <span className="font-display font-black text-3xl tracking-wide text-black drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">LINKER</span>
-            </div>
+            </Link>
             <div className="hidden md:flex gap-2">
-              <RetroButton variant="ghost">Events</RetroButton>
-              <RetroButton variant="ghost">Clubs</RetroButton>
-              <RetroButton variant="ghost">Market</RetroButton>
-              <RetroButton variant="secondary" className="ml-2">Login</RetroButton>
+              <Link href="/events"><RetroButton variant="ghost">Events</RetroButton></Link>
+              <Link href="/clubs"><RetroButton variant="ghost">Clubs</RetroButton></Link>
+              <Link href="/marketplace"><RetroButton variant="ghost">Market</RetroButton></Link>
+              <Link href="/login"><RetroButton variant="secondary" className="ml-2">Login</RetroButton></Link>
             </div>
             {/* Mobile Profile Button */}
             <div className="md:hidden">
-              <RetroButton variant="secondary" className="px-4 py-2 text-sm">
-                Login
-              </RetroButton>
+              <Link href="/login">
+                <RetroButton variant="secondary" className="px-4 py-2 text-sm">
+                  Login
+                </RetroButton>
+              </Link>
             </div>
           </nav>
 
@@ -43,10 +47,17 @@ export default function Home() {
           <div className="mb-32 relative">
             <div className="text-center max-w-4xl mx-auto relative z-40 px-4">
 
-              <h1 className="text-4xl md:text-7xl leading-[0.9] mb-8 tracking-tight mx-auto max-w-3xl">
-                <span className="font-pixel block text-gray-400 text-2xl md:text-4xl mb-4 tracking-widest uppercase">Link. Learn. Live.</span>
-                <span className="font-display font-black block text-white drop-shadow-[4px_4px_0px_#FACC15] uppercase text-stroke-indigo text-stroke-2 md:text-stroke-3" style={{ WebkitTextStroke: '2px #4F46E5' }}>
-                  Campus Chaos â€” Organized.
+              <h1 className="text-4xl md:text-7xl leading-[0.9] mb-8 tracking-tight mx-auto max-w-3xl relative z-10">
+
+                <span
+                  className="block uppercase moo-lah-lah-regular transform -rotate-2 hover:rotate-0 transition-transform duration-500 text-hero-moo"
+                  style={{
+                    fontSize: 'clamp(2.5rem, 8vw, 5rem)',
+                    letterSpacing: "3px",
+                    lineHeight: 1.2
+                  }}
+                >
+                  Academic Chaos as a Service.™
                 </span>
               </h1>
 
@@ -56,12 +67,16 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col md:flex-row justify-center gap-4">
-                <RetroButton variant="secondary" className="px-10 py-4 text-base shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
-                  I'm in.
-                </RetroButton>
-                <RetroButton variant="outline" className="px-10 py-4 text-base">
-                  Show me around.
-                </RetroButton>
+                <Link href="/register">
+                  <RetroButton variant="secondary" className="px-10 py-4 text-base shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
+                    I'm in.
+                  </RetroButton>
+                </Link>
+                <Link href="/dashboard">
+                  <RetroButton variant="outline" className="px-10 py-4 text-base">
+                    Show me around.
+                  </RetroButton>
+                </Link>
               </div>
             </div>
 
@@ -176,7 +191,7 @@ export default function Home() {
               <p className="text-xl text-gray-600 font-serif italic">"A role for everyone."</p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               {/* Student */}
               <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="w-12 h-12 bg-accent-blue rounded-full flex items-center justify-center mb-4 border-2 border-black">
@@ -218,20 +233,6 @@ export default function Home() {
                   <li>Access event analytics</li>
                 </ul>
               </NewspaperCard>
-
-              {/* Admin */}
-              <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-4 border-2 border-black">
-                  <Doodle src="/doodles/megaphone.svg" className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-bold text-xl mb-2">ADMIN</h3>
-                <ul className="text-sm space-y-2 text-gray-600 list-disc list-inside">
-                  <li>Full moderation panel</li>
-                  <li>Validate clubs & events</li>
-                  <li>Manage user roles</li>
-                  <li>System-wide settings</li>
-                </ul>
-              </NewspaperCard>
             </div>
           </div>
 
@@ -262,7 +263,9 @@ export default function Home() {
                     <span className="font-bold">Save & bookmark events</span>
                   </li>
                 </ul>
-                <RetroButton variant="secondary">Explore Events</RetroButton>
+                <Link href="/events">
+                  <RetroButton variant="secondary">Explore Events</RetroButton>
+                </Link>
               </div>
               <div className="order-1 md:order-2">
                 <NewspaperCard variant="curved" className="bg-accent-blue p-8 rotate-2 hover:rotate-0 transition-transform">
@@ -309,7 +312,9 @@ export default function Home() {
                       <Badge className="bg-gray-100 border-gray-200">Workshop</Badge>
                     </div>
                     <div className="mt-6 pt-6 border-t border-gray-100">
-                      <RetroButton className="w-full" variant="outline">Join Club</RetroButton>
+                      <Link href="/clubs">
+                        <RetroButton className="w-full" variant="outline">Join Club</RetroButton>
+                      </Link>
                     </div>
                   </div>
                 </NewspaperCard>
@@ -338,7 +343,9 @@ export default function Home() {
                     <span className="font-bold">Member management for leaders</span>
                   </li>
                 </ul>
-                <RetroButton variant="secondary">Browse Clubs</RetroButton>
+                <Link href="/clubs">
+                  <RetroButton variant="secondary">Browse Clubs</RetroButton>
+                </Link>
               </div>
             </div>
           </div>
@@ -370,7 +377,9 @@ export default function Home() {
                     <span className="font-bold">Previous year question papers</span>
                   </li>
                 </ul>
-                <RetroButton variant="secondary">Find Notes</RetroButton>
+                <Link href="/notes">
+                  <RetroButton variant="secondary">Find Notes</RetroButton>
+                </Link>
               </div>
               <div className="order-1 md:order-2">
                 <NewspaperCard variant="curved" className="bg-accent-yellow p-8 rotate-2 hover:rotate-0 transition-transform">
@@ -412,7 +421,9 @@ export default function Home() {
                     </div>
                     <h3 className="font-bold text-xl mb-1">Engineering Calculator</h3>
                     <p className="text-sm text-gray-500 mb-4">Used for 1 semester. Good condition.</p>
-                    <RetroButton className="w-full text-sm" variant="secondary">Contact Seller</RetroButton>
+                    <Link href="/marketplace">
+                      <RetroButton className="w-full text-sm" variant="secondary">Contact Seller</RetroButton>
+                    </Link>
                   </div>
                 </NewspaperCard>
               </div>
@@ -440,7 +451,9 @@ export default function Home() {
                     <span className="font-bold">Search & category filtering</span>
                   </li>
                 </ul>
-                <RetroButton variant="secondary">Visit Market</RetroButton>
+                <Link href="/marketplace">
+                  <RetroButton variant="secondary">Visit Market</RetroButton>
+                </Link>
               </div>
             </div>
           </div>
@@ -486,10 +499,27 @@ export default function Home() {
             </NewspaperCard>
 
             <div className="text-center mt-8">
-              <RetroButton variant="outline">View Full Calendar</RetroButton>
+              <Link href="/events">
+                <RetroButton variant="outline">View Full Calendar</RetroButton>
+              </Link>
             </div>
           </div>
 
+          {/* Bottom Motivation Marquee */}
+          <div className="mb-24 -mx-4 md:-mx-8 transform rotate-1">
+            <div className="bg-white py-4 border-y-4 border-black shadow-xl">
+              <Marquee speed={40} direction="right">
+                <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Sleep is for the weak (and the graduated)"</span>
+                <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Coffee: The real MVP"</span>
+                <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Is it too late to drop out?"</span>
+                <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Due tomorrow? Do tomorrow."</span>
+              </Marquee>
+            </div>
+          </div>
 
         </div>
 

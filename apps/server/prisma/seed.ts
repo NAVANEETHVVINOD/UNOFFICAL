@@ -10,14 +10,10 @@ async function main() {
     data: {
       email: 'admin@collegeconnect.com',
       password: adminPassword,
-      role: 'SUPER_ADMIN',
-      status: 'ACTIVE',
-      emailVerified: true,
+      role: 'SUPERADMIN',
       profile: {
         create: {
           fullName: 'System Administrator',
-          department: 'Administration',
-          year: 0,
         },
       },
     },

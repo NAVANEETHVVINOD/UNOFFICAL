@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AppConfigService } from '../../config/app-config.service';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -11,44 +11,26 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private config: AppConfigService,
-  ) {}
+    private config: ConfigService,
+  ) { }
 
   async register(registerDto: RegisterDto) {
-    // Check if user already exists
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: registerDto.email },
-          { studentId: registerDto.studentId },
-        ],
-      },
-    });
-
-    if (existingUser) {
-      throw new UnauthorizedException('User already exists');
-    }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-    // Create user with profile
+    // Create user and profile
     const user = await this.prisma.user.create({
       data: {
         email: registerDto.email,
         password: hashedPassword,
-        studentId: registerDto.studentId,
         profile: {
           create: {
             fullName: registerDto.fullName,
-            department: registerDto.department,
-            year: registerDto.year,
+            collegeId: registerDto.collegeId,
           },
         },
       },
-      include: {
-        profile: true,
-      },
+      include: { profile: true },
     });
 
     // Generate tokens
@@ -88,7 +70,9 @@ export class AuthService {
 
   async refreshToken(token: string) {
     try {
-      const decoded = await this.jwtService.verifyAsync(token);
+      const decoded = await this.jwtService.verifyAsync(token, {
+        secret: this.config.get('jwt.refreshSecret'),
+      });
       const tokens = await this.generateTokens(decoded.sub, decoded.email, decoded.role);
       return tokens;
     } catch {
@@ -105,12 +89,12 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.config.jwtSecret,
-        expiresIn: this.config.jwtExpiresIn,
+        secret: this.config.get('jwt.accessSecret'),
+        expiresIn: this.config.get('jwt.accessExpires'),
       }),
       this.jwtService.signAsync(payload, {
-        secret: this.config.jwtSecret,
-        expiresIn: this.config.jwtRefreshExpiresIn,
+        secret: this.config.get('jwt.refreshSecret'),
+        expiresIn: this.config.get('jwt.refreshExpires'),
       }),
     ]);
 
