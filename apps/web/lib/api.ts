@@ -20,17 +20,26 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers,
-    });
+    const fullUrl = `${API_URL}${endpoint}`;
+    console.log(`[API] Requesting: ${fullUrl}`);
 
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Request failed' }));
-        throw new Error(error.message || `HTTP ${response.status}`);
+    try {
+        const response = await fetch(fullUrl, {
+            ...options,
+            headers,
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ message: 'Request failed' }));
+            console.error(`[API] Error ${response.status}:`, error);
+            throw new Error(error.message || `HTTP ${response.status}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error(`[API] Network/Server Error for ${fullUrl}:`, error);
+        throw error;
     }
-
-    return response.json();
 }
 
 // Specific API calls

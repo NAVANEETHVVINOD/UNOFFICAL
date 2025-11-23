@@ -67,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     async function login(email: string, password: string) {
+        console.log('Attempting login for:', email)
         try {
             const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
@@ -77,12 +78,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             })
 
             const data = await res.json()
+            console.log('Login response status:', res.status)
 
             if (res.ok) {
+                console.log('Login successful, setting token')
                 localStorage.setItem('token', data.accessToken)
+                // Set cookie for middleware
+                document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 setUser(data.user)
                 router.push('/dashboard')
             } else {
+                console.error('Login failed:', data)
                 throw new Error(data.message || 'Login failed')
             }
         } catch (error) {
@@ -92,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     async function register(email: string, password: string, fullName: string, collegeId?: string) {
+        console.log('Attempting registration for:', email)
         try {
             const res = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
@@ -102,12 +109,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             })
 
             const data = await res.json()
+            console.log('Registration response status:', res.status)
 
             if (res.ok) {
+                console.log('Registration successful, setting token')
                 localStorage.setItem('token', data.accessToken)
+                // Set cookie for middleware
+                document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 setUser(data.user)
                 router.push('/dashboard')
             } else {
+                console.error('Registration failed:', data)
                 throw new Error(data.message || 'Registration failed')
             }
         } catch (error) {
@@ -118,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     function logout() {
         localStorage.removeItem('token')
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
         setUser(null)
         router.push('/')
     }
