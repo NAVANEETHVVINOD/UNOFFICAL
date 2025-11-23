@@ -3,40 +3,127 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+
+interface User {
+    id: string
+    email: string
+    role: string
+    profile?: {
+        fullName: string
+        bio?: string
+        collegeId?: string
+    }
+}
+
 interface AuthContextType {
+    user: User | null
     isAuthenticated: boolean
-    login: () => void
+    loading: boolean
+    login: (email: string, password: string) => Promise<void>
+    register: (email: string, password: string, fullName: string, collegeId?: string) => Promise<void>
     logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [user, setUser] = useState<User | null>(null)
+    const [loading, setLoading] = useState(true)
     const router = useRouter()
 
+    const isAuthenticated = !!user
+
     useEffect(() => {
-        // Check local storage or session on mount
-        const storedAuth = localStorage.getItem('isAuthenticated')
-        if (storedAuth === 'true') {
-            setIsAuthenticated(true)
-        }
+        loadUser()
     }, [])
 
-    const login = () => {
-        setIsAuthenticated(true)
-        localStorage.setItem('isAuthenticated', 'true')
-        router.push('/dashboard')
+    async function loadUser() {
+        try {
+            const token = localStorage.getItem('token')
+            if (!token) {
+                setLoading(false)
+                return
+            }
+
+            const res = await fetch(`${API_URL}/users/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+
+            if (res.ok) {
+                const userData = await res.json()
+                setUser(userData)
+            } else {
+                localStorage.removeItem('token')
+            }
+        } catch (error) {
+            console.error('Failed to load user:', error)
+            localStorage.removeItem('token')
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const logout = () => {
-        setIsAuthenticated(false)
-        localStorage.removeItem('isAuthenticated')
+    async function login(email: string, password: string) {
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            })
+
+            const data = await res.json()
+
+            if (res.ok) {
+                localStorage.setItem('token', data.accessToken)
+                setUser(data.user)
+                router.push('/dashboard')
+            } else {
+                throw new Error(data.message || 'Login failed')
+            }
+        } catch (error) {
+            console.error('Login error:', error)
+            throw error
+        }
+    }
+
+    async function register(email: string, password: string, fullName: string, collegeId?: string) {
+        try {
+            const res = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password, fullName, collegeId }),
+            })
+
+            const data = await res.json()
+
+            if (res.ok) {
+                localStorage.setItem('token', data.accessToken)
+                setUser(data.user)
+                router.push('/dashboard')
+            } else {
+                throw new Error(data.message || 'Registration failed')
+            }
+        } catch (error) {
+            console.error('Register error:', error)
+            throw error
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('token')
+        setUser(null)
         router.push('/')
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     )
