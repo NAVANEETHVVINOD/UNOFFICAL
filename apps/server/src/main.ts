@@ -25,6 +25,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'https://linker-inky.vercel.app',
+      'https://linker-fg6pbxoix-navaneethvvinods-projects.vercel.app',
       process.env.CORS_ORIGIN,
     ].filter(Boolean),
     credentials: true,
