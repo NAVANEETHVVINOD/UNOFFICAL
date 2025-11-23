@@ -1,98 +1,232 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🔧 Linker Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS backend API for the Linker college social network platform.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## 🚀 Quick Start
 
 ```bash
-$ npm install
+# Install dependencies
+npm install --legacy-peer-deps
+
+# Set up environment variables
+cp .env.example .env
+
+# Generate Prisma Client
+npx prisma generate
+
+# Push database schema
+npx prisma db push
+
+# Start development server
+npm run start:dev
 ```
 
-## Compile and run the project
+API runs on [http://localhost:4000](http://localhost:4000)
+
+## 📋 Environment Variables
+
+Create a `.env` file:
+
+```env
+DATABASE_URL="postgresql://user:password@host:5432/database"
+JWT_ACCESS_SECRET="your-super-secret-access-key"
+JWT_REFRESH_SECRET="your-super-secret-refresh-key"
+JWT_ACCESS_EXPIRES="15m"
+JWT_REFRESH_EXPIRES="7d"
+PORT=4000
+CORS_ORIGIN="http://localhost:3000"
+```
+
+## 🛠️ Tech Stack
+
+- **Framework**: NestJS 11
+- **Language**: TypeScript
+- **ORM**: Prisma 6.18.0
+- **Database**: PostgreSQL (Supabase)
+- **Authentication**: JWT
+- **Validation**: class-validator
+- **Security**: Helmet, CORS, bcrypt
+
+## 📁 Project Structure
+
+```
+src/
+├── modules/          # Feature modules
+│   ├── auth/         # Authentication & JWT
+│   ├── users/        # User management
+│   ├── profiles/     # User profiles
+│   ├── colleges/     # Colleges
+│   ├── clubs/        # Student clubs
+│   ├── events/       # Campus events
+│   ├── marketplace/  # Buy/sell marketplace
+│   └── notes/        # Study materials
+├── prisma/           # Prisma service
+├── config/           # App configuration
+└── main.ts           # Application entry point
+
+prisma/
+├── schema.prisma     # Database schema
+└── seed.ts           # Database seeding
+```
+
+## 📜 Available Scripts
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run start:dev    # Start in watch mode (http://localhost:4000)
+npm run build        # Build for production
+npm run start:prod   # Start production server
+npm run test         # Run unit tests
+npm run test:e2e     # Run end-to-end tests
+npx prisma studio    # Open Prisma Studio (DB GUI)
+npx prisma generate  # Generate Prisma Client
+npx prisma db push   # Push schema to database
 ```
 
-## Run tests
+## 🗄️ Database Schema
+
+### Models
+- **User** - User accounts with authentication
+- **Profile** - User profile information
+- **College** - College/university information
+- **Club** - Student clubs and organizations
+- **ClubMember** - Club membership (M:N relation)
+- **Event** - Campus events
+- **EventParticipant** - Event RSVPs (M:N relation)
+- **MarketplaceListing** - Marketplace items for sale
+- **Note** - Study materials and notes
+- **NoteLike** - Note likes (M:N relation)
+
+### Enums
+- **Role**: STUDENT, CLUBADMIN, ADMIN, SUPERADMIN
+- **EventRSVPStatus**: GOING, INTERESTED, NOT_GOING
+- **ListingStatus**: ACTIVE, SOLD, DELETED
+
+## 🔐 API Endpoints
+
+### Authentication
+```
+POST   /auth/register    # Register new user
+POST   /auth/login       # Login user
+POST   /auth/refresh     # Refresh access token
+```
+
+### Users & Profiles
+```
+GET    /users/me         # Get current user
+GET    /profiles/me      # Get current profile
+PATCH  /profiles/me      # Update profile
+```
+
+### Colleges & Clubs
+```
+GET    /colleges         # List all colleges
+GET    /colleges/:slug   # Get college by slug
+GET    /clubs            # List all clubs
+GET    /clubs/:id        # Get club by ID
+POST   /clubs/:id/join   # Join a club
+DELETE /clubs/:id/leave  # Leave a club
+```
+
+### Events
+```
+GET    /events           # List all events
+GET    /events/:id       # Get event by ID
+POST   /events           # Create event (auth required)
+POST   /events/:id/rsvp  # RSVP to event
+```
+
+### Marketplace
+```
+GET    /marketplace      # List all listings
+GET    /marketplace/:id  # Get listing by ID
+POST   /marketplace      # Create listing (auth required)
+PATCH  /marketplace/:id  # Update listing (owner only)
+```
+
+### Notes
+```
+GET    /notes            # List all notes
+GET    /notes/:id        # Get note by ID
+POST   /notes            # Upload note (auth required)
+POST   /notes/:id/like   # Like note
+DELETE /notes/:id/like   # Unlike note
+```
+
+## 🔒 Authentication
+
+All protected endpoints require a JWT token in the `Authorization` header:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+### Token Expiry
+- **Access Token**: 15 minutes
+- **Refresh Token**: 7 days
+
+## 🌐 Deployment (Render)
+
+1. Push code to GitHub
+2. Create Web Service in Render
+3. Configure:
+   - **Build Command**: 
+     ```bash
+     cd apps/server && npm install --legacy-peer-deps && npx prisma generate && npm run build
+     ```
+   - **Start Command**: 
+     ```bash
+     cd apps/server && npm run start:prod
+     ```
+   - **Environment Variables**: Add all `.env` variables
+4. Deploy
+
+## 🧪 Testing
 
 ```bash
-# unit tests
-$ npm run test
+# Unit tests
+npm run test
 
-# e2e tests
-$ npm run test:e2e
+# E2E tests
+npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# Test coverage
+npm run test:cov
 ```
 
-## Deployment
+## 🔧 Development Guidelines
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Adding a New Module
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. Generate module: `nest g module modules/feature-name`
+2. Generate service: `nest g service modules/feature-name`
+3. Generate controller: `nest g controller modules/feature-name`
+4. Update Prisma schema if needed
+5. Run `npx prisma generate`
+
+### Adding a New Endpoint
+
+1. Add DTO in `dto/` folder
+2. Add validation decorators
+3. Create method in service
+4. Create route in controller
+5. Add guards if authentication required
+
+### Database Changes
+
+1. Update `prisma/schema.prisma`
+2. Run `npx prisma generate`
+3. Run `npx prisma db push` (dev) or `npx prisma migrate dev` (prod)
+
+## 📊 Prisma Studio
+
+Visual database editor:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma studio
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Opens at [http://localhost:5555](http://localhost:5555)
 
-## Resources
+## 🤝 Contributing
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+See main [README.md](../../README.md) for contribution guidelines.
