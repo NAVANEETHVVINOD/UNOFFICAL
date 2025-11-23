@@ -53,8 +53,16 @@ export function Marquee({ children, className = '', speed = 20, direction = 'lef
     );
 }
 
-export function RetroButton({ children, onClick, className = '', variant = 'primary' }: { children: React.ReactNode; onClick?: () => void; className?: string; variant?: 'primary' | 'secondary' | 'outline' | 'ghost' }) {
-    const baseStyles = "px-8 py-3 font-bold text-sm uppercase tracking-wider border-2 border-black transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex items-center justify-center gap-2 rounded-full";
+export function RetroButton({
+    children,
+    onClick,
+    className = '',
+    variant = 'primary',
+    disabled = false,
+    type = 'button',
+    ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'outline' | 'ghost' }) {
+    const baseStyles = "px-8 py-3 font-bold text-sm uppercase tracking-wider border-2 border-black transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex items-center justify-center gap-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed";
 
     const variants = {
         primary: "bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:bg-gray-900",
@@ -65,8 +73,11 @@ export function RetroButton({ children, onClick, className = '', variant = 'prim
 
     return (
         <button
+            type={type}
             onClick={onClick}
+            disabled={disabled}
             className={`${baseStyles} ${variants[variant]} ${className}`}
+            {...props}
         >
             {children}
         </button>
