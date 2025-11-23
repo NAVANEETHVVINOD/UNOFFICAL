@@ -2,7 +2,6 @@
 
 import { Component, ReactNode } from 'react';
 import { NewspaperCard, RetroButton } from './ui/NewspaperUI';
-import Doodle from './ui/Doodle';
 
 interface Props {
     children: ReactNode;
@@ -37,8 +36,6 @@ export class ErrorBoundary extends Component<Props, State> {
             return (
                 <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
                     <NewspaperCard className="max-w-lg p-8 border-4 border-black bg-red-50 relative">
-                        <Doodle src="/doodles/warning.svg" className="absolute -top-6 -right-6 w-16 h-16 opacity-50" />
-
                         <div className="text-center mb-6">
                             <h1 className="font-display text-4xl font-black text-red-600 mb-2">
                                 ERROR!
@@ -84,7 +81,7 @@ export function LoadingState() {
     return (
         <div className="min-h-screen flex items-center justify-center">
             <div className="text-center">
-                <Doodle src="/doodles/loading.svg" className="w-16 h-16 mx-auto mb-4 animate-spin" />
+                <div className="w-16 h-16 mx-auto mb-4 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
                 <p className="font-mono text-gray-600">LOADING_DATA...</p>
             </div>
         </div>

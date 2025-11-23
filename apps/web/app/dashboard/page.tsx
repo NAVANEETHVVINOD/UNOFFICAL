@@ -15,19 +15,14 @@ import Link from 'next/link';
 function DashboardContent() {
     const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
-    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (mounted && !loading && !isAuthenticated) {
+        if (!loading && !isAuthenticated) {
             router.replace('/login');
         }
-    }, [isAuthenticated, router, loading, mounted]);
+    }, [isAuthenticated, router, loading]);
 
-    if (!mounted || loading) {
+    if (loading) {
         return <LoadingState />;
     }
 
