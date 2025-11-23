@@ -6,22 +6,36 @@ import Doodle from '../components/ui/Doodle';
 import { PageTransition } from '../providers/AnimationProvider';
 import DashboardNavbar from '../components/ui/DashboardNavbar';
 import { motion } from 'framer-motion';
-
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ErrorBoundary, LoadingState } from '../components/ErrorBoundary';
+import Link from 'next/link';
 
-export default function DashboardPage() {
-    const { isAuthenticated, user } = useAuth();
+function DashboardContent() {
+    const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            router.push('/login');
-        }
-    }, [isAuthenticated, router]);
+        setMounted(true);
+    }, []);
 
-    if (!isAuthenticated) return null;
+    useEffect(() => {
+        if (mounted && !loading && !isAuthenticated) {
+            router.replace('/login');
+        }
+    }, [isAuthenticated, router, loading, mounted]);
+
+    if (!mounted || loading) {
+        return <LoadingState />;
+    }
+
+    if (!isAuthenticated || !user) {
+        return null;
+    }
+
+    const firstName = user?.profile?.fullName?.split(' ')[0] || 'STUDENT';
 
     return (
         <PageTransition>
@@ -32,14 +46,13 @@ export default function DashboardPage() {
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
                         className="flex justify-between items-end mb-12"
                     >
                         <div>
                             <p className="font-pixel text-xl text-gray-500 mb-2 uppercase">
-                                WELCOME_BACK_{user?.profile?.fullName?.split(' ')[0] || 'STUDENT'}
+                                WELCOME_BACK_{firstName}
                             </p>
                             <h1 className="font-display text-5xl md:text-7xl font-black">DASHBOARD</h1>
                         </div>
@@ -54,28 +67,34 @@ export default function DashboardPage() {
                             {/* Welcome Section */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.3 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.2 }}
                                 className="relative mt-4"
                             >
                                 <Staple />
-                                <NewspaperCard className="bg-accent-yellow/20 p-8 border-black">
+                                <NewspaperCard className="bg-gradient-to-br from-accent-yellow/20 to-accent-pink/20 p-8 border-black">
                                     <div className="flex items-start gap-6">
                                         <div className="hidden md:block w-24 shrink-0">
                                             <Doodle src="/doodles/sun.jpg" className="w-full animate-spin-slow" />
                                         </div>
                                         <div>
                                             <h2 className="font-serif text-3xl italic mb-4">
-                                                Good Morning, {user?.profile?.fullName?.split(' ')[0] || 'Friend'}.
+                                                Good Day, {firstName}.
                                             </h2>
                                             <p className="text-lg mb-6 leading-relaxed">
-                                                You have <strong className="bg-accent-blue/30 px-1">3 classes</strong> today and <strong className="bg-accent-pink/30 px-1">1 event</strong> tonight.
-                                                Don't forget to submit your assignment for CS101.
+                                                Welcome to your campus command center. Explore <strong className="bg-accent-blue/30 px-1">clubs</strong>, join <strong className="bg-accent-pink/30 px-1">events</strong>, and connect with your community.
                                             </p>
-                                            <div className="flex gap-3">
-                                                <RetroButton className="text-sm">VIEW SCHEDULE</RetroButton>
-                                                <RetroButton variant="outline" className="text-sm bg-white">MARK ATTENDANCE</RetroButton>
+                                            <div className="flex flex-wrap gap-3">
+                                                <Link href="/events">
+                                                    <RetroButton className="text-sm bg-accent-blue text-white border-black">
+                                                        VIEW EVENTS
+                                                    </RetroButton>
+                                                </Link>
+                                                <Link href="/feed">
+                                                    <RetroButton variant="outline" className="text-sm bg-white border-black">
+                                                        BROWSE FEED
+                                                    </RetroButton>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
@@ -85,50 +104,73 @@ export default function DashboardPage() {
                             {/* Recent Updates */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
                             >
                                 <h3 className="font-bold text-xl uppercase mb-6 flex items-center gap-2 border-b-4 border-black w-fit pb-1">
                                     <span className="w-3 h-3 bg-accent-blue border border-black"></span>
                                     Latest Headlines
                                 </h3>
                                 <div className="space-y-6">
-                                    <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
-                                        <div className="flex gap-4">
-                                            <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-pink/20 transition-colors">
-                                                <Doodle src="/doodles/group.svg" className="w-10 h-10 opacity-70" />
-                                            </div>
-                                            <div>
-                                                <div className="flex gap-2 mb-2">
-                                                    <Badge className="text-[10px] py-0 px-2 bg-black text-white">CLUBS</Badge>
-                                                    <span className="text-xs font-mono text-gray-500 mt-1">2 hours ago</span>
+                                    <Link href="/clubs">
+                                        <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
+                                            <div className="flex gap-4">
+                                                <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-pink/20 transition-colors">
+                                                    <span className="text-3xl">🎭</span>
                                                 </div>
-                                                <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-pink">Photography Club Meeting Rescheduled</h4>
-                                                <p className="text-sm text-gray-600 line-clamp-2">
-                                                    Due to rain, the outdoor shoot is cancelled. We will meet in Room 304 instead. Bring your cameras!
-                                                </p>
+                                                <div>
+                                                    <div className="flex gap-2 mb-2">
+                                                        <Badge className="text-[10px] py-0 px-2 bg-black text-white">CLUBS</Badge>
+                                                        <span className="text-xs font-mono text-gray-500 mt-1">2 hours ago</span>
+                                                    </div>
+                                                    <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-pink">Join Campus Clubs</h4>
+                                                    <p className="text-sm text-gray-600 line-clamp-2">
+                                                        Explore student organizations and find your community. From coding to photography, there's something for everyone.
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </NewspaperCard>
+                                        </NewspaperCard>
+                                    </Link>
 
-                                    <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
-                                        <div className="flex gap-4">
-                                            <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-blue/20 transition-colors">
-                                                <Doodle src="/doodles/book.svg" className="w-10 h-10 opacity-70" />
-                                            </div>
-                                            <div>
-                                                <div className="flex gap-2 mb-2">
-                                                    <Badge className="text-[10px] py-0 px-2 bg-white border-black text-black">RESOURCES</Badge>
-                                                    <span className="text-xs font-mono text-gray-500 mt-1">5 hours ago</span>
+                                    <Link href="/notes">
+                                        <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
+                                            <div className="flex gap-4">
+                                                <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-blue/20 transition-colors">
+                                                    <span className="text-3xl">📚</span>
                                                 </div>
-                                                <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-blue">New Notes Added: Physics 101</h4>
-                                                <p className="text-sm text-gray-600 line-clamp-2">
-                                                    Sarah J. uploaded her handwritten notes for Chapter 4: Thermodynamics. Download them now before the exam!
-                                                </p>
+                                                <div>
+                                                    <div className="flex gap-2 mb-2">
+                                                        <Badge className="text-[10px] py-0 px-2 bg-white border-black text-black">RESOURCES</Badge>
+                                                        <span className="text-xs font-mono text-gray-500 mt-1">5 hours ago</span>
+                                                    </div>
+                                                    <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-blue">Study Materials Available</h4>
+                                                    <p className="text-sm text-gray-600 line-clamp-2">
+                                                        Access shared notes and study materials from your peers. Upload your own to help others succeed.
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </NewspaperCard>
+                                        </NewspaperCard>
+                                    </Link>
+
+                                    <Link href="/marketplace">
+                                        <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
+                                            <div className="flex gap-4">
+                                                <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-yellow/20 transition-colors">
+                                                    <span className="text-3xl">🛍️</span>
+                                                </div>
+                                                <div>
+                                                    <div className="flex gap-2 mb-2">
+                                                        <Badge className="text-[10px] py-0 px-2 bg-accent-yellow border-black text-black">MARKETPLACE</Badge>
+                                                        <span className="text-xs font-mono text-gray-500 mt-1">1 day ago</span>
+                                                    </div>
+                                                    <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-yellow">Campus Marketplace</h4>
+                                                    <p className="text-sm text-gray-600 line-clamp-2">
+                                                        Buy and sell textbooks, electronics, and more. Your one-stop shop for campus deals.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </NewspaperCard>
+                                    </Link>
                                 </div>
                             </motion.div>
                         </div>
@@ -136,9 +178,8 @@ export default function DashboardPage() {
                         {/* Sidebar (Right) */}
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.5 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.4 }}
                             className="space-y-8"
                         >
                             {/* Quick Actions */}
@@ -148,22 +189,28 @@ export default function DashboardPage() {
                                     <h3 className="font-pixel text-xl text-accent-yellow mb-6 border-b border-gray-800 pb-2">&gt; QUICK_ACTIONS</h3>
                                     <ul className="space-y-3">
                                         <li>
-                                            <button className="w-full text-left py-3 px-2 border-b border-gray-800 hover:text-black hover:bg-accent-blue transition-all font-mono text-sm flex justify-between group">
+                                            <Link href="/events/create" className="block w-full text-left py-3 px-2 border-b border-gray-800 hover:text-black hover:bg-accent-blue transition-all font-mono text-sm flex justify-between group">
                                                 <span>[+] Create New Event</span>
                                                 <span className="opacity-0 group-hover:opacity-100">&lt;-</span>
-                                            </button>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <button className="w-full text-left py-3 px-2 border-b border-gray-800 hover:text-black hover:bg-accent-pink transition-all font-mono text-sm flex justify-between group">
+                                            <Link href="/notes/upload" className="block w-full text-left py-3 px-2 border-b border-gray-800 hover:text-black hover:bg-accent-pink transition-all font-mono text-sm flex justify-between group">
                                                 <span>[+] Upload Notes</span>
                                                 <span className="opacity-0 group-hover:opacity-100">&lt;-</span>
-                                            </button>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <button className="w-full text-left py-3 px-2 hover:text-black hover:bg-accent-yellow transition-all font-mono text-sm flex justify-between group">
+                                            <Link href="/marketplace/create" className="block w-full text-left py-3 px-2 border-b border-gray-800 hover:text-black hover:bg-accent-yellow transition-all font-mono text-sm flex justify-between group">
                                                 <span>[+] Sell Item</span>
                                                 <span className="opacity-0 group-hover:opacity-100">&lt;-</span>
-                                            </button>
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/feed/create" className="block w-full text-left py-3 px-2 hover:text-black hover:bg-green-400 transition-all font-mono text-sm flex justify-between group">
+                                                <span>[+] New Post</span>
+                                                <span className="opacity-0 group-hover:opacity-100">&lt;-</span>
+                                            </Link>
                                         </li>
                                     </ul>
                                 </NewspaperCard>
@@ -173,47 +220,65 @@ export default function DashboardPage() {
                             <NewspaperCard className="p-6 bg-paper">
                                 <h3 className="font-bold text-lg uppercase mb-4 border-b-2 border-black pb-2 flex justify-between items-center">
                                     Up Next
-                                    <Doodle src="/doodles/calendar.svg" className="w-6 h-6" />
+                                    <span className="text-2xl">📅</span>
                                 </h3>
                                 <div className="space-y-4">
-                                    <div className="flex gap-3 items-start group cursor-pointer">
+                                    <Link href="/events" className="flex gap-3 items-start group cursor-pointer">
                                         <div className="bg-accent-pink border-2 border-black px-3 py-2 text-center shrink-0 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-y-1 group-hover:shadow-none transition-all">
                                             <p className="text-xs font-bold">NOV</p>
                                             <p className="font-bold text-xl leading-none">24</p>
                                         </div>
                                         <div>
-                                            <p className="font-bold text-sm group-hover:underline">Freshers' Night</p>
-                                            <p className="text-xs text-gray-500 font-mono">6:00 PM • Auditorium</p>
+                                            <p className="font-bold text-sm group-hover:underline">Campus Events</p>
+                                            <p className="text-xs text-gray-500 font-mono">Check upcoming events</p>
                                         </div>
-                                    </div>
-                                    <div className="flex gap-3 items-start group cursor-pointer">
+                                    </Link>
+                                    <Link href="/events" className="flex gap-3 items-start group cursor-pointer">
                                         <div className="bg-accent-blue border-2 border-black px-3 py-2 text-center shrink-0 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-y-1 group-hover:shadow-none transition-all">
                                             <p className="text-xs font-bold">DEC</p>
                                             <p className="font-bold text-xl leading-none">01</p>
                                         </div>
                                         <div>
-                                            <p className="font-bold text-sm group-hover:underline">Code Chaos Hackathon</p>
-                                            <p className="text-xs text-gray-500 font-mono">All Day • CS Lab</p>
+                                            <p className="font-bold text-sm group-hover:underline">View All Events</p>
+                                            <p className="text-xs text-gray-500 font-mono">Browse calendar</p>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </div>
                             </NewspaperCard>
 
-                            {/* Ad/Promo */}
-                            <div className="relative group cursor-pointer">
-                                <NewspaperCard className="bg-white p-4 border-dashed border-2 border-gray-400">
-                                    <div className="absolute -top-2 -left-2 bg-accent-yellow text-xs font-bold px-2 py-1 border border-black rotate-[-6deg]">AD</div>
-                                    <div className="text-center">
-                                        <Doodle src="/doodles/shopping-bag.svg" className="w-16 h-16 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                                        <h4 className="font-black text-lg">CAMPUS STORE SALE!</h4>
-                                        <p className="text-xs text-gray-500">Get 20% off on all hoodies.</p>
+                            {/* Profile Card */}
+                            <Link href="/profile">
+                                <NewspaperCard className="p-6 bg-white border-dashed border-2 border-gray-400 hover:bg-gray-50 hover:border-black transition-all group cursor-pointer">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="w-16 h-16 bg-gray-100 border-2 border-black overflow-hidden">
+                                            <img
+                                                src={user.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.profile?.fullName || 'User'}`}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-bold text-lg group-hover:underline">{user.profile?.fullName}</p>
+                                            <p className="text-xs font-mono text-gray-500">{user.email}</p>
+                                        </div>
                                     </div>
+                                    <RetroButton className="w-full text-sm bg-accent-blue text-white border-black">
+                                        VIEW PROFILE
+                                    </RetroButton>
                                 </NewspaperCard>
-                            </div>
+                            </Link>
                         </motion.div>
                     </div>
                 </div>
             </Container>
         </PageTransition>
+    );
+}
+
+export default function DashboardPage() {
+    return (
+        <ErrorBoundary>
+            <DashboardContent />
+        </ErrorBoundary>
     );
 }
