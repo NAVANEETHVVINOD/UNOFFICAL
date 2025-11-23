@@ -2,10 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useAuth } from "../../context/AuthContext"
 
 const items = [
     {
         href: "/",
+        authHref: "/dashboard",
         label: "Home",
         icon: (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
@@ -63,16 +65,19 @@ const items = [
 
 export default function BottomNav() {
     const pathname = usePathname()
+    const { isAuthenticated } = useAuth()
 
     return (
         <nav className="fixed inset-x-0 bottom-0 z-50 border-t-2 border-black bg-paper/95 backdrop-blur-sm md:hidden shadow-[0_-4px_8px_rgba(0,0,0,0.1)]">
             <div className="mx-auto flex max-w-[480px] items-center justify-around px-2 py-2">
                 {items.map((item) => {
-                    const active = pathname === item.href
+                    const linkHref = (isAuthenticated && item.authHref) ? item.authHref : item.href
+                    const active = pathname === linkHref
+
                     return (
                         <Link
                             key={item.href}
-                            href={item.href}
+                            href={linkHref}
                             className={`flex flex-col items-center gap-1 px-3 py-1 rounded-lg transition-all ${active ? "bg-black text-white" : "text-ink/60 hover:text-ink"
                                 }`}
                         >

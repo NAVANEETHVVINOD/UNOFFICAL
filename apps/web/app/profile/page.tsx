@@ -1,17 +1,17 @@
 "use client"
 
 import Container from '../components/ui/Container';
-import { NewspaperCard, RetroButton, Tape } from '../components/ui/NewspaperUI';
+import { NewspaperCard, RetroButton, Badge, Staple, Tape } from '../components/ui/NewspaperUI';
 import Doodle from '../components/ui/Doodle';
 import { PageTransition } from '../providers/AnimationProvider';
-import Navigation from '../components/layout/Navigation';
-
+import DashboardNavbar from '../components/ui/DashboardNavbar';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
-    const { isAuthenticated } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -23,98 +23,95 @@ export default function ProfilePage() {
     if (!isAuthenticated) return null;
 
     return (
-        <>
-            <Navigation />
-            <PageTransition>
-                <Container>
-                    <div className="py-12">
-                        <div className="max-w-2xl mx-auto">
-                            <div className="text-center mb-8">
-                                <h1 className="h1-display">STUDENT PROFILE</h1>
-                                <p className="font-hand text-gray-600">"Who are you, again?"</p>
-                            </div>
+        <PageTransition>
+            <Container>
+                <div className="py-8 min-h-screen">
+                    <DashboardNavbar />
 
-                            {/* ID Card */}
-                            <div className="relative mb-12">
-                                <Tape className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20" />
-                                <NewspaperCard className="border-4 p-0 overflow-hidden relative">
-                                    {/* Header */}
-                                    <div className="bg-black text-white p-4 flex justify-between items-center border-b-4 border-black">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-white rounded-full"></div>
-                                            <span className="font-bold tracking-widest">LINKER ID</span>
+                    <div className="max-w-2xl mx-auto mt-12">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="relative"
+                        >
+                            <Tape className="absolute -top-4 left-1/2 -translate-x-1/2 rotate-2 z-10" />
+                            <NewspaperCard className="p-8 md:p-12 bg-white border-4 border-black relative overflow-hidden">
+                                {/* ID Card Header */}
+                                <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-4">
+                                    <div>
+                                        <h1 className="font-display text-4xl font-black uppercase">Student ID</h1>
+                                        <p className="font-mono text-sm text-gray-500">LINKER_OS // VERIFIED_USER</p>
+                                    </div>
+                                    <Doodle src="/doodles/sparkle.svg" className="w-12 h-12 animate-spin-slow" />
+                                </div>
+
+                                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                                    {/* Avatar Section */}
+                                    <div className="shrink-0 flex flex-col items-center gap-4">
+                                        <div className="w-40 h-40 bg-gray-100 border-4 border-black overflow-hidden relative">
+                                            <img
+                                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.profile?.fullName || 'User'}`}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute bottom-0 inset-x-0 bg-black text-white text-center text-[10px] py-1 font-mono">
+                                                IMG_REF_01
+                                            </div>
                                         </div>
-                                        <span className="font-mono text-sm">#882910</span>
+                                        <Badge className="bg-accent-blue text-white border-black">STUDENT</Badge>
                                     </div>
 
-                                    <div className="p-8 flex flex-col md:flex-row gap-8 items-center md:items-start">
-                                        {/* Photo */}
-                                        <div className="shrink-0 relative">
-                                            <div className="w-32 h-40 bg-gray-200 border-2 border-black flex items-center justify-center overflow-hidden">
-                                                <Doodle src="/doodles/students-hero.svg" className="w-full h-full object-cover" />
-                                            </div>
-                                            <div className="absolute -bottom-3 -right-3 bg-accent-yellow border-2 border-black px-2 py-1 text-xs font-bold transform -rotate-6">
-                                                ACTIVE
-                                            </div>
+                                    {/* Details Section */}
+                                    <div className="flex-1 w-full space-y-6">
+                                        <div>
+                                            <label className="font-bold text-xs uppercase text-gray-500 block mb-1">Full Name</label>
+                                            <p className="font-serif text-2xl italic border-b-2 border-gray-200 pb-1">
+                                                {user?.profile?.fullName || 'Unknown Student'}
+                                            </p>
                                         </div>
 
-                                        {/* Details */}
-                                        <div className="flex-1 w-full space-y-4">
+                                        <div>
+                                            <label className="font-bold text-xs uppercase text-gray-500 block mb-1">Email Address</label>
+                                            <p className="font-mono text-lg border-b-2 border-gray-200 pb-1">
+                                                {user?.email}
+                                            </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-xs font-bold text-gray-500 uppercase">Name</label>
-                                                <p className="font-display text-2xl">ALEXANDER SMITH</p>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-xs font-bold text-gray-500 uppercase">Major</label>
-                                                    <p className="font-bold">Computer Science</p>
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-bold text-gray-500 uppercase">Year</label>
-                                                    <p className="font-bold">Junior (2025)</p>
-                                                </div>
+                                                <label className="font-bold text-xs uppercase text-gray-500 block mb-1">College ID</label>
+                                                <p className="font-mono text-lg border-b-2 border-gray-200 pb-1">
+                                                    {user?.profile?.collegeId || 'N/A'}
+                                                </p>
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-bold text-gray-500 uppercase">Bio</label>
-                                                <p className="font-hand text-lg leading-tight">
-                                                    "I code, I coffee, I conquer (sometimes). Looking for a study buddy for Algorithms."
+                                                <label className="font-bold text-xs uppercase text-gray-500 block mb-1">Role</label>
+                                                <p className="font-mono text-lg border-b-2 border-gray-200 pb-1 uppercase">
+                                                    {user?.role || 'USER'}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Footer */}
-                                    <div className="bg-gray-100 p-4 border-t-4 border-black flex justify-between items-center">
-                                        <div className="h-8 w-32 bg-black opacity-20"></div> {/* Barcode placeholder */}
-                                        <p className="text-xs font-bold text-gray-500">VALID THRU 2026</p>
+                                {/* Footer / Actions */}
+                                <div className="mt-12 pt-8 border-t-2 border-dashed border-gray-300 flex justify-between items-center">
+                                    <div className="text-xs font-mono text-gray-400">
+                                        ID: {user?.id?.substring(0, 8)}...
                                     </div>
-                                </NewspaperCard>
-                            </div>
-
-                            {/* Stats / Activity */}
-                            <div className="grid grid-cols-3 gap-4 mb-8">
-                                <NewspaperCard className="text-center py-4 bg-accent-blue/10">
-                                    <p className="text-3xl font-display">12</p>
-                                    <p className="text-xs font-bold uppercase">Events</p>
-                                </NewspaperCard>
-                                <NewspaperCard className="text-center py-4 bg-accent-yellow/10">
-                                    <p className="text-3xl font-display">5</p>
-                                    <p className="text-xs font-bold uppercase">Clubs</p>
-                                </NewspaperCard>
-                                <NewspaperCard className="text-center py-4 bg-green-100">
-                                    <p className="text-3xl font-display">8</p>
-                                    <p className="text-xs font-bold uppercase">Notes</p>
-                                </NewspaperCard>
-                            </div>
-
-                            <div className="flex justify-center gap-4">
-                                <RetroButton>EDIT PROFILE</RetroButton>
-                                <RetroButton className="bg-white text-black border-2 border-black">SETTINGS</RetroButton>
-                            </div>
-                        </div>
+                                    <RetroButton
+                                        onClick={logout}
+                                        className="bg-red-600 hover:bg-red-700 text-white"
+                                    >
+                                        LOGOUT
+                                    </RetroButton>
+                                </div>
+                            </NewspaperCard>
+                        </motion.div>
                     </div>
-                </Container>
-            </PageTransition>
-        </>
+                </div>
+            </Container>
+        </PageTransition>
     );
 }

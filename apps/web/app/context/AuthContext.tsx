@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Set cookie for middleware
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 setUser(data.user)
-                router.push('/dashboard')
+                router.replace('/dashboard')
             } else {
                 console.error('Login failed:', data)
                 throw new Error(data.message || 'Login failed')
@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Set cookie for middleware
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 setUser(data.user)
-                router.push('/dashboard')
+                router.replace('/dashboard')
             } else {
                 console.error('Registration failed:', data)
                 throw new Error(data.message || 'Registration failed')
