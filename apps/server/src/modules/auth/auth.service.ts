@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -19,19 +19,27 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
     // Create user and profile
-    const user = await this.prisma.user.create({
-      data: {
-        email: registerDto.email,
-        password: hashedPassword,
-        profile: {
-          create: {
-            fullName: registerDto.fullName,
-            collegeId: registerDto.collegeId,
+    let user;
+    try {
+      user = await this.prisma.user.create({
+        data: {
+          email: registerDto.email,
+          password: hashedPassword,
+          profile: {
+            create: {
+              fullName: registerDto.fullName,
+              collegeId: registerDto.collegeId,
+            },
           },
         },
-      },
-      include: { profile: true },
-    });
+        include: { profile: true },
+      });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ConflictException('Email already exists');
+      }
+      throw error;
+    }
 
     // Generate tokens
     const tokens = await this.generateTokens(user.id, user.email, user.role);
