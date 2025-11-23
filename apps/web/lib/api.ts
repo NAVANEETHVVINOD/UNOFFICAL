@@ -147,4 +147,24 @@ export const api = {
 
     unlikeNote: (id: string) =>
         apiRequest(`/notes/${id}/like`, { method: 'DELETE' }),
+
+    // Posts (Community Feed)
+    getPosts: (collegeSlug?: string) => {
+        const query = collegeSlug ? `?collegeSlug=${collegeSlug}` : '';
+        return apiRequest(`/posts${query}`);
+    },
+
+    getPost: (id: string) => apiRequest(`/posts/${id}`),
+
+    createPost: (data: any) =>
+        apiRequest('/posts', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+
+    likePost: (id: string) =>
+        apiRequest(`/posts/${id}/like`, { method: 'POST' }),
+
+    unlikePost: (id: string) =>
+        apiRequest(`/posts/${id}/like`, { method: 'DELETE' }),
 };
