@@ -13,6 +13,7 @@ import { ClubsModule } from './modules/clubs/clubs.module';
 import { EventsModule } from './modules/events/events.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { NotesModule } from './modules/notes/notes.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { NotesModule } from './modules/notes/notes.module';
     MarketplaceModule,
     NotesModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule { }
