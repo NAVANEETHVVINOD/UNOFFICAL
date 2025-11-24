@@ -18,6 +18,17 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
+    // Resolve collegeId if slug is provided
+    let collegeId = registerDto.collegeId;
+    if (registerDto.collegeSlug && !collegeId) {
+      const college = await this.prisma.college.findUnique({
+        where: { slug: registerDto.collegeSlug },
+      });
+      if (college) {
+        collegeId = college.id;
+      }
+    }
+
     // Create user and profile
     let user;
     try {
@@ -28,7 +39,7 @@ export class AuthService {
           profile: {
             create: {
               fullName: registerDto.fullName,
-              collegeId: registerDto.collegeId,
+              collegeId: collegeId,
             },
           },
         },

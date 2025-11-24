@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Container from '../../components/ui/Container';
-import { NewspaperCard, RetroButton, Tape } from '../../components/ui/NewspaperUI';
+import { NewspaperCard, RetroButton, Tape, Badge } from '../../components/ui/NewspaperUI';
 import Doodle from '../../components/ui/Doodle';
 import { PageTransition } from '../../providers/AnimationProvider';
 import Link from 'next/link';
@@ -12,6 +12,9 @@ import { useAuth } from '../../context/AuthContext';
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const collegeSlug = searchParams.get('college');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -80,12 +83,20 @@ export default function LoginPage() {
               <Tape className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20" />
 
               <NewspaperCard className="border-4 p-8 relative bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <h1 className="h1-display text-center mb-2 text-4xl">LOGIN</h1>
-                <p className="text-center font-hand text-gray-600 mb-8 text-lg">Welcome back, scholar.</p>
+                {collegeSlug && (
+                  <div className="absolute -top-3 right-4 transform rotate-2">
+                    <Badge className="bg-accent-blue text-white border-black">
+                      {collegeSlug.replace('-', ' ').toUpperCase()}
+                    </Badge>
+                  </div>
+                )}
+
+                <h1 className="font-display font-black text-center mb-2 text-4xl">LOGIN</h1>
+                <p className="text-center font-serif italic text-gray-600 mb-8 text-lg">Welcome back, scholar.</p>
 
                 {error && (
-                  <div className="mb-4 p-3 bg-red-100 border-2 border-red-500 text-red-700 font-body text-sm flex items-center gap-2">
-                    <span className="font-bold">ERROR:</span> {error}
+                  <div className="mb-4 p-3 bg-red-100 border-2 border-red-500 text-red-700 font-bold text-sm flex items-center gap-2">
+                    <span className="font-black">ERROR:</span> {error}
                   </div>
                 )}
 
@@ -97,7 +108,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full border-2 border-black p-3 font-body focus:outline-none focus:ring-4 focus:ring-accent-yellow/50 bg-gray-50 transition-all"
+                      className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-4 focus:ring-accent-yellow/50 bg-gray-50 transition-all"
                       placeholder="you@college.edu"
                     />
                   </div>
@@ -109,7 +120,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full border-2 border-black p-3 font-body focus:outline-none focus:ring-4 focus:ring-accent-yellow/50 bg-gray-50 transition-all"
+                      className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-4 focus:ring-accent-yellow/50 bg-gray-50 transition-all"
                       placeholder="••••••••"
                     />
                   </div>
@@ -142,8 +153,8 @@ export default function LoginPage() {
                 </div>
 
                 <div className="mt-8 text-center border-t-2 border-black pt-6 border-dashed">
-                  <p className="font-body text-sm">
-                    New here? <Link href="/register" className="font-bold underline decoration-2 decoration-accent-yellow underline-offset-2 hover:text-accent-blue hover:decoration-accent-blue transition-all">Get your ID card.</Link>
+                  <p className="font-bold text-sm">
+                    New here? <Link href={`/register${collegeSlug ? `?college=${collegeSlug}` : ''}`} className="font-black underline decoration-2 decoration-accent-yellow underline-offset-2 hover:text-accent-blue hover:decoration-accent-blue transition-all">Get your ID card.</Link>
                   </p>
                 </div>
               </NewspaperCard>

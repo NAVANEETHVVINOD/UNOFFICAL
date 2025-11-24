@@ -80,6 +80,13 @@ function DashboardContent() {
                                                 Welcome to your campus command center. Explore <strong className="bg-accent-blue/30 px-1">clubs</strong>, join <strong className="bg-accent-pink/30 px-1">events</strong>, and connect with your community.
                                             </p>
                                             <div className="flex flex-wrap gap-3">
+                                                {user.profile?.college && (
+                                                    <Link href={`/colleges/${user.profile.college.slug}`}>
+                                                        <RetroButton className="text-sm bg-accent-yellow text-black border-black">
+                                                            VISIT {user.profile.college.name.toUpperCase()} HUB
+                                                        </RetroButton>
+                                                    </Link>
+                                                )}
                                                 <Link href="/events">
                                                     <RetroButton className="text-sm bg-accent-blue text-white border-black">
                                                         VIEW EVENTS

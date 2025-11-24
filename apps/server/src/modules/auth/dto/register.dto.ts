@@ -14,4 +14,8 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   collegeId?: string;
+
+  @IsString()
+  @IsOptional()
+  collegeSlug?: string;
 }

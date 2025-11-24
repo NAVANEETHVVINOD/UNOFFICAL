@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Container from '../../components/ui/Container';
-import { NewspaperCard, RetroButton, Tape } from '../../components/ui/NewspaperUI';
+import { NewspaperCard, RetroButton, Tape, Badge } from '../../components/ui/NewspaperUI';
 import Doodle from '../../components/ui/Doodle';
 import { PageTransition } from '../../providers/AnimationProvider';
 import Link from 'next/link';
@@ -12,6 +12,9 @@ import { useAuth } from '../../context/AuthContext';
 export default function RegisterPage() {
   const { register, isAuthenticated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const collegeSlug = searchParams.get('college');
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -34,8 +37,10 @@ export default function RegisterPage() {
 
     try {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-      await register(formData.email, formData.password, fullName);
-      // Redirect happens automatically in AuthContext
+      // Pass collegeSlug to register function if available
+      // Note: AuthContext needs to be updated to accept collegeSlug, or we handle it here
+      // For now, assuming register accepts it or we'll update AuthContext next
+      await register(formData.email, formData.password, fullName, collegeSlug || undefined);
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -93,6 +98,14 @@ export default function RegisterPage() {
               <Tape className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20" />
 
               <NewspaperCard className="border-4 p-8 relative bg-yellow-50 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                {collegeSlug && (
+                  <div className="absolute -top-3 right-4 transform rotate-2">
+                    <Badge className="bg-accent-blue text-white border-black">
+                      {collegeSlug.replace('-', ' ').toUpperCase()}
+                    </Badge>
+                  </div>
+                )}
+
                 <h1 className="h1-display text-center mb-2 text-4xl">JOIN US</h1>
                 <p className="text-center font-hand text-gray-600 mb-8 text-lg">Become a part of the chaos.</p>
 
@@ -187,7 +200,7 @@ export default function RegisterPage() {
 
                 <div className="mt-8 text-center border-t-2 border-black pt-6 border-dashed">
                   <p className="font-body text-sm">
-                    Already have an ID? <Link href="/login" className="font-bold underline decoration-2 decoration-accent-yellow underline-offset-2 hover:text-accent-blue hover:decoration-accent-blue transition-all">Login here.</Link>
+                    Already have an ID? <Link href={`/login${collegeSlug ? `?college=${collegeSlug}` : ''}`} className="font-bold underline decoration-2 decoration-accent-yellow underline-offset-2 hover:text-accent-blue hover:decoration-accent-blue transition-all">Login here.</Link>
                   </p>
                 </div>
               </NewspaperCard>

@@ -109,9 +109,11 @@ export const api = {
         }),
 
     // Marketplace
-    getMarketplaceListings: (search?: string) => {
-        const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        return apiRequest(`/marketplace${query}`);
+    getMarketplaceListings: (search?: string, collegeSlug?: string) => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (collegeSlug) params.append('collegeSlug', collegeSlug);
+        return apiRequest(`/marketplace?${params.toString()}`);
     },
 
     getMarketplaceListing: (id: string) => apiRequest(`/marketplace/${id}`),
@@ -129,9 +131,11 @@ export const api = {
         }),
 
     // Notes
-    getNotes: (search?: string) => {
-        const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        return apiRequest(`/notes${query}`);
+    getNotes: (search?: string, collegeSlug?: string) => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (collegeSlug) params.append('collegeSlug', collegeSlug);
+        return apiRequest(`/notes?${params.toString()}`);
     },
 
     getNote: (id: string) => apiRequest(`/notes/${id}`),

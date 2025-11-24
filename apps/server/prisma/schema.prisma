@@ -8,17 +8,58 @@ generator client {
   output   = "../../../node_modules/.prisma/client"
 }
 
+enum Role {
+  STUDENT
+  CLUB_ADMIN
+  COLLEGE_ADMIN
+  PLATFORM_ADMIN
+}
+
+enum ClubRole {
+  MEMBER
+  LEAD
+  STAFF
+}
+
+enum EventStatus {
+  GOING
+  INTERESTED
+  NOT_GOING
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  HIDDEN
+}
+
+enum EventScope {
+  COLLEGE
+  STATE
+}
+
+enum MarketplaceScope {
+  COLLEGE
+  STATE
+}
+
+enum AttendanceRole {
+  ATTENDEE
+  VOLUNTEER
+  SPEAKER
+}
+
 model User {
   id          String   @id @default(cuid())
   email       String   @unique
-  password    String   // hashed
+  password    String
   role        Role     @default(STUDENT)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   profile     Profile?
   memberships ClubMember[]
-  events      EventParticipant[]
+  events      EventAttendance[]
   createdEvents Event[]
   listings    MarketplaceListing[] @relation("ListingOwner")
   notes       Note[]               @relation("AuthorNotes")
@@ -26,6 +67,13 @@ model User {
   posts       Post[]
   comments    Comment[]
   postLikes   PostLike[]
+  
+  // Messaging
+  sentMessages     Message[] @relation("SentMessages")
+  conversations    Conversation[] @relation("UserConversations")
+  
+  // Certificates
+  certificates     CertificateIssue[]
 }
 
 model Profile {
@@ -35,7 +83,7 @@ model Profile {
   collegeId   String?
   bio         String?
   avatarUrl   String?
-  tags        String[] // JSON array: ["web dev", "volunteering"]
+  tags        String[]
   githubUrl   String?
   instagram   String?
   createdAt   DateTime @default(now())
@@ -80,6 +128,7 @@ model ClubMember {
   userId    String
   clubId    String
   role      ClubRole @default(MEMBER)
+  displayRole String? // Chair, Lead, etc.
   joinedAt  DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id])
@@ -98,21 +147,26 @@ model Event {
   clubId      String?
   collegeId   String?
   createdById String
-
+  scope       EventScope @default(COLLEGE)
+  
   club        Club?               @relation(fields: [clubId], references: [id])
   college     College?            @relation(fields: [collegeId], references: [id])
   createdBy   User                @relation(fields: [createdById], references: [id])
-  participants EventParticipant[]
+  attendees   EventAttendance[]
+  certificates CertificateIssue[]
 }
 
-model EventParticipant {
-  id       String   @id @default(cuid())
-  eventId  String
-  userId   String
-  status   EventStatus @default(GOING)
-
-  event    Event    @relation(fields: [eventId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+model EventAttendance {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  status    EventStatus @default(GOING)
+  role      AttendanceRole @default(ATTENDEE)
+  checkInMethod String? // QR, MANUAL
+  checkInTime   DateTime?
+  
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([eventId, userId])
 }
@@ -121,15 +175,17 @@ model MarketplaceListing {
   id          String   @id @default(cuid())
   title       String
   description String?
-  price       Int      // in rupees
+  price       Int
   imageUrl    String?
   ownerId     String
   collegeId   String?
+  scope       MarketplaceScope @default(COLLEGE)
   status      ListingStatus @default(ACTIVE)
   createdAt   DateTime @default(now())
 
   owner       User     @relation("ListingOwner", fields: [ownerId], references: [id])
   college     College? @relation(fields: [collegeId], references: [id])
+  conversations Conversation[]
 }
 
 model Note {
@@ -163,13 +219,14 @@ model Post {
   id          String   @id @default(cuid())
   content     String
   imageUrl    String?
-  authorId    String
+  authorId    String? // Nullable for anonymous
   collegeId   String?
   clubId      String?
+  isAnonymous Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  author      User     @relation(fields: [authorId], references: [id])
+  author      User?    @relation(fields: [authorId], references: [id])
   college     College? @relation(fields: [collegeId], references: [id])
   club        Club?    @relation(fields: [clubId], references: [id])
   comments    Comment[]
@@ -198,27 +255,56 @@ model PostLike {
   @@unique([postId, userId])
 }
 
-enum Role {
-  STUDENT
-  MODERATOR
-  ADMIN
-  SUPERADMIN
+model Feedback {
+  id        String   @id @default(cuid())
+  content   String
+  category  String // Event, Club, Academics, Facility
+  userId    String?
+  collegeId String?
+  createdAt DateTime @default(now())
 }
 
-enum ClubRole {
-  MEMBER
-  LEAD
-  STAFF
+model CertificateTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  fileUrl   String // PDF/Image template
+  fields    String[] // JSON array of placeholders
+  createdAt DateTime @default(now())
+  
+  issues    CertificateIssue[]
 }
 
-enum EventStatus {
-  GOING
-  INTERESTED
-  NOT_GOING
+model CertificateIssue {
+  id          String   @id @default(cuid())
+  templateId  String
+  userId      String
+  eventId     String?
+  issuedAt    DateTime @default(now())
+  fileUrl     String // Generated PDF
+  
+  template    CertificateTemplate @relation(fields: [templateId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  event       Event?   @relation(fields: [eventId], references: [id])
 }
 
-enum ListingStatus {
-  ACTIVE
-  SOLD
-  HIDDEN
+model Conversation {
+  id          String   @id @default(cuid())
+  listingId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  listing     MarketplaceListing? @relation(fields: [listingId], references: [id])
+  participants User[] @relation("UserConversations")
+  messages    Message[]
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+  
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
 }

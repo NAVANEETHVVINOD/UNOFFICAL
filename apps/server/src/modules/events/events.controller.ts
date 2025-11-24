@@ -22,8 +22,8 @@ export class EventsController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    async create(@Body() createEventDto: Prisma.EventCreateInput) {
-        return this.eventsService.create(createEventDto);
+    async create(@Request() req, @Body() createEventDto: Prisma.EventCreateInput) {
+        return this.eventsService.create(createEventDto, req.user.userId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -34,5 +34,22 @@ export class EventsController {
         @Body('status') status: 'GOING' | 'INTERESTED' | 'NOT_GOING',
     ) {
         return this.eventsService.rsvp(req.user.userId, eventId, status);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/qr')
+    async generateQr(@Param('id') eventId: string) {
+        // TODO: Check if user is admin/organizer
+        return this.eventsService.generateQr(eventId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/check-in')
+    async checkIn(
+        @Request() req,
+        @Param('id') eventId: string,
+        @Body('token') token: string,
+    ) {
+        return this.eventsService.checkIn(req.user.userId, eventId, token);
     }
 }

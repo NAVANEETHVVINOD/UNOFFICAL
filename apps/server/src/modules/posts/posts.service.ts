@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class PostsService {
@@ -17,9 +18,18 @@ export class PostsService {
       throw new NotFoundException('User or College not found');
     }
 
+    const sanitizedContent = sanitizeHtml(createPostDto.content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        'img': ['src', 'alt']
+      }
+    });
+
     return this.prisma.post.create({
       data: {
         ...createPostDto,
+        content: sanitizedContent,
         authorId: userId,
         collegeId: user.profile.collegeId,
       },

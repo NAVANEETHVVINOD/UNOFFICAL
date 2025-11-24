@@ -55,4 +55,19 @@ export class ClubsService {
             },
         });
     }
+
+    async updateMemberRole(userId: string, clubId: string, role: 'MEMBER' | 'LEAD' | 'STAFF', displayRole?: string) {
+        return this.prisma.clubMember.update({
+            where: {
+                userId_clubId: {
+                    userId,
+                    clubId,
+                },
+            },
+            data: {
+                role,
+                displayRole,
+            },
+        });
+    }
 }

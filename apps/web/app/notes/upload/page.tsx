@@ -16,6 +16,7 @@ export default function UploadNotePage() {
     const [formData, setFormData] = useState({
         title: '',
         subject: '',
+        semester: 1,
         description: '',
         fileUrl: ''
     });
@@ -85,6 +86,20 @@ export default function UploadNotePage() {
                                             className="w-full p-3 border-2 border-black font-mono focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
                                             placeholder="e.g. Mathematics"
                                         />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2 uppercase text-sm">Semester</label>
+                                        <select
+                                            required
+                                            value={formData.semester}
+                                            onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
+                                            className="w-full p-3 border-2 border-black font-mono focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                                        >
+                                            {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                                                <option key={sem} value={sem}>Semester {sem}</option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     <div>

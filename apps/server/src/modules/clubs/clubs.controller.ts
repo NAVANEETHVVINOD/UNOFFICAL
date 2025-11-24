@@ -31,4 +31,15 @@ export class ClubsController {
     async leaveClub(@Request() req, @Param('id') clubId: string) {
         return this.clubsService.leaveClub(req.user.userId, clubId);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/members/:userId')
+    async updateMemberRole(
+        @Param('id') clubId: string,
+        @Param('userId') userId: string,
+        @Body() body: { role: 'MEMBER' | 'LEAD' | 'STAFF'; displayRole?: string },
+    ) {
+        // TODO: Add check if requester is Club Admin
+        return this.clubsService.updateMemberRole(userId, clubId, body.role, body.displayRole);
+    }
 }

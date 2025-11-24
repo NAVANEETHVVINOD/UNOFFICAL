@@ -8,15 +8,35 @@ export class MarketplaceController {
     constructor(private readonly marketplaceService: MarketplaceService) { }
 
     @Get()
-    async findAll(@Query('search') search?: string) {
-        const where: Prisma.MarketplaceListingWhereInput = search
-            ? {
+    async findAll(
+        @Query('search') search?: string,
+        @Query('scope') scope?: 'COLLEGE' | 'STATE',
+        @Query('college') collegeSlug?: string,
+    ) {
+        const where: Prisma.MarketplaceListingWhereInput = {};
+        const andConditions: Prisma.MarketplaceListingWhereInput[] = [];
+
+        if (search) {
+            andConditions.push({
                 OR: [
                     { title: { contains: search, mode: 'insensitive' } },
                     { description: { contains: search, mode: 'insensitive' } },
                 ],
-            }
-            : {};
+            });
+        }
+
+        if (scope) {
+            // @ts-ignore: Scope is valid in DB but types might be lagging
+            andConditions.push({ scope: scope });
+        }
+
+        if (collegeSlug) {
+            andConditions.push({ college: { slug: collegeSlug } });
+        }
+
+        if (andConditions.length > 0) {
+            where.AND = andConditions;
+        }
         return this.marketplaceService.findAll({ where });
     }
 

@@ -1,169 +1,152 @@
-# 🎓 Linker - College Social Network Platform
+# 🎓 LINKER - The Campus Collective
 
-> Connect. Learn. Live. - A comprehensive social platform for college students to manage campus life, clubs, events, marketplace, and academic resources.
+> **Connect. Learn. Live.** - Events, Clubs, Notes & Chaos — Organized.
 
-[![Deployment](https://img.shields.io/badge/Deploy-Vercel-black)](https://vercel.com)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7)](https://render.com)
+[![Deployment](https://img.shields.io/badge/Deploy-Vercel-black)](https://linker-inky.vercel.app)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7)](https://linker-backend-wx4i.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/NAVANEETHVVINOD/UNOFFICAL)
 
 ## 📋 Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Development](#development)
 - [Deployment](#deployment)
+- [Project Structure](#project-structure)
 - [API Documentation](#api-documentation)
+- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 
 ---
 
 ## 🌟 Overview
 
-**Linker** is a full-stack social networking platform designed specifically for college students. It provides a centralized hub for managing campus activities, connecting with peers, buying/selling items, sharing study materials, and staying updated with college events.
+**LINKER** is a comprehensive social platform designed specifically for college students. It's your one-stop hub for campus life - manage clubs, discover events, buy/sell items, share study materials, and connect with your college community.
 
-### **Key Highlights**
-- 🔐 **Secure Authentication** - JWT-based auth with refresh tokens
-- 🏛️ **Multi-College Support** - Supports multiple colleges with college-specific content
-- 🎯 **Club Management** - Create, join, and manage student clubs
-- 📅 **Event System** - RSVP to campus events with status tracking
-- 🛍️ **Marketplace** - Buy and sell items within your college community
-- 📚 **Note Sharing** - Upload and access study materials with like system
-- 🎨 **Modern UI** - Beautiful, responsive design with Next.js 15 and Tailwind CSS
+### **Live Demo**
+- 🌐 **Frontend**: [linker-inky.vercel.app](https://linker-inky.vercel.app)
+- 🔧 **Backend API**: [linker-backend-wx4i.onrender.com](https://linker-backend-wx4i.onrender.com)
+
+### **Why LINKER?**
+- 🎨 **Beautiful UI** - Unique "Newspaper/Retro" aesthetic with hand-drawn elements
+- 🚀 **Fast & Modern** - Built with Next.js 15 and NestJS
+- 📱 **Mobile-First** - Fully responsive design
+- 🔒 **Secure** - JWT authentication with bcrypt password hashing
+- 🎯 **Feature-Rich** - Everything a college student needs in one place
 
 ---
 
 ## ✨ Features
 
-### **Implemented** ✅
+### **Core Modules** ✅ (Live)
 
-#### 🔐 Authentication & User Management
-- User registration with email/password
-- Secure login with JWT access & refresh tokens
-- Profile management with bio, interests, and college affiliation
-- Role-based access control (Student, Admin, Superadmin)
+#### 🔐 **Authentication & Profiles**
+- Secure registration and login
+- Customizable user profiles
+- Bio, interests, social links (GitHub, Instagram)
+- College affiliation
+- Edit profile functionality
 
-#### 🏛️ Colleges & Clubs
-- Browse colleges by city
-- Create and join student clubs
-- Club member management
-- College-specific content filtering
+#### 🏛️ **Clubs**
+- Browse all campus clubs
+- View club details and member count
+- Join/Leave clubs instantly
+- Search clubs by name or description
 
-#### 📅 Events
-- Browse upcoming campus events
+#### 📅 **Events**
+- Discover upcoming campus events
 - RSVP with status (Going/Interested/Not Going)
-- Event creation by authorized users
-- Filter events by college
+- **Create your own events**
+- Filter by date and venue
+- View event details (date, time, location, organizer)
 
-#### 🛍️ Marketplace
-- Post items for sale
-- Browse listings by college
+#### 🛍️ **Marketplace**
+- Buy and sell items within your college
+- **Post new listings**
+- Browse with search functionality
+- Contact sellers
+- Item status tracking (Active/Sold)
+
+#### 📚 **Study Materials (Notes)**
+- Upload and share study materials
+- **Like/Unlike system** for popular content
+- Download/view files
+- Browse by subject and semester
 - Search functionality
-- Item status tracking (Active/Sold/Deleted)
 
-#### 📚 Notes & Resources
-- Upload study materials and notes
-- Like/unlike system for popular content
-- Search notes by title/subject
-- College-specific note filtering
+#### 💬 **Community Feed**
+- **Create text posts** to share updates
+- Like posts
+- View community activity
+- Author information with timestamps
 
-### **Planned** 🚧
-- Direct messaging between users
-- Push notifications for events and marketplace
-- Advanced search and filters
-- User reputation system
-- Mobile app (React Native)
+#### 🎨 **UI/UX Excellence**
+- **Error Boundaries** - Graceful error handling on all pages
+- **Loading States** - Smooth loading experience
+- **Responsive Design** - Works on all devices
+- **Animations** - Framer Motion powered interactions
+- **Newspaper Theme** - Unique college vibe design
+
+---
+
+### **Coming Soon** 🚧 (Phase 2)
+
+#### 🤖 **AI Assistant** (Next Priority)
+- Personalized academic assistant
+- Query CGPA, attendance, deadlines
+- Resume and LinkedIn post generator
+- Study material recommendations
+- Club and event Q&A
+
+#### 🔔 **Additional Features**
+- Direct messaging
+- Push notifications
+- Advanced search & filters
+- Anonymous posting
+- Task planner & reminders
+- Gamification & badges
 
 ---
 
 ## 🛠️ Tech Stack
 
-### **Frontend** (apps/web)
-- **Framework**: Next.js 16.0.3 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **State**: React Context API
-- **Animations**: Framer Motion
-
-### **Backend** (apps/server)
-- **Framework**: NestJS 11
-- **Language**: TypeScript
-- **ORM**: Prisma 6.18.0
-- **Database**: PostgreSQL (Supabase)
-- **Authentication**: JWT (@nestjs/jwt)
-- **Validation**: class-validator, class-transformer
-- **Security**: Helmet, CORS, bcrypt
-
-### **Database Schema**
-```prisma
-User → Profile (1:1)
-User → Clubs (M:N via ClubMember)
-User → Events (M:N via EventParticipant)
-User → MarketplaceListing (1:N)
-User → Note (1:N)
-College → Clubs (1:N)
-College → Events (1:N)
+### **Frontend** (`apps/web`)
+```
+Framework:    Next.js 15 (App Router)
+Language:     TypeScript
+Styling:      Tailwind CSS
+Animations:   Framer Motion
+State:        React Context API
+HTTP Client:  Fetch API
 ```
 
-### **DevOps & Tools**
-- **Monorepo**: Turborepo
-- **Package Manager**: npm
-- **Version Control**: Git & GitHub
-- **Frontend Hosting**: Vercel
-- **Backend Hosting**: Render
-- **Database**: Supabase (PostgreSQL)
-
----
-
-## 📁 Project Structure
-
+### **Backend** (`apps/server`)
 ```
-unoffical/
-├── apps/
-│   ├── web/                    # Next.js Frontend
-│   │   ├── app/               # App router pages
-│   │   │   ├── (auth)/       # Auth pages (login, register)
-│   │   │   ├── clubs/        # Clubs page
-│   │   │   ├── events/       # Events page
-│   │   │   ├── marketplace/  # Marketplace page
-│   │   │   ├── notes/        # Notes page
-│   │   │   ├── profile/      # Profile page
-│   │   │   └── dashboard/    # Dashboard page
-│   │   ├── components/       # Reusable UI components
-│   │   │   ├── common/       # Common components (Footer, Nav)
-│   │   │   ├── sections/     # Landing page sections
-│   │   │   └── animations/   # Animation components
-│   │   ├── context/          # React Context (AuthContext)
-│   │   └── styles/           # Global styles
-│   │
-│   └── server/                # NestJS Backend
-│       ├── src/
-│       │   ├── modules/      # Feature modules
-│       │   │   ├── auth/     # Authentication module
-│       │   │   ├── users/    # Users module
-│       │   │   ├── profiles/ # Profiles module
-│       │   │   ├── colleges/ # Colleges module
-│       │   │   ├── clubs/    # Clubs module
-│       │   │   ├── events/   # Events module
-│       │   │   ├── marketplace/ # Marketplace module
-│       │   │   └── notes/    # Notes module
-│       │   ├── prisma/       # Prisma service
-│       │   ├── config/       # Configuration module
-│       │   └── main.ts       # Entry point
-│       ├── prisma/
-│       │   ├── schema.prisma # Database schema
-│       │   └── seed.ts       # Database seeding
-│       └── dist/             # Compiled output
-│
-├── packages/
-│   └── config/               # Shared TypeScript config
-│
-├── turbo.json               # Turborepo config
-├── package.json             # Root package.json
-└── README.md                # This file
+Framework:    NestJS 11
+Language:     TypeScript
+Database:     PostgreSQL (Supabase)
+ORM:          Prisma 6.18.0
+Auth:         JWT (@nestjs/jwt)
+Validation:   class-validator
+Security:     Helmet, CORS, bcrypt
+```
+
+### **Infrastructure**
+```
+Monorepo:     Turborepo
+Deployment:   Vercel (Frontend) + Render (Backend)
+Database:     Supabase (Managed PostgreSQL)
+Version:      Git + GitHub
+```
+
+### **Database Models**
+```
+User, Profile, College, Club, ClubMember
+Event, EventParticipant, MarketplaceListing
+Note, NoteLike, Post, PostLike, Comment
 ```
 
 ---
@@ -171,11 +154,11 @@ unoffical/
 ## 🚀 Getting Started
 
 ### **Prerequisites**
-- Node.js ≥18.0.0
-- npm ≥9.0.0
+- Node.js ≥ 18.0.0
+- npm ≥ 9.0.0
 - PostgreSQL database (or Supabase account)
 
-### **Installation**
+### **Quick Start**
 
 1. **Clone the repository**
    ```bash
@@ -190,7 +173,7 @@ unoffical/
 
 3. **Set up environment variables**
 
-   **Frontend** (`apps/web/.env`):
+   **Frontend** (`apps/web/.env.local`):
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:4000
    ```
@@ -198,8 +181,8 @@ unoffical/
    **Backend** (`apps/server/.env`):
    ```env
    DATABASE_URL="postgresql://user:password@host:5432/database"
-   JWT_ACCESS_SECRET="your-access-secret"
-   JWT_REFRESH_SECRET="your-refresh-secret"
+   JWT_ACCESS_SECRET="your-secret-key-here"
+   JWT_REFRESH_SECRET="your-refresh-secret-here"
    JWT_ACCESS_EXPIRES="15m"
    JWT_REFRESH_EXPIRES="7d"
    PORT=4000
@@ -210,30 +193,28 @@ unoffical/
    ```bash
    cd apps/server
    npx prisma generate
+   npx prisma migrate deploy
+   # Or for development:
    npx prisma db push
    ```
 
 5. **Start development servers**
-
-   **Option 1: Run all (from root)**
    ```bash
+   # From root directory:
    npm run dev
-   ```
 
-   **Option 2: Run individually**
-   ```bash
+   # Or individually:
    # Terminal 1 - Backend
-   cd apps/server
-   npm run start:dev
+   cd apps/server && npm run start:dev
 
    # Terminal 2 - Frontend
-   cd apps/web
-   npm run dev
+   cd apps/web && npm run dev
    ```
 
-6. **Access the application**
+6. **Access the app**
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:4000
+   - Backend: http://localhost:4000
+   - Prisma Studio: `npx prisma studio` (Database GUI)
 
 ---
 
@@ -241,89 +222,130 @@ unoffical/
 
 ### **Available Scripts**
 
-**Root Level:**
+**Root:**
 ```bash
-npm run dev          # Start all apps in development
+npm run dev          # Start all apps
 npm run build        # Build all apps
 npm run lint         # Lint all apps
 ```
 
-**Frontend (apps/web):**
+**Frontend (`apps/web`):**
 ```bash
-npm run dev          # Start Next.js dev server
-npm run build        # Build for production
+npm run dev          # Dev server (localhost:3000)
+npm run build        # Production build
 npm run start        # Start production server
-npm run lint         # Run ESLint
+npm run lint         # ESLint
 ```
 
-**Backend (apps/server):**
+**Backend (`apps/server`):**
 ```bash
-npm run start:dev    # Start NestJS in watch mode
+npm run start:dev    # NestJS dev mode with hot reload
 npm run build        # Build for production
-npm run start:prod   # Start production server
+npm run start:prod   # Production server
 npm run test         # Run tests
-npx prisma studio    # Open Prisma Studio (DB GUI)
 ```
 
-### **Database Commands**
+**Database:**
 ```bash
-npx prisma generate      # Generate Prisma Client
-npx prisma db push       # Push schema to database
-npx prisma studio        # Open database GUI
-npx prisma migrate dev   # Create migration (production)
+npx prisma generate            # Generate Prisma Client
+npx prisma migrate dev         # Create & apply migration
+npx prisma migrate deploy      # Deploy migrations (production)
+npx prisma studio              # Open database GUI
+npx prisma db push             # Push schema changes (dev only)
 ```
 
 ---
 
 ## 🌐 Deployment
 
-### **Frontend (Vercel)**
+### **Production URLs**
+- **Frontend**: https://linker-inky.vercel.app
+- **Backend**: https://linker-backend-wx4i.onrender.com
+
+### **Deploy to Vercel (Frontend)**
 
 1. Push code to GitHub
-2. Import repository in Vercel
-3. Configure build settings:
-   - **Framework**: Next.js
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `.next`
-   - **Install Command**: `npm install --legacy-peer-deps`
-4. Add environment variables:
-   - `NEXT_PUBLIC_API_URL`: Your backend URL
-5. Deploy
-
-### **Backend (Render)**
-
-1. Push code to GitHub
-2. Create new Web Service in Render
+2. Import repository in [Vercel](https://vercel.com)
 3. Configure:
+   - Framework: **Next.js**
+   - Root Directory: **apps/web**
+   - Build Command: `npm run build`
+   - Install Command: `npm install --legacy-peer-deps`
+4. Add environment variable:
+   - `NEXT_PUBLIC_API_URL`: Your backend URL
+5. Deploy!
+
+### **Deploy to Render (Backend)**
+
+1. Create new Web Service in [Render](https://render.com)
+2. Configure:
    - **Build Command**: 
      ```bash
      cd apps/server && npm install --legacy-peer-deps && npx prisma generate && npm run build
      ```
    - **Start Command**: 
      ```bash
-     cd apps/server && npm run start:prod
+     cd apps/server && npx prisma migrate deploy && npm run start:prod
      ```
-   - **Environment Variables**:
-     - `DATABASE_URL`
-     - `JWT_ACCESS_SECRET`
-     - `JWT_REFRESH_SECRET`
-     - `JWT_ACCESS_EXPIRES`: `15m`
-     - `JWT_REFRESH_EXPIRES`: `7d`
-     - `PORT`: `4000`
-     - `CORS_ORIGIN`: Your Vercel frontend URL
-4. Deploy
+3. Add environment variables (see `.env` example above)
+4. Deploy!
+
+---
+
+## 📁 Project Structure
+
+```
+UNOFFICAL/
+├── apps/
+│   ├── web/                      # Next.js Frontend
+│   │   ├── app/
+│   │   │   ├── (auth)/          # Login, Register
+│   │   │   ├── dashboard/       # Main dashboard
+│   │   │   ├── profile/         # User profile & edit
+│   │   │   ├── clubs/           # Clubs directory & details
+│   │   │   ├── events/          # Events directory, details & create
+│   │   │   ├── marketplace/     # Marketplace listings & create
+│   │   │   ├── notes/           # Notes directory, details & upload
+│   │   │   ├── feed/            # Community feed & create post
+│   │   │   ├── components/      # UI components
+│   │   │   ├── context/         # AuthContext
+│   │   │   └── lib/             # API client
+│   │   └── public/              # Static assets
+│   │
+│   └── server/                   # NestJS Backend
+│       ├── src/
+│       │   ├── modules/
+│       │   │   ├── auth/        # Authentication
+│       │   │   ├── users/       # User management
+│       │   │   ├── profiles/    # Profile management
+│       │   │   ├── colleges/    # College data
+│       │   │   ├── clubs/       # Club CRUD
+│       │   │   ├── events/      # Event CRUD
+│       │   │   ├── marketplace/ # Marketplace CRUD
+│       │   │   ├── notes/       # Notes CRUD
+│       │   │   └── posts/       # Community feed
+│       │   ├── prisma/          # Prisma service
+│       │   └── main.ts          # Entry point
+│       └── prisma/
+│           └── schema.prisma    # Database schema
+│
+├── packages/
+│   └── config/                   # Shared TypeScript config
+│
+└── turbo.json                    # Turborepo config
+```
 
 ---
 
 ## 📚 API Documentation
 
 ### **Base URL**
-- Development: `http://localhost:4000`
-- Production: `https://your-backend.onrender.com`
+- Local: `http://localhost:4000`
+- Production: `https://linker-backend-wx4i.onrender.com`
 
-### **Authentication Endpoints**
+### **Authentication**
 
-#### Register
+**Register**
 ```http
 POST /auth/register
 Content-Type: application/json
@@ -332,11 +354,11 @@ Content-Type: application/json
   "email": "student@example.com",
   "password": "SecurePass123",
   "fullName": "John Doe",
-  "collegeId": "college-id-here"
+  "collegeId": "optional-college-id"
 }
 ```
 
-#### Login
+**Login**
 ```http
 POST /auth/login
 Content-Type: application/json
@@ -346,83 +368,82 @@ Content-Type: application/json
   "password": "SecurePass123"
 }
 
-Response: {
-  "user": { ... },
-  "accessToken": "...",
-  "refreshToken": "..."
+Response:
+{
+  "accessToken": "jwt-token",
+  "user": { ... }
 }
 ```
 
-### **Protected Endpoints**
-All protected endpoints require `Authorization: Bearer <token>` header.
+### **Protected Endpoints** (Require `Authorization: Bearer <token>`)
 
-- `GET /users/me` - Get current user
-- `GET /profiles/me` - Get current user profile
-- `PATCH /profiles/me` - Update profile
-- `GET /clubs` - List all clubs
-- `POST /clubs/:id/join` - Join a club
-- `GET /events` - List all events
-- `POST /events/:id/rsvp` - RSVP to event
-- `GET /marketplace` - Browse marketplace
-- `POST /marketplace` - Create listing
-- `GET /notes` - Browse notes
-- `POST /notes` - Upload note
-- `POST /notes/:id/like` - Like a note
-
-For complete API documentation, visit `/api-docs` (Swagger - coming soon).
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users/me` | Get current user |
+| GET | `/profiles/:id` | Get profile by ID |
+| PATCH | `/profiles/:id` | Update profile |
+| GET | `/clubs` | List all clubs |
+| GET | `/clubs/:id` | Get club details |
+| POST | `/clubs/:id/join` | Join club |
+| DELETE | `/clubs/:id/leave` | Leave club |
+| GET | `/events` | List all events |
+| POST | `/events` | Create event |
+| POST | `/events/:id/rsvp` | RSVP to event |
+| GET | `/marketplace` | List marketplace items |
+| POST | `/marketplace` | Create listing |
+| GET | `/notes` | List study notes |
+| POST | `/notes` | Upload note |
+| POST | `/notes/:id/like` | Like note |
+| GET | `/posts` | List community posts |
+| POST | `/posts` | Create post |
+| POST | `/posts/:id/like` | Like post |
 
 ---
 
-## 🔄 Control Flow
+## 🗺️ Roadmap
 
-### **User Authentication Flow**
-```
-1. User Registration
-   ↓
-2. Password Hashing (bcrypt)
-   ↓
-3. Create User + Profile (Prisma transaction)
-   ↓
-4. Generate JWT Tokens (Access + Refresh)
-   ↓
-5. Return tokens + sanitized user data
+### **Phase 1: MVP** ✅ (Complete - Nov 2024)
+- [x] Authentication & User Management
+- [x] Clubs, Events, Marketplace, Notes modules
+- [x] Community Feed
+- [x] Profile Management
+- [x] Responsive UI with Error Handling
 
-Login Flow:
-1. Verify credentials
-   ↓
-2. Compare password hash
-   ↓
-3. Generate new tokens
-   ↓
-4. Return tokens + user data
-```
+### **Phase 2: Production Launch** 🚀 (In Progress)
+- [ ] Deploy to production
+- [ ] Collect user feedback (50+ students)
+- [ ] Bug fixes & iterations
 
-### **Protected Resource Access**
-```
-1. Client sends request with Authorization header
-   ↓
-2. JwtAuthGuard validates token
-   ↓
-3. Attach user to request object
-   ↓
-4. (Optional) RolesGuard checks user role
-   ↓
-5. Execute controller method
-   ↓
-6. Return response
-```
+### **Phase 3: AI Assistant** 🤖 (Dec 2024)
+- [ ] Gemini API integration
+- [ ] Personalized academic assistant
+- [ ] Resume & LinkedIn generator
+- [ ] RAG for college-specific data
+
+### **Phase 4: Advanced Features** (Q1 2025)
+- [ ] Real-time messaging
+- [ ] Push notifications
+- [ ] Admin dashboard
+- [ ] Mobile app (React Native)
+- [ ] Gamification & badges
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+We welcome contributions! Here's how:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit changes: `git commit -m 'Add AmazingFeature'`
+4. Push to branch: `git push origin feature/AmazingFeature`
 5. Open a Pull Request
+
+**Development Guidelines:**
+- Follow TypeScript best practices
+- Maintain the "Newspaper" UI theme
+- Write descriptive commit messages
+- Test locally before submitting PR
 
 ---
 
@@ -434,24 +455,42 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-- **Navaneeth V** - [@NAVANEETHVVINOD](https://github.com/NAVANEETHVVINOD)
+**Navaneeth V** - Creator & Lead Developer  
+- GitHub: [@NAVANEETHVVINOD](https://github.com/NAVANEETHVVINOD)
+- Email: navaneethvvinod@gmail.com
 
 ---
 
 ## 🙏 Acknowledgments
 
-- NestJS Team for the amazing backend framework
-- Vercel for frontend hosting
-- Render for backend hosting
-- Supabase for managed PostgreSQL
-- The open-source community
+- **NestJS** - Powerful backend framework
+- **Next.js** - Amazing React framework
+- **Vercel** - Seamless frontend hosting
+- **Render** - Reliable backend hosting
+- **Supabase** - Managed PostgreSQL
+- **Prisma** - Excellent database ORM
+- **Open Source Community** - For inspiration and tools
 
 ---
 
 ## 📞 Support
 
-For support, email navaneethvvinod@gmail.com or open an issue on GitHub.
+- **Issues**: [GitHub Issues](https://github.com/NAVANEETHVVINOD/UNOFFICAL/issues)
+- **Email**: navaneethvvinod@gmail.com
+- **Discussions**: [GitHub Discussions](https://github.com/NAVANEETHVVINOD/UNOFFICAL/discussions)
 
 ---
 
+## 🌟 Star History
+
+If you find this project useful, please consider giving it a ⭐ on GitHub!
+
+---
+
+<div align="center">
+
 **Built with ❤️ for students, by students**
+
+[🌐 Visit Live Site](https://linker-inky.vercel.app) • [📖 Documentation](https://github.com/NAVANEETHVVINOD/UNOFFICAL/wiki) • [🐛 Report Bug](https://github.com/NAVANEETHVVINOD/UNOFFICAL/issues)
+
+</div>

@@ -1,0 +1,145 @@
+"use client"
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { NewspaperCard, RetroButton, Badge, Tape } from '../../../../components/ui/NewspaperUI';
+import Doodle from '../../../../components/ui/Doodle';
+import { api } from '../../../../../lib/api';
+
+interface PageProps {
+    params: {
+        slug: string;
+    };
+}
+
+export default function CreateEventPage({ params }: PageProps) {
+    const router = useRouter();
+    const { slug } = params;
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        startsAt: '',
+        venue: '',
+        scope: 'COLLEGE' // Default to college scope
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            // In a real app, we would pass the collegeSlug to the API
+            await api.createEvent({
+                ...formData,
+                collegeSlug: slug
+            });
+            router.push(`/colleges/${slug}/events`);
+        } catch (error) {
+            console.error('Failed to create event:', error);
+            alert('Failed to create event. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen py-12">
+            <div className="max-w-2xl mx-auto">
+                <NewspaperCard className="p-8 relative bg-white">
+                    <Tape className="absolute -top-3 left-1/2 -translate-x-1/2" />
+
+                    <div className="text-center mb-8">
+                        <Badge className="mb-2 bg-accent-yellow text-black border-black">NEW EVENT</Badge>
+                        <h1 className="font-display text-4xl font-black">SUBMIT AN EVENT</h1>
+                        <p className="font-serif text-gray-600 mt-2">
+                            Got something cool planned for {slug.replace(/-/g, ' ').toUpperCase()}?
+                        </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block font-bold text-sm mb-2">EVENT TITLE</label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full p-3 border-2 border-black rounded-lg font-serif focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                                placeholder="e.g. Hackathon 2024"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block font-bold text-sm mb-2">DESCRIPTION</label>
+                            <textarea
+                                required
+                                rows={4}
+                                className="w-full p-3 border-2 border-black rounded-lg font-serif focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                                placeholder="What's it about? Who should come?"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block font-bold text-sm mb-2">DATE & TIME</label>
+                                <input
+                                    type="datetime-local"
+                                    required
+                                    className="w-full p-3 border-2 border-black rounded-lg font-serif focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                                    value={formData.startsAt}
+                                    onChange={(e) => setFormData({ ...formData, startsAt: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block font-bold text-sm mb-2">VENUE</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full p-3 border-2 border-black rounded-lg font-serif focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                                    placeholder="e.g. Main Auditorium"
+                                    value={formData.venue}
+                                    onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block font-bold text-sm mb-2">SCOPE</label>
+                            <select
+                                className="w-full p-3 border-2 border-black rounded-lg font-serif focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white"
+                                value={formData.scope}
+                                onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
+                            >
+                                <option value="COLLEGE">College Only (Visible to {slug})</option>
+                                <option value="STATE">State Wide (Visible to all Kerala)</option>
+                            </select>
+                        </div>
+
+                        <div className="pt-4 flex gap-4">
+                            <RetroButton
+                                type="button"
+                                variant="outline"
+                                className="flex-1"
+                                onClick={() => router.back()}
+                            >
+                                CANCEL
+                            </RetroButton>
+                            <RetroButton
+                                type="submit"
+                                className="flex-1 bg-black text-white hover:bg-accent-green hover:text-black"
+                                disabled={loading}
+                            >
+                                {loading ? 'SUBMITTING...' : 'CREATE EVENT'}
+                            </RetroButton>
+                        </div>
+                    </form>
+                </NewspaperCard>
+            </div>
+
+            <Doodle src="/doodles/calendar.svg" className="fixed bottom-10 right-10 w-32 h-32 opacity-20 -rotate-12 pointer-events-none" />
+        </div>
+    );
+}

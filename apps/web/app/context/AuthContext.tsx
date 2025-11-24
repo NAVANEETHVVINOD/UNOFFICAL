@@ -17,6 +17,11 @@ interface User {
         githubUrl?: string
         instagram?: string
         tags?: string[]
+        college?: {
+            id: string
+            name: string
+            slug: string
+        }
     }
 }
 
@@ -25,7 +30,7 @@ interface AuthContextType {
     isAuthenticated: boolean
     loading: boolean
     login: (email: string, password: string) => Promise<void>
-    register: (email: string, password: string, fullName: string, collegeId?: string) => Promise<void>
+    register: (email: string, password: string, fullName: string, collegeSlug?: string) => Promise<void>
     logout: () => void
     refreshUser: () => Promise<void>
 }
@@ -102,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    async function register(email: string, password: string, fullName: string, collegeId?: string) {
+    async function register(email: string, password: string, fullName: string, collegeSlug?: string) {
         console.log('Attempting registration for:', email)
         try {
             const res = await fetch(`${API_URL}/auth/register`, {
@@ -110,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password, fullName, collegeId }),
+                body: JSON.stringify({ email, password, fullName, collegeSlug }),
             })
 
             const data = await res.json()
