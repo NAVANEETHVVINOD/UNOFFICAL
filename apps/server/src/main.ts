@@ -41,7 +41,7 @@ async function bootstrap() {
   const { WINSTON_MODULE_NEST_PROVIDER } = require('nest-winston');
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://localhost:${port}`);
 }
 
