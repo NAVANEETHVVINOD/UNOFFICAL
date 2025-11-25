@@ -31,6 +31,13 @@ export default function OnboardingPage() {
     const router = useRouter();
     const { user, refreshUser } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
+
+    // Safety check
+    const step = STEPS[currentStep];
+    if (!step && currentStep > 0) {
+        // Fallback if step is out of bounds
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
     const [loading, setLoading] = useState(false);
     const [colleges, setColleges] = useState<any[]>([]);
     const [formData, setFormData] = useState({
@@ -42,6 +49,9 @@ export default function OnboardingPage() {
         interests: [] as string[],
         collegeId: '',
     });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isCustomCollege, setIsCustomCollege] = useState(false);
+    const [customCollegeData, setCustomCollegeData] = useState({ name: '', city: '' });
 
     // Analytics: Duration Tracking
     const startTimeRef = useRef<number>(Date.now());
@@ -96,6 +106,7 @@ export default function OnboardingPage() {
             case 1: // Vibe
                 return !!formData.bio.trim();
             case 4: // Campus
+                if (isCustomCollege) return !!customCollegeData.name.trim();
                 return !!formData.collegeId;
             default:
                 return true;
@@ -125,7 +136,7 @@ export default function OnboardingPage() {
             } else if (currentStep === 3) { // Interests
                 stepData.interests = formData.interests;
             } else if (currentStep === 4) { // Campus
-                stepData.collegeId = formData.collegeId;
+                stepData.collegeId = formData.collegeId || null;
             } else if (currentStep === 5) { // Review
                 stepData.isOnboarded = true;
             }
@@ -257,33 +268,95 @@ export default function OnboardingPage() {
                     </div>
                 );
             case 4: // Campus
+                const filteredColleges = colleges.filter(c =>
+                    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.city?.toLowerCase().includes(searchQuery.toLowerCase())
+                ).slice(0, 5);
+
                 return (
                     <div className="space-y-4">
-                        {colleges.length === 0 ? (
-                            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
-                                <p className="text-gray-500 font-bold">No colleges found.</p>
-                                <p className="text-xs text-gray-400 mt-2">Please contact support.</p>
+                        {!isCustomCollege ? (
+                            <>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full p-3 pl-10 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all"
+                                        placeholder="Search your college..."
+                                        autoFocus
+                                    />
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                                </div>
+
+                                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                    {searchQuery && filteredColleges.length === 0 && (
+                                        <div className="text-center py-4 text-gray-500 text-sm">
+                                            No matches found.
+                                        </div>
+                                    )}
+
+                                    {filteredColleges.map(college => (
+                                        <div
+                                            key={college.id}
+                                            onClick={() => setFormData({ ...formData, collegeId: college.id })}
+                                            className={`p-4 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${formData.collegeId === college.id
+                                                ? 'bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                                                : 'bg-white hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            <div>
+                                                <h3 className="font-bold text-sm">{college.name}</h3>
+                                                <p className="text-xs text-gray-600">{college.city}</p>
+                                            </div>
+                                            {formData.collegeId === college.id && <span>✅</span>}
+                                        </div>
+                                    ))}
+                                </div>
+
                                 <button
-                                    onClick={fetchColleges}
-                                    className="mt-4 text-xs underline text-accent-blue hover:text-blue-700"
+                                    onClick={() => {
+                                        setIsCustomCollege(true);
+                                        setFormData({ ...formData, collegeId: '' });
+                                    }}
+                                    className="w-full py-2 text-xs font-bold text-gray-500 hover:text-black underline"
                                 >
-                                    Refresh List
+                                    My college is not listed
+                                </button>
+                            </>
+                        ) : (
+                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg text-sm text-yellow-800 mb-4">
+                                    <p><strong>Note:</strong> Adding a custom college means you won&apos;t see college-specific events until we verify it.</p>
+                                </div>
+                                <div>
+                                    <label className="block font-bold mb-2 uppercase text-sm tracking-wider">College Name <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="text"
+                                        value={customCollegeData.name}
+                                        onChange={(e) => setCustomCollegeData({ ...customCollegeData, name: e.target.value })}
+                                        className="w-full p-3 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all"
+                                        placeholder="e.g. Hogwarts School of Witchcraft"
+                                        autoFocus
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block font-bold mb-2 uppercase text-sm tracking-wider">City</label>
+                                    <input
+                                        type="text"
+                                        value={customCollegeData.city}
+                                        onChange={(e) => setCustomCollegeData({ ...customCollegeData, city: e.target.value })}
+                                        className="w-full p-3 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all"
+                                        placeholder="e.g. Highlands"
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => setIsCustomCollege(false)}
+                                    className="text-xs text-gray-500 hover:text-black underline"
+                                >
+                                    Back to search
                                 </button>
                             </div>
-                        ) : (
-                            colleges.map(college => (
-                                <div
-                                    key={college.id}
-                                    onClick={() => setFormData({ ...formData, collegeId: college.id })}
-                                    className={`p-4 border-2 border-black cursor-pointer transition-all ${formData.collegeId === college.id
-                                        ? 'bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
-                                        : 'bg-white hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <h3 className="font-bold text-lg">{college.name}</h3>
-                                    <p className="text-sm text-gray-600">{college.location}</p>
-                                </div>
-                            ))
                         )}
                     </div>
                 );
@@ -296,7 +369,11 @@ export default function OnboardingPage() {
                         </div>
                         <div className="p-4 bg-gray-50 border-2 border-black">
                             <p className="font-bold text-xs uppercase text-gray-500">College</p>
-                            <p className="font-bold text-lg">{colleges.find(c => c.id === formData.collegeId)?.name || 'Not Selected'}</p>
+                            <p className="font-bold text-lg">
+                                {isCustomCollege
+                                    ? `${customCollegeData.name} (Custom)`
+                                    : colleges.find(c => c.id === formData.collegeId)?.name || 'Not Selected'}
+                            </p>
                         </div>
                         <div className="p-4 bg-gray-50 border-2 border-black">
                             <p className="font-bold text-xs uppercase text-gray-500">Bio</p>
