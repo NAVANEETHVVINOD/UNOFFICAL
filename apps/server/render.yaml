@@ -2,8 +2,10 @@ services:
   - type: web
     name: linker-api
     env: node
-    buildCommand: npm install && npx prisma generate && npm run build && npx prisma migrate deploy
+    rootDir: .
+    buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npm run start:prod
+    postDeployCommand: npx prisma migrate deploy
     envVars:
       - key: DATABASE_URL
         sync: false
