@@ -259,19 +259,32 @@ export default function OnboardingPage() {
             case 4: // Campus
                 return (
                     <div className="space-y-4">
-                        {colleges.map(college => (
-                            <div
-                                key={college.id}
-                                onClick={() => setFormData({ ...formData, collegeId: college.id })}
-                                className={`p-4 border-2 border-black cursor-pointer transition-all ${formData.collegeId === college.id
-                                    ? 'bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
-                                    : 'bg-white hover:bg-gray-50'
-                                    }`}
-                            >
-                                <h3 className="font-bold text-lg">{college.name}</h3>
-                                <p className="text-sm text-gray-600">{college.location}</p>
+                        {colleges.length === 0 ? (
+                            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
+                                <p className="text-gray-500 font-bold">No colleges found.</p>
+                                <p className="text-xs text-gray-400 mt-2">Please contact support.</p>
+                                <button
+                                    onClick={fetchColleges}
+                                    className="mt-4 text-xs underline text-accent-blue hover:text-blue-700"
+                                >
+                                    Refresh List
+                                </button>
                             </div>
-                        ))}
+                        ) : (
+                            colleges.map(college => (
+                                <div
+                                    key={college.id}
+                                    onClick={() => setFormData({ ...formData, collegeId: college.id })}
+                                    className={`p-4 border-2 border-black cursor-pointer transition-all ${formData.collegeId === college.id
+                                        ? 'bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                                        : 'bg-white hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <h3 className="font-bold text-lg">{college.name}</h3>
+                                    <p className="text-sm text-gray-600">{college.location}</p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 );
             case 5: // Review
@@ -340,7 +353,8 @@ export default function OnboardingPage() {
                                 {currentStep > 0 && (
                                     <RetroButton
                                         onClick={handleBack}
-                                        className="flex-1 bg-white text-black"
+                                        variant="outline"
+                                        className="flex-1"
                                         disabled={loading}
                                     >
                                         BACK
