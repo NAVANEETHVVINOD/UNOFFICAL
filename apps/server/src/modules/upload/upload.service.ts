@@ -13,13 +13,18 @@ export class UploadService {
         const supabaseKey = this.configService.get<string>('supabase.key');
 
         if (!supabaseUrl || !supabaseKey) {
-            throw new Error('Supabase URL and Key must be defined in configuration');
+            console.warn('Supabase URL and Key not found. Uploads will fail.');
+            return;
         }
 
         this.supabase = createClient(supabaseUrl, supabaseKey);
     }
 
     async uploadFile(file: Express.Multer.File) {
+        if (!this.supabase) {
+            throw new InternalServerErrorException('Supabase not configured');
+        }
+
         const fileExtension = file.originalname.split('.').pop();
         const fileName = `${uuidv4()}.${fileExtension}`;
         const filePath = `${fileName}`;
