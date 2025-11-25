@@ -9,11 +9,13 @@ import { PageTransition } from '../../providers/AnimationProvider';
 import DashboardNavbar from '../../components/ui/DashboardNavbar';
 import { motion } from 'framer-motion';
 import { api } from '../../../lib/api';
+import UploadComponent from '../../components/ui/UploadComponent';
 
 export default function CreatePostPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -21,7 +23,7 @@ export default function CreatePostPage() {
 
         setLoading(true);
         try {
-            await api.createPost({ content });
+            await api.createPost({ content, imageUrl });
             router.push('/feed');
         } catch (error) {
             console.error('Failed to create post:', error);
@@ -65,6 +67,28 @@ export default function CreatePostPage() {
                                             className="w-full p-4 border-2 border-black font-mono text-lg focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow h-64 resize-none"
                                             placeholder="What's on your mind? (Markdown supported)"
                                         />
+                                    </div>
+
+                                    <div>
+                                        <label className="block font-bold mb-2 uppercase text-sm">Attach Image (Optional)</label>
+                                        {imageUrl ? (
+                                            <div className="relative w-full max-w-xs aspect-video bg-gray-100 border-2 border-black overflow-hidden group">
+                                                <img src={imageUrl} alt="Attached" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setImageUrl('')}
+                                                    className="absolute inset-0 bg-black/50 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                                                >
+                                                    REMOVE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <UploadComponent
+                                                onUpload={(url: string) => setImageUrl(url)}
+                                                accept="image/*"
+                                                label="Upload Image"
+                                            />
+                                        )}
                                     </div>
 
                                     <div className="flex justify-end">

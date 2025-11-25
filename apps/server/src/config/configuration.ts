@@ -8,4 +8,8 @@ export default () => ({
         refreshExpires: process.env.JWT_REFRESH_EXPIRES ?? '7d',
     },
     corsOrigin: (process.env.CORS_ORIGIN ?? '').split(',').filter(Boolean),
+    supabase: {
+        url: process.env.SUPABASE_URL,
+        key: process.env.SUPABASE_KEY,
+    },
 });

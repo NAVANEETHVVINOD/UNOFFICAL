@@ -108,6 +108,14 @@ export const api = {
             body: JSON.stringify({ status }),
         }),
 
+    generateQr: (id: string) => apiRequest(`/events/${id}/qr`, { method: 'POST' }),
+
+    checkIn: (id: string, token: string) =>
+        apiRequest(`/events/${id}/check-in`, {
+            method: 'POST',
+            body: JSON.stringify({ token }),
+        }),
+
     // Marketplace
     getMarketplaceListings: (search?: string, collegeSlug?: string) => {
         const params = new URLSearchParams();
@@ -160,7 +168,7 @@ export const api = {
 
     getPost: (id: string) => apiRequest(`/posts/${id}`),
 
-    createPost: (data: any) =>
+    createPost: (data: { content: string; imageUrl?: string; clubId?: string }) =>
         apiRequest('/posts', {
             method: 'POST',
             body: JSON.stringify(data),
@@ -171,4 +179,28 @@ export const api = {
 
     unlikePost: (id: string) =>
         apiRequest(`/posts/${id}/like`, { method: 'DELETE' }),
+
+    // Upload
+    uploadFile: async (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_URL}/upload`, {
+            method: 'POST',
+            body: formData,
+            headers,
+        });
+
+        if (!response.ok) {
+            throw new Error('Upload failed');
+        }
+
+        return response.json();
+    },
 };

@@ -9,6 +9,7 @@ import { PageTransition } from '../../providers/AnimationProvider';
 import DashboardNavbar from '../../components/ui/DashboardNavbar';
 import { motion } from 'framer-motion';
 import { api } from '../../../lib/api';
+import UploadComponent from '../../components/ui/UploadComponent';
 
 export default function UploadNotePage() {
     const router = useRouter();
@@ -114,18 +115,27 @@ export default function UploadNotePage() {
                                     </div>
 
                                     <div>
-                                        <label className="block font-bold mb-2 uppercase text-sm">File Link (PDF/Drive)</label>
-                                        <input
-                                            type="url"
-                                            required
-                                            value={formData.fileUrl}
-                                            onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
-                                            className="w-full p-3 border-2 border-black font-mono focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
-                                            placeholder="https://..."
-                                        />
-                                        <p className="text-xs text-gray-500 mt-1 font-mono">
-                                            * Direct file upload coming soon. Please provide a shareable link.
-                                        </p>
+                                        <label className="block font-bold mb-2 uppercase text-sm">Upload File (PDF/Image)</label>
+                                        {formData.fileUrl ? (
+                                            <div className="flex items-center gap-4 p-4 border-2 border-black bg-green-50">
+                                                <div className="flex-1 truncate font-mono text-sm">
+                                                    {formData.fileUrl}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, fileUrl: '' })}
+                                                    className="text-red-500 font-bold hover:underline"
+                                                >
+                                                    REMOVE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <UploadComponent
+                                                onUpload={(url: string) => setFormData({ ...formData, fileUrl: url })}
+                                                accept=".pdf,image/*"
+                                                label="Click to upload notes"
+                                            />
+                                        )}
                                     </div>
 
                                     <RetroButton
