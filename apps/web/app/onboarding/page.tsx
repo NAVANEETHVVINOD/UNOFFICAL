@@ -29,8 +29,15 @@ const STEPS = [
 
 export default function OnboardingPage() {
     const router = useRouter();
-    const { user, refreshUser } = useAuth();
+    const { user, refreshUser, loading: authLoading } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
+
+    // Auth Check
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.replace('/auth/login');
+        }
+    }, [user, authLoading, router]);
 
     // Safety check
     const step = STEPS[currentStep];

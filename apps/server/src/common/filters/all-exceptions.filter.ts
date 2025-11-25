@@ -24,6 +24,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
             method: request.method,
             exception,
             stack: exception?.stack,
+            authDebug: {
+                authHeader: request.headers.authorization,
+                token: request.headers.authorization?.split(" ")[1],
+            }
         });
 
         response.status(status).json({

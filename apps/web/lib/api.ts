@@ -22,11 +22,15 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
 
     const fullUrl = `${API_URL}${endpoint}`;
     console.log(`[API] Requesting: ${fullUrl}`);
+    if (token) {
+        console.log("[API] Using Token: ", token.substring(0, 10) + "...");
+    }
 
     try {
         const response = await fetch(fullUrl, {
             ...options,
             headers,
+            credentials: 'include',
         });
 
         if (!response.ok) {
