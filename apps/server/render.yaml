@@ -19,5 +19,7 @@ services:
         value: 7d
       - key: PORT
         value: 4000
+      - key: DIRECT_URL
+        sync: false
       - key: CORS_ORIGIN
         sync: false
