@@ -93,6 +93,15 @@ export default function SelectCollegePage() {
                         )}
                     </div>
                 )}
+
+                <div className="mt-8">
+                    <button
+                        onClick={() => router.push('/dashboard')}
+                        className="text-gray-500 font-bold hover:text-black hover:underline decoration-2 underline-offset-4"
+                    >
+                        Not now, take me to Global Dashboard -&gt;
+                    </button>
+                </div>
             </div>
         </Container>
     );

@@ -20,6 +20,20 @@ async function main() {
   });
 
   console.log({ admin });
+
+  // Create Model Engineering College
+  const mec = await prisma.college.upsert({
+    where: { slug: 'model-engineering-college' },
+    update: {},
+    create: {
+      name: 'Model Engineering College',
+      slug: 'model-engineering-college',
+      city: 'Kochi',
+      state: 'Kerala',
+    },
+  });
+
+  console.log({ mec });
 }
 
 main()

@@ -42,6 +42,12 @@ export default function LoginPage() {
                     <NewspaperCard className="p-8 md:p-12 relative bg-white">
                         <Tape className="absolute -top-4 left-1/2 -translate-x-1/2" />
 
+                        <div className="absolute top-4 left-4">
+                            <Link href="/" className="font-black text-xl tracking-tighter hover:underline decoration-2 decoration-accent-orange">
+                                LINKER.
+                            </Link>
+                        </div>
+
                         <div className="text-center mb-8">
                             <h1 className="font-display text-4xl font-black mb-2">WELCOME BACK</h1>
                             <p className="text-gray-600 font-serif italic">"Ready for another day of chaos?"</p>

@@ -113,6 +113,12 @@ export default function RegisterPage() {
                     <NewspaperCard className="p-8 md:p-12 relative bg-white">
                         <Tape className="absolute -top-4 left-1/2 -translate-x-1/2" />
 
+                        <div className="absolute top-4 left-4">
+                            <Link href="/" className="font-black text-xl tracking-tighter hover:underline decoration-2 decoration-accent-orange">
+                                LINKER.
+                            </Link>
+                        </div>
+
                         <div className="text-center mb-8">
                             <Badge className="mb-4 bg-accent-green text-black border-black">JOINING {collegeName}</Badge>
                             <h1 className="font-display text-4xl font-black mb-2">NEW RECRUIT</h1>
