@@ -16,6 +16,9 @@ async function main() {
       profile: {
         create: {
           fullName: 'System Administrator',
+          isOnboarded: true,
+          onboardingStep: 5,
+          bio: 'I am the system administrator.',
         },
       },
     },
@@ -23,19 +26,42 @@ async function main() {
 
   console.log({ admin });
 
-  // Create Model Engineering College
-  const mec = await prisma.college.upsert({
-    where: { slug: 'model-engineering-college' },
-    update: {},
-    create: {
+  // Dynamic Colleges
+  const colleges = [
+    {
       name: 'Model Engineering College',
       slug: 'model-engineering-college',
       city: 'Kochi',
       state: 'Kerala',
     },
-  });
+    {
+      name: 'Tech Institute of Innovation',
+      slug: 'tech-institute',
+      city: 'Bangalore',
+      state: 'Karnataka',
+    },
+    {
+      name: 'City Arts & Science College',
+      slug: 'city-arts',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+    },
+    {
+      name: 'Global Business School',
+      slug: 'global-business',
+      city: 'Delhi',
+      state: 'Delhi',
+    },
+  ];
 
-  console.log({ mec });
+  for (const college of colleges) {
+    const c = await prisma.college.upsert({
+      where: { slug: college.slug },
+      update: {},
+      create: college,
+    });
+    console.log(`Seeded college: ${c.name}`);
+  }
 }
 
 main()
