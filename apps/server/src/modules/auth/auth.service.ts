@@ -16,7 +16,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     // Hash password
@@ -43,7 +43,7 @@ export class AuthService {
           profile: {
             create: {
               fullName: registerDto.fullName,
-              collegeId: collegeId,
+              collegeId: collegeId || null,
             },
           },
         },
