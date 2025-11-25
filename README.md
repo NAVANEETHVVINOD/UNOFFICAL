@@ -86,32 +86,6 @@
 #### 🎨 **UI/UX Excellence**
 - **Error Boundaries** - Graceful error handling on all pages
 - **Loading States** - Smooth loading experience
-- **Responsive Design** - Works on all devices
-- **Animations** - Framer Motion powered interactions
-- **Newspaper Theme** - Unique college vibe design
-
----
-
-### **Coming Soon** 🚧 (Phase 2)
-
-#### 🤖 **AI Assistant** (Next Priority)
-- Personalized academic assistant
-- Query CGPA, attendance, deadlines
-- Resume and LinkedIn post generator
-- Study material recommendations
-- Club and event Q&A
-
-#### 🔔 **Additional Features**
-- Direct messaging
-- Push notifications
-- Advanced search & filters
-- Anonymous posting
-- Task planner & reminders
-- Gamification & badges
-
----
-
-## 🛠️ Tech Stack
 
 ### **Frontend** (`apps/web`)
 ```

@@ -11,16 +11,39 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ErrorBoundary, LoadingState } from '../components/ErrorBoundary';
 import Link from 'next/link';
+import { api } from '../../lib/api';
 
 function DashboardContent() {
     const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
+    const [recentEvents, setRecentEvents] = useState<any[]>([]);
+    const [loadingEvents, setLoadingEvents] = useState(false);
 
     useEffect(() => {
         if (!loading && !isAuthenticated) {
             router.replace('/login');
         }
     }, [isAuthenticated, router, loading]);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            if (user?.profile?.college?.slug) {
+                setLoadingEvents(true);
+                try {
+                    const events = await api.getEvents(user.profile.college.slug);
+                    setRecentEvents(events.slice(0, 3)); // Get top 3
+                } catch (error) {
+                    console.error("Failed to fetch dashboard events", error);
+                } finally {
+                    setLoadingEvents(false);
+                }
+            }
+        };
+
+        if (user) {
+            fetchDashboardData();
+        }
+    }, [user]);
 
     if (loading) {
         return <LoadingState />;
@@ -31,6 +54,7 @@ function DashboardContent() {
     }
 
     const firstName = user?.profile?.fullName?.split(' ')[0] || 'STUDENT';
+    const college = user?.profile?.college;
 
     return (
         <PageTransition>
@@ -59,7 +83,7 @@ function DashboardContent() {
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Main Column (Left) */}
                         <div className="md:col-span-2 space-y-8">
-                            {/* Welcome Section */}
+                            {/* My College Card */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -68,113 +92,109 @@ function DashboardContent() {
                             >
                                 <Staple />
                                 <NewspaperCard className="bg-gradient-to-br from-accent-yellow/20 to-accent-pink/20 p-8 border-black">
-                                    <div className="flex items-start gap-6">
-                                        <div className="hidden md:block w-24 shrink-0">
+                                    <div className="flex flex-col md:flex-row items-start gap-8">
+                                        <div className="hidden md:block w-32 shrink-0">
                                             <Doodle src="/doodles/sun.jpg" className="w-full animate-spin-slow" />
                                         </div>
-                                        <div>
-                                            <h2 className="font-serif text-3xl italic mb-4">
-                                                Good Day, {firstName}.
-                                            </h2>
-                                            <p className="text-lg mb-6 leading-relaxed">
-                                                Welcome to your campus command center. Explore <strong className="bg-accent-blue/30 px-1">clubs</strong>, join <strong className="bg-accent-pink/30 px-1">events</strong>, and connect with your community.
-                                            </p>
-                                            <div className="flex flex-wrap gap-3">
-                                                {user.profile?.college && (
-                                                    <Link href={`/colleges/${user.profile.college.slug}`}>
-                                                        <RetroButton className="text-sm bg-accent-yellow text-black border-black">
-                                                            VISIT {user.profile.college.name.toUpperCase()} HUB
+                                        <div className="flex-1">
+                                            {college ? (
+                                                <>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Badge className="bg-black text-white">MY CAMPUS</Badge>
+                                                    </div>
+                                                    <h2 className="font-display text-4xl font-black mb-4 uppercase leading-none">
+                                                        {college.name}
+                                                    </h2>
+                                                    <p className="text-lg mb-6 leading-relaxed font-serif italic">
+                                                        "Your gateway to everything happening at {college.name}. Don't miss out on the latest buzz."
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-3">
+                                                        <Link href={`/colleges/${college.slug}`}>
+                                                            <RetroButton className="bg-black text-white hover:bg-gray-800 px-8 py-3 text-lg">
+                                                                ENTER HUB -&gt;
+                                                            </RetroButton>
+                                                        </Link>
+                                                        <Link href="/profile">
+                                                            <RetroButton variant="outline" className="bg-white">
+                                                                MY PROFILE
+                                                            </RetroButton>
+                                                        </Link>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <h2 className="font-display text-3xl font-black mb-4">
+                                                        NO COLLEGE SELECTED
+                                                    </h2>
+                                                    <p className="text-lg mb-6">
+                                                        Join a college to unlock the full experience.
+                                                    </p>
+                                                    <Link href="/select-college">
+                                                        <RetroButton className="bg-black text-white">
+                                                            SELECT COLLEGE
                                                         </RetroButton>
                                                     </Link>
-                                                )}
-                                                <Link href="/events">
-                                                    <RetroButton className="text-sm bg-accent-blue text-white border-black">
-                                                        VIEW EVENTS
-                                                    </RetroButton>
-                                                </Link>
-                                                <Link href="/feed">
-                                                    <RetroButton variant="outline" className="text-sm bg-white border-black">
-                                                        BROWSE FEED
-                                                    </RetroButton>
-                                                </Link>
-                                            </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </NewspaperCard>
                             </motion.div>
 
-                            {/* Recent Updates */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                            >
-                                <h3 className="font-bold text-xl uppercase mb-6 flex items-center gap-2 border-b-4 border-black w-fit pb-1">
-                                    <span className="w-3 h-3 bg-accent-blue border border-black"></span>
-                                    Latest Headlines
-                                </h3>
-                                <div className="space-y-6">
-                                    <Link href="/clubs">
-                                        <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
-                                            <div className="flex gap-4">
-                                                <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-pink/20 transition-colors">
-                                                    <span className="text-3xl">🎭</span>
-                                                </div>
-                                                <div>
-                                                    <div className="flex gap-2 mb-2">
-                                                        <Badge className="text-[10px] py-0 px-2 bg-black text-white">CLUBS</Badge>
-                                                        <span className="text-xs font-mono text-gray-500 mt-1">2 hours ago</span>
-                                                    </div>
-                                                    <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-pink">Join Campus Clubs</h4>
-                                                    <p className="text-sm text-gray-600 line-clamp-2">
-                                                        Explore student organizations and find your community. From coding to photography, there's something for everyone.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </NewspaperCard>
-                                    </Link>
+                            {/* Campus Pulse (Recent Events) */}
+                            {college && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    <h3 className="font-bold text-xl uppercase mb-6 flex items-center gap-2 border-b-4 border-black w-fit pb-1">
+                                        <span className="w-3 h-3 bg-accent-pink border border-black"></span>
+                                        Campus Pulse
+                                    </h3>
 
-                                    <Link href="/notes">
-                                        <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
-                                            <div className="flex gap-4">
-                                                <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-blue/20 transition-colors">
-                                                    <span className="text-3xl">📚</span>
-                                                </div>
-                                                <div>
-                                                    <div className="flex gap-2 mb-2">
-                                                        <Badge className="text-[10px] py-0 px-2 bg-white border-black text-black">RESOURCES</Badge>
-                                                        <span className="text-xs font-mono text-gray-500 mt-1">5 hours ago</span>
-                                                    </div>
-                                                    <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-blue">Study Materials Available</h4>
-                                                    <p className="text-sm text-gray-600 line-clamp-2">
-                                                        Access shared notes and study materials from your peers. Upload your own to help others succeed.
-                                                    </p>
-                                                </div>
-                                            </div>
+                                    {loadingEvents ? (
+                                        <div className="text-center py-8 font-mono">Loading updates...</div>
+                                    ) : recentEvents.length > 0 ? (
+                                        <div className="space-y-6">
+                                            {recentEvents.map((event) => (
+                                                <Link href={`/events/${event.id}`} key={event.id}>
+                                                    <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-4" noShadow>
+                                                        <div className="flex gap-4">
+                                                            <div className="w-16 h-16 bg-accent-pink border-2 border-black shrink-0 flex flex-col items-center justify-center text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                                                <span className="text-xs font-bold uppercase">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
+                                                                <span className="text-xl font-black">{new Date(event.date).getDate()}</span>
+                                                            </div>
+                                                            <div>
+                                                                <div className="flex gap-2 mb-1">
+                                                                    <Badge className="text-[10px] py-0 px-2 bg-white border-black text-black">EVENT</Badge>
+                                                                    <span className="text-xs font-mono text-gray-500 mt-1">@{event.venue}</span>
+                                                                </div>
+                                                                <h4 className="font-bold text-xl leading-tight mb-1 group-hover:underline decoration-2 decoration-accent-pink">
+                                                                    {event.title}
+                                                                </h4>
+                                                                <p className="text-sm text-gray-600 line-clamp-1">
+                                                                    {event.description}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </NewspaperCard>
+                                                </Link>
+                                            ))}
+                                            <Link href={`/colleges/${college.slug}/events`} className="block text-center font-bold underline decoration-2 decoration-accent-blue hover:text-accent-blue mt-4">
+                                                VIEW ALL CAMPUS EVENTS
+                                            </Link>
+                                        </div>
+                                    ) : (
+                                        <NewspaperCard className="p-8 text-center bg-gray-50 border-dashed">
+                                            <p className="font-mono text-gray-500 mb-4">No recent events found.</p>
+                                            <Link href="/events/create">
+                                                <RetroButton className="text-sm">CREATE AN EVENT</RetroButton>
+                                            </Link>
                                         </NewspaperCard>
-                                    </Link>
-
-                                    <Link href="/marketplace">
-                                        <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" noShadow>
-                                            <div className="flex gap-4">
-                                                <div className="w-20 h-20 bg-gray-100 border-2 border-black shrink-0 flex items-center justify-center group-hover:bg-accent-yellow/20 transition-colors">
-                                                    <span className="text-3xl">🛍️</span>
-                                                </div>
-                                                <div>
-                                                    <div className="flex gap-2 mb-2">
-                                                        <Badge className="text-[10px] py-0 px-2 bg-accent-yellow border-black text-black">MARKETPLACE</Badge>
-                                                        <span className="text-xs font-mono text-gray-500 mt-1">1 day ago</span>
-                                                    </div>
-                                                    <h4 className="font-bold text-xl leading-tight mb-2 group-hover:underline decoration-2 decoration-accent-yellow">Campus Marketplace</h4>
-                                                    <p className="text-sm text-gray-600 line-clamp-2">
-                                                        Buy and sell textbooks, electronics, and more. Your one-stop shop for campus deals.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </NewspaperCard>
-                                    </Link>
-                                </div>
-                            </motion.div>
+                                    )}
+                                </motion.div>
+                            )}
                         </div>
 
                         {/* Sidebar (Right) */}
@@ -218,57 +238,42 @@ function DashboardContent() {
                                 </NewspaperCard>
                             </div>
 
-                            {/* Upcoming */}
+                            {/* Global Highlights */}
                             <NewspaperCard className="p-6 bg-paper">
                                 <h3 className="font-bold text-lg uppercase mb-4 border-b-2 border-black pb-2 flex justify-between items-center">
-                                    Up Next
-                                    <span className="text-2xl">📅</span>
+                                    Explore
+                                    <span className="text-2xl">🌍</span>
                                 </h3>
                                 <div className="space-y-4">
-                                    <Link href="/events" className="flex gap-3 items-start group cursor-pointer">
-                                        <div className="bg-accent-pink border-2 border-black px-3 py-2 text-center shrink-0 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-y-1 group-hover:shadow-none transition-all">
-                                            <p className="text-xs font-bold">NOV</p>
-                                            <p className="font-bold text-xl leading-none">24</p>
+                                    <Link href="/marketplace" className="flex gap-3 items-center group cursor-pointer hover:bg-white p-2 -mx-2 rounded transition-colors">
+                                        <div className="w-10 h-10 bg-accent-yellow border-2 border-black flex items-center justify-center shrink-0">
+                                            🛍️
                                         </div>
                                         <div>
-                                            <p className="font-bold text-sm group-hover:underline">Campus Events</p>
-                                            <p className="text-xs text-gray-500 font-mono">Check upcoming events</p>
+                                            <p className="font-bold text-sm group-hover:underline">Marketplace</p>
+                                            <p className="text-xs text-gray-500 font-mono">Buy & Sell</p>
                                         </div>
                                     </Link>
-                                    <Link href="/events" className="flex gap-3 items-start group cursor-pointer">
-                                        <div className="bg-accent-blue border-2 border-black px-3 py-2 text-center shrink-0 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-y-1 group-hover:shadow-none transition-all">
-                                            <p className="text-xs font-bold">DEC</p>
-                                            <p className="font-bold text-xl leading-none">01</p>
+                                    <Link href="/notes" className="flex gap-3 items-center group cursor-pointer hover:bg-white p-2 -mx-2 rounded transition-colors">
+                                        <div className="w-10 h-10 bg-accent-blue border-2 border-black flex items-center justify-center shrink-0">
+                                            📚
                                         </div>
                                         <div>
-                                            <p className="font-bold text-sm group-hover:underline">View All Events</p>
-                                            <p className="text-xs text-gray-500 font-mono">Browse calendar</p>
+                                            <p className="font-bold text-sm group-hover:underline">Study Notes</p>
+                                            <p className="text-xs text-gray-500 font-mono">Share resources</p>
+                                        </div>
+                                    </Link>
+                                    <Link href="/clubs" className="flex gap-3 items-center group cursor-pointer hover:bg-white p-2 -mx-2 rounded transition-colors">
+                                        <div className="w-10 h-10 bg-accent-pink border-2 border-black flex items-center justify-center shrink-0">
+                                            🎭
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm group-hover:underline">All Clubs</p>
+                                            <p className="text-xs text-gray-500 font-mono">Find communities</p>
                                         </div>
                                     </Link>
                                 </div>
                             </NewspaperCard>
-
-                            {/* Profile Card */}
-                            <Link href="/profile">
-                                <NewspaperCard className="p-6 bg-white border-dashed border-2 border-gray-400 hover:bg-gray-50 hover:border-black transition-all group cursor-pointer">
-                                    <div className="flex items-center gap-4 mb-4">
-                                        <div className="w-16 h-16 bg-gray-100 border-2 border-black overflow-hidden">
-                                            <img
-                                                src={user.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.profile?.fullName || 'User'}`}
-                                                alt="Profile"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-lg group-hover:underline">{user.profile?.fullName}</p>
-                                            <p className="text-xs font-mono text-gray-500">{user.email}</p>
-                                        </div>
-                                    </div>
-                                    <RetroButton className="w-full text-sm bg-accent-blue text-white border-black">
-                                        VIEW PROFILE
-                                    </RetroButton>
-                                </NewspaperCard>
-                            </Link>
                         </motion.div>
                     </div>
                 </div>
