@@ -34,6 +34,7 @@ async function bootstrap() {
   });
 
   // Start server
+  // Render deployment fix: Use process.env.PORT
   const port = process.env.PORT || 4000;
 
   // Logger
