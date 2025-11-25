@@ -4,18 +4,18 @@ import { College, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CollegesService {
-    constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-    async findAll(): Promise<College[]> {
-        return this.prisma.college.findMany();
-    }
+  async findAll(): Promise<College[]> {
+    return this.prisma.college.findMany();
+  }
 
-    async findOne(
-        collegeWhereUniqueInput: Prisma.CollegeWhereUniqueInput,
-    ): Promise<College | null> {
-        return this.prisma.college.findUnique({
-            where: collegeWhereUniqueInput,
-            include: { clubs: true },
-        });
-    }
+  async findOne(
+    collegeWhereUniqueInput: Prisma.CollegeWhereUniqueInput,
+  ): Promise<College | null> {
+    return this.prisma.college.findUnique({
+      where: collegeWhereUniqueInput,
+      include: { clubs: true },
+    });
+  }
 }

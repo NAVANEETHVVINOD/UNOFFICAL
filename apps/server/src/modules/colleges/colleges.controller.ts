@@ -3,15 +3,15 @@ import { CollegesService } from './colleges.service';
 
 @Controller('colleges')
 export class CollegesController {
-    constructor(private readonly collegesService: CollegesService) { }
+  constructor(private readonly collegesService: CollegesService) {}
 
-    @Get()
-    async findAll() {
-        return this.collegesService.findAll();
-    }
+  @Get()
+  async findAll() {
+    return this.collegesService.findAll();
+  }
 
-    @Get(':slug')
-    async findOne(@Param('slug') slug: string) {
-        return this.collegesService.findOne({ slug });
-    }
+  @Get(':slug')
+  async findOne(@Param('slug') slug: string) {
+    return this.collegesService.findOne({ slug });
+  }
 }

@@ -1,7 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import Loading from '../loading'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 
@@ -17,6 +18,10 @@ interface User {
         githubUrl?: string
         instagram?: string
         tags?: string[]
+        interests?: string[]
+        socials?: any
+        isOnboarded?: boolean
+        onboardingStep?: number
         college?: {
             id: string
             name: string
@@ -41,12 +46,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [isLoadingUser, setIsLoadingUser] = useState(true)
     const router = useRouter()
+    const pathname = usePathname()
 
     const isAuthenticated = !!user
 
     useEffect(() => {
         loadUser()
     }, [])
+
+    // Onboarding Check
+    useEffect(() => {
+        if (isLoadingUser) return;
+
+        if (user) {
+            // If logged in but not onboarded -> Force Onboarding
+            if (!user.profile?.isOnboarded && pathname !== '/onboarding') {
+                router.replace('/onboarding')
+            }
+            // If logged in AND onboarded -> Prevent accessing Onboarding
+            else if (user.profile?.isOnboarded && pathname.startsWith('/onboarding')) {
+                router.replace('/dashboard')
+            }
+        }
+    }, [user, isLoadingUser, pathname])
 
     // Session Heartbeat: Refresh user every 5 minutes
     useEffect(() => {
@@ -84,7 +106,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         } catch (error) {
             console.error('Failed to load user:', error)
-            // Don't logout on network error, just keep old state if possible or retry
         } finally {
             setIsLoadingUser(false)
         }
@@ -108,10 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (res.ok) {
                 console.log('Login successful, setting token')
                 localStorage.setItem('token', data.accessToken)
-                // Set cookie for middleware
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
-                await loadUser() // Load full profile
-                router.replace('/dashboard')
+                await loadUser()
+                // router.replace('/dashboard') // Let effect handle redirect
             } else {
                 console.error('Login failed:', data)
                 throw new Error(data.message || 'Login failed')
@@ -142,10 +162,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (res.ok) {
                 console.log('Registration successful, setting token')
                 localStorage.setItem('token', data.accessToken)
-                // Set cookie for middleware
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 await loadUser()
-                router.replace('/dashboard')
+                // router.replace('/dashboard') // Let component or effect handle
             } else {
                 console.error('Registration failed:', data)
                 throw new Error(data.message || 'Registration failed')
@@ -163,6 +182,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
         setUser(null)
         router.push('/')
+    }
+
+    if (isLoadingUser) {
+        return <Loading />
     }
 
     return (

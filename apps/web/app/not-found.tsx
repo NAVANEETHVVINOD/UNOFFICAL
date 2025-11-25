@@ -10,7 +10,7 @@ export default function NotFound() {
                 <h1 className="font-display text-6xl font-black mb-2">404</h1>
                 <h2 className="font-bold text-2xl mb-6 uppercase">Page Not Found</h2>
                 <p className="font-serif text-lg text-gray-600 mb-8">
-                    "Looks like this page got lost in the archives. Or maybe the aliens took it."
+                    &quot;Looks like this page got lost in the archives. Or maybe the aliens took it.&quot;
                 </p>
                 <Link href="/dashboard">
                     <RetroButton className="bg-black text-white">

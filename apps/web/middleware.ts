@@ -9,15 +9,15 @@ export function middleware(request: NextRequest) {
 
     // 1. Define Route Types
     const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register')
-    const isPublicPage = pathname === '/' || pathname === '/select-college'
+    const isPublicPage = pathname === '/'
     const isProtectedPage = pathname.startsWith('/dashboard') ||
         pathname.startsWith('/profile') ||
         pathname.startsWith('/colleges') ||
-        pathname === '/clubs' ||
-        pathname === '/events' ||
-        pathname === '/marketplace' ||
-        pathname === '/notes' ||
-        pathname === '/messages'
+        pathname.startsWith('/clubs') ||
+        pathname.startsWith('/events') ||
+        pathname.startsWith('/marketplace') ||
+        pathname.startsWith('/notes') ||
+        pathname.startsWith('/messages')
 
     // 2. Redirect to login if accessing protected page without token
     if (isProtectedPage && !token) {

@@ -69,7 +69,7 @@ export default function Home() {
               <div className="flex flex-col md:flex-row justify-center gap-4">
                 <Link href="/register">
                   <RetroButton variant="secondary" className="px-10 py-4 text-base shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
-                    I'm in.
+                    I&apos;m in.
                   </RetroButton>
                 </Link>
                 <Link href="/dashboard">
@@ -135,11 +135,11 @@ export default function Home() {
           <div className="mb-24 -mx-4 md:-mx-8 transform -rotate-1">
             <div className="bg-black py-4 border-y-4 border-accent-yellow shadow-xl">
               <Marquee speed={30}>
-                <span className="text-white font-pixel text-3xl mx-8">/// BREAKING_NEWS: HACKATHON REGISTRATIONS OPEN ///</span>
-                <span className="text-accent-yellow font-serif italic text-3xl mx-8">Don't miss out!</span>
-                <span className="text-white font-pixel text-3xl mx-8">/// NEW_CLUB_ALERT: ROBOTICS ///</span>
+                <span className="text-white font-pixel text-3xl mx-8">{"/// BREAKING_NEWS: HACKATHON REGISTRATIONS OPEN ///"}</span>
+                <span className="text-accent-yellow font-serif italic text-3xl mx-8">Don&apos;t miss out!</span>
+                <span className="text-white font-pixel text-3xl mx-8">{"/// NEW_CLUB_ALERT: ROBOTICS ///"}</span>
                 <span className="text-accent-blue font-serif italic text-3xl mx-8">Join the revolution</span>
-                <span className="text-white font-pixel text-3xl mx-8">/// EXAM_SCHEDULE_RELEASED ///</span>
+                <span className="text-white font-pixel text-3xl mx-8">{"/// EXAM_SCHEDULE_RELEASED ///"}</span>
                 <span className="text-accent-pink font-serif italic text-3xl mx-8">Panic mode: ON</span>
               </Marquee>
             </div>
@@ -188,7 +188,7 @@ export default function Home() {
           <div className="mb-32">
             <div className="text-center mb-12">
               <h2 className="font-display text-5xl font-black mb-4">THE ECOSYSTEM</h2>
-              <p className="text-xl text-gray-600 font-serif italic">"A role for everyone."</p>
+              <p className="text-xl text-gray-600 font-serif italic">&quot;A role for everyone.&quot;</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
@@ -278,7 +278,7 @@ export default function Home() {
                       <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-4">
                         <div className="w-12 h-12 bg-accent-yellow rounded-full flex items-center justify-center font-bold border border-black">24</div>
                         <div>
-                          <h4 className="font-bold">Freshers' Night</h4>
+                          <h4 className="font-bold">Freshers&apos; Night</h4>
                           <p className="text-xs text-gray-500">Auditorium â€¢ 6 PM</p>
                         </div>
                       </div>
@@ -409,55 +409,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* FEATURE 4: MARKETPLACE */}
-          <div className="mb-32">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <NewspaperCard variant="curved" className="bg-accent-purple p-8 -rotate-2 hover:rotate-0 transition-transform">
-                  <div className="bg-white rounded-3xl p-6 shadow-lg">
-                    <div className="aspect-video bg-gray-100 rounded-xl mb-4 relative overflow-hidden border border-gray-200">
-                      <Doodle src="/doodles/shopping-bag.svg" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 opacity-20" />
-                      <div className="absolute bottom-2 left-2 bg-white px-2 py-1 text-xs font-bold rounded border border-black">$15</div>
-                    </div>
-                    <h3 className="font-bold text-xl mb-1">Engineering Calculator</h3>
-                    <p className="text-sm text-gray-500 mb-4">Used for 1 semester. Good condition.</p>
-                    <Link href="/marketplace">
-                      <RetroButton className="w-full text-sm" variant="secondary">Contact Seller</RetroButton>
-                    </Link>
-                  </div>
-                </NewspaperCard>
-              </div>
-              <div>
-                <Badge className="mb-4 bg-accent-purple text-white border-black">MODULE_04</Badge>
-                <h2 className="font-display text-5xl font-black mb-6">MARKETPLACE</h2>
-                <p className="text-xl text-gray-600 mb-8">
-                  Buy, sell, and exchange items within the campus. A secure environment for students to trade.
-                </p>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
-                    <span className="font-bold">Secure campus-only environment</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
-                    <span className="font-bold">Chat/contact system for sellers</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
-                    <span className="font-bold">Buy/sell books, lab coats, etc.</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">âœ“</div>
-                    <span className="font-bold">Search & category filtering</span>
-                  </li>
-                </ul>
-                <Link href="/marketplace">
-                  <RetroButton variant="secondary">Visit Market</RetroButton>
-                </Link>
-              </div>
-            </div>
-          </div>
-
           {/* Upcoming Events List (Existing) */}
           <div className="max-w-5xl mx-auto mb-24">
             <div className="flex items-center gap-4 mb-8">
@@ -510,13 +461,13 @@ export default function Home() {
             <div className="bg-white py-4 border-y-4 border-black shadow-xl">
               <Marquee speed={40} direction="right">
                 <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
-                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Sleep is for the weak (and the graduated)"</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">&quot;Sleep is for the weak (and the graduated)&quot;</span>
                 <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
-                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Coffee: The real MVP"</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">&quot;Coffee: The real MVP&quot;</span>
                 <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
-                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Is it too late to drop out?"</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">&quot;Is it too late to drop out?&quot;</span>
                 <span className="text-black font-pixel text-4xl mx-8 uppercase">Link. Learn. Live.</span>
-                <span className="text-gray-400 font-serif italic text-3xl mx-8">"Due tomorrow? Do tomorrow."</span>
+                <span className="text-gray-400 font-serif italic text-3xl mx-8">&quot;Due tomorrow? Do tomorrow.&quot;</span>
               </Marquee>
             </div>
           </div>

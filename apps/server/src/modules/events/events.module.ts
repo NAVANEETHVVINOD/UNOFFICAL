@@ -8,4 +8,4 @@ import { QrService } from './qr.service';
   controllers: [EventsController],
   providers: [EventsService, QrService],
 })
-export class EventsModule { }
+export class EventsModule {}

@@ -6,6 +6,14 @@ export const metadata: Metadata = {
     description: 'Discover upcoming events, workshops, and parties at your college.',
 };
 
-export default function EventsPage() {
+import { redirect } from 'next/navigation';
+import { getServerProfile } from '../../lib/server-utils';
+
+export default async function EventsPage() {
+    const user = await getServerProfile();
+    if (!user?.profile?.isOnboarded) {
+        redirect('/onboarding');
+    }
+
     return <EventsClient />;
 }

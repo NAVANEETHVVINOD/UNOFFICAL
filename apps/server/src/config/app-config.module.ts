@@ -7,10 +7,7 @@ import { configValidationSchema } from './validation.schema';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [
-        `.env.${process.env.NODE_ENV || 'development'}`,
-        '.env',
-      ],
+      envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
       validationSchema: configValidationSchema,
       validationOptions: {
         allowUnknown: true,

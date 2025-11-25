@@ -6,7 +6,7 @@ import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createPostDto: CreatePostDto, userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -22,8 +22,8 @@ export class PostsService {
       allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
       allowedAttributes: {
         ...sanitizeHtml.defaults.allowedAttributes,
-        'img': ['src', 'alt']
-      }
+        img: ['src', 'alt'],
+      },
     });
 
     return this.prisma.post.create({

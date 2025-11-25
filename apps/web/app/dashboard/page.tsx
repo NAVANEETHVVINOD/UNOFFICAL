@@ -15,8 +15,8 @@ export default async function DashboardPage() {
         redirect('/login');
     }
 
-    if (!user.profile?.collegeId) {
-        redirect('/select-college');
+    if (!user.profile?.isOnboarded) {
+        redirect('/onboarding');
     }
 
     return <DashboardClient />;

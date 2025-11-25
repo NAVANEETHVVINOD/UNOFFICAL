@@ -3,7 +3,7 @@ import { MessagingService } from './messaging.service';
 import { MessagingController } from './messaging.controller';
 
 @Module({
-    controllers: [MessagingController],
-    providers: [MessagingService],
+  controllers: [MessagingController],
+  providers: [MessagingService],
 })
-export class MessagingModule { }
+export class MessagingModule {}

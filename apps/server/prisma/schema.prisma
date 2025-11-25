@@ -86,6 +86,10 @@ model Profile {
   tags        String[]
   githubUrl   String?
   instagram   String?
+  socials     Json?
+  interests   String[]
+  isOnboarded Boolean @default(false)
+  onboardingStep Int @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -18,8 +18,8 @@ export default async function CollegeHome({ params }: PageProps) {
         redirect('/login');
     }
 
-    if (!user.profile?.collegeId) {
-        redirect('/select-college');
+    if (!user.profile?.isOnboarded) {
+        redirect('/onboarding');
     }
 
     const { slug } = params;

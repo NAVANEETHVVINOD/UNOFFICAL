@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -12,7 +16,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     // Hash password
@@ -73,7 +77,10 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -92,7 +99,11 @@ export class AuthService {
       const decoded = await this.jwtService.verifyAsync(token, {
         secret: this.config.get('jwt.refreshSecret'),
       });
-      const tokens = await this.generateTokens(decoded.sub, decoded.email, decoded.role);
+      const tokens = await this.generateTokens(
+        decoded.sub,
+        decoded.email,
+        decoded.role,
+      );
       return tokens;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');

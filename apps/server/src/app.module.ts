@@ -19,7 +19,10 @@ import { MessagingModule } from './modules/messaging/messaging.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { HealthController } from './health.controller';
-import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
+import {
+  WinstonModule,
+  utilities as nestWinstonModuleUtilities,
+} from 'nest-winston';
 import * as winston from 'winston';
 
 @Module({
@@ -60,4 +63,4 @@ import * as winston from 'winston';
   controllers: [AppController, HealthController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
