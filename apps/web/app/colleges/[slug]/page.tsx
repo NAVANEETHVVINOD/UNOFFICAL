@@ -2,13 +2,26 @@ import { NewspaperCard, RetroButton, Badge, Tape, Sticker, EventRow, Marquee } f
 import Doodle from '../../components/ui/Doodle';
 import Link from 'next/link';
 
+import { redirect } from 'next/navigation';
+import { getServerProfile } from '../../../lib/server-utils';
+
 interface PageProps {
     params: {
         slug: string;
     };
 }
 
-export default function CollegeHome({ params }: PageProps) {
+export default async function CollegeHome({ params }: PageProps) {
+    const user = await getServerProfile();
+
+    if (!user) {
+        redirect('/login');
+    }
+
+    if (!user.profile?.collegeId) {
+        redirect('/select-college');
+    }
+
     const { slug } = params;
     const collegeName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 

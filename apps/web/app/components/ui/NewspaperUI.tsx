@@ -2,13 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import Doodle from './Doodle';
 
-export function NewspaperCard({ children, className = '', noShadow = false, rotate = 0, variant = 'default' }: { children: React.ReactNode; className?: string; noShadow?: boolean; rotate?: number; variant?: 'default' | 'curved' | 'pixel' }) {
+export function NewspaperCard({ children, className = '', noShadow = false, rotate = 0, variant = 'default', ...props }: { children: React.ReactNode; className?: string; noShadow?: boolean; rotate?: number; variant?: 'default' | 'curved' | 'pixel' } & React.HTMLAttributes<HTMLDivElement>) {
     const radius = variant === 'curved' ? 'rounded-[2.5rem]' : variant === 'pixel' ? 'rounded-none' : 'rounded-xl';
 
     return (
         <div
             className={`bg-white border-2 border-black transition-all duration-300 ${radius} ${noShadow ? '' : 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5'} ${className}`}
             style={{ transform: rotate ? `rotate(${rotate}deg)` : undefined }}
+            {...props}
         >
             {children}
         </div>

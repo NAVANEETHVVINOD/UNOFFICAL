@@ -5,29 +5,49 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get('token')?.value ||
         request.headers.get('authorization')?.replace('Bearer ', '')
 
-    const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
-        request.nextUrl.pathname.startsWith('/register')
+    const { pathname } = request.nextUrl
 
-    const isProtectedPage = request.nextUrl.pathname.startsWith('/dashboard') ||
-        request.nextUrl.pathname.startsWith('/profile') ||
-        request.nextUrl.pathname === '/clubs' ||
-        request.nextUrl.pathname === '/events' ||
-        request.nextUrl.pathname === '/marketplace' ||
-        request.nextUrl.pathname === '/notes'
+    // 1. Define Route Types
+    const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register')
+    const isPublicPage = pathname === '/' || pathname === '/select-college'
+    const isProtectedPage = pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/profile') ||
+        pathname.startsWith('/colleges') ||
+        pathname === '/clubs' ||
+        pathname === '/events' ||
+        pathname === '/marketplace' ||
+        pathname === '/notes' ||
+        pathname === '/messages'
 
-    // Redirect to login if accessing protected page without token
+    // 2. Redirect to login if accessing protected page without token
     if (isProtectedPage && !token) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        const url = new URL('/login', request.url)
+        url.searchParams.set('callbackUrl', pathname)
+        return NextResponse.redirect(url)
     }
 
-    // Redirect to dashboard if accessing auth pages with token
-    if (isAuthPage && token) {
+    // 3. Redirect to dashboard if accessing auth/public pages with token
+    if ((isAuthPage || pathname === '/') && token) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
+
+    // 4. College Hub Protection (Basic check, full check needs user profile in AuthContext/Server Component)
+    // We can't easily check user profile here without decoding JWT or making API call.
+    // For now, we rely on the Server Component Guard or Client AuthContext to redirect if no collegeId.
 
     return NextResponse.next()
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/profile/:path*', '/clubs', '/events', '/marketplace', '/notes', '/login', '/register']
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - doodles (public assets)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico|doodles).*)',
+    ],
 }

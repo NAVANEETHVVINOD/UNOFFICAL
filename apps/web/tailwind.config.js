@@ -9,7 +9,8 @@ module.exports = {
     extend: {
       colors: {
         ink: '#1a1a1a',
-        paper: '#ffffff',
+        paper: '#f7f1e3',
+        retroAccent: '#d66b33',
         accent: {
           yellow: '#FFD600',
           blue: '#2D5BFF',

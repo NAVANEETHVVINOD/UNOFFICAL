@@ -39,7 +39,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
-    const [loading, setLoading] = useState(true)
+    const [isLoadingUser, setIsLoadingUser] = useState(true)
     const router = useRouter()
 
     const isAuthenticated = !!user
@@ -48,11 +48,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loadUser()
     }, [])
 
-    async function loadUser() {
+    // Session Heartbeat: Refresh user every 5 minutes
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const interval = setInterval(() => {
+            console.log('❤️ Session Heartbeat: Refreshing user...')
+            loadUser(true) // true = silent refresh
+        }, 5 * 60 * 1000)
+
+        return () => clearInterval(interval)
+    }, [isAuthenticated])
+
+    async function loadUser(silent = false) {
+        if (!silent) setIsLoadingUser(true)
         try {
             const token = localStorage.getItem('token')
             if (!token) {
-                setLoading(false)
+                setIsLoadingUser(false)
                 return
             }
 
@@ -66,18 +79,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 const userData = await res.json()
                 setUser(userData)
             } else {
-                localStorage.removeItem('token')
+                console.warn('Token invalid or expired')
+                logout()
             }
         } catch (error) {
             console.error('Failed to load user:', error)
-            localStorage.removeItem('token')
+            // Don't logout on network error, just keep old state if possible or retry
         } finally {
-            setLoading(false)
+            setIsLoadingUser(false)
         }
     }
 
     async function login(email: string, password: string) {
         console.log('Attempting login for:', email)
+        setIsLoadingUser(true)
         try {
             const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
@@ -95,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('token', data.accessToken)
                 // Set cookie for middleware
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
-                setUser(data.user)
+                await loadUser() // Load full profile
                 router.replace('/dashboard')
             } else {
                 console.error('Login failed:', data)
@@ -104,11 +119,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
             console.error('Login error:', error)
             throw error
+        } finally {
+            setIsLoadingUser(false)
         }
     }
 
     async function register(email: string, password: string, fullName: string, collegeSlug?: string) {
         console.log('Attempting registration for:', email)
+        setIsLoadingUser(true)
         try {
             const res = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
@@ -126,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('token', data.accessToken)
                 // Set cookie for middleware
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
-                setUser(data.user)
+                await loadUser()
                 router.replace('/dashboard')
             } else {
                 console.error('Registration failed:', data)
@@ -135,6 +153,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
             console.error('Register error:', error)
             throw error
+        } finally {
+            setIsLoadingUser(false)
         }
     }
 
@@ -146,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, loading, login, register, logout, refreshUser: loadUser }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, loading: isLoadingUser, login, register, logout, refreshUser: () => loadUser(false) }}>
             {children}
         </AuthContext.Provider>
     )
