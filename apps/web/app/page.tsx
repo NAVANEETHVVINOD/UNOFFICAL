@@ -8,7 +8,20 @@ import BottomNav from './components/ui/BottomNav';
 
 
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from './context/AuthContext';
+
 export default function Home() {
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, user, router]);
+
   return (
     <>
       <div className="absolute top-0 left-0 w-full h-[80vh] overflow-hidden -z-10">
