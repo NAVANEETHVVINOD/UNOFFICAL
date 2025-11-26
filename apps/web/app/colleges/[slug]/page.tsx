@@ -1,3 +1,12 @@
+/**
+ * CollegeHome (Dynamic Route)
+ * 
+ * The specific dashboard for a single college (/colleges/[slug]).
+ * Displays:
+ * - College-specific news ("The Daily [College]")
+ * - College-specific events and clubs
+ * - Notice board and stats
+ */
 import { NewspaperCard, RetroButton, Badge, Tape, Sticker, EventRow, Marquee } from '../../components/ui/NewspaperUI';
 import Doodle from '../../components/ui/Doodle';
 import Link from 'next/link';

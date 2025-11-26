@@ -1,3 +1,12 @@
+/**
+ * AuthService
+ * 
+ * Handles all authentication logic including:
+ * - User registration (with college association)
+ * - Login (email/password)
+ * - JWT Token generation (Access & Refresh tokens)
+ * - Password hashing (bcrypt)
+ */
 import {
   Injectable,
   UnauthorizedException,

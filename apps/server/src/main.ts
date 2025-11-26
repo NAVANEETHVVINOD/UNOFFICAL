@@ -43,7 +43,9 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Global Filter
-  const { AllExceptionsFilter } = require('./common/filters/all-exceptions.filter');
+  const {
+    AllExceptionsFilter,
+  } = require('./common/filters/all-exceptions.filter');
   app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(port, '0.0.0.0');

@@ -1,3 +1,13 @@
+/**
+ * DashboardClient
+ * 
+ * The main client-side component for the Global Dashboard (/dashboard).
+ * Displays:
+ * - "My Home Base" (User's College)
+ * - Global Event Feed ("Happening Across Kerala")
+ * - List of all colleges ("Explore Campuses")
+ * - Network Stats
+ */
 "use client"
 
 import Container from '../components/ui/Container';

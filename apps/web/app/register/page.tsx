@@ -11,7 +11,11 @@ import Doodle from '../components/ui/Doodle';
 
 export default function RegisterPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, user, isAuthenticated } = useAuth();
+
+    if (isAuthenticated && user) {
+        router.replace('/dashboard');
+    }
 
     const [formData, setFormData] = useState({
         fullName: '',

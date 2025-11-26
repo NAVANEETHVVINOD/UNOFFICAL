@@ -1,3 +1,12 @@
+/**
+ * FeedPage
+ * 
+ * The social feed for the campus network (/feed).
+ * Allows students to:
+ * - View posts from across the network
+ * - Create new posts
+ * - Like and comment on posts
+ */
 "use client"
 
 import { useState, useEffect } from 'react';

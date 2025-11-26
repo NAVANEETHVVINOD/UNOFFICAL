@@ -10,11 +10,15 @@ import Doodle from '../components/ui/Doodle';
 
 export default function LoginPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, user, isAuthenticated } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    if (isAuthenticated && user) {
+        router.replace('/dashboard');
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

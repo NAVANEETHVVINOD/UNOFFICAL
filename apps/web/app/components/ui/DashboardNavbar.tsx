@@ -31,6 +31,9 @@ export default function DashboardNavbar() {
                 <Link href="/marketplace">
                     <RetroButton variant="ghost">Market</RetroButton>
                 </Link>
+                <Link href="/feed">
+                    <RetroButton variant="ghost">Feed</RetroButton>
+                </Link>
             </div>
 
             <div className="flex items-center gap-4">
