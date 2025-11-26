@@ -5,10 +5,11 @@ import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
+    console.log("REGISTER BODY:", registerDto);
     return this.authService.register(registerDto);
   }
 
