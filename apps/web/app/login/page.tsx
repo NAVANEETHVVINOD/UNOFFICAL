@@ -41,7 +41,7 @@ export default function LoginPage() {
                 <div className="w-full max-w-md relative">
                     {/* Decorative Elements */}
                     <Doodle src="/doodles/sparkle.svg" className="absolute -top-12 -left-12 w-24 h-24 text-accent-yellow animate-pulse" />
-                    <Doodle src="/doodles/arrow-curly.svg" className="absolute -bottom-8 -right-16 w-32 h-32 text-black rotate-12 hidden md:block" />
+                    <Doodle src="/doodles/arrow-scribble.svg" className="absolute -bottom-8 -right-16 w-32 h-32 text-black rotate-12 hidden md:block" />
 
                     <NewspaperCard className="p-8 md:p-12 relative bg-white">
                         <Tape className="absolute -top-4 left-1/2 -translate-x-1/2" />

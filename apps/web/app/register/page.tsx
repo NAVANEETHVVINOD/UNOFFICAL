@@ -57,7 +57,7 @@ export default function RegisterPage() {
             <div className="min-h-screen flex items-center justify-center py-12">
                 <div className="w-full max-w-lg relative">
                     {/* Decorative Elements */}
-                    <Doodle src="/doodles/star.svg" className="absolute -top-8 -right-8 w-20 h-20 text-accent-pink animate-spin-slow" />
+                    <Doodle src="/doodles/sparkle.svg" className="absolute -top-8 -right-8 w-20 h-20 text-accent-pink animate-spin-slow" />
 
                     <NewspaperCard className="p-8 md:p-12 relative bg-white">
                         <Tape className="absolute -top-4 left-1/2 -translate-x-1/2" />
