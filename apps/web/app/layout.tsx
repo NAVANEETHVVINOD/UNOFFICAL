@@ -2,6 +2,7 @@ import './globals.css'
 import BottomNav from './components/ui/BottomNav'
 import { AuthProvider } from './context/AuthContext'
 import ScrollRestoration from './components/ScrollRestoration'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
@@ -23,6 +24,7 @@ export default function RootLayout({
                     <ScrollRestoration />
                     <div className="min-h-screen pb-16 md:pb-0">
                         {children}
+                        <SpeedInsights />
                     </div>
                     <BottomNav />
                 </AuthProvider>
