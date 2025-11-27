@@ -158,7 +158,7 @@ export default function OnboardingPage() {
             }
         } catch (error) {
             console.error('Failed to update profile', error);
-            // Show error toast
+            alert('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }

@@ -50,6 +50,7 @@ export default function RegisterPage() {
             // 3. Redirect to Onboarding
             router.push('/onboarding');
         } catch (err: any) {
+            console.error('Registration failed:', err);
             setError(err.message || 'Registration failed');
         } finally {
             setLoading(false);
