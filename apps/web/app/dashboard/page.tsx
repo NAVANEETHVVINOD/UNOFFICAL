@@ -9,15 +9,20 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-    const user = await getServerProfile();
+    try {
+        const user = await getServerProfile();
 
-    if (!user) {
+        if (!user) {
+            redirect('/login');
+        }
+
+        if (!user.profile?.isOnboarded) {
+            redirect('/onboarding');
+        }
+
+        return <DashboardClient />;
+    } catch (error) {
+        console.error('DashboardPage Error:', error);
         redirect('/login');
     }
-
-    if (!user.profile?.isOnboarded) {
-        redirect('/onboarding');
-    }
-
-    return <DashboardClient />;
 }
