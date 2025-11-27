@@ -67,7 +67,7 @@ function ProfileContent() {
                                                 className="w-full h-full object-cover"
                                             />
                                             <div className="absolute bottom-0 inset-x-0 bg-black text-white text-center text-[10px] py-1 font-mono">
-                                                IMG_REF_{user.id.substring(0, 4).toUpperCase()}
+                                                IMG_REF_{user?.id?.substring(0, 4).toUpperCase()}
                                             </div>
                                         </div>
                                         <Badge className="bg-accent-blue text-white border-black uppercase">

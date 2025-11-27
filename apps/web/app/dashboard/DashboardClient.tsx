@@ -215,10 +215,10 @@ function DashboardContent() {
                                     <h3 className="font-pixel text-xl mb-6 border-b-2 border-black pb-2">EXPLORE_CAMPUSES</h3>
                                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                                         {colleges.map(college => (
-                                            <Link href={`/colleges/${college.slug}`} key={college.id} className="block group">
+                                            <Link href={`/colleges/${college.slug}`} key={college?.id} className="block group">
                                                 <div className="p-3 border-2 border-gray-200 hover:border-black hover:bg-accent-yellow transition-all rounded-lg">
-                                                    <h4 className="font-bold text-sm group-hover:underline">{college.name}</h4>
-                                                    <p className="text-xs text-gray-500 group-hover:text-black">{college.city}</p>
+                                                    <h4 className="font-bold text-sm group-hover:underline">{college?.name}</h4>
+                                                    <p className="text-xs text-gray-500 group-hover:text-black">{college?.city}</p>
                                                 </div>
                                             </Link>
                                         ))}
