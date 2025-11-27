@@ -9,10 +9,18 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-    const user = await getServerProfile();
+    try {
+        const user = await getServerProfile();
 
-    if (!user?.profile?.isOnboarded) {
-        redirect('/onboarding');
+        if (!user?.profile?.isOnboarded) {
+            redirect('/onboarding');
+        }
+
+        return <ProfileClient />;
+    } catch (error) {
+        console.error('ProfilePage Error:', error);
+        // Fallback to client-side fetching or login
+        redirect('/login');
     }
 
     return <ProfileClient />;
