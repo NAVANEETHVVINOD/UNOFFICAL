@@ -37,13 +37,16 @@ function DashboardContent() {
     }, [isAuthenticated, router, loading]);
 
     useEffect(() => {
+        console.log('DashboardClient: user', user);
         const fetchGlobalData = async () => {
             setLoadingData(true);
             try {
+                console.log('DashboardClient: Fetching global data...');
                 const [eventsData, collegesData] = await Promise.all([
                     api.getEvents(), // Fetch all events (global)
                     api.getColleges()
                 ]);
+                console.log('DashboardClient: Data fetched', { eventsData, collegesData });
                 setGlobalEvents(eventsData.slice(0, 5)); // Top 5 global events
                 setColleges(collegesData);
             } catch (error) {

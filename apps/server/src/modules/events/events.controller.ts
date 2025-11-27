@@ -14,10 +14,11 @@ import { Prisma } from '@prisma/client';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
 
   @Get()
   async findAll(@Query('college') collegeSlug?: string) {
+    console.log('EventsController: findAll called', { collegeSlug });
     const where: Prisma.EventWhereInput = collegeSlug
       ? { college: { slug: collegeSlug } }
       : {};
