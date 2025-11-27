@@ -41,10 +41,6 @@ export default function OnboardingPage() {
 
     // Safety check
     const step = STEPS[currentStep];
-    if (!step && currentStep > 0) {
-        // Fallback if step is out of bounds
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-    }
     const [loading, setLoading] = useState(false);
     const [colleges, setColleges] = useState<any[]>([]);
     const [formData, setFormData] = useState({
@@ -392,6 +388,10 @@ export default function OnboardingPage() {
                 return null;
         }
     };
+
+    if (!step && currentStep > 0) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     return (
         <Container>
