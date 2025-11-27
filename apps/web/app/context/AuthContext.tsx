@@ -75,8 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!isAuthenticated) return;
 
         const interval = setInterval(() => {
-            console.log('❤️ Session Heartbeat: Refreshing user...')
-            loadUser(true) // true = silent refresh
+            console.log('❤️ Session Heartbeat: Refreshing session...')
+            refreshSession()
         }, 5 * 60 * 1000)
 
         return () => clearInterval(interval)
@@ -129,9 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (res.ok) {
                 console.log('Login successful, setting token')
                 localStorage.setItem('token', data.accessToken)
+                localStorage.setItem('refreshToken', data.refreshToken)
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 await loadUser()
-                // router.replace('/dashboard') // Let effect handle redirect
             } else {
                 console.error('Login failed:', data)
                 throw new Error(data.message || 'Login failed')
@@ -162,9 +162,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (res.ok) {
                 console.log('Registration successful, setting token')
                 localStorage.setItem('token', data.accessToken)
+                localStorage.setItem('refreshToken', data.refreshToken)
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 await loadUser()
-                // router.replace('/dashboard') // Let component or effect handle
             } else {
                 console.error('Registration failed:', data)
                 throw new Error(data.message || 'Registration failed')
@@ -177,8 +177,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    async function refreshSession() {
+        try {
+            const refreshToken = localStorage.getItem('refreshToken')
+            if (!refreshToken) return
+
+            console.log('🔄 Refreshing session...')
+            const res = await fetch(`${API_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken }),
+            })
+
+            if (res.ok) {
+                const data = await res.json()
+                localStorage.setItem('token', data.accessToken)
+                localStorage.setItem('refreshToken', data.refreshToken)
+                document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
+                console.log('✅ Session refreshed')
+            } else {
+                console.warn('Session refresh failed')
+                logout()
+            }
+        } catch (error) {
+            console.error('Session refresh error:', error)
+        }
+    }
+
     function logout() {
         localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
         document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
         setUser(null)
         router.push('/')
