@@ -21,16 +21,13 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // CORS
+  // CORS
+  const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://linker-inky.vercel.app',
-      'https://linker-fg6pbxoix-navaneethvvinods-projects.vercel.app',
-      process.env.CORS_ORIGIN,
-    ].filter(Boolean),
+    origin: allowedOrigin,
     credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Authorization',
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     exposedHeaders: ['Authorization'],
   });
 
