@@ -41,7 +41,8 @@ export default function RegisterPage() {
                 formData.email,
                 formData.password,
                 formData.fullName,
-                '' // College ID is now handled in onboarding
+                undefined, // College ID is now handled in onboarding
+                undefined
             );
 
             // 2. Auto Login

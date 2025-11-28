@@ -139,7 +139,9 @@ export default function OnboardingPage() {
             } else if (currentStep === 3) { // Interests
                 stepData.interests = formData.interests;
             } else if (currentStep === 4) { // Campus
+                const selectedCollege = colleges.find(c => c.id === formData.collegeId);
                 stepData.collegeId = formData.collegeId || null;
+                stepData.collegeSlug = selectedCollege?.slug || null;
             } else if (currentStep === 5) { // Review
                 stepData.isOnboarded = true;
             }
@@ -150,6 +152,10 @@ export default function OnboardingPage() {
             logEvent('onboarding_step_completed', { step: currentStep, stepName: STEPS[currentStep].id });
 
             if (currentStep === STEPS.length - 1) {
+                if (!formData.collegeId && !isCustomCollege) {
+                    alert("Please select a college before finishing.");
+                    return;
+                }
                 const duration = Date.now() - startTimeRef.current;
                 logEvent('onboarding_completed', { duration_ms: duration });
                 router.push('/dashboard');

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -40,10 +41,13 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Global Filter
-  const {
-    AllExceptionsFilter,
-  } = require('./common/filters/all-exceptions.filter');
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Ensure Prisma connects before starting
+  const { PrismaService } = require('./prisma/prisma.service');
+  const prismaService = app.get(PrismaService);
+  await prismaService.$connect();
+  console.log("Prisma connected successfully.");
 
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://localhost:${port}`);

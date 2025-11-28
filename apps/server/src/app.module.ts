@@ -63,4 +63,4 @@ import * as winston from 'winston';
   controllers: [AppController, HealthController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

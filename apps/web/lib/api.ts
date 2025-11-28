@@ -65,10 +65,10 @@ export const api = {
             body: JSON.stringify({ email, password }),
         }),
 
-    register: (email: string, password: string, fullName: string, collegeId?: string) =>
+    register: (email: string, password: string, fullName: string, collegeId?: string, collegeSlug?: string) =>
         apiRequest('/auth/register', {
             method: 'POST',
-            body: JSON.stringify({ email, password, fullName, collegeId }),
+            body: JSON.stringify({ email, password, fullName, collegeId, collegeSlug }),
         }),
 
     // Users
