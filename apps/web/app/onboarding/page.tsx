@@ -81,8 +81,10 @@ export default function OnboardingPage() {
                 interests: profile.interests || [],
                 collegeId: profile.collegeId || '',
             }));
-            if (profile.onboardingStep) {
-                setCurrentStep(profile.onboardingStep);
+            if (profile.onboardingStep !== undefined && profile.onboardingStep !== null) {
+                // Clamp step to valid range to prevent crash
+                const safeStep = Math.min(profile.onboardingStep, STEPS.length - 1);
+                setCurrentStep(safeStep);
             }
         }
         fetchColleges();
@@ -90,10 +92,14 @@ export default function OnboardingPage() {
 
     // Analytics: Step View & Drop-off
     useEffect(() => {
-        logEvent('onboarding_step_viewed', { step: currentStep, stepName: STEPS[currentStep].id });
+        if (currentStep < STEPS.length) {
+            logEvent('onboarding_step_viewed', { step: currentStep, stepName: STEPS[currentStep].id });
+        }
 
         const handleUnload = () => {
-            logEvent('onboarding_abandoned_step', { step: currentStep, stepName: STEPS[currentStep].id });
+            if (currentStep < STEPS.length) {
+                logEvent('onboarding_abandoned_step', { step: currentStep, stepName: STEPS[currentStep].id });
+            }
         };
 
         window.addEventListener('beforeunload', handleUnload);
