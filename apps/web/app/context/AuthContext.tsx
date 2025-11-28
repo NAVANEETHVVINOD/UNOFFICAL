@@ -100,8 +100,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (res.ok) {
                 const userData = await res.json()
                 setUser(userData)
+            } else if (res.status === 401) {
+                console.warn('Token expired, attempting refresh...')
+                const refreshSuccess = await refreshSession()
+                if (refreshSuccess) {
+                    // Retry loadUser ONE time
+                    const newToken = localStorage.getItem('token')
+                    const retryRes = await fetch(`${API_URL}/users/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${newToken}`,
+                        },
+                    })
+                    if (retryRes.ok) {
+                        const userData = await retryRes.json()
+                        setUser(userData)
+                    } else {
+                        logout()
+                    }
+                } else {
+                    logout()
+                }
             } else {
-                console.warn('Token invalid or expired')
+                console.warn('Failed to load user', res.status)
                 logout()
             }
         } catch (error) {
@@ -177,10 +197,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    async function refreshSession() {
+    async function refreshSession(): Promise<boolean> {
         try {
             const refreshToken = localStorage.getItem('refreshToken')
-            if (!refreshToken) return
+            if (!refreshToken) return false
 
             console.log('🔄 Refreshing session...')
             const res = await fetch(`${API_URL}/auth/refresh`, {
@@ -197,12 +217,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('refreshToken', data.refreshToken)
                 document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`
                 console.log('✅ Session refreshed')
+                return true
             } else {
                 console.warn('Session refresh failed')
-                logout()
+                return false
             }
         } catch (error) {
             console.error('Session refresh error:', error)
+            return false
         }
     }
 
@@ -214,13 +236,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push('/')
     }
 
-    if (isLoadingUser) {
-        return <Loading />
-    }
-
+    // Always render provider, pass loading state
     return (
         <AuthContext.Provider value={{ user, isAuthenticated, loading: isLoadingUser, login, register, logout, refreshUser: () => loadUser(false) }}>
-            {children}
+            {isLoadingUser ? <Loading /> : children}
         </AuthContext.Provider>
     )
 }
