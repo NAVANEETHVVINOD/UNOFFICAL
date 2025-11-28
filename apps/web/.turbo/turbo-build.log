@@ -8,3 +8,47 @@
 
  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
    Creating an optimized production build ...
+ ✓ Compiled successfully in 12.4s
+   Running TypeScript ...
+   Collecting page data using 7 workers ...
+   Generating static pages using 7 workers (0/1) ...
+ ✓ Generating static pages using 7 workers (1/1) in 1053.0ms
+   Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /clubs
+├ ƒ /clubs/[id]
+├ ƒ /colleges/[slug]
+├ ƒ /colleges/[slug]/clubs
+├ ƒ /colleges/[slug]/clubs/create
+├ ƒ /colleges/[slug]/events
+├ ƒ /colleges/[slug]/events/create
+├ ƒ /colleges/[slug]/marketplace
+├ ƒ /colleges/[slug]/marketplace/create
+├ ƒ /dashboard
+├ ƒ /events
+├ ƒ /events/[id]
+├ ƒ /events/create
+├ ƒ /feed
+├ ƒ /feed/create
+├ ƒ /login
+├ ƒ /marketplace
+├ ƒ /marketplace/[id]
+├ ƒ /marketplace/create
+├ ƒ /messages
+├ ƒ /messages/[id]
+├ ƒ /notes
+├ ƒ /notes/[id]
+├ ƒ /notes/upload
+├ ƒ /onboarding
+├ ƒ /profile
+├ ƒ /profile/edit
+└ ƒ /register
+
+
+ƒ Proxy (Middleware)
+
+ƒ  (Dynamic)  server-rendered on demand
+

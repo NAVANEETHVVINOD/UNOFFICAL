@@ -8,7 +8,17 @@ async function main() {
   const adminPassword = await bcrypt.hash('admin123', 10);
   const admin = await prisma.user.upsert({
     where: { email: 'admin@collegeconnect.com' },
-    update: {},
+    update: {
+      profile: {
+        update: {
+          college: {
+            connect: {
+              slug: 'nitc',
+            },
+          },
+        },
+      },
+    },
     create: {
       email: 'admin@collegeconnect.com',
       password: adminPassword,
@@ -19,6 +29,11 @@ async function main() {
           isOnboarded: true,
           onboardingStep: 5,
           bio: 'I am the system administrator.',
+          college: {
+            connect: {
+              slug: 'nitc',
+            },
+          },
         },
       },
     },
