@@ -141,7 +141,6 @@ export default function OnboardingPage() {
             } else if (currentStep === 4) { // Campus
                 const selectedCollege = colleges.find(c => c.id === formData.collegeId);
                 stepData.collegeId = formData.collegeId || null;
-                stepData.collegeSlug = selectedCollege?.slug || null;
             } else if (currentStep === 5) { // Review
                 stepData.isOnboarded = true;
             }
