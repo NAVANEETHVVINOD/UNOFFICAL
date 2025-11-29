@@ -4,7 +4,7 @@ import { MarketplaceListing, Prisma } from '@prisma/client';
 
 @Injectable()
 export class MarketplaceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAll(params: {
     skip?: number;

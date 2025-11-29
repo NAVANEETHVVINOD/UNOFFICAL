@@ -34,9 +34,13 @@ export class EventsController {
   @Post()
   async create(
     @Request() req,
-    @Body() createEventDto: Prisma.EventCreateInput,
+    @Body() createEventDto: Prisma.EventCreateInput & { collegeSlug?: string },
   ) {
-    return this.eventsService.create(createEventDto, req.user.userId);
+    const { collegeSlug, ...rest } = createEventDto;
+    return this.eventsService.create({
+      ...rest,
+      ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
+    }, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)

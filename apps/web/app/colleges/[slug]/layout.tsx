@@ -42,7 +42,7 @@ export default async function CollegeLayout({ children, params }: CollegeLayoutP
                         <div className="flex gap-2">
                             <Link href="/dashboard">
                                 <RetroButton variant="outline" className="text-white border-white hover:bg-white hover:text-black">
-                                    Exit Hub
+                                    Return to Dashboard
                                 </RetroButton>
                             </Link>
                         </div>
@@ -51,22 +51,34 @@ export default async function CollegeLayout({ children, params }: CollegeLayoutP
                     {/* Navigation Tabs */}
                     <div className="flex flex-wrap gap-2">
                         <Link href={`/colleges/${slug}`}>
-                            <RetroButton variant="secondary" className="rounded-b-none border-b-0 translate-y-1">
+                            <RetroButton
+                                variant="secondary"
+                                className={`rounded-b-none border-b-0 translate-y-1 ${!params.toString().includes('/events') && !params.toString().includes('/clubs') && !params.toString().includes('/marketplace') ? 'bg-accent-yellow text-black' : 'bg-white/10 text-gray-300 hover:text-white'}`}
+                            >
                                 Overview
                             </RetroButton>
                         </Link>
                         <Link href={`/colleges/${slug}/events`}>
-                            <RetroButton variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
+                            <RetroButton
+                                variant="ghost"
+                                className={`rounded-b-none border-b-0 translate-y-1 ${typeof window !== 'undefined' && window.location.pathname.includes('/events') ? 'bg-accent-yellow text-black' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                            >
                                 Events
                             </RetroButton>
                         </Link>
                         <Link href={`/colleges/${slug}/clubs`}>
-                            <RetroButton variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
+                            <RetroButton
+                                variant="ghost"
+                                className={`rounded-b-none border-b-0 translate-y-1 ${typeof window !== 'undefined' && window.location.pathname.includes('/clubs') ? 'bg-accent-yellow text-black' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                            >
                                 Clubs
                             </RetroButton>
                         </Link>
                         <Link href={`/colleges/${slug}/marketplace`}>
-                            <RetroButton variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
+                            <RetroButton
+                                variant="ghost"
+                                className={`rounded-b-none border-b-0 translate-y-1 ${typeof window !== 'undefined' && window.location.pathname.includes('/marketplace') ? 'bg-accent-yellow text-black' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                            >
                                 Marketplace
                             </RetroButton>
                         </Link>

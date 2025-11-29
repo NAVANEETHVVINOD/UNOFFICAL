@@ -8,7 +8,7 @@ export class EventsService {
   constructor(
     private prisma: PrismaService,
     private qrService: QrService,
-  ) {}
+  ) { }
 
   async findAll(params: {
     skip?: number;

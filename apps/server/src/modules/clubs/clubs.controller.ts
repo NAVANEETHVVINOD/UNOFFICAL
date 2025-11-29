@@ -14,7 +14,7 @@ import { Prisma } from '@prisma/client';
 
 @Controller('clubs')
 export class ClubsController {
-  constructor(private readonly clubsService: ClubsService) {}
+  constructor(private readonly clubsService: ClubsService) { }
 
   @Get()
   async findAll(@Query('college') collegeSlug?: string) {
@@ -27,6 +27,27 @@ export class ClubsController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.clubsService.findOne({ id });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async create(
+    @Request() req,
+    @Body() createClubDto: Prisma.ClubCreateInput & { collegeSlug?: string },
+  ) {
+    const { collegeSlug, ...rest } = createClubDto;
+    return this.clubsService.create({
+      ...rest,
+      ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
+      // Add the creator as the first member/admin
+      members: {
+        create: {
+          userId: req.user.userId,
+          role: 'LEAD',
+          displayRole: 'Founder'
+        }
+      }
+    });
   }
 
   @UseGuards(JwtAuthGuard)
