@@ -121,11 +121,13 @@ function DashboardContent() {
                                                     <p className="text-lg mb-6 leading-relaxed font-serif italic">
                                                         "Jump back into your campus hub. Events, clubs, and chaos await."
                                                     </p>
-                                                    <Link href={`/colleges/${myCollege.slug}`}>
-                                                        <RetroButton className="bg-black text-white hover:bg-gray-800 px-8 py-3 text-lg">
-                                                            ENTER CAMPUS -&gt;
-                                                        </RetroButton>
-                                                    </Link>
+                                                    {myCollege.slug && (
+                                                        <Link href={`/colleges/${myCollege.slug}`}>
+                                                            <RetroButton className="bg-black text-white hover:bg-gray-800 px-8 py-3 text-lg">
+                                                                ENTER CAMPUS -&gt;
+                                                            </RetroButton>
+                                                        </Link>
+                                                    )}
                                                 </>
                                             ) : (
                                                 <>

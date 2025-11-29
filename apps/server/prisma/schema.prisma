@@ -181,6 +181,7 @@ model MarketplaceListing {
   title       String
   description String?
   price       Int
+  category    String   @default("OTHER")
   imageUrl    String?
   ownerId     String
   collegeId   String?

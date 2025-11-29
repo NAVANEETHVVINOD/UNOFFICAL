@@ -1,20 +1,20 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { NewspaperCard, RetroButton, Badge, Tape } from '../../../../components/ui/NewspaperUI';
 import Doodle from '../../../../components/ui/Doodle';
 import { api } from '../../../../../lib/api';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export default function CreateListingPage({ params }: PageProps) {
     const router = useRouter();
-    const { slug } = params;
+    const { slug } = use(params);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
@@ -159,7 +159,7 @@ export default function CreateListingPage({ params }: PageProps) {
                 </NewspaperCard>
             </div>
 
-            <Doodle src="/doodles/money.svg" className="fixed bottom-10 right-10 w-32 h-32 opacity-20 -rotate-12 pointer-events-none" />
+            <Doodle src="/doodles/shopping-bag.svg" className="fixed bottom-10 right-10 w-32 h-32 opacity-20 -rotate-12 pointer-events-none" />
         </div>
     );
 }
