@@ -15,9 +15,9 @@ import { redirect } from 'next/navigation';
 import { getServerProfile } from '../../../lib/server-utils';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export default async function CollegeHome({ params }: PageProps) {
@@ -31,7 +31,7 @@ export default async function CollegeHome({ params }: PageProps) {
         redirect('/onboarding');
     }
 
-    const { slug } = params;
+    const { slug } = await params;
     const collegeName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     return (
