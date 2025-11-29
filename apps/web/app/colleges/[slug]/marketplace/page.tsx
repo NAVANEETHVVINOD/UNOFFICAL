@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { NewspaperCard, RetroButton, Badge, Sticker } from '../../../components/ui/NewspaperUI';
 import Doodle from '../../../components/ui/Doodle';
 import { motion } from 'framer-motion';
@@ -22,15 +22,15 @@ interface MarketplaceItem {
 }
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export default function CollegeMarketplacePage({ params }: PageProps) {
     const [items, setItems] = useState<MarketplaceItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const { slug } = params;
+    const { slug } = use(params);
 
     useEffect(() => {
         fetchItems();
@@ -102,7 +102,7 @@ export default function CollegeMarketplacePage({ params }: PageProps) {
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                                                <Doodle src="/doodles/camera.svg" className="w-12 h-12 opacity-20" />
+                                                <Doodle src="/doodles/shopping-bag.svg" className="w-12 h-12 opacity-20" />
                                             </div>
                                         )}
                                     </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { NewspaperCard, RetroButton, Badge } from '../../../components/ui/NewspaperUI';
 import Doodle from '../../../components/ui/Doodle';
 import { motion } from 'framer-motion';
@@ -19,15 +19,15 @@ interface Event {
 }
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export default function CollegeEventsPage({ params }: PageProps) {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
-    const { slug } = params;
+    const { slug } = use(params);
 
     useEffect(() => {
         // In a real app, we would fetch events specific to this college slug

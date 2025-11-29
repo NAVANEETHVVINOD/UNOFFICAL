@@ -154,21 +154,21 @@ export default async function CollegeHome({ params }: PageProps) {
                             date="OCT 24"
                             title="Intro to React Workshop"
                             time="2:00 PM"
-                            icon="/doodles/computer.svg"
+                            icon="/doodles/book.svg"
                             color="bg-accent-blue"
                         />
                         <EventRow
                             date="OCT 26"
                             title="Halloween Party"
                             time="8:00 PM"
-                            icon="/doodles/ghost.svg"
+                            icon="/doodles/star.svg"
                             color="bg-accent-pink"
                         />
                         <EventRow
                             date="NOV 01"
                             title="Career Fair 2024"
                             time="10:00 AM"
-                            icon="/doodles/briefcase.svg"
+                            icon="/doodles/shopping-bag.svg"
                             color="bg-accent-yellow"
                         />
                     </div>
