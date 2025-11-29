@@ -26,8 +26,7 @@ import { api } from '../../lib/api';
 function DashboardContent() {
     const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
-    const [globalEvents, setGlobalEvents] = useState<any[]>([]);
-    const [colleges, setColleges] = useState<any[]>([]);
+    const [events, setEvents] = useState<any[]>([]);
     const [loadingData, setLoadingData] = useState(false);
 
     useEffect(() => {
@@ -37,27 +36,24 @@ function DashboardContent() {
     }, [isAuthenticated, router, loading]);
 
     useEffect(() => {
-        console.log('DashboardClient: user', user);
-        const fetchGlobalData = async () => {
+        const fetchDashboardData = async () => {
+            if (!user?.profile?.college?.slug) return;
+
             setLoadingData(true);
             try {
-                console.log('DashboardClient: Fetching global data...');
-                const [eventsData, collegesData] = await Promise.all([
-                    api.getEvents(), // Fetch all events (global)
-                    api.getColleges()
-                ]);
-                console.log('DashboardClient: Data fetched', { eventsData, collegesData });
-                setGlobalEvents(eventsData.slice(0, 5)); // Top 5 global events
-                setColleges(collegesData);
+                console.log('DashboardClient: Fetching college data...');
+                const eventsData = await api.getEvents(user.profile.college.slug);
+                console.log('DashboardClient: Data fetched', { eventsData });
+                setEvents(eventsData.slice(0, 5)); // Top 5 events
             } catch (error) {
-                console.error("Failed to fetch global dashboard data", error);
+                console.error("Failed to fetch dashboard data", error);
             } finally {
                 setLoadingData(false);
             }
         };
 
         if (user) {
-            fetchGlobalData();
+            fetchDashboardData();
         }
     }, [user]);
 
@@ -92,7 +88,7 @@ function DashboardContent() {
                             <h1 className="font-display text-5xl md:text-7xl font-black">CAMPUS KERALA</h1>
                         </div>
                         <div className="text-right hidden md:block">
-                            <Badge className="bg-accent-yellow text-black border-black">GLOBAL_FEED</Badge>
+                            <Badge className="bg-accent-yellow text-black border-black">MY_CAMPUS</Badge>
                         </div>
                     </motion.div>
 
@@ -151,7 +147,7 @@ function DashboardContent() {
                                 </NewspaperCard>
                             </motion.div>
 
-                            {/* Global Happenings */}
+                            {/* College Happenings */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -159,14 +155,14 @@ function DashboardContent() {
                             >
                                 <h3 className="font-bold text-xl uppercase mb-6 flex items-center gap-2 border-b-4 border-black w-fit pb-1">
                                     <span className="w-3 h-3 bg-accent-pink border border-black"></span>
-                                    Happening Across Kerala
+                                    Happening at {myCollege?.name || 'Campus'}
                                 </h3>
 
                                 {loadingData ? (
-                                    <div className="text-center py-8 font-mono">Loading global feed...</div>
-                                ) : globalEvents.length > 0 ? (
+                                    <div className="text-center py-8 font-mono">Loading campus feed...</div>
+                                ) : events.length > 0 ? (
                                     <div className="space-y-6">
-                                        {globalEvents.map((event) => (
+                                        {events.map((event) => (
                                             <Link href={`/events/${event.id}`} key={event.id}>
                                                 <NewspaperCard className="hover:bg-white transition-all cursor-pointer p-6 group hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-4" noShadow>
                                                     <div className="flex gap-4">
@@ -177,7 +173,7 @@ function DashboardContent() {
                                                         <div>
                                                             <div className="flex gap-2 mb-1">
                                                                 <Badge className="text-[10px] py-0 px-2 bg-white border-black text-black">
-                                                                    {event.college?.name || 'GLOBAL'}
+                                                                    {event.college?.name || 'CAMPUS'}
                                                                 </Badge>
                                                                 <span className="text-xs font-mono text-gray-500 mt-1">@{event.venue}</span>
                                                             </div>
@@ -195,7 +191,7 @@ function DashboardContent() {
                                     </div>
                                 ) : (
                                     <NewspaperCard className="p-8 text-center bg-gray-50 border-dashed">
-                                        <p className="font-mono text-gray-500">No events found across the network.</p>
+                                        <p className="font-mono text-gray-500">No events found at your campus yet.</p>
                                     </NewspaperCard>
                                 )}
                             </motion.div>
@@ -208,38 +204,13 @@ function DashboardContent() {
                             transition={{ delay: 0.4 }}
                             className="space-y-8"
                         >
-                            {/* Explore Colleges */}
-                            <div className="relative">
-                                <Tape className="absolute -top-3 -right-3 rotate-12 z-10" />
-                                <NewspaperCard className="bg-white p-6">
-                                    <h3 className="font-pixel text-xl mb-6 border-b-2 border-black pb-2">EXPLORE_CAMPUSES</h3>
-                                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                                        {colleges.map(college => (
-                                            <Link href={`/colleges/${college.slug}`} key={college?.id} className="block group">
-                                                <div className="p-3 border-2 border-gray-200 hover:border-black hover:bg-accent-yellow transition-all rounded-lg">
-                                                    <h4 className="font-bold text-sm group-hover:underline">{college?.name}</h4>
-                                                    <p className="text-xs text-gray-500 group-hover:text-black">{college?.city}</p>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                        {colleges.length === 0 && !loadingData && (
-                                            <p className="text-sm text-gray-500 italic">No colleges found.</p>
-                                        )}
-                                    </div>
-                                </NewspaperCard>
-                            </div>
-
                             {/* Quick Stats */}
                             <NewspaperCard className="p-6 bg-black text-white">
-                                <h3 className="font-bold text-lg uppercase mb-4 border-b border-gray-700 pb-2">Network Stats</h3>
+                                <h3 className="font-bold text-lg uppercase mb-4 border-b border-gray-700 pb-2">Campus Stats</h3>
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-400 text-sm">Colleges</span>
-                                        <span className="font-pixel text-accent-green">{colleges.length}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-400 text-sm">Total Events</span>
-                                        <span className="font-pixel text-accent-pink">{globalEvents.length}+</span>
+                                        <span className="text-gray-400 text-sm">My Events</span>
+                                        <span className="font-pixel text-accent-pink">{events.length}</span>
                                     </div>
                                 </div>
                             </NewspaperCard>
