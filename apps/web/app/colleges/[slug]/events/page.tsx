@@ -36,8 +36,7 @@ export default function CollegeEventsPage({ params }: PageProps) {
 
     const fetchEvents = async () => {
         try {
-            // TODO: Add college filter to API
-            const data = await api.getEvents();
+            const data = await api.getEvents(slug);
             setEvents(data);
         } catch (error) {
             console.error('Failed to fetch events:', error);

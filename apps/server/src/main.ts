@@ -22,10 +22,14 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // CORS
-  // CORS
-  const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://linker-inky.vercel.app',
+    process.env.CORS_ORIGIN
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: allowedOrigin,
+    origin: allowedOrigins,
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",

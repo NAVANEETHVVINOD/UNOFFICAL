@@ -30,7 +30,7 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
         const response = await fetch(fullUrl, {
             ...options,
             headers,
-            credentials: 'include',
+            credentials: 'omit',
         });
 
         if (!response.ok) {
@@ -87,6 +87,8 @@ export const api = {
     getColleges: () => apiRequest('/colleges'),
 
     getCollegeBySlug: (slug: string) => apiRequest(`/colleges/${slug}`),
+
+    getCollegeStats: (slug: string) => apiRequest(`/colleges/${slug}/stats`),
 
     // Clubs
     getClubs: (collegeSlug?: string) => {

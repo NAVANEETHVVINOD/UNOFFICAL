@@ -7,6 +7,7 @@ import {
   UseGuards,
   Request,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -17,11 +18,16 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) { }
 
   @Get()
-  async findAll(@Query('college') collegeSlug?: string) {
+  async findAll(@Query('collegeSlug') collegeSlug?: string) {
     console.log('EventsController: findAll called', { collegeSlug });
-    const where: Prisma.EventWhereInput = collegeSlug
-      ? { college: { slug: collegeSlug } }
-      : {};
+
+    if (!collegeSlug) {
+      throw new BadRequestException('collegeSlug is required');
+    }
+
+    const where: Prisma.EventWhereInput = {
+      college: { slug: collegeSlug }
+    };
     return this.eventsService.findAll({ where });
   }
 

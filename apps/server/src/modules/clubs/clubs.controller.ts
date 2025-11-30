@@ -7,6 +7,7 @@ import {
   UseGuards,
   Request,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClubsService } from './clubs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -17,10 +18,14 @@ export class ClubsController {
   constructor(private readonly clubsService: ClubsService) { }
 
   @Get()
-  async findAll(@Query('college') collegeSlug?: string) {
-    const where: Prisma.ClubWhereInput = collegeSlug
-      ? { college: { slug: collegeSlug } }
-      : {};
+  async findAll(@Query('collegeSlug') collegeSlug?: string) {
+    if (!collegeSlug) {
+      throw new BadRequestException('collegeSlug is required');
+    }
+
+    const where: Prisma.ClubWhereInput = {
+      college: { slug: collegeSlug }
+    };
     return this.clubsService.findAll({ where });
   }
 

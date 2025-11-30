@@ -4,7 +4,7 @@ import { Profile, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProfilesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findOne(
     profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput,
@@ -23,6 +23,17 @@ export class ProfilesService {
 
     // Validation: College is required to complete onboarding
     const updateData = data as any;
+
+    // Validate College Existence
+    if (updateData.collegeId && typeof updateData.collegeId === 'string') {
+      const collegeExists = await this.prisma.college.findUnique({
+        where: { id: updateData.collegeId }
+      });
+      if (!collegeExists) {
+        throw new BadRequestException('Invalid collegeId');
+      }
+    }
+
     if (updateData.isOnboarded === true) {
       // Check if collegeId is being set OR already exists
       if (!updateData.collegeId) {
