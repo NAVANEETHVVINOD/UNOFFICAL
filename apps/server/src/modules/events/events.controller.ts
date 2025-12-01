@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
 
   @Get()
   async findAll(
@@ -45,7 +45,7 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLUB_ADMIN, Role.COLLEGE_ADMIN)
+  @Roles('CLUB_ADMIN' as Role, 'COLLEGE_ADMIN' as Role)
   @Post()
   async create(
     @Request() req,
@@ -72,7 +72,7 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLUB_ADMIN, Role.COLLEGE_ADMIN)
+  @Roles('CLUB_ADMIN' as Role, 'COLLEGE_ADMIN' as Role)
   @Post(':id/qr')
   async generateQr(@Param('id') eventId: string) {
     return this.eventsService.generateQr(eventId);
