@@ -85,6 +85,7 @@ npx prisma db push   # Push schema to database
 ## 🗄️ Database Schema
 
 ### Models
+
 - **User** - User accounts with authentication
 - **Profile** - User profile information
 - **College** - College/university information
@@ -97,6 +98,7 @@ npx prisma db push   # Push schema to database
 - **NoteLike** - Note likes (M:N relation)
 
 ### Enums
+
 - **Role**: STUDENT, CLUBADMIN, ADMIN, SUPERADMIN
 - **EventRSVPStatus**: GOING, INTERESTED, NOT_GOING
 - **ListingStatus**: ACTIVE, SOLD, DELETED
@@ -104,6 +106,7 @@ npx prisma db push   # Push schema to database
 ## 🔐 API Endpoints
 
 ### Authentication
+
 ```
 POST   /auth/register    # Register new user
 POST   /auth/login       # Login user
@@ -111,6 +114,7 @@ POST   /auth/refresh     # Refresh access token
 ```
 
 ### Users & Profiles
+
 ```
 GET    /users/me         # Get current user
 GET    /profiles/me      # Get current profile
@@ -118,6 +122,7 @@ PATCH  /profiles/me      # Update profile
 ```
 
 ### Colleges & Clubs
+
 ```
 GET    /colleges         # List all colleges
 GET    /colleges/:slug   # Get college by slug
@@ -128,6 +133,7 @@ DELETE /clubs/:id/leave  # Leave a club
 ```
 
 ### Events
+
 ```
 GET    /events           # List all events
 GET    /events/:id       # Get event by ID
@@ -136,6 +142,7 @@ POST   /events/:id/rsvp  # RSVP to event
 ```
 
 ### Marketplace
+
 ```
 GET    /marketplace      # List all listings
 GET    /marketplace/:id  # Get listing by ID
@@ -144,6 +151,7 @@ PATCH  /marketplace/:id  # Update listing (owner only)
 ```
 
 ### Notes
+
 ```
 GET    /notes            # List all notes
 GET    /notes/:id        # Get note by ID
@@ -161,6 +169,7 @@ Authorization: Bearer <your-jwt-token>
 ```
 
 ### Token Expiry
+
 - **Access Token**: 15 minutes
 - **Refresh Token**: 7 days
 
@@ -169,11 +178,11 @@ Authorization: Bearer <your-jwt-token>
 1. Push code to GitHub
 2. Create Web Service in Render
 3. Configure:
-   - **Build Command**: 
+   - **Build Command**:
      ```bash
      cd apps/server && npm install --legacy-peer-deps && npx prisma generate && npm run build
      ```
-   - **Start Command**: 
+   - **Start Command**:
      ```bash
      cd apps/server && npm run start:prod
      ```

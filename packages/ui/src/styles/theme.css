@@ -1,38 +1,38 @@
 :root {
   /* Notebook Paper Colors */
   --paper-white: #fff;
-  --paper-line: #93B5C6;
-  --paper-margin: #FF7F7F;
+  --paper-line: #93b5c6;
+  --paper-margin: #ff7f7f;
   --paper-shadow: rgba(0, 0, 0, 0.1);
-  
+
   /* College Theme Colors */
-  --college-blue: #2C3E50;
-  --college-red: #E74C3C;
-  --college-yellow: #F1C40F;
-  --college-green: #27AE60;
-  
+  --college-blue: #2c3e50;
+  --college-red: #e74c3c;
+  --college-yellow: #f1c40f;
+  --college-green: #27ae60;
+
   /* Paper Texture */
   --notebook-bg: repeating-linear-gradient(
     #fff,
     #fff 24px,
     var(--paper-line) 25px
   );
-  
+
   /* Clip Colors */
-  --clip-metal: #D0D3D4;
-  --clip-shadow: #95A5A6;
-  
+  --clip-metal: #d0d3d4;
+  --clip-shadow: #95a5a6;
+
   /* Typography */
-  --handwriting: 'Kalam', cursive;
-  --notes: 'Indie Flower', cursive;
-  --headers: 'Permanent Marker', cursive;
-  --body: 'Quicksand', sans-serif;
-  
+  --handwriting: "Kalam", cursive;
+  --notes: "Indie Flower", cursive;
+  --headers: "Permanent Marker", cursive;
+  --body: "Quicksand", sans-serif;
+
   /* Spacing */
   --margin-left: 60px;
   --line-height: 25px;
   --card-spacing: 20px;
-  
+
   /* Animations */
   --swing-duration: 0.5s;
   --paper-rustle: 0.3s;

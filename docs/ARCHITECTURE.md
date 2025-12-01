@@ -3,7 +3,9 @@
 ## Page Structure & Component Architecture
 
 ### 1. Authentication & Onboarding
+
 #### Pages
+
 ```
 apps/web/src/app/
 ├── (auth)/
@@ -18,6 +20,7 @@ apps/web/src/app/
 ```
 
 #### Components
+
 - `AuthForm` - Reusable form component for auth flows
 - `SocialAuthButtons` - Social login options
 - `ProfileSetup` - Multi-step profile completion wizard
@@ -25,6 +28,7 @@ apps/web/src/app/
 - `VerificationStatus` - Email verification status indicator
 
 #### Database Schema
+
 ```prisma
 model User {
   id            String    @id @default(cuid())
@@ -53,7 +57,9 @@ model Profile {
 ```
 
 ### 2. Dashboard & Navigation
+
 #### Pages
+
 ```
 apps/web/src/app/
 └── (dashboard)/
@@ -66,6 +72,7 @@ apps/web/src/app/
 ```
 
 #### Components
+
 - `Sidebar` - Main navigation sidebar
 - `NotificationBell` - Real-time notification indicator
 - `QuickActions` - Frequently used actions menu
@@ -73,7 +80,9 @@ apps/web/src/app/
 - `ActivityFeed` - Recent activity timeline
 
 ### 3. Clubs Module
+
 #### Pages
+
 ```
 apps/web/src/app/(dashboard)/clubs/
 ├── page.tsx                      # Clubs listing
@@ -90,6 +99,7 @@ apps/web/src/app/(dashboard)/clubs/
 ```
 
 #### Components
+
 - `ClubCard` - Club preview card
 - `ClubHeader` - Club page header with cover
 - `MembersList` - Members management
@@ -97,6 +107,7 @@ apps/web/src/app/(dashboard)/clubs/
 - `ClubForm` - Club creation/edit form
 
 #### Database Schema
+
 ```prisma
 model Club {
   id          String    @id @default(cuid())
@@ -121,7 +132,9 @@ model ClubMember {
 ```
 
 ### 4. Events Module
+
 #### Pages
+
 ```
 apps/web/src/app/(dashboard)/events/
 ├── page.tsx                      # Events listing
@@ -134,6 +147,7 @@ apps/web/src/app/(dashboard)/events/
 ```
 
 #### Components
+
 - `EventCard` - Event preview card
 - `EventDetails` - Event information display
 - `AttendeesList` - Event attendees management
@@ -141,6 +155,7 @@ apps/web/src/app/(dashboard)/events/
 - `EventForm` - Event creation form
 
 #### Database Schema
+
 ```prisma
 model Event {
   id          String    @id @default(cuid())
@@ -167,7 +182,9 @@ model EventAttendee {
 ```
 
 ### 5. Marketplace Module
+
 #### Pages
+
 ```
 apps/web/src/app/(dashboard)/marketplace/
 ├── page.tsx                      # Listings page
@@ -181,6 +198,7 @@ apps/web/src/app/(dashboard)/marketplace/
 ```
 
 #### Components
+
 - `ListingCard` - Product listing card
 - `ListingGallery` - Product images gallery
 - `ChatInterface` - Buyer-seller messaging
@@ -188,6 +206,7 @@ apps/web/src/app/(dashboard)/marketplace/
 - `PriceFilter` - Price range filter
 
 #### Database Schema
+
 ```prisma
 model Listing {
   id          String    @id @default(cuid())
@@ -217,7 +236,9 @@ model Message {
 ```
 
 ### 6. Study Materials Module
+
 #### Pages
+
 ```
 apps/web/src/app/(dashboard)/study/
 ├── page.tsx                      # Materials listing
@@ -233,6 +254,7 @@ apps/web/src/app/(dashboard)/study/
 ```
 
 #### Components
+
 - `MaterialCard` - Study material preview
 - `SubjectFilter` - Subject filtering
 - `UploadForm` - Material upload form
@@ -240,6 +262,7 @@ apps/web/src/app/(dashboard)/study/
 - `PDFViewer` - Document preview
 
 #### Database Schema
+
 ```prisma
 model StudyMaterial {
   id          String    @id @default(cuid())
@@ -268,6 +291,7 @@ model MaterialVersion {
 ```
 
 ## UI Component Library
+
 ```
 packages/ui/src/components/
 ├── core/                       # Base components
@@ -294,6 +318,7 @@ packages/ui/src/components/
 ```
 
 ## Third-party Libraries
+
 1. **Core Libraries**
    - `next`: Frontend framework
    - `react`: UI library
@@ -325,6 +350,7 @@ packages/ui/src/components/
    - `jose`: JWT handling
 
 ## Development Process
+
 1. Set up UI component library first
 2. Implement authentication flows
 3. Create base layout and navigation
@@ -338,6 +364,7 @@ packages/ui/src/components/
 7. Polish UI/UX and animations
 
 ## Backend Architecture
+
 ```
 apps/server/src/modules/
 ├── auth/                      # Authentication
@@ -351,6 +378,7 @@ apps/server/src/modules/
 ```
 
 ## API Routes Structure
+
 ```
 apps/web/src/app/api/
 ├── auth/

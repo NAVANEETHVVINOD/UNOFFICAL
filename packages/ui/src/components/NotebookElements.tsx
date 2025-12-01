@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import { motion } from "framer-motion";
+import styled from "styled-components";
 
 export const NotebookPage = styled(motion.div)`
   position: relative;
@@ -7,9 +7,9 @@ export const NotebookPage = styled(motion.div)`
   min-height: 100vh;
   background: var(--notebook-bg);
   padding: 40px var(--margin-left);
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: calc(var(--margin-left) - 2px);
     top: 0;
@@ -17,9 +17,9 @@ export const NotebookPage = styled(motion.div)`
     width: 2px;
     background: var(--paper-margin);
   }
-  
+
   /* Paper texture and shadow */
-  box-shadow: 
+  box-shadow:
     -3px 0 6px var(--paper-shadow),
     3px 0 6px var(--paper-shadow);
 `;
@@ -34,9 +34,9 @@ export const PaperClip = styled(motion.div)`
   border-radius: 0 0 5px 5px;
   transform: rotate(-5deg);
   box-shadow: 2px 2px 5px var(--clip-shadow);
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 10px;
     left: 5px;
@@ -54,20 +54,20 @@ export const NotebookCard = styled(motion.div)`
   margin: var(--card-spacing) 0;
   box-shadow: 0 2px 8px var(--paper-shadow);
   transform-origin: top center;
-  
+
   /* Notebook paper lines */
   background-image: repeating-linear-gradient(
     transparent,
     transparent 24px,
     var(--paper-line) 25px
   );
-  
+
   h2 {
     font-family: var(--headers);
     color: var(--college-blue);
     margin-bottom: 15px;
   }
-  
+
   p {
     font-family: var(--handwriting);
     line-height: var(--line-height);
@@ -81,27 +81,27 @@ export const cardAnimations = {
     transition: {
       duration: 0.3,
       repeat: Infinity,
-      repeatType: "reverse"
-    }
+      repeatType: "reverse",
+    },
   },
   tap: {
     scale: 0.98,
-    rotate: 0
+    rotate: 0,
   },
   initial: {
-    rotate: Math.random() * 4 - 2
-  }
+    rotate: Math.random() * 4 - 2,
+  },
 };
 
 export const pageAnimations = {
   initial: { opacity: 0, y: 20 },
-  animate: { 
-    opacity: 1, 
+  animate: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
-      staggerChildren: 0.1
-    }
+      staggerChildren: 0.1,
+    },
   },
-  exit: { opacity: 0, y: -20 }
+  exit: { opacity: 0, y: -20 },
 };

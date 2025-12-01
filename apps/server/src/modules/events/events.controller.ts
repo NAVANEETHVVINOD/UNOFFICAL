@@ -11,24 +11,32 @@ import {
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) { }
+  constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  async findAll(@Query('collegeSlug') collegeSlug?: string) {
-    console.log('EventsController: findAll called', { collegeSlug });
+  async findAll(
+    @Query('collegeSlug') collegeSlug?: string,
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const take = limit ? parseInt(limit) : 10;
+    const where: Prisma.EventWhereInput = collegeSlug
+      ? { college: { slug: collegeSlug } }
+      : {};
 
-    if (!collegeSlug) {
-      throw new BadRequestException('collegeSlug is required');
-    }
-
-    const where: Prisma.EventWhereInput = {
-      college: { slug: collegeSlug }
-    };
-    return this.eventsService.findAll({ where });
+    return this.eventsService.findAll({
+      take,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      where,
+      orderBy: { startsAt: 'asc' }, // Or createdAt desc
+    });
   }
 
   @Get(':id')
@@ -36,17 +44,21 @@ export class EventsController {
     return this.eventsService.findOne({ id });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CLUB_ADMIN, Role.COLLEGE_ADMIN)
   @Post()
   async create(
     @Request() req,
     @Body() createEventDto: Prisma.EventCreateInput & { collegeSlug?: string },
   ) {
     const { collegeSlug, ...rest } = createEventDto;
-    return this.eventsService.create({
-      ...rest,
-      ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
-    }, req.user.userId);
+    return this.eventsService.create(
+      {
+        ...rest,
+        ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
+      },
+      req.user.userId,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -59,10 +71,10 @@ export class EventsController {
     return this.eventsService.rsvp(req.user.userId, eventId, status);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CLUB_ADMIN, Role.COLLEGE_ADMIN)
   @Post(':id/qr')
   async generateQr(@Param('id') eventId: string) {
-    // TODO: Check if user is admin/organizer
     return this.eventsService.generateQr(eventId);
   }
 

@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { motion } from "framer-motion"
-import { NotebookPage } from "../ui/NotebookUI"
+import { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { NotebookPage } from "../ui/NotebookUI";
 
 interface SectionContainerProps {
-  children: ReactNode
-  className?: string
-  withMargin?: boolean
-  withHeader?: boolean
-  withLines?: boolean
-  id?: string
+  children: ReactNode;
+  className?: string;
+  withMargin?: boolean;
+  withHeader?: boolean;
+  withLines?: boolean;
+  id?: string;
 }
 
 export default function SectionContainer({
@@ -19,11 +19,11 @@ export default function SectionContainer({
   withMargin = true,
   withHeader = false,
   withLines = true,
-  id
+  id,
 }: SectionContainerProps) {
   return (
     <section id={id} className={`min-h-screen flex items-center ${className}`}>
-      <NotebookPage 
+      <NotebookPage
         withMargin={withMargin}
         withHeader={withHeader}
         withLines={withLines}
@@ -39,5 +39,5 @@ export default function SectionContainer({
         </motion.div>
       </NotebookPage>
     </section>
-  )
+  );
 }

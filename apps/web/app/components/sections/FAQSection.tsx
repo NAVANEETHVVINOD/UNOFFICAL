@@ -1,33 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import SectionContainer from "../layout/SectionContainer"
-import ContentWrapper from "../layout/ContentWrapper"
-import { NotebookTitle, NotebookText, NotebookCard } from "../ui/NotebookUI"
-import { SparklesDoodle, BulbDoodle } from "../doodles/CollegeDoodles"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import SectionContainer from "../layout/SectionContainer";
+import ContentWrapper from "../layout/ContentWrapper";
+import { NotebookTitle, NotebookText, NotebookCard } from "../ui/NotebookUI";
+import { SparklesDoodle, BulbDoodle } from "../doodles/CollegeDoodles";
 
 const faqs = [
   {
     question: "How does the AI study assistant work?",
-    answer: "Our AI assistant uses natural language processing to understand your questions and provide personalized help. It can explain concepts, solve problems step-by-step, and adapt to your learning style."
+    answer:
+      "Our AI assistant uses natural language processing to understand your questions and provide personalized help. It can explain concepts, solve problems step-by-step, and adapt to your learning style.",
   },
   {
     question: "Can I use this platform for any subject?",
-    answer: "Yes! Our platform supports a wide range of subjects including Mathematics, Sciences, Computer Programming, Languages, and more. The AI assistant is trained on diverse educational content."
+    answer:
+      "Yes! Our platform supports a wide range of subjects including Mathematics, Sciences, Computer Programming, Languages, and more. The AI assistant is trained on diverse educational content.",
   },
   {
     question: "How do study groups work?",
-    answer: "You can create or join study groups based on your courses, interests, or study goals. Groups can share notes, schedule virtual study sessions, and collaborate on projects."
+    answer:
+      "You can create or join study groups based on your courses, interests, or study goals. Groups can share notes, schedule virtual study sessions, and collaborate on projects.",
   },
   {
     question: "Is there a mobile app available?",
-    answer: "Yes, we have mobile apps for both iOS and Android platforms. You can sync your study materials and access all features on the go."
-  }
-]
+    answer:
+      "Yes, we have mobile apps for both iOS and Android platforms. You can sync your study materials and access all features on the go.",
+  },
+];
 
 export default function FAQSection() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   return (
     <SectionContainer id="faq">
@@ -53,12 +57,14 @@ export default function FAQSection() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <NotebookCard 
-                className={`transform ${index % 2 === 0 ? 'rotate-[-0.5deg]' : 'rotate-[0.5deg]'}`}
+              <NotebookCard
+                className={`transform ${index % 2 === 0 ? "rotate-[-0.5deg]" : "rotate-[0.5deg]"}`}
               >
                 <button
                   className="w-full text-left p-6 flex justify-between items-start"
-                  onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+                  onClick={() =>
+                    setActiveIndex(activeIndex === index ? null : index)
+                  }
                 >
                   <NotebookText className="font-semibold pr-8">
                     {faq.question}
@@ -67,10 +73,14 @@ export default function FAQSection() {
                     animate={{ rotate: activeIndex === index ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {activeIndex === index ? <BulbDoodle className="w-6 h-6" /> : <SparklesDoodle className="w-6 h-6" />}
+                    {activeIndex === index ? (
+                      <BulbDoodle className="w-6 h-6" />
+                    ) : (
+                      <SparklesDoodle className="w-6 h-6" />
+                    )}
                   </motion.div>
                 </button>
-                
+
                 <AnimatePresence>
                   {activeIndex === index && (
                     <motion.div
@@ -94,5 +104,5 @@ export default function FAQSection() {
         </div>
       </ContentWrapper>
     </SectionContainer>
-  )
+  );
 }

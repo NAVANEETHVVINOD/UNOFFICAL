@@ -26,6 +26,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
 For production:
+
 ```env
 NEXT_PUBLIC_API_URL=https://your-backend-url.onrender.com
 ```
@@ -74,7 +75,7 @@ npm run lint         # Run ESLint
 - **Landing Page** (/) - Hero, features, CTA
 - **Login** (/login) - User authentication
 - **Register** (/register) - New user signup
-- **Dashboard** (/dashboard) - User dashboard  
+- **Dashboard** (/dashboard) - User dashboard
 - **Clubs** (/clubs) - Browse and join clubs
 - **Events** (/events) - Browse events and RSVP
 - **Marketplace** (/marketplace) - Buy/sell items
@@ -89,7 +90,7 @@ npm run lint         # Run ESLint
 2. Add `page.tsx` file
 3. Update navigation in `components/common/Nav.tsx`
 
-### Adding a Component  
+### Adding a Component
 
 1. Create component in `components/` (category folder)
 2. Export from `index.ts` if needed
@@ -119,11 +120,12 @@ npm run lint         # Run ESLint
 All API calls use `NEXT_PUBLIC_API_URL` from environment variables.
 
 Example:
+
 ```typescript
 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, password })
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password }),
 });
 ```
 

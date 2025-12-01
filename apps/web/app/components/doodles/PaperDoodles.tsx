@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 export const PaperclipDoodle = () => (
   <motion.svg
@@ -10,12 +10,12 @@ export const PaperclipDoodle = () => (
     className="absolute -right-4 bottom-1/4"
     animate={{
       x: [0, -10, 0],
-      rotate: [0, -5, 0]
+      rotate: [0, -5, 0],
     }}
     transition={{
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -26,22 +26,22 @@ export const PaperclipDoodle = () => (
       fill="none"
     />
   </motion.svg>
-)
+);
 
 export const StickNoteDoodle = () => (
   <motion.div
     className="sticky-note"
     animate={{
       rotate: [2, -1, 2],
-      y: [0, -5, 0]
+      y: [0, -5, 0],
     }}
     transition={{
       duration: 5,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   />
-)
+);
 
 export const StarDoodle = () => (
   <motion.svg
@@ -50,12 +50,12 @@ export const StarDoodle = () => (
     viewBox="0 0 32 32"
     animate={{
       scale: [1, 1.2, 1],
-      rotate: [0, 180, 360]
+      rotate: [0, 180, 360],
     }}
     transition={{
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -63,7 +63,7 @@ export const StarDoodle = () => (
       fill="var(--sunshine-yellow)"
     />
   </motion.svg>
-)
+);
 
 export const NotebookDoodles = () => (
   <motion.div
@@ -75,7 +75,7 @@ export const NotebookDoodles = () => (
       backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M10 10h10v10H10zM30 10h10v10H30zM50 10h10v10H50zM10 30h10v10H10zM30 30h10v10H30z' stroke='%2387CEEB' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E")`,
     }}
   />
-)
+);
 
 export const PenDoodle = () => (
   <motion.svg
@@ -85,12 +85,12 @@ export const PenDoodle = () => (
     className="absolute right-2 top-2"
     animate={{
       rotate: [0, 10, 0],
-      x: [0, 5, 0]
+      x: [0, 5, 0],
     }}
     transition={{
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -100,4 +100,4 @@ export const PenDoodle = () => (
       fill="none"
     />
   </motion.svg>
-)
+);

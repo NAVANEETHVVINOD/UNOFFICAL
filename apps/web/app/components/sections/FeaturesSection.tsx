@@ -1,54 +1,60 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { CalendarDoodle, GroupDoodle, ShoppingBagDoodle, ChatDoodle, AwardDoodle } from "../doodles/AppDoodles"
-import { BookDoodle } from "../doodles/CollegeDoodles"
-import { Tape } from "../ui/Tape"
+import { motion } from "framer-motion";
+import {
+  CalendarDoodle,
+  GroupDoodle,
+  ShoppingBagDoodle,
+  ChatDoodle,
+  AwardDoodle,
+} from "../doodles/AppDoodles";
+import { BookDoodle } from "../doodles/CollegeDoodles";
+import { Tape } from "../ui/Tape";
 
 const features = [
   {
     icon: CalendarDoodle,
-    title: 'Event Hub',
-    description: 'Discover & join campus events in real-time',
-    color: 'from-blue-400 to-cyan-400',
-    rotation: -2
+    title: "Event Hub",
+    description: "Discover & join campus events in real-time",
+    color: "from-blue-400 to-cyan-400",
+    rotation: -2,
   },
   {
     icon: GroupDoodle,
-    title: 'Club Central',
-    description: 'Find your tribe, join clubs that match your vibe',
-    color: 'from-purple-400 to-pink-400',
-    rotation: 2
+    title: "Club Central",
+    description: "Find your tribe, join clubs that match your vibe",
+    color: "from-purple-400 to-pink-400",
+    rotation: 2,
   },
   {
     icon: BookDoodle,
-    title: 'Notes Library',
-    description: 'Share & access study materials instantly',
-    color: 'from-green-400 to-teal-400',
-    rotation: -1
+    title: "Notes Library",
+    description: "Share & access study materials instantly",
+    color: "from-green-400 to-teal-400",
+    rotation: -1,
   },
   {
     icon: ShoppingBagDoodle,
-    title: 'Campus Mart',
-    description: 'Buy, sell, exchange - sustainable student economy',
-    color: 'from-orange-400 to-red-400',
-    rotation: 1
+    title: "Campus Mart",
+    description: "Buy, sell, exchange - sustainable student economy",
+    color: "from-orange-400 to-red-400",
+    rotation: 1,
   },
   {
     icon: ChatDoodle,
-    title: 'Real-time Chat',
-    description: 'Connect with peers, organize hangouts',
-    color: 'from-yellow-400 to-amber-400',
-    rotation: -2
+    title: "Real-time Chat",
+    description: "Connect with peers, organize hangouts",
+    color: "from-yellow-400 to-amber-400",
+    rotation: -2,
   },
   {
     icon: AwardDoodle,
-    title: 'Achievements',
-    description: 'Earn badges, climb leaderboards, get recognized',
-    color: 'from-indigo-400 to-purple-400',
-    rotation: 2
-  }
-]
+    title: "Achievements",
+    description: "Earn badges, climb leaderboards, get recognized",
+    color: "from-indigo-400 to-purple-400",
+    rotation: 2,
+  },
+];
 
 export default function FeaturesSection() {
   return (
@@ -65,11 +71,11 @@ export default function FeaturesSection() {
             className="text-6xl md:text-8xl font-black mb-6"
             style={{
               fontFamily: "'Permanent Marker', cursive",
-              background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(3px 3px 0px rgba(0,0,0,0.1))',
-              transform: 'rotate(-1deg)'
+              background: "linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              filter: "drop-shadow(3px 3px 0px rgba(0,0,0,0.1))",
+              transform: "rotate(-1deg)",
             }}
           >
             Everything You Need!
@@ -82,7 +88,7 @@ export default function FeaturesSection() {
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {features.map((feature, index) => {
-            const Icon = feature.icon
+            const Icon = feature.icon;
             return (
               <motion.div
                 key={index}
@@ -98,7 +104,7 @@ export default function FeaturesSection() {
                   whileHover={{
                     scale: 1.05,
                     rotate: 0,
-                    transition: { duration: 0.2 }
+                    transition: { duration: 0.2 },
                   }}
                 >
                   {/* Decorative tape */}
@@ -110,7 +116,10 @@ export default function FeaturesSection() {
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Icon className="w-8 h-8 text-gray-800" stroke="currentColor" />
+                    <Icon
+                      className="w-8 h-8 text-gray-800"
+                      stroke="currentColor"
+                    />
                   </motion.div>
 
                   {/* Content */}
@@ -122,15 +131,13 @@ export default function FeaturesSection() {
                   </p>
 
                   {/* Hover effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"
-                  />
+                  <motion.div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                 </motion.div>
               </motion.div>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }

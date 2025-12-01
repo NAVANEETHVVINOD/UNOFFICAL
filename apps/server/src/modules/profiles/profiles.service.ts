@@ -4,7 +4,7 @@ import { Profile, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProfilesService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async findOne(
     profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput,
@@ -27,7 +27,7 @@ export class ProfilesService {
     // Validate College Existence
     if (updateData.collegeId && typeof updateData.collegeId === 'string') {
       const collegeExists = await this.prisma.college.findUnique({
-        where: { id: updateData.collegeId }
+        where: { id: updateData.collegeId },
       });
       if (!collegeExists) {
         throw new BadRequestException('Invalid collegeId');
@@ -45,6 +45,28 @@ export class ProfilesService {
         }
       }
     }
+
+    // Validate Social URLs
+    const validateUrl = (url: string, domain: string) => {
+      if (!url) return;
+      try {
+        const parsed = new URL(url);
+        if (!parsed.hostname.includes(domain)) {
+          throw new Error();
+        }
+        // Basic XSS prevention
+        if (parsed.protocol === 'javascript:') {
+          throw new Error();
+        }
+      } catch {
+        throw new BadRequestException(`Invalid ${domain} URL`);
+      }
+    };
+
+    if (updateData.instagram)
+      validateUrl(updateData.instagram, 'instagram.com');
+    if (updateData.linkedin) validateUrl(updateData.linkedin, 'linkedin.com');
+    if (updateData.githubUrl) validateUrl(updateData.githubUrl, 'github.com');
 
     return this.prisma.profile.update({
       data,

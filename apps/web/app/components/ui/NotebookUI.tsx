@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { ReactNode } from "react"
+import { motion } from "framer-motion";
+import { ReactNode } from "react";
 
 interface NotebookPageProps {
-  children: ReactNode
-  className?: string
-  withMargin?: boolean
-  withHeader?: boolean
-  withLines?: boolean
-  lineSpacing?: number
+  children: ReactNode;
+  className?: string;
+  withMargin?: boolean;
+  withHeader?: boolean;
+  withLines?: boolean;
+  lineSpacing?: number;
 }
 
 export function NotebookPage({
@@ -18,7 +18,7 @@ export function NotebookPage({
   withMargin = true,
   withHeader = false,
   withLines = true,
-  lineSpacing = 32
+  lineSpacing = 32,
 }: NotebookPageProps) {
   return (
     <div className={`relative min-h-screen bg-white ${className}`}>
@@ -33,7 +33,7 @@ export function NotebookPage({
               var(--sky-light) ${lineSpacing}px
             )
           `,
-          opacity: 0.3
+          opacity: 0.3,
         }}
       />
 
@@ -57,49 +57,52 @@ export function NotebookPage({
       )}
 
       {/* Content */}
-      <div className={`relative z-10 ${withMargin ? 'pl-8 md:pl-24' : ''} p-4 md:p-8`}>
+      <div
+        className={`relative z-10 ${withMargin ? "pl-8 md:pl-24" : ""} p-4 md:p-8`}
+      >
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 interface NotebookCardProps {
-  children: ReactNode
-  className?: string
-  rotate?: number
+  children: ReactNode;
+  className?: string;
+  rotate?: number;
 }
 
 export function NotebookCard({
   children,
   className = "",
-  rotate = 0
+  rotate = 0,
 }: NotebookCardProps) {
   return (
     <motion.div
       className={`bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 ${className}`}
       style={{
-        transform: `rotate(${rotate}deg)`
+        transform: `rotate(${rotate}deg)`,
       }}
       whileHover={{
         scale: 1.02,
         rotate: rotate + 2,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
     >
-      <div className="relative z-10 p-6">
-        {children}
-      </div>
+      <div className="relative z-10 p-6">{children}</div>
     </motion.div>
-  )
+  );
 }
 
 interface NotebookTitleProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
-export function NotebookTitle({ children, className = "" }: NotebookTitleProps) {
+export function NotebookTitle({
+  children,
+  className = "",
+}: NotebookTitleProps) {
   return (
     <motion.h2
       className={`font-hand text-4xl md:text-5xl text-sky-600 mb-6 ${className}`}
@@ -110,19 +113,19 @@ export function NotebookTitle({ children, className = "" }: NotebookTitleProps) 
     >
       {children}
     </motion.h2>
-  )
+  );
 }
 
 interface NotebookTextProps {
-  children: ReactNode
-  className?: string
-  withAnimation?: boolean
+  children: ReactNode;
+  className?: string;
+  withAnimation?: boolean;
 }
 
 export function NotebookText({
   children,
   className = "",
-  withAnimation = true
+  withAnimation = true,
 }: NotebookTextProps) {
   return (
     <motion.p
@@ -134,27 +137,28 @@ export function NotebookText({
     >
       {children}
     </motion.p>
-  )
+  );
 }
 
 interface NotebookButtonProps {
-  children: ReactNode
-  className?: string
-  onClick?: () => void
-  variant?: "primary" | "secondary"
+  children: ReactNode;
+  className?: string;
+  onClick?: () => void;
+  variant?: "primary" | "secondary";
 }
 
 export function NotebookButton({
   children,
   className = "",
   onClick,
-  variant = "primary"
+  variant = "primary",
 }: NotebookButtonProps) {
-  const baseClasses = "doodle-button font-hand text-xl px-8 py-3 transition-all"
+  const baseClasses =
+    "doodle-button font-hand text-xl px-8 py-3 transition-all";
   const variantClasses = {
     primary: "bg-sky-500 hover:bg-sky-600 text-white",
-    secondary: "bg-sunshine-orange hover:bg-sunshine-red text-white"
-  }
+    secondary: "bg-sunshine-orange hover:bg-sunshine-red text-white",
+  };
 
   return (
     <motion.button
@@ -165,5 +169,5 @@ export function NotebookButton({
     >
       {children}
     </motion.button>
-  )
+  );
 }

@@ -34,6 +34,42 @@ web-build/
 # Metro
 .metro-health-check*
 
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Next.js
+.next/
+out/
+build
+dist
+
+# Misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
 # IDE
 .idea
 .vscode/*
@@ -43,3 +79,11 @@ web-build/
 # Prisma
 prisma/*.db
 prisma/migrations/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Uploads
+uploads/

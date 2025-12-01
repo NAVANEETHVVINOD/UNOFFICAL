@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 export const PaperclipDoodle = () => (
   <motion.svg
@@ -10,14 +10,14 @@ export const PaperclipDoodle = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className="absolute -right-4 bottom-1/4"
-    animate={{ 
+    animate={{
       x: [0, -10, 0],
-      rotate: [0, -5, 0]
+      rotate: [0, -5, 0],
     }}
     transition={{
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -27,7 +27,7 @@ export const PaperclipDoodle = () => (
       strokeLinecap="round"
     />
   </motion.svg>
-)
+);
 
 export const PushpinDoodle = () => (
   <motion.svg
@@ -37,14 +37,14 @@ export const PushpinDoodle = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className="absolute -left-4 top-1/2"
-    animate={{ 
+    animate={{
       x: [0, 10, 0],
-      rotate: [0, 5, 0]
+      rotate: [0, 5, 0],
     }}
     transition={{
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -55,7 +55,7 @@ export const PushpinDoodle = () => (
     />
     <circle cx="24" cy="24" r="4" fill="#E74C3C" />
   </motion.svg>
-)
+);
 
 export const SparklesDoodle = () => (
   <motion.svg
@@ -64,14 +64,14 @@ export const SparklesDoodle = () => (
     viewBox="0 0 32 32"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    animate={{ 
+    animate={{
       scale: [1, 1.2, 1],
-      rotate: [0, 180, 360]
+      rotate: [0, 180, 360],
     }}
     transition={{
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -79,14 +79,14 @@ export const SparklesDoodle = () => (
       fill="#FFD700"
     />
   </motion.svg>
-)
+);
 
 export const NotebookDoodle = () => (
   <motion.div
     className="w-full h-full absolute inset-0 pointer-events-none z-0"
     style={{
       backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M0 0h60v60H0z'/%3E%3Cpath d='M10 10h10v10H10zM30 10h10v10H30zM50 10h10v10H50zM10 30h10v10H10zM30 30h10v10H30zM50 30h10v10H50z' stroke='%2393B5C6' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E")`,
-      opacity: 0.1
+      opacity: 0.1,
     }}
   />
-)
+);

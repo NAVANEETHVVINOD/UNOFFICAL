@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=VT323&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Shadows+Into+Light&family=Permanent+Marker&family=Rock+Salt&family=Silkscreen:wght@400;700&family=Moo+Lah+Lah&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Moo+Lah+Lah&family=Silkscreen:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=VT323&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Shadows+Into+Light&family=Permanent+Marker&family=Rock+Salt&family=Silkscreen:wght@400;700&family=Moo+Lah+Lah&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Moo+Lah+Lah&family=Silkscreen:wght@400;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,10 +15,10 @@ body {
 :root {
   --ink: #1a1a1a;
   --paper: #ffffff;
-  --accent-yellow: #FFD600;
-  --accent-blue: #2D5BFF;
-  --accent-pink: #FF2D88;
-  --accent-purple: #9D2DFF;
+  --accent-yellow: #ffd600;
+  --accent-blue: #2d5bff;
+  --accent-pink: #ff2d88;
+  --accent-purple: #9d2dff;
   --grid-color: #f0f0f0;
 }
 
@@ -53,22 +53,21 @@ body::before {
 
 /* Typography */
 .font-display {
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   font-weight: 900;
   letter-spacing: -0.02em;
 }
 
 .font-pixel {
-  font-family: 'VT323', monospace;
+  font-family: "VT323", monospace;
 }
 
 .font-serif {
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
 }
 
 /* Animations */
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0);
@@ -119,19 +118,19 @@ body::before {
 /* Border Color Animation */
 @keyframes border-color-change {
   0% {
-    border-color: #FACC15;
+    border-color: #facc15;
   }
 
   33% {
-    border-color: #4F46E5;
+    border-color: #4f46e5;
   }
 
   66% {
-    border-color: #F472B6;
+    border-color: #f472b6;
   }
 
   100% {
-    border-color: #FACC15;
+    border-color: #facc15;
   }
 }
 
@@ -160,24 +159,24 @@ body::before {
 
 /* Retro Text Styles */
 .text-shadow-retro {
-  text-shadow: 4px 4px 0px #FFD600;
+  text-shadow: 4px 4px 0px #ffd600;
   /* Linker Yellow */
 }
 
 .text-shadow-retro:hover {
-  text-shadow: 6px 6px 0px #FFD600;
+  text-shadow: 6px 6px 0px #ffd600;
   transform: translate(-2px, -2px);
 }
 
 .text-hero-moo {
-  color: #1E3A8A;
+  color: #1e3a8a;
   /* Dark Blue */
-  text-shadow: 4px 4px 0px #FFD600;
+  text-shadow: 4px 4px 0px #ffd600;
   /* Linker Yellow */
 }
 
 .text-hero-moo:hover {
-  text-shadow: 6px 6px 0px #FFD600;
+  text-shadow: 6px 6px 0px #ffd600;
 }
 
 /* Glitch Animation */
@@ -208,7 +207,7 @@ body::before {
 }
 
 .animate-glitch:hover {
-  animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
 }
 
 /* Ink Bleed Effect */
@@ -216,7 +215,7 @@ body::before {
   color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
-  background-image: linear-gradient(to bottom right, #2D5BFF, #4F46E5);
+  background-image: linear-gradient(to bottom right, #2d5bff, #4f46e5);
   text-shadow:
     2px 2px 0px rgba(45, 91, 255, 0.2),
     -1px -1px 0px rgba(79, 70, 229, 0.2),
@@ -232,7 +231,7 @@ body::before {
   top: 0;
   width: 100%;
   height: 100%;
-  color: #4F46E5;
+  color: #4f46e5;
   z-index: -1;
   filter: blur(4px);
   opacity: 0.7;

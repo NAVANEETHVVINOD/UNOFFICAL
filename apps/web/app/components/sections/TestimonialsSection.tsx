@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 const testimonials = [
   {
-    name: 'Rahul Kumar',
-    role: 'CS Student',
-    text: 'LINKER changed how I experience college life! Found my coding club here! 💻',
-    avatar: '🧑‍💻',
-    color: 'bg-blue-200'
+    name: "Rahul Kumar",
+    role: "CS Student",
+    text: "LINKER changed how I experience college life! Found my coding club here! 💻",
+    avatar: "🧑‍💻",
+    color: "bg-blue-200",
   },
   {
-    name: 'Priya Sharma',
-    role: 'Club President',
-    text: 'Managing our club is so easy now. Events get 3x more attendance! 🎯',
-    avatar: '👩‍🎓',
-    color: 'bg-pink-200'
+    name: "Priya Sharma",
+    role: "Club President",
+    text: "Managing our club is so easy now. Events get 3x more attendance! 🎯",
+    avatar: "👩‍🎓",
+    color: "bg-pink-200",
   },
   {
-    name: 'Arjun Patel',
-    role: 'Engineering Junior',
-    text: 'Sold my old books, got notes for exams. This app is a lifesaver! 📖',
-    avatar: '🧑‍🔧',
-    color: 'bg-green-200'
-  }
-]
+    name: "Arjun Patel",
+    role: "Engineering Junior",
+    text: "Sold my old books, got notes for exams. This app is a lifesaver! 📖",
+    avatar: "🧑‍🔧",
+    color: "bg-green-200",
+  },
+];
 
 export default function TestimonialsSection() {
   return (
@@ -34,10 +34,10 @@ export default function TestimonialsSection() {
           className="text-6xl md:text-8xl font-black text-center mb-16"
           style={{
             fontFamily: "'Permanent Marker', cursive",
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            filter: 'drop-shadow(3px 3px 0px rgba(0,0,0,0.1))'
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            filter: "drop-shadow(3px 3px 0px rgba(0,0,0,0.1))",
           }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -66,13 +66,17 @@ export default function TestimonialsSection() {
                 "{testimonial.text}"
               </p>
               <div>
-                <div className="font-black text-lg font-body">{testimonial.name}</div>
-                <div className="text-gray-600 font-bold font-body">{testimonial.role}</div>
+                <div className="font-black text-lg font-body">
+                  {testimonial.name}
+                </div>
+                <div className="text-gray-600 font-bold font-body">
+                  {testimonial.role}
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

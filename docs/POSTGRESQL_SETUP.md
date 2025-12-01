@@ -38,10 +38,11 @@
 
 1. Open Command Prompt or PowerShell
 2. Run these commands:
+
    ```powershell
    # Connect to database
    psql -U postgres -d college_connect
-   
+
    # You should see a prompt like: college_connect=#
    # Type \q to exit
    ```
@@ -51,17 +52,20 @@
 After successful installation:
 
 1. Run database migrations:
+
    ```bash
    cd apps/server
    npx prisma migrate dev --name init
    ```
 
 2. Generate Prisma client:
+
    ```bash
    npx prisma generate
    ```
 
 3. Seed initial data:
+
    ```bash
    npm run prisma:seed
    ```

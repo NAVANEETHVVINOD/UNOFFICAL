@@ -11,22 +11,40 @@ import {
 } from '@nestjs/common';
 import { ClubsService } from './clubs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('clubs')
 export class ClubsController {
-  constructor(private readonly clubsService: ClubsService) { }
+  constructor(private readonly clubsService: ClubsService) {}
 
   @Get()
-  async findAll(@Query('collegeSlug') collegeSlug?: string) {
-    if (!collegeSlug) {
-      throw new BadRequestException('collegeSlug is required');
-    }
-
+  async findAll(
+    @Query('collegeSlug') collegeSlug?: string,
+    @Query('search') search?: string,
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const take = limit ? parseInt(limit) : 10;
     const where: Prisma.ClubWhereInput = {
-      college: { slug: collegeSlug }
+      ...(collegeSlug ? { college: { slug: collegeSlug } } : {}),
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
     };
-    return this.clubsService.findAll({ where });
+
+    return this.clubsService.findAll({
+      take,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      where,
+    });
   }
 
   @Get(':id')
@@ -34,7 +52,8 @@ export class ClubsController {
     return this.clubsService.findOne({ id });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.COLLEGE_ADMIN, Role.PLATFORM_ADMIN)
   @Post()
   async create(
     @Request() req,
@@ -49,9 +68,9 @@ export class ClubsController {
         create: {
           userId: req.user.userId,
           role: 'LEAD',
-          displayRole: 'Founder'
-        }
-      }
+          displayRole: 'Founder',
+        },
+      },
     });
   }
 
@@ -67,14 +86,14 @@ export class ClubsController {
     return this.clubsService.leaveClub(req.user.userId, clubId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CLUB_ADMIN, Role.COLLEGE_ADMIN, Role.PLATFORM_ADMIN)
   @Post(':id/members/:userId')
   async updateMemberRole(
     @Param('id') clubId: string,
     @Param('userId') userId: string,
     @Body() body: { role: 'MEMBER' | 'LEAD' | 'STAFF'; displayRole?: string },
   ) {
-    // TODO: Add check if requester is Club Admin
     return this.clubsService.updateMemberRole(
       userId,
       clubId,

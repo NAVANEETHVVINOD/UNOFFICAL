@@ -1,9 +1,9 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Common environment variables
 export const commonEnvSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']),
-  APP_NAME: z.string().default('College Connect'),
+  NODE_ENV: z.enum(["development", "production", "test"]),
+  APP_NAME: z.string().default("College Connect"),
 });
 
 // Backend environment variables
@@ -11,7 +11,7 @@ export const backendEnvSchema = commonEnvSchema.extend({
   PORT: z.number().default(3001),
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string(),
-  JWT_EXPIRES_IN: z.string().default('7d'),
+  JWT_EXPIRES_IN: z.string().default("7d"),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.number().optional(),
   SMTP_USER: z.string().optional(),

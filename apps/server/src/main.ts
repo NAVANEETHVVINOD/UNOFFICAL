@@ -4,9 +4,20 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import * as Sentry from '@sentry/nestjs';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  Sentry.init({
+    dsn: configService.get('SENTRY_DSN'),
+    integrations: [nodeProfilingIntegration()],
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+  });
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -25,14 +36,15 @@ async function bootstrap() {
   const allowedOrigins = [
     'http://localhost:3000',
     'https://linker-inky.vercel.app',
-    process.env.CORS_ORIGIN
+    process.env.CORS_ORIGIN,
   ].filter(Boolean);
 
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders:
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
     exposedHeaders: ['Authorization'],
   });
 
@@ -51,7 +63,7 @@ async function bootstrap() {
   const { PrismaService } = require('./prisma/prisma.service');
   const prismaService = app.get(PrismaService);
   await prismaService.$connect();
-  console.log("Prisma connected successfully.");
+  console.log('Prisma connected successfully.');
 
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on: http://localhost:${port}`);

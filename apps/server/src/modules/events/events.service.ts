@@ -8,7 +8,7 @@ export class EventsService {
   constructor(
     private prisma: PrismaService,
     private qrService: QrService,
-  ) { }
+  ) {}
 
   async findAll(params: {
     skip?: number;
@@ -72,16 +72,33 @@ export class EventsService {
   }
 
   async generateQr(eventId: string) {
-    return this.qrService.generateQrCode(eventId);
+    const { qrCodeDataUrl, token } =
+      await this.qrService.generateQrCode(eventId);
+
+    // Store the token in the event
+    await this.prisma.event.update({
+      where: { id: eventId },
+      data: { qrToken: token },
+    });
+
+    return { qrCodeDataUrl, token };
   }
 
   async checkIn(userId: string, eventId: string, token: string) {
-    // In a real app, verify token against stored event token
-    // For now, we assume token validation passes if it matches eventId logic or similar
-    // But QrService.validateToken needs a stored token to compare against.
-    // For simplicity in this MVP, we might skip strict token validation or store it in Event.
+    // Verify token
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
 
-    // Let's just mark attendance
+    if (!event) {
+      throw new BadRequestException('Event not found');
+    }
+
+    if (event.qrToken !== token) {
+      throw new BadRequestException('Invalid QR Token');
+    }
+
+    // Mark attendance
     return this.prisma.eventAttendance.upsert({
       where: {
         eventId_userId: {
@@ -93,6 +110,7 @@ export class EventsService {
         checkInTime: new Date(),
         checkInMethod: 'QR',
         role: 'ATTENDEE',
+        status: 'GOING', // Confirm they are going if they check in
       },
       create: {
         userId,

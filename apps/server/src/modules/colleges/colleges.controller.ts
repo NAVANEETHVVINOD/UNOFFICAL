@@ -3,7 +3,7 @@ import { CollegesService } from './colleges.service';
 
 @Controller('colleges')
 export class CollegesController {
-  constructor(private readonly collegesService: CollegesService) { }
+  constructor(private readonly collegesService: CollegesService) {}
 
   @Get()
   async findAll() {

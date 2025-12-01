@@ -1,5 +1,5 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import styled from 'styled-components';
+import { motion, useScroll, useTransform } from "framer-motion";
+import styled from "styled-components";
 
 const ScrollDoodle = styled(motion.div)`
   position: fixed;
@@ -9,7 +9,7 @@ const ScrollDoodle = styled(motion.div)`
   width: 100px;
   height: 400px;
   pointer-events: none;
-  
+
   svg {
     width: 100%;
     height: 100%;
@@ -24,11 +24,7 @@ const ScrollDoodle = styled(motion.div)`
 export const ScrollProgress = () => {
   const { scrollYProgress } = useScroll();
   const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const opacity = useTransform(
-    scrollYProgress,
-    [0, 0.1, 0.9, 1],
-    [0, 1, 1, 0]
-  );
+  const opacity = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
 
   return (
     <ScrollDoodle style={{ opacity }}>

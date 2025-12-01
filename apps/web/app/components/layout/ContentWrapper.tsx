@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
+import { ReactNode } from "react";
 
 interface ContentWrapperProps {
-  children: ReactNode
-  className?: string
-  size?: "sm" | "md" | "lg" | "xl" | "full"
+  children: ReactNode;
+  className?: string;
+  size?: "sm" | "md" | "lg" | "xl" | "full";
 }
 
 const maxWidths = {
@@ -13,17 +13,17 @@ const maxWidths = {
   md: "max-w-4xl",
   lg: "max-w-6xl",
   xl: "max-w-7xl",
-  full: "max-w-full"
-}
+  full: "max-w-full",
+};
 
 export default function ContentWrapper({
   children,
   className = "",
-  size = "xl"
+  size = "xl",
 }: ContentWrapperProps) {
   return (
     <div className={`${maxWidths[size]} mx-auto px-4 md:px-6 ${className}`}>
       {children}
     </div>
-  )
+  );
 }

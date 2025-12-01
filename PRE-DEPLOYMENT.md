@@ -1,12 +1,14 @@
 # Pre-Deployment Checklist ✅
 
 ## Build Status
+
 - ✅ **Frontend Build**: Success (Next.js production build)
 - ✅ **Backend Build**: Success (NestJS/Prisma)
 - ✅ **TypeScript**: No errors
 - ✅ **Database**: Migrations applied, seed data loaded
 
 ## Features Completed
+
 - ✅ User authentication with college selection
 - ✅ College Hub with events, clubs, marketplace
 - ✅ Create pages for events, clubs, marketplace, notes, posts
@@ -14,6 +16,7 @@
 - ✅ Dashboard with college hub link
 
 ## Fixed Issues
+
 1. Port configuration (frontend → 4000)
 2. Server compilation (ts-node-dev setup)
 3. Module imports (PostsModule)
@@ -22,6 +25,7 @@
 6. Posts DTO (validation decorators)
 
 ## Known Limitations
+
 - SVG static file serving (Next.js dev server issue - works in production)
 - Real-time messaging (WebSocket implementation pending)
 - File uploads (direct upload not implemented, uses URLs)
@@ -70,9 +74,11 @@ git push origin main
 
 1. Go to [vercel.com](https://vercel.com)
 2. Import your repository
-3.  Configure:
-   - **Root Directory**: `apps/web`
-   - **Framework**: Next.js
+3. Configure:
+
+- **Root Directory**: `apps/web`
+- **Framework**: Next.js
+
 4. Add environment variable:
    ```
    NEXT_PUBLIC_API_URL=https://your-backend.onrender.com

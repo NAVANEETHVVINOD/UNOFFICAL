@@ -1,10 +1,19 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { PencilDoodle, BookDoodle, CoffeeDoodle } from "../doodles/CollegeDoodles"
-import { NotebookCard, NotebookTitle, NotebookText, NotebookButton } from "../ui/NotebookUI"
-import SectionContainer from "../layout/SectionContainer"
-import ContentWrapper from "../layout/ContentWrapper"
+import { motion } from "framer-motion";
+import {
+  PencilDoodle,
+  BookDoodle,
+  CoffeeDoodle,
+} from "../doodles/CollegeDoodles";
+import {
+  NotebookCard,
+  NotebookTitle,
+  NotebookText,
+  NotebookButton,
+} from "../ui/NotebookUI";
+import SectionContainer from "../layout/SectionContainer";
+import ContentWrapper from "../layout/ContentWrapper";
 
 export default function AboutSection() {
   return (
@@ -27,7 +36,7 @@ export default function AboutSection() {
                   "Information scattered across multiple platforms",
                   "Missing important events and deadlines",
                   "Difficulty finding study groups and resources",
-                  "Limited interaction with AI learning tools"
+                  "Limited interaction with AI learning tools",
                 ].map((text, index) => (
                   <motion.div
                     key={text}
@@ -66,16 +75,19 @@ export default function AboutSection() {
                 {[
                   {
                     title: "Smart Organization",
-                    description: "AI-powered tools to keep your academic life organized and efficient"
+                    description:
+                      "AI-powered tools to keep your academic life organized and efficient",
                   },
                   {
                     title: "Community Connection",
-                    description: "Connect with peers, join study groups, and share resources seamlessly"
+                    description:
+                      "Connect with peers, join study groups, and share resources seamlessly",
                   },
                   {
                     title: "Learning Enhancement",
-                    description: "Interactive AI assistance to help you master any subject"
-                  }
+                    description:
+                      "Interactive AI assistance to help you master any subject",
+                  },
                 ].map(({ title, description }, index) => (
                   <motion.div
                     key={title}
@@ -85,7 +97,9 @@ export default function AboutSection() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.2 }}
                   >
-                    <h4 className="font-patrick text-xl sm:text-2xl mb-2">{title}</h4>
+                    <h4 className="font-patrick text-xl sm:text-2xl mb-2">
+                      {title}
+                    </h4>
                     <NotebookText className="text-white/90 text-lg">
                       {description}
                     </NotebookText>
@@ -125,5 +139,5 @@ export default function AboutSection() {
         </motion.div>
       </ContentWrapper>
     </SectionContainer>
-  )
+  );
 }

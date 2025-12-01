@@ -27,10 +27,12 @@
 **LINKER** is a comprehensive social platform designed specifically for college students. It's your one-stop hub for campus life - manage clubs, discover events, buy/sell items, share study materials, and connect with your college community.
 
 ### **Live Demo**
+
 - 🌐 **Frontend**: [linker-inky.vercel.app](https://linker-inky.vercel.app)
 - 🔧 **Backend API**: [linker-backend-wx4i.onrender.com](https://linker-backend-wx4i.onrender.com)
 
 ### **Why LINKER?**
+
 - 🎨 **Beautiful UI** - Unique "Newspaper/Retro" aesthetic with hand-drawn elements
 - 🚀 **Fast & Modern** - Built with Next.js 15 and NestJS
 - 📱 **Mobile-First** - Fully responsive design
@@ -44,6 +46,7 @@
 ### **Core Modules** ✅ (Live)
 
 #### 🔐 **Authentication & Profiles**
+
 - Secure registration and login
 - Customizable user profiles
 - Bio, interests, social links (GitHub, Instagram)
@@ -51,12 +54,14 @@
 - Edit profile functionality
 
 #### 🏛️ **Clubs**
+
 - Browse all campus clubs
 - View club details and member count
 - Join/Leave clubs instantly
 - Search clubs by name or description
 
 #### 📅 **Events**
+
 - Discover upcoming campus events
 - RSVP with status (Going/Interested/Not Going)
 - **Create your own events**
@@ -64,6 +69,7 @@
 - View event details (date, time, location, organizer)
 
 #### 🛍️ **Marketplace**
+
 - Buy and sell items within your college
 - **Post new listings**
 - Browse with search functionality
@@ -71,6 +77,7 @@
 - Item status tracking (Active/Sold)
 
 #### 📚 **Study Materials (Notes)**
+
 - Upload and share study materials
 - **Like/Unlike system** for popular content
 - Download/view files
@@ -78,16 +85,19 @@
 - Search functionality
 
 #### 💬 **Community Feed**
+
 - **Create text posts** to share updates
 - Like posts
 - View community activity
 - Author information with timestamps
 
 #### 🎨 **UI/UX Excellence**
+
 - **Error Boundaries** - Graceful error handling on all pages
 - **Loading States** - Smooth loading experience
 
 ### **Frontend** (`apps/web`)
+
 ```
 Framework:    Next.js 15 (App Router)
 Language:     TypeScript
@@ -98,6 +108,7 @@ HTTP Client:  Fetch API
 ```
 
 ### **Backend** (`apps/server`)
+
 ```
 Framework:    NestJS 11
 Language:     TypeScript
@@ -109,6 +120,7 @@ Security:     Helmet, CORS, bcrypt
 ```
 
 ### **Infrastructure**
+
 ```
 Monorepo:     Turborepo
 Deployment:   Vercel (Frontend) + Render (Backend)
@@ -117,6 +129,7 @@ Version:      Git + GitHub
 ```
 
 ### **Database Models**
+
 ```
 User, Profile, College, Club, ClubMember
 Event, EventParticipant, MarketplaceListing
@@ -128,6 +141,7 @@ Note, NoteLike, Post, PostLike, Comment
 ## 🚀 Getting Started
 
 ### **Prerequisites**
+
 - Node.js ≥ 18.0.0
 - npm ≥ 9.0.0
 - PostgreSQL database (or Supabase account)
@@ -135,12 +149,14 @@ Note, NoteLike, Post, PostLike, Comment
 ### **Quick Start**
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/NAVANEETHVVINOD/UNOFFICAL.git
    cd UNOFFICAL
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install --legacy-peer-deps
    ```
@@ -148,11 +164,13 @@ Note, NoteLike, Post, PostLike, Comment
 3. **Set up environment variables**
 
    **Frontend** (`apps/web/.env.local`):
+
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:4000
    ```
 
    **Backend** (`apps/server/.env`):
+
    ```env
    DATABASE_URL="postgresql://user:password@host:5432/database"
    JWT_ACCESS_SECRET="your-secret-key-here"
@@ -164,6 +182,7 @@ Note, NoteLike, Post, PostLike, Comment
    ```
 
 4. **Set up the database**
+
    ```bash
    cd apps/server
    npx prisma generate
@@ -173,6 +192,7 @@ Note, NoteLike, Post, PostLike, Comment
    ```
 
 5. **Start development servers**
+
    ```bash
    # From root directory:
    npm run dev
@@ -197,6 +217,7 @@ Note, NoteLike, Post, PostLike, Comment
 ### **Available Scripts**
 
 **Root:**
+
 ```bash
 npm run dev          # Start all apps
 npm run build        # Build all apps
@@ -204,6 +225,7 @@ npm run lint         # Lint all apps
 ```
 
 **Frontend (`apps/web`):**
+
 ```bash
 npm run dev          # Dev server (localhost:3000)
 npm run build        # Production build
@@ -212,6 +234,7 @@ npm run lint         # ESLint
 ```
 
 **Backend (`apps/server`):**
+
 ```bash
 npm run start:dev    # NestJS dev mode with hot reload
 npm run build        # Build for production
@@ -220,6 +243,7 @@ npm run test         # Run tests
 ```
 
 **Database:**
+
 ```bash
 npx prisma generate            # Generate Prisma Client
 npx prisma migrate dev         # Create & apply migration
@@ -233,6 +257,7 @@ npx prisma db push             # Push schema changes (dev only)
 ## 🌐 Deployment
 
 ### **Production URLs**
+
 - **Frontend**: https://linker-inky.vercel.app
 - **Backend**: https://linker-backend-wx4i.onrender.com
 
@@ -253,11 +278,11 @@ npx prisma db push             # Push schema changes (dev only)
 
 1. Create new Web Service in [Render](https://render.com)
 2. Configure:
-   - **Build Command**: 
+   - **Build Command**:
      ```bash
      cd apps/server && npm install --legacy-peer-deps && npx prisma generate && npm run build
      ```
-   - **Start Command**: 
+   - **Start Command**:
      ```bash
      cd apps/server && npx prisma migrate deploy && npm run start:prod
      ```
@@ -314,12 +339,14 @@ UNOFFICAL/
 ## 📚 API Documentation
 
 ### **Base URL**
+
 - Local: `http://localhost:4000`
 - Production: `https://linker-backend-wx4i.onrender.com`
 
 ### **Authentication**
 
 **Register**
+
 ```http
 POST /auth/register
 Content-Type: application/json
@@ -333,6 +360,7 @@ Content-Type: application/json
 ```
 
 **Login**
+
 ```http
 POST /auth/login
 Content-Type: application/json
@@ -351,32 +379,33 @@ Response:
 
 ### **Protected Endpoints** (Require `Authorization: Bearer <token>`)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/users/me` | Get current user |
-| GET | `/profiles/:id` | Get profile by ID |
-| PATCH | `/profiles/:id` | Update profile |
-| GET | `/clubs` | List all clubs |
-| GET | `/clubs/:id` | Get club details |
-| POST | `/clubs/:id/join` | Join club |
-| DELETE | `/clubs/:id/leave` | Leave club |
-| GET | `/events` | List all events |
-| POST | `/events` | Create event |
-| POST | `/events/:id/rsvp` | RSVP to event |
-| GET | `/marketplace` | List marketplace items |
-| POST | `/marketplace` | Create listing |
-| GET | `/notes` | List study notes |
-| POST | `/notes` | Upload note |
-| POST | `/notes/:id/like` | Like note |
-| GET | `/posts` | List community posts |
-| POST | `/posts` | Create post |
-| POST | `/posts/:id/like` | Like post |
+| Method | Endpoint           | Description            |
+| ------ | ------------------ | ---------------------- |
+| GET    | `/users/me`        | Get current user       |
+| GET    | `/profiles/:id`    | Get profile by ID      |
+| PATCH  | `/profiles/:id`    | Update profile         |
+| GET    | `/clubs`           | List all clubs         |
+| GET    | `/clubs/:id`       | Get club details       |
+| POST   | `/clubs/:id/join`  | Join club              |
+| DELETE | `/clubs/:id/leave` | Leave club             |
+| GET    | `/events`          | List all events        |
+| POST   | `/events`          | Create event           |
+| POST   | `/events/:id/rsvp` | RSVP to event          |
+| GET    | `/marketplace`     | List marketplace items |
+| POST   | `/marketplace`     | Create listing         |
+| GET    | `/notes`           | List study notes       |
+| POST   | `/notes`           | Upload note            |
+| POST   | `/notes/:id/like`  | Like note              |
+| GET    | `/posts`           | List community posts   |
+| POST   | `/posts`           | Create post            |
+| POST   | `/posts/:id/like`  | Like post              |
 
 ---
 
 ## 🗺️ Roadmap
 
 ### **Phase 1: MVP** ✅ (Complete - Nov 2024)
+
 - [x] Authentication & User Management
 - [x] Clubs, Events, Marketplace, Notes modules
 - [x] Community Feed
@@ -384,17 +413,20 @@ Response:
 - [x] Responsive UI with Error Handling
 
 ### **Phase 2: Production Launch** 🚀 (In Progress)
+
 - [ ] Deploy to production
 - [ ] Collect user feedback (50+ students)
 - [ ] Bug fixes & iterations
 
 ### **Phase 3: AI Assistant** 🤖 (Dec 2024)
+
 - [ ] Gemini API integration
 - [ ] Personalized academic assistant
 - [ ] Resume & LinkedIn generator
 - [ ] RAG for college-specific data
 
 ### **Phase 4: Advanced Features** (Q1 2025)
+
 - [ ] Real-time messaging
 - [ ] Push notifications
 - [ ] Admin dashboard
@@ -414,6 +446,7 @@ We welcome contributions! Here's how:
 5. Open a Pull Request
 
 **Development Guidelines:**
+
 - Follow TypeScript best practices
 - Maintain the "Newspaper" UI theme
 - Write descriptive commit messages
@@ -429,7 +462,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-**Navaneeth V** - Creator & Lead Developer  
+**Navaneeth V** - Creator & Lead Developer
+
 - GitHub: [@NAVANEETHVVINOD](https://github.com/NAVANEETHVVINOD)
 - Email: navaneethvvinod@gmail.com
 

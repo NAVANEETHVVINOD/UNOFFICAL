@@ -3,6 +3,7 @@
 ## Local Development (Already Working! ✅)
 
 Your application is configured correctly:
+
 - **Frontend**: http://localhost:3000
 - **Backend**: http://localhost:4000
 
@@ -15,6 +16,7 @@ Both are already configured to work together.
 ### Frontend → Vercel
 
 1. **Push your code to GitHub**
+
    ```bash
    git add .
    git commit -m "Ready for deployment"
@@ -29,6 +31,7 @@ Both are already configured to work together.
 
 3. **Environment Variables**
    Add these in Vercel Dashboard → Project → Settings → Environment Variables:
+
    ```
    NEXT_PUBLIC_API_URL=https://your-render-backend-url.onrender.com
    ```
@@ -54,6 +57,7 @@ Both are already configured to work together.
 
 3. **Environment Variables**
    In Render Dashboard → Environment, add:
+
    ```
    DATABASE_URL=your_supabase_postgres_url
    JWT_ACCESS_SECRET=super-secret-access-key
@@ -83,13 +87,16 @@ Both are already configured to work together.
 ## Troubleshooting
 
 **CORS Errors:**
+
 - Make sure `CORS_ORIGIN` in Render matches your Vercel URL exactly
 - Include `https://` protocol
 
 **Database Connection:**
+
 - Verify `DATABASE_URL` is correctly set in Render
 - Run `npx prisma generate` in build command
 
 **Build Failures:**
+
 - Check Render logs for specific errors
 - Ensure all dependencies are in `package.json`

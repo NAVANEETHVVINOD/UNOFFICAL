@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 // Individual Doodles
 export const BookDoodle = ({ className = "" }) => (
@@ -14,12 +14,12 @@ export const BookDoodle = ({ className = "" }) => (
     whileHover={{ scale: 1.1, rotate: 5 }}
     animate={{
       y: [0, -10, 0],
-      rotate: [0, -2, 0]
+      rotate: [0, -2, 0],
     }}
     transition={{
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -36,7 +36,7 @@ export const BookDoodle = ({ className = "" }) => (
       strokeLinecap="round"
     />
   </motion.svg>
-)
+);
 
 export const PencilDoodle = ({ className = "w-8 h-8" }) => (
   <motion.svg
@@ -56,8 +56,8 @@ export const PencilDoodle = ({ className = "w-8 h-8" }) => (
       rotate: {
         duration: 25,
         repeat: Infinity,
-        ease: "linear"
-      }
+        ease: "linear",
+      },
     }}
   >
     <path
@@ -67,10 +67,7 @@ export const PencilDoodle = ({ className = "w-8 h-8" }) => (
       strokeWidth="2"
       className="drop-shadow-md"
     />
-    <path
-      d="M16 48l-4 8 8-4-4-4z"
-      fill="var(--color-ink)"
-    />
+    <path d="M16 48l-4 8 8-4-4-4z" fill="var(--color-ink)" />
     <path
       d="M52 12l4 4-4 4-4-4 4-4z"
       fill="var(--sunshine-orange)"
@@ -78,7 +75,7 @@ export const PencilDoodle = ({ className = "w-8 h-8" }) => (
       strokeWidth="2"
     />
   </motion.svg>
-)
+);
 
 export const CalculatorDoodle = ({ className = "" }) => (
   <motion.svg
@@ -95,10 +92,20 @@ export const CalculatorDoodle = ({ className = "" }) => (
     transition={{
       duration: 5,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
-    <rect x="8" y="8" width="32" height="48" rx="4" fill="white" stroke="var(--sky-deep)" strokeWidth="2" className="drop-shadow-sm" />
+    <rect
+      x="8"
+      y="8"
+      width="32"
+      height="48"
+      rx="4"
+      fill="white"
+      stroke="var(--sky-deep)"
+      strokeWidth="2"
+      className="drop-shadow-sm"
+    />
     <rect x="12" y="12" width="24" height="12" fill="var(--sky-light)" />
     <circle cx="16" cy="32" r="3" fill="var(--sunshine-orange)" />
     <circle cx="24" cy="32" r="3" fill="var(--sunshine-orange)" />
@@ -110,7 +117,7 @@ export const CalculatorDoodle = ({ className = "" }) => (
     <circle cx="24" cy="48" r="3" fill="var(--sunshine-orange)" />
     <circle cx="32" cy="48" r="3" fill="var(--sunshine-orange)" />
   </motion.svg>
-)
+);
 
 export const CoffeeDoodle = ({ className = "" }) => (
   <motion.svg
@@ -123,12 +130,12 @@ export const CoffeeDoodle = ({ className = "" }) => (
     whileHover={{ scale: 1.1, rotate: -5 }}
     animate={{
       rotate: [0, 5, 0],
-      y: [0, -5, 0]
+      y: [0, -5, 0],
     }}
     transition={{
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -138,10 +145,7 @@ export const CoffeeDoodle = ({ className = "" }) => (
       strokeWidth="2"
       className="drop-shadow-sm"
     />
-    <path
-      d="M10 36h28v4H10z"
-      fill="var(--color-ink)"
-    />
+    <path d="M10 36h28v4H10z" fill="var(--color-ink)" />
     <path
       d="M36 20h4v12h-4c-2.2 0-4-2.7-4-6s1.8-6 4-6z"
       fill="white"
@@ -157,18 +161,18 @@ export const CoffeeDoodle = ({ className = "" }) => (
         d: [
           "M16 8s0-4 8-4 8 4 8 4",
           "M16 6s0-4 8-4 8 4 8 4",
-          "M16 8s0-4 8-4 8 4 8 4"
+          "M16 8s0-4 8-4 8 4 8 4",
         ],
-        opacity: [0.5, 1, 0.5]
+        opacity: [0.5, 1, 0.5],
       }}
       transition={{
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: "easeInOut",
       }}
     />
   </motion.svg>
-)
+);
 
 export const LaptopDoodle = ({ className = "" }) => (
   <motion.svg
@@ -180,15 +184,15 @@ export const LaptopDoodle = ({ className = "" }) => (
     className={`absolute ${className}`}
     whileHover={{
       scale: 1.1,
-      transition: { duration: 0.2 }
+      transition: { duration: 0.2 },
     }}
     animate={{
-      y: [0, -6, 0]
+      y: [0, -6, 0],
     }}
     transition={{
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -198,10 +202,7 @@ export const LaptopDoodle = ({ className = "" }) => (
       strokeWidth="2"
       className="drop-shadow-sm"
     />
-    <path
-      d="M4 32h56v8H4z"
-      fill="var(--sky-deep)"
-    />
+    <path d="M4 32h56v8H4z" fill="var(--sky-deep)" />
     <rect x="12" y="12" width="40" height="16" fill="var(--sky-light)" />
     <motion.circle
       cx="32"
@@ -210,16 +211,16 @@ export const LaptopDoodle = ({ className = "" }) => (
       fill="var(--sunshine-yellow)"
       animate={{
         opacity: [1, 0.5, 1],
-        scale: [1, 1.2, 1]
+        scale: [1, 1.2, 1],
       }}
       transition={{
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: "easeInOut",
       }}
     />
   </motion.svg>
-)
+);
 
 export const BackpackDoodle = ({ className = "" }) => (
   <motion.svg
@@ -232,12 +233,12 @@ export const BackpackDoodle = ({ className = "" }) => (
     whileHover={{ scale: 1.1 }}
     animate={{
       rotate: [0, -3, 0],
-      y: [0, 4, 0]
+      y: [0, 4, 0],
     }}
     transition={{
       duration: 3.5,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -253,13 +254,10 @@ export const BackpackDoodle = ({ className = "" }) => (
       stroke="var(--color-ink)"
       strokeWidth="2"
     />
-    <path
-      d="M12 36h24v4H12z"
-      fill="var(--color-ink)"
-    />
+    <path d="M12 36h24v4H12z" fill="var(--color-ink)" />
     <circle cx="24" cy="28" r="4" fill="white" />
   </motion.svg>
-)
+);
 
 export const HeartDoodle = ({ className = "w-8 h-8" }) => (
   <motion.svg
@@ -274,7 +272,7 @@ export const HeartDoodle = ({ className = "w-8 h-8" }) => (
     transition={{
       duration: 1.5,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -287,7 +285,7 @@ export const HeartDoodle = ({ className = "w-8 h-8" }) => (
       fillOpacity="0.2"
     />
   </motion.svg>
-)
+);
 
 export const StarDoodle = ({ className = "w-8 h-8" }) => (
   <motion.svg
@@ -298,19 +296,19 @@ export const StarDoodle = ({ className = "w-8 h-8" }) => (
     whileHover={{ scale: 1.2 }}
     animate={{
       rotate: [0, 360],
-      scale: [1, 1.2, 1]
+      scale: [1, 1.2, 1],
     }}
     transition={{
       rotate: {
         duration: 20,
         repeat: Infinity,
-        ease: "linear"
+        ease: "linear",
       },
       scale: {
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
-      }
+        ease: "easeInOut",
+      },
     }}
   >
     <path
@@ -323,7 +321,7 @@ export const StarDoodle = ({ className = "w-8 h-8" }) => (
       fillOpacity="0.2"
     />
   </motion.svg>
-)
+);
 
 export const RobotDoodle = ({ className = "w-8 h-8" }) => (
   <motion.svg
@@ -334,12 +332,12 @@ export const RobotDoodle = ({ className = "w-8 h-8" }) => (
     whileHover={{ scale: 1.1 }}
     animate={{
       y: [0, -3, 0],
-      rotate: [0, 5, 0]
+      rotate: [0, 5, 0],
     }}
     transition={{
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <rect
@@ -381,7 +379,7 @@ export const RobotDoodle = ({ className = "w-8 h-8" }) => (
       strokeLinecap="round"
     />
   </motion.svg>
-)
+);
 
 export const BulbDoodle = ({ className = "w-8 h-8" }) => (
   <motion.svg
@@ -391,12 +389,12 @@ export const BulbDoodle = ({ className = "w-8 h-8" }) => (
     xmlns="http://www.w3.org/2000/svg"
     whileHover={{ scale: 1.1 }}
     animate={{
-      opacity: [1, 0.6, 1]
+      opacity: [1, 0.6, 1],
     }}
     transition={{
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -419,7 +417,7 @@ export const BulbDoodle = ({ className = "w-8 h-8" }) => (
       strokeLinecap="round"
     />
   </motion.svg>
-)
+);
 
 export const SparklesDoodle = ({ className = "w-8 h-8" }) => (
   <motion.svg
@@ -430,12 +428,12 @@ export const SparklesDoodle = ({ className = "w-8 h-8" }) => (
     whileHover={{ scale: 1.1 }}
     animate={{
       rotate: [0, 180, 360],
-      scale: [1, 1.2, 1]
+      scale: [1, 1.2, 1],
     }}
     transition={{
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
     }}
   >
     <path
@@ -447,7 +445,7 @@ export const SparklesDoodle = ({ className = "w-8 h-8" }) => (
       fill="white"
     />
   </motion.svg>
-)
+);
 
 // Main Component to aggregate doodles
 export const CollegeDoodles = () => {
@@ -466,5 +464,5 @@ export const CollegeDoodles = () => {
       <HeartDoodle className="bottom-1/4 right-1/3 opacity-30 w-8 h-8" />
       <SparklesDoodle className="top-20 right-20 opacity-40 w-6 h-6" />
     </div>
-  )
-}
+  );
+};

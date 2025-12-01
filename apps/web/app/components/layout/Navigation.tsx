@@ -1,21 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { motion, useScroll } from "framer-motion"
-import { MenuDoodle, XDoodle } from "../doodles/AppDoodles"
-import { useAuth } from "../../context/AuthContext"
+import { useState } from "react";
+import Link from "next/link";
+import { motion, useScroll } from "framer-motion";
+import { MenuDoodle, XDoodle } from "../doodles/AppDoodles";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navigation() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { scrollY } = useScroll()
-  const { isAuthenticated, logout } = useAuth()
+  const [isOpen, setIsOpen] = useState(false);
+  const { scrollY } = useScroll();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <>
-      <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-ink/10"
-      >
+      <motion.nav className="fixed top-0 left-0 right-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-ink/10">
         <div className="container mx-auto px-4 py-2 md:py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -28,15 +26,16 @@ export default function Navigation() {
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-6">
-              {isAuthenticated && ['Events', 'Clubs', 'Marketplace', 'Notes'].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  className="text-ink font-semibold hover:text-accent-blue transition-colors text-sm"
-                >
-                  {item}
-                </Link>
-              ))}
+              {isAuthenticated &&
+                ["Events", "Clubs", "Marketplace", "Notes"].map((item) => (
+                  <Link
+                    key={item}
+                    href={`/${item.toLowerCase()}`}
+                    className="text-ink font-semibold hover:text-accent-blue transition-colors text-sm"
+                  >
+                    {item}
+                  </Link>
+                ))}
             </div>
 
             {/* Login/Logout Button */}
@@ -59,5 +58,5 @@ export default function Navigation() {
         </div>
       </motion.nav>
     </>
-  )
+  );
 }
