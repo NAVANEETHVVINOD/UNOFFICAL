@@ -25,7 +25,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     // Hash password
@@ -87,6 +87,9 @@ export class AuthService {
     }
 
     // Verify password
+    if (!user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
       user.password,
@@ -168,7 +171,7 @@ export class AuthService {
     });
   }
 
-  private async generateTokens(userId: string, email: string, role: string) {
+  private async generateTokens(userId: string, email: string | null, role: string) {
     const payload = {
       sub: userId,
       email,
@@ -192,67 +195,48 @@ export class AuthService {
     };
   }
 
-  async validateOAuthUser(details: {
-    email: string;
-    fullName: string;
-    avatarUrl?: string;
-    googleId?: string;
-    githubId?: string;
-    githubUrl?: string;
-  }) {
-    // Check if user exists
-    const user = await this.prisma.user.findUnique({
-      where: { email: details.email },
+  async validateSupabaseUser(payload: any) {
+    const { sub, email } = payload;
+
+    // Check if internal user exists
+    let user = await this.prisma.user.findUnique({
+      where: { supabaseId: sub } as any,
       include: { profile: true },
     });
 
-    if (user) {
-      // Update existing user with OAuth ID if missing
-      const updateData: any = {};
-      const userWithOAuth = user as typeof user & {
-        googleId?: string;
-        githubId?: string;
-      };
-      if (details.googleId && !userWithOAuth.googleId)
-        updateData.googleId = details.googleId;
-      if (details.githubId && !userWithOAuth.githubId)
-        updateData.githubId = details.githubId;
-
-      if (Object.keys(updateData).length > 0) {
-        await this.prisma.user.update({
-          where: { id: user.id },
-          data: updateData,
-        });
+    if (!user) {
+      // Create internal user
+      if (email) {
+        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+          // Link existing user to Supabase ID
+          user = await this.prisma.user.update({
+            where: { id: existingUser.id },
+            data: { supabaseId: sub } as any,
+            include: { profile: true },
+          });
+          return user;
+        }
       }
-      return user;
+
+      user = await this.prisma.user.create({
+        data: {
+          supabaseId: sub,
+          email,
+          role: 'STUDENT',
+          profile: {
+            create: {
+              fullName: '', // Profile will be updated in onboarding
+              onboardingStep: 0,
+              isOnboarded: false,
+            },
+          },
+        } as any,
+        include: { profile: true },
+      });
     }
 
-    // Create new user
-    // Generate a random password since they are using OAuth
-    const randomPassword =
-      Math.random().toString(36).slice(-8) +
-      Math.random().toString(36).slice(-8);
-    const hashedPassword = await bcrypt.hash(randomPassword, 10);
-
-    const newUser = await this.prisma.user.create({
-      data: {
-        email: details.email,
-        password: hashedPassword,
-        ...(details.googleId && { googleId: details.googleId }),
-        ...(details.githubId && { githubId: details.githubId }),
-        profile: {
-          create: {
-            fullName: details.fullName,
-            avatarUrl: details.avatarUrl,
-            githubUrl: details.githubUrl,
-            onboardingStep: 1, // Start onboarding
-          },
-        },
-      },
-      include: { profile: true },
-    });
-
-    return newUser;
+    return user;
   }
 
   private sanitizeUser(user: any) {

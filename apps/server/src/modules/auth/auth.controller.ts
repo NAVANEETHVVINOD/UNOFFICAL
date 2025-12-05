@@ -20,7 +20,7 @@ import { Throttle } from '@nestjs/throttler';
 @Controller('auth')
 @Throttle({ default: { limit: 5, ttl: 60000 } })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
@@ -46,35 +46,11 @@ export class AuthController {
     return this.authService.logout(req.user.userId);
   }
 
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {}
-
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req, @Res() res) {
-    const { accessToken, refreshToken } = await this.authService.loginWithUser(
-      req.user,
-    );
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    res.redirect(
-      `${frontendUrl}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}`,
-    );
-  }
-
-  @Get('github')
-  @UseGuards(AuthGuard('github'))
-  async githubAuth(@Req() req) {}
-
-  @Get('github/callback')
-  @UseGuards(AuthGuard('github'))
-  async githubAuthRedirect(@Req() req, @Res() res) {
-    const { accessToken, refreshToken } = await this.authService.loginWithUser(
-      req.user,
-    );
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    res.redirect(
-      `${frontendUrl}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}`,
-    );
+  @UseGuards(AuthGuard('supabase'))
+  @Post('supabase/login')
+  async supabaseLogin(@Req() req) {
+    // req.user implies the payload returned by SupabaseStrategy.validate()
+    const user = await this.authService.validateSupabaseUser(req.user);
+    return this.authService.loginWithUser(user);
   }
 }

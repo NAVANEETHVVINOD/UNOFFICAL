@@ -28,21 +28,23 @@ async function main() {
   // Note: In schema userId is String @unique, so it can't be null unless optional.
   // If it's optional in schema, this is needed. If required, this won't find anything but won't hurt.
   // We'll check if we can query for it.
-  try {
-    // @ts-ignore - in case strict types complain
-    const nullUserProfiles = await prisma.profile.findMany({
-      where: { userId: null },
-    });
-    if (nullUserProfiles.length > 0) {
-      console.log(
-        `Found ${nullUserProfiles.length} profiles with null userId. Deleting...`,
-      );
-      // @ts-ignore
-      await prisma.profile.deleteMany({ where: { userId: null } });
-    }
-  } catch (e) {
-    console.log("Skipping null userId check (likely required field).");
-  }
+  // 2a. Profiles with null userId (explicit check requested)
+  console.log("🔍 Removing profiles with null userId...");
+  // @ts-ignore
+  await prisma.profile.deleteMany({
+    where: { userId: { equals: null } },
+  });
+
+  // 2c. Remove corrupted users (no supabaseId AND no password)
+  console.log("🔍 Removing ghost users (no Auth)...");
+  await prisma.user.deleteMany({
+    where: {
+      AND: [
+        { supabaseId: null },
+        { password: null },
+      ],
+    },
+  });
 
   // 2b. Profiles where User doesn't exist
   const allProfiles = await prisma.profile.findMany({

@@ -17,7 +17,7 @@ import Doodle from "../components/ui/Doodle";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login, user, isAuthenticated } = useAuth();
+  const { login, register, user, isAuthenticated } = useAuth();
 
   if (isAuthenticated && user) {
     router.replace("/dashboard");
@@ -42,19 +42,14 @@ export default function RegisterPage() {
         throw new Error("Password must be at least 8 characters long");
       }
 
-      // 1. Register
-      await api.register(
+      // Register using Supabase (via AuthContext)
+      await register(
         formData.email,
         formData.password,
-        formData.fullName,
-        undefined, // College ID is now handled in onboarding
-        undefined,
+        formData.fullName
       );
 
-      // 2. Auto Login
-      await login(formData.email, formData.password);
-
-      // 3. Redirect to Onboarding
+      // Redirect to Onboarding (AuthContext listener handles sync)
       router.push("/onboarding");
     } catch (err: any) {
       console.error("Registration failed:", err);
@@ -148,46 +143,6 @@ export default function RegisterPage() {
                   ⚠️ {error}
                 </div>
               )}
-
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <button
-                  type="button"
-                  onClick={() =>
-                    (window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/auth/google`)
-                  }
-                  className="flex items-center justify-center gap-2 p-3 border-2 border-black rounded-lg hover:bg-gray-50 transition-colors font-bold text-sm"
-                >
-                  <img
-                    src="https://www.svgrepo.com/show/475656/google-color.svg"
-                    className="w-5 h-5"
-                    alt="Google"
-                  />
-                  GOOGLE
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    (window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/auth/github`)
-                  }
-                  className="flex items-center justify-center gap-2 p-3 border-2 border-black rounded-lg hover:bg-gray-50 transition-colors font-bold text-sm"
-                >
-                  <img
-                    src="https://www.svgrepo.com/show/512317/github-142.svg"
-                    className="w-5 h-5"
-                    alt="GitHub"
-                  />
-                  GITHUB
-                </button>
-              </div>
-
-              <div className="relative mb-6 text-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <span className="relative bg-white px-2 text-xs text-gray-500 font-mono">
-                  OR JOIN WITH
-                </span>
-              </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">

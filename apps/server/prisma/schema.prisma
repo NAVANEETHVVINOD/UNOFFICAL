@@ -6,6 +6,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client"
 }
 
 enum Role {
@@ -51,15 +52,14 @@ enum AttendanceRole {
 
 model User {
   id          String   @id @default(cuid())
-  email       String   @unique
-  password    String
+  email       String?   @unique
+  password    String?
   role        Role     @default(STUDENT)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   hashedRefreshToken String?
-  googleId    String?  @unique
-  githubId    String?  @unique
+  supabaseId  String?  @unique
 
   profile     Profile?
   memberships ClubMember[]
@@ -78,6 +78,8 @@ model User {
   
   // Certificates
   certificates     CertificateIssue[]
+
+  @@index([supabaseId])
 }
 
 model Profile {

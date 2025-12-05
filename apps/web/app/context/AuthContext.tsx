@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Loading from "../loading";
+import { supabase } from "../../lib/supabase";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -62,11 +63,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = !!user;
 
+  // Initial Load & Listener
   useEffect(() => {
-    loadUser();
+    let mounted = true;
+
+    // 1. Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted) {
+        if (session) {
+          syncSession(session);
+        } else {
+          setIsLoadingUser(false);
+        }
+      }
+    });
+
+    // 2. Listen for changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (mounted) {
+        if (session) {
+          await syncSession(session);
+        } else {
+          setUser(null);
+          setIsLoadingUser(false);
+          // Optional: clear local storage if you rely on it
+        }
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  // Onboarding Check
   // Onboarding Check
   useEffect(() => {
     if (isLoadingUser) return;
@@ -75,108 +107,79 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const isProfileComplete =
         user.profile?.isOnboarded && user.profile?.collegeId;
 
-      // If logged in but not fully onboarded -> Force Onboarding
       if (!isProfileComplete && pathname !== "/onboarding") {
         router.replace("/onboarding");
-      }
-      // If logged in AND fully onboarded -> Prevent accessing Onboarding
-      else if (isProfileComplete && pathname.startsWith("/onboarding")) {
+      } else if (isProfileComplete && pathname.startsWith("/onboarding")) {
         router.replace("/dashboard");
       }
     }
   }, [user, isLoadingUser, pathname]);
 
-  // Session Heartbeat: Refresh user every 5 minutes
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const interval = setInterval(
-      () => {
-        refreshSession();
-      },
-      5 * 60 * 1000,
-    );
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
-
-  async function loadUser(silent = false) {
-    if (!silent) setIsLoadingUser(true);
+  async function syncSession(session: any) {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setIsLoadingUser(false);
-        return;
-      }
+      if (!session?.access_token) return;
 
-      const res = await fetch(`${API_URL}/users/me`, {
+      const res = await fetch(`${API_URL}/auth/supabase/login`, {
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
 
       if (res.ok) {
-        const userData = await res.json();
-        setUser(userData);
-      } else if (res.status === 401) {
-        console.warn("Token expired, attempting refresh...");
-        const refreshSuccess = await refreshSession();
-        if (refreshSuccess) {
-          // Retry loadUser ONE time
-          const newToken = localStorage.getItem("token");
-          const retryRes = await fetch(`${API_URL}/users/me`, {
-            headers: {
-              Authorization: `Bearer ${newToken}`,
-            },
-          });
-          if (retryRes.ok) {
-            const userData = await retryRes.json();
-            setUser(userData);
-          } else {
-            logout();
-          }
-        } else {
-          logout();
-        }
+        const data = await res.json();
+        // data contains { user, accessToken, refreshToken } from backend
+        // We use backend accessToken for internal API calls, but Supabase handles Auth state.
+        // We'll store internal token for API calls.
+        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken); // Internal refresh token if needed, but Supabase rotates its own.
+        // Actually, internal refresh might be redundant if we just exchange Supabase token every time,
+        // BUT for perf, we keep internal token.
+        // The user plan says "Refresh Token Rotation ... internal JWT is still needed".
+
+        setUser(data.user);
       } else {
-        console.warn("Failed to load user", res.status);
-        logout();
+        console.error("Failed to sync session with backend");
+        await supabase.auth.signOut();
       }
-    } catch (error) {
-      console.error("Failed to load user:", error);
+    } catch (err) {
+      console.error("Sync session error", err);
     } finally {
       setIsLoadingUser(false);
     }
   }
 
+  async function loadUser() {
+    // If using Supabase, usually we rely on syncSession. 
+    // But if we want to manually reload user data from backend:
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        setUser(userData);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   async function login(email: string, password: string) {
     setIsLoadingUser(true);
-    try {
-      const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        localStorage.setItem("token", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
-        await loadUser();
-      } else {
-        console.error("Login failed:", data);
-        throw new Error(data.message || "Login failed");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    } finally {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
       setIsLoadingUser(false);
+      throw error;
     }
+    // Listener will pick up session change
   }
 
   async function register(
@@ -186,73 +189,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     collegeSlug?: string,
   ) {
     setIsLoadingUser(true);
-    try {
-      const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          // We can pass other metadata if we want supabase to hold it, 
+          // but our backend creates profile based on what? 
+          // Our backend validateSupabaseUser creates profile with empty fullName currently.
+          // Wait, the plan said "create internal user ... profile: { create: { fullName: '' } }".
+          // We should probably pass fullName to backend or update it later.
+          // For now, let's stick to the plan.
         },
-        body: JSON.stringify({ email, password, fullName, collegeSlug }),
-      });
+      },
+    });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        localStorage.setItem("token", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
-        await loadUser();
-      } else {
-        console.error("Registration failed:", data);
-        throw new Error(data.message || "Registration failed");
-      }
-    } catch (error) {
-      console.error("Register error:", error);
-      throw error;
-    } finally {
+    if (error) {
       setIsLoadingUser(false);
+      throw error;
     }
+    // Listener will pick up session change
   }
 
-  async function refreshSession(): Promise<boolean> {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) return false;
-
-      const res = await fetch(`${API_URL}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
-
-        return true;
-      } else {
-        console.warn("Session refresh failed");
-        return false;
-      }
-    } catch (error) {
-      console.error("Session refresh error:", error);
-      return false;
-    }
-  }
-
-  function logout() {
+  async function logout() {
+    setIsLoadingUser(true);
+    await supabase.auth.signOut();
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setUser(null);
     router.push("/");
+    setIsLoadingUser(false);
   }
 
-  // Always render provider, pass loading state
   return (
     <AuthContext.Provider
       value={{
@@ -262,7 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
-        refreshUser: () => loadUser(false),
+        refreshUser: loadUser,
       }}
     >
       {isLoadingUser ? <Loading /> : children}
@@ -277,3 +247,4 @@ export function useAuth() {
   }
   return context;
 }
+

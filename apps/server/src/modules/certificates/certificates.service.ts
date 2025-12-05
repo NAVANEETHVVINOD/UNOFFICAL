@@ -4,7 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class CertificatesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async generateCertificate(userId: string, eventId: string) {
     // 1. Fetch user and event details
@@ -33,7 +33,7 @@ export class CertificatesService {
     doc.moveDown();
     doc
       .fontSize(30)
-      .text(user.profile?.fullName || user.email, { align: 'center' });
+      .text(user.profile?.fullName || user.email || 'Unknown User', { align: 'center' });
     doc.moveDown();
     doc.fontSize(20).text(`has participated in`, { align: 'center' });
     doc.moveDown();
