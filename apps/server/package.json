@@ -32,7 +32,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/throttler": "^6.4.0",
-    "@prisma/client": "^6.18.0",
+    "@prisma/client": "^6.19.0",
     "@sentry/nestjs": "^10.27.0",
     "@sentry/profiling-node": "^10.27.0",
     "@supabase/supabase-js": "^2.84.0",

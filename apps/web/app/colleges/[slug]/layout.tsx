@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, use } from "react";
 import Link from "next/link";
 import Container from "../../components/ui/Container";
 import {
@@ -17,11 +17,11 @@ interface CollegeLayoutProps {
   }>;
 }
 
-export default async function CollegeLayout({
+export default function CollegeLayout({
   children,
   params,
 }: CollegeLayoutProps) {
-  const { slug } = await params;
+  const { slug } = use(params);
   const collegeName = slug
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
