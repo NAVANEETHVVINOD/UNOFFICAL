@@ -32,7 +32,7 @@ async function main() {
   console.log("🔍 Removing profiles with null userId...");
   // @ts-ignore
   await prisma.profile.deleteMany({
-    where: { userId: { equals: null } },
+    where: { userId: { equals: null } } as any,
   });
 
   // 2c. Remove corrupted users (no supabaseId AND no password)

@@ -1,4 +1,4 @@
 
 > @college-connect/config@0.1.0 build
-> tsc
+> npx tsc
 
