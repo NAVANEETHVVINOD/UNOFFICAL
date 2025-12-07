@@ -49,6 +49,12 @@ async function main() {
     data: { onboardingStep: 0 },
   });
 
+  // 5. Clean up old refresh tokens (Senior Review)
+  console.log("🔍 Clearing stale refresh tokens...");
+  await prisma.user.updateMany({
+    data: { hashedRefreshToken: null },
+  });
+
   // 5. Ensure Platform Admin exists
   console.log("🔍 Checking for Platform Admin...");
   const adminEmail = process.env.ADMIN_EMAIL || "admin@linker.com";

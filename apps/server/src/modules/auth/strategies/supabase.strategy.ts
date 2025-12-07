@@ -19,6 +19,14 @@ export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
 
     async validate(payload: any) {
         if (!payload.sub) throw new UnauthorizedException('Invalid token: missing sub');
+
+        // Verify Issuer
+        const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+        const expectedIssuer = `${supabaseUrl}/auth/v1`;
+        if (payload.iss !== expectedIssuer) {
+            throw new UnauthorizedException('Invalid issuer');
+        }
+
         return payload; // { sub, email, ... }
     }
 }
