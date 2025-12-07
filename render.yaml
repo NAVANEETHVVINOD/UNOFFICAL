@@ -7,11 +7,11 @@ services:
     rootDir: apps/server
 
     buildCommand: |
-      npm install &&
-      npx prisma generate --schema=prisma/schema.prisma &&
+      npm install
+      npx prisma generate
       npm run build
 
-    startCommand: "npm run start:prod"
+    startCommand: node dist/main.js
 
     envVars:
       - key: PORT
