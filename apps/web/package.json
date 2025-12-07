@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
