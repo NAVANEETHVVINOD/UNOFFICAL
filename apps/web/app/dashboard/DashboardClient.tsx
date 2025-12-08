@@ -39,45 +39,73 @@ function DashboardContent() {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.replace("/login");
-    }
-  }, [isAuthenticated, router, loading]);
-
-  const loadFeed = useCallback(async () => {
+  const loadFeed = useCallback(async (reset = false) => {
     if (!user) return;
-    setLoadingFeed(true);
+
+    const currentPage = reset ? 1 : page;
+
+    if (reset) {
+      setLoadingFeed(true);
+    } else {
+      setIsLoadingMore(true);
+    }
+
     try {
-      // Fetch Posts and Events in parallel
-      const [posts, events] = await Promise.all([
-        api.getPosts().catch(() => []), // Assumes basic getPosts returns recent posts, handles failure
-        api.getEvents(undefined, undefined, 5).catch(() => []) // Get recent 5 events
+      // Fetch Posts and Events
+      // For Load More, we might only want posts? For now, fetch both to keep mix consistent or just posts?
+      // Let's just fetch posts for pagination to keep events at top.
+      const postsPromise = api.getPosts(undefined, currentPage);
+      const eventsPromise = reset ? api.getEvents(undefined, undefined, 5) : Promise.resolve([]); // Only fetch events on initial load
+
+      const [postsRes, events] = await Promise.all([
+        postsPromise.catch(() => ({ data: [], meta: { lastPage: 0 } })),
+        eventsPromise.catch(() => [])
       ]);
 
-      // normalize and combine
-      const combined: FeedItem[] = [
-        ...posts.map((p: any) => ({ type: 'post', data: p, date: new Date(p.createdAt) } as FeedItem)),
-        ...events.map((e: any) => ({ type: 'event', data: e, date: new Date(e.createdAt || e.startsAt) } as FeedItem))
+      const postsData = postsRes.data || [];
+      const newItems: FeedItem[] = [
+        ...postsData.map((p: any) => ({ type: 'post', data: p, date: new Date(p.createdAt) } as FeedItem)),
+        ...(Array.isArray(events) ? events : []).map((e: any) => ({ type: 'event', data: e, date: new Date(e.createdAt || e.startsAt) } as FeedItem))
       ];
 
-      // Sort by date descending
-      combined.sort((a, b) => b.date.getTime() - a.date.getTime());
+      setFeedItems(prev => {
+        const combined = reset ? newItems : [...prev, ...newItems];
+        // Remove duplicates just in case
+        const unique = Array.from(new Map(combined.map(item => [item.data.id, item])).values());
+        // Sort by date descending
+        return unique.sort((a, b) => b.date.getTime() - a.date.getTime());
+      });
 
-      setFeedItems(combined);
+      if (postsRes.meta) {
+        setHasMore(currentPage < postsRes.meta.lastPage);
+        setPage(currentPage + 1);
+      } else {
+        setHasMore(false);
+      }
+
     } catch (e) {
       console.error("Feed load failed", e);
     } finally {
       setLoadingFeed(false);
+      setIsLoadingMore(false);
     }
-  }, [user]);
+  }, [user, page]);
 
   useEffect(() => {
     if (user) {
-      loadFeed();
+      // Intentionally only run on mount/user change
+      loadFeed(true);
     }
-  }, [user, loadFeed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handlePostCreated = () => {
+    loadFeed(true);
+  }
 
   const handleQuickAction = (action: string) => {
     if (action === 'post') {
@@ -131,11 +159,24 @@ function DashboardContent() {
                   Loading the chaos...
                 </div>
               ) : feedItems.length > 0 ? (
-                feedItems.map((item, idx) => {
-                  if (item.type === 'post') return <PostCard key={`post-${item.data.id || idx}`} post={item.data} />;
-                  if (item.type === 'event') return <EventTicket key={`event-${item.data.id || idx}`} event={item.data} />;
-                  return null;
-                })
+                <>
+                  {feedItems.map((item, idx) => {
+                    if (item.type === 'post') return <PostCard key={`post-${item.data.id || idx}`} post={item.data} />;
+                    if (item.type === 'event') return <EventTicket key={`event-${item.data.id || idx}`} event={item.data} />;
+                    return null;
+                  })}
+
+                  {/* Load More Button */}
+                  <div className="text-center pt-8 pb-12">
+                    {isLoadingMore ? (
+                      <span className="font-mono text-gray-400 animate-pulse">Loading more...</span>
+                    ) : hasMore ? (
+                      <RetroButton onClick={() => loadFeed(false)} variant="outline">Load More</RetroButton>
+                    ) : (
+                      <span className="font-mono text-gray-400 text-xs uppercase tracking-widest">--- You've reached the end ---</span>
+                    )}
+                  </div>
+                </>
               ) : (
                 <div className="text-center py-20 border-4 border-dashed border-gray-300 rounded-xl">
                   <h3 className="font-display text-2xl text-gray-400 uppercase">It's quiet... too quiet.</h3>
@@ -147,12 +188,6 @@ function DashboardContent() {
                   >
                     Create Post
                   </RetroButton>
-                </div>
-              )}
-
-              {!loadingFeed && feedItems.length > 0 && (
-                <div className="text-center py-8">
-                  <span className="font-mono text-gray-400 text-xs uppercase tracking-widest">--- You've reached the end ---</span>
                 </div>
               )}
             </div>
@@ -207,7 +242,7 @@ function DashboardContent() {
       <CreatePostModal
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
-        onPostCreated={loadFeed}
+        onPostCreated={() => handlePostCreated()}
       />
     </div>
   );

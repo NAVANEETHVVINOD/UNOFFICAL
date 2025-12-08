@@ -102,17 +102,42 @@ export function QuickActions({ onAction }: { onAction: (type: string) => void })
 // --- Main Feed Components ---
 
 export function PollCard({ post }: { post: any }) {
-    const isVoted = false; // TODO: Check if user voted
-    const totalVotes = post.poll?.options?.reduce((acc: number, opt: any) => acc + (opt._count?.votes || 0), 0) || 0;
-    const [votedOption, setVotedOption] = useState<string | null>(null);
+    const [optimisticOptions, setOptimisticOptions] = useState(post.poll?.options || []);
+    const [optimisticTotalVotes, setOptimisticTotalVotes] = useState(
+        post.poll?.options?.reduce((acc: number, opt: any) => acc + (opt._count?.votes || 0), 0) || 0
+    );
+    const [votedOption, setVotedOption] = useState<string | null>(null); // In a real app, hydrate this from backend "myVote"
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleVote = async (optionId: string) => {
+        if (votedOption || isSubmitting) return; // Prevent double voting locally
+
+        setIsSubmitting(true);
+        const previousOptions = [...optimisticOptions];
+        const previousTotal = optimisticTotalVotes;
+
+        // Optimistic Update
+        setOptimisticOptions((prev: any) => prev.map((opt: any) => {
+            if (opt.id === optionId) {
+                return { ...opt, _count: { votes: (opt._count?.votes || 0) + 1 } };
+            }
+            return opt;
+        }));
+        setOptimisticTotalVotes((prev: number) => prev + 1);
+        setVotedOption(optionId);
+
         try {
             await api.votePoll(post.id, optionId);
-            setVotedOption(optionId);
-            // Optimize: Optimistically update UI
-        } catch (e) {
+            // Success - state matches reality
+        } catch (e: any) {
             console.error(e);
+            // Revert on failure
+            setOptimisticOptions(previousOptions);
+            setOptimisticTotalVotes(previousTotal);
+            setVotedOption(null);
+            alert("Failed to record vote. You may have already voted.");
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -131,13 +156,27 @@ export function PollCard({ post }: { post: any }) {
             </div>
 
             <div className="space-y-3">
-                {post.poll?.options?.map((option: any) => {
-                    const percentage = totalVotes > 0 ? Math.round(((option._count?.votes || 0) / totalVotes) * 100) : 0;
+                {optimisticOptions.map((option: any) => {
+                    const percentage = optimisticTotalVotes > 0 ? Math.round(((option._count?.votes || 0) / optimisticTotalVotes) * 100) : 0;
+                    const isSelected = votedOption === option.id;
+
                     return (
-                        <div key={option.id} onClick={() => handleVote(option.id)} className="cursor-pointer relative border-2 border-black bg-white p-3 hover:bg-gray-50 transition-colors">
-                            <div className="absolute top-0 left-0 h-full bg-accent-blue/20 transition-all duration-500" style={{ width: `${percentage}%` }}></div>
+                        <div
+                            key={option.id}
+                            onClick={() => handleVote(option.id)}
+                            className={`relative border-2 border-black p-3 transition-colors ${votedOption ? 'cursor-default' : 'cursor-pointer hover:bg-gray-50'} ${isSelected ? 'bg-blue-50' : 'bg-white'}`}
+                        >
+                            {/* Progress Bar */}
+                            <div
+                                className={`absolute top-0 left-0 h-full transition-all duration-500 ${isSelected ? 'bg-accent-blue/30' : 'bg-gray-200/50'}`}
+                                style={{ width: `${percentage}%` }}
+                            ></div>
+
                             <div className="relative z-10 flex justify-between font-bold text-sm">
-                                <span>{option.text}</span>
+                                <span className="flex items-center gap-2">
+                                    {isSelected && <span>✅</span>}
+                                    {option.text}
+                                </span>
                                 <span>{percentage}%</span>
                             </div>
                         </div>
@@ -145,7 +184,7 @@ export function PollCard({ post }: { post: any }) {
                 })}
             </div>
             <div className="mt-4 text-xs font-mono text-gray-500 text-right">
-                {totalVotes} Votes • Ends {post.poll?.endDate ? new Date(post.poll.endDate).toLocaleDateString() : 'Never'}
+                {optimisticTotalVotes} Votes • Ends {post.poll?.endDate ? new Date(post.poll.endDate).toLocaleDateString() : 'Never'}
             </div>
         </NewspaperCard>
     )

@@ -258,9 +258,12 @@ export const api = {
     apiRequest(`/notes/${id}/like`, { method: "DELETE" }),
 
   // Posts (Community Feed)
-  getPosts: (collegeSlug?: string) => {
-    const query = collegeSlug ? `?collegeSlug=${collegeSlug}` : "";
-    return apiRequest(`/posts${query}`);
+  getPosts: (collegeSlug?: string, page: number = 1, limit: number = 20) => {
+    const query = new URLSearchParams();
+    if (collegeSlug) query.append("collegeSlug", collegeSlug);
+    query.append("page", page.toString());
+    query.append("limit", limit.toString());
+    return apiRequest(`/posts?${query.toString()}`);
   },
 
   getPost: (id: string) => apiRequest(`/posts/${id}`),

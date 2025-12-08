@@ -20,6 +20,9 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Prop
     const [pollOptions, setPollOptions] = useState(["", ""]);
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [imageUrl, setImageUrl] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     if (!isOpen) return null;
 
@@ -33,6 +36,21 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Prop
         setPollOptions(newOptions);
     };
 
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setUploading(true);
+            try {
+                const res = await api.uploadFile(e.target.files[0]);
+                setImageUrl(res.url); // Assumes backend returns { url: "..." }
+            } catch (err) {
+                console.error("Upload failed", err);
+                alert("Failed to upload image");
+            } finally {
+                setUploading(false);
+            }
+        }
+    };
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
@@ -41,7 +59,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Prop
             const payload: any = {
                 type: activeTab,
                 content,
-                isAnonymous
+                isAnonymous,
+                imageUrl
             };
 
             if (activeTab === 'POLL') {
@@ -73,6 +92,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Prop
             setPollQuestion("");
             setPollOptions(["", ""]);
             setIsAnonymous(false);
+            setImageUrl("");
             onPostCreated();
             onClose();
         } catch (error) {
@@ -141,6 +161,41 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Prop
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
                             />
+                        </div>
+                    )}
+
+                    {/* Media Upload (Available for TEXT and maybe POLL?) */}
+                    {activeTab !== 'COLLAB' && (
+                        <div>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                            />
+
+                            {imageUrl ? (
+                                <div className="relative mb-2 inline-block">
+                                    <img src={imageUrl} alt="Preview" className="h-32 w-auto border-2 border-black object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setImageUrl("")}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full font-bold border-2 border-black flex items-center justify-center hover:scale-110"
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="flex items-center gap-2 text-xs font-bold uppercase border border-dashed border-gray-400 p-2 hover:bg-gray-50 transition-colors"
+                                    disabled={uploading}
+                                >
+                                    {uploading ? "Uploading..." : "📎 Attach Image"}
+                                </button>
+                            )}
                         </div>
                     )}
 

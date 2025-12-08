@@ -26,8 +26,12 @@ export class PostsController {
   }
 
   @Get()
-  findAll(@Query('collegeSlug') collegeSlug?: string) {
-    return this.postsService.findAll(collegeSlug);
+  findAll(
+    @Query('collegeSlug') collegeSlug?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.postsService.findAll(collegeSlug, Number(page), Number(limit));
   }
 
   @Get(':id')

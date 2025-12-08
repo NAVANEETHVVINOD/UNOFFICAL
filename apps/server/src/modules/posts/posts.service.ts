@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -70,7 +70,8 @@ export class PostsService {
     });
   }
 
-  async findAll(collegeSlug?: string) {
+  async findAll(collegeSlug?: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
     const whereClause: any = {};
     if (collegeSlug) {
       whereClause.college = { slug: collegeSlug };
@@ -80,28 +81,42 @@ export class PostsService {
     // In strict smart feed, we would do complex SQL here.
     // We will ensure we fetch the "type" and "poll" data.
 
-    return this.prisma.post.findMany({
-      where: whereClause,
-      include: {
-        author: {
-          include: { profile: true },
+    const [total, posts] = await this.prisma.$transaction([
+      this.prisma.post.count({ where: whereClause }),
+      this.prisma.post.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        include: {
+          author: {
+            include: { profile: true },
+          },
+          poll: {
+            include: {
+              options: {
+                include: {
+                  _count: { select: { votes: true } }
+                }
+              },
+              _count: { select: { votes: true } }
+            }
+          },
+          _count: {
+            select: { likes: true, comments: true },
+          },
         },
-        poll: {
-          include: {
-            options: {
-              include: {
-                _count: { select: { votes: true } }
-              }
-            },
-            _count: { select: { votes: true } }
-          }
-        },
-        _count: {
-          select: { likes: true, comments: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      })
+    ]);
+
+    return {
+      data: posts,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit),
+      }
+    };
   }
 
   async findOne(id: string) {
@@ -177,21 +192,16 @@ export class PostsService {
     });
 
     if (existingVote) {
-      // Change vote? Or throw error?
-      // Spec said "vote persists", usually allow changing.
-      // Let's allow changing just update the optionId
-      return this.prisma.pollVote.update({
-        where: { id: existingVote.id },
-        data: { optionId }
-      });
+      throw new BadRequestException("You already voted.");
     }
+  }
 
     return this.prisma.pollVote.create({
-      data: {
-        userId,
-        pollId,
-        optionId
-      }
-    });
+    data: {
+      userId,
+      pollId,
+      optionId
+    }
+  });
   }
 }

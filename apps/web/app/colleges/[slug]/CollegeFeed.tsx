@@ -10,34 +10,62 @@ import Doodle from "../../components/ui/Doodle";
 export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlug: string, initialEvents: any[] }) {
     const [feedItems, setFeedItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
-    const loadFeed = async () => {
-        setLoading(true);
+    const loadFeed = async (reset = false) => {
+        const currentPage = reset ? 1 : page;
+
+        if (reset) {
+            setLoading(true);
+        } else {
+            setIsLoadingMore(true);
+        }
+
         try {
-            const [posts, events] = await Promise.all([
-                api.getPosts(collegeSlug).catch(() => []),
-                api.getEvents(collegeSlug).catch(() => [])
+            const postsPromise = api.getPosts(collegeSlug, currentPage);
+            const eventsPromise = reset ? api.getEvents(collegeSlug) : Promise.resolve([]);
+
+            const [postsRes, events] = await Promise.all([
+                postsPromise.catch(() => ({ data: [], meta: { lastPage: 0 } })),
+                eventsPromise.catch(() => [])
             ]);
 
-            // Combine and sort
-            const combined = [
-                ...posts.map((p: any) => ({ type: 'post', data: p, date: new Date(p.createdAt) })),
-                ...events.map((e: any) => ({
-                    type: 'event', data: e, date: new Date(e.createdAt) // Using createdAt for feed sort, though maybe startsAt is better? Spec says mixed.
-                }))
-            ].sort((a, b) => b.date.getTime() - a.date.getTime());
+            const postsData = postsRes.data || [];
 
-            setFeedItems(combined);
+            // Combine and sort
+            const newItems = [
+                ...postsData.map((p: any) => ({ type: 'post', data: p, date: new Date(p.createdAt) })),
+                ...(Array.isArray(events) ? events : []).map((e: any) => ({
+                    type: 'event', data: e, date: new Date(e.createdAt)
+                }))
+            ];
+
+            setFeedItems(prev => {
+                const combined = reset ? newItems : [...prev, ...newItems];
+                const unique = Array.from(new Map(combined.map(item => [item.data.id, item])).values());
+                return unique.sort((a, b) => b.date.getTime() - a.date.getTime());
+            });
+
+            if (postsRes.meta) {
+                setHasMore(currentPage < postsRes.meta.lastPage);
+                setPage(currentPage + 1);
+            } else {
+                setHasMore(false);
+            }
+
         } catch (e) {
             console.error("Feed error", e);
         } finally {
             setLoading(false);
+            setIsLoadingMore(false);
         }
     }
 
     useEffect(() => {
-        loadFeed();
+        loadFeed(true);
     }, [collegeSlug]);
 
     return (
@@ -76,6 +104,19 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
                     return null;
                 })}
 
+                {/* Load More Button */}
+                {!loading && feedItems.length > 0 && (
+                    <div className="text-center pt-8 pb-12">
+                        {isLoadingMore ? (
+                            <span className="font-mono text-gray-400 animate-pulse">Loading more...</span>
+                        ) : hasMore ? (
+                            <RetroButton onClick={() => loadFeed(false)} variant="outline">Load More</RetroButton>
+                        ) : (
+                            <span className="font-mono text-gray-400 text-xs uppercase tracking-widest">--- You've reached the end ---</span>
+                        )}
+                    </div>
+                )}
+
                 {feedItems.length === 0 && !loading && (
                     <div className="text-center py-12 opacity-50">
                         <Doodle src="/doodles/tumbleweed.svg" className="w-24 h-24 mx-auto mb-4" />
@@ -99,7 +140,7 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
             <CreatePostModal
                 isOpen={isPostModalOpen}
                 onClose={() => setIsPostModalOpen(false)}
-                onPostCreated={loadFeed}
+                onPostCreated={() => loadFeed(true)}
             />
         </div>
     )
