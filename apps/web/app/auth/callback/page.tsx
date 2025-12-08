@@ -31,6 +31,7 @@ export default function AuthCallback() {
           const data = await res.json();
           localStorage.setItem("token", data.accessToken);
           localStorage.setItem("refreshToken", data.refreshToken);
+          document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
           router.replace("/dashboard");
         } else {
           console.error("Backend sync failed");

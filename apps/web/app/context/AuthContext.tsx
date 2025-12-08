@@ -134,7 +134,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // We use backend accessToken for internal API calls, but Supabase handles Auth state.
         // We'll store internal token for API calls.
         localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("token", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken); // Internal refresh token if needed, but Supabase rotates its own.
+        document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
+
         // Actually, internal refresh might be redundant if we just exchange Supabase token every time,
         // BUT for perf, we keep internal token.
         // The user plan says "Refresh Token Rotation ... internal JWT is still needed".
