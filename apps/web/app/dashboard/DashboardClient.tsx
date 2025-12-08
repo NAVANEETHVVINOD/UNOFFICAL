@@ -20,7 +20,8 @@ import {
   PostCard,
   EventTicket,
   CollegeRadar,
-  TrendingMarquee
+  TrendingMarquee,
+  LinkerNews
 } from "../components/ui/SocialComponents";
 import { RetroButton, Badge } from "../components/ui/NewspaperUI";
 import Link from "next/link";
@@ -116,6 +117,8 @@ function DashboardContent() {
     if (action === 'post') handleOpenPostModal('TEXT');
     else if (action === 'note') alert("Upload Note Coming Soon!");
     else if (action === 'event') alert("Create Event Coming Soon!");
+    else if (action === 'market') alert("Marketplace Coming Soon!");
+    else if (action === 'club') alert("Clubs Coming Soon!");
   }
 
   if (loading) return <LoadingState />;
@@ -128,13 +131,15 @@ function DashboardContent() {
 
       <Navbar showLinks={true} />
 
+      {/* Full Width Marquee */}
+      <TrendingMarquee />
+
       <Container>
         <div className="grid md:grid-cols-12 gap-8 py-4 relative">
 
           {/* --- LEFT SIDEBAR (3 cols) - Minimal/Trending --- */}
           <div className="md:col-span-3 hidden md:block">
             <div className="sticky top-24 space-y-6">
-              <TrendingMarquee />
               <QuickActions onAction={handleQuickAction} />
 
               <div className="text-[10px] uppercase text-gray-400 font-mono leading-relaxed mt-8">
@@ -200,6 +205,7 @@ function DashboardContent() {
           <div className="md:col-span-3 hidden md:block">
             <div className="sticky top-24 space-y-6">
               <MiniProfile user={user} />
+              <LinkerNews />
               <CollegeRadar />
             </div>
           </div>

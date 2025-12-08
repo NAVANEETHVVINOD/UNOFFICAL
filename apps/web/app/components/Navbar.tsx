@@ -13,9 +13,10 @@ export default function Navbar({ showLinks = true }: { showLinks?: boolean }) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     const navLinks = [
-        { label: "Feed", href: "/dashboard" },
-        { label: "My College", href: user?.profile?.college?.slug ? `/colleges/${user.profile.college.slug}` : '/my-college' },
+        { label: "Home", href: "/dashboard" },
+        { label: "Campus", href: user?.profile?.college?.slug ? `/colleges/${user.profile.college.slug}` : '/my-college' },
         { label: "Events", href: "/events" },
+        { label: "Market", href: "/marketplace" },
         { label: "Messages", href: "/messages" },
     ];
 
@@ -28,7 +29,7 @@ export default function Navbar({ showLinks = true }: { showLinks?: boolean }) {
 
                 {/* LEFT: Logo & Links */}
                 <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-2 group">
+                    <Link href="/dashboard" className="flex items-center gap-2 group">
                         <div className="w-8 h-8 bg-accent-yellow border-2 border-black flex items-center justify-center font-black text-lg transform group-hover:rotate-12 transition-transform">
                             L
                         </div>

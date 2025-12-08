@@ -47,11 +47,11 @@ export function NavStack({ user }: { user?: any }) {
     const collegeHref = collegeSlug ? `/colleges/${collegeSlug}` : '/my-college';
 
     const navItems = [
-        { label: "Feed", href: "/dashboard", icon: "/doodles/megaphone.svg" },
-        { label: "My College", href: collegeHref, icon: "/icons/building.svg" },
+        { label: "Home", href: "/dashboard", icon: "/doodles/megaphone.svg" },
+        { label: "Campus", href: collegeHref, icon: "/icons/building.svg" },
         { label: "Events", href: "/events", icon: "/doodles/calendar.svg" },
-        { label: "Messages", href: "/messages", icon: "/icons/mail.svg" },
         { label: "Market", href: "/marketplace", icon: "/doodles/shopping-bag.svg" },
+        { label: "Messages", href: "/messages", icon: "/icons/mail.svg" },
         { label: "Notes", href: "/notes", icon: "/doodles/book.svg" },
         { label: "Clubs", href: "/clubs", icon: "/doodles/group.svg" },
     ];
@@ -123,6 +123,18 @@ export function QuickActions({ onAction }: { onAction: (type: string) => void })
                         <span className="font-black text-xs">📅</span>
                     </div>
                     <span className="font-bold text-[10px] uppercase">Event</span>
+                </button>
+                <button onClick={() => onAction('market')} className="flex flex-col items-center gap-1 group">
+                    <div className="w-10 h-10 bg-green-400 text-black border-2 border-black rounded-full flex items-center justify-center shadow-neo-sm group-active:translate-y-0.5 group-active:shadow-none transition-all">
+                        <span className="font-black text-xs">💰</span>
+                    </div>
+                    <span className="font-bold text-[10px] uppercase">Sell</span>
+                </button>
+                <button onClick={() => onAction('club')} className="flex flex-col items-center gap-1 group">
+                    <div className="w-10 h-10 bg-purple-400 text-white border-2 border-black rounded-full flex items-center justify-center shadow-neo-sm group-active:translate-y-0.5 group-active:shadow-none transition-all">
+                        <span className="font-black text-xs">🛡️</span>
+                    </div>
+                    <span className="font-bold text-[10px] uppercase">Club</span>
                 </button>
             </div>
         </div>
@@ -358,18 +370,55 @@ export function EventTicket({ event }: { event: any }) {
 export function CollegeRadar() {
     return (
         <NewspaperCard className="bg-accent-yellow p-6 border-4 text-center group cursor-pointer hover:bg-yellow-400" rotate={2}>
-            <Doodle src="/doodles/building.svg" className="w-16 h-16 mx-auto mb-2 opacity-80" />
+            <Doodle src="/icons/building.svg" className="w-16 h-16 mx-auto mb-2 opacity-80" />
             <h3 className="font-display font-black text-2xl uppercase mb-1">My Campus Hub</h3>
             <p className="font-hand text-lg leading-none mb-0">Tap to teleport →</p>
         </NewspaperCard>
     )
 }
 
+export function LinkerNews() {
+    const news = [
+        { id: 1, title: "Campus Fest Announced!", tag: "OFFICIAL" },
+        { id: 2, title: "Exam Dates Rescheduled", tag: "ACADEMIC" },
+        { id: 3, title: "New Cafeteria Menu 🍔", tag: "LIFE" },
+        { id: 4, title: "Robotics Club Wins Gold", tag: "CLUB" },
+        { id: 5, title: "Lost ID Card Found @ Lib", tag: "LOST" },
+    ];
+
+    return (
+        <NewspaperCard className="p-4 border-4 mb-6" rotate={1}>
+            <div className="flex items-center justify-between mb-4 border-b-2 border-black pb-2">
+                <h3 className="font-display font-black text-xl uppercase">Linker News</h3>
+                <Badge className="bg-red-500 text-white animate-pulse">LIVE</Badge>
+            </div>
+            <div className="space-y-3">
+                {news.map((item, i) => (
+                    <div key={item.id} className="group cursor-pointer">
+                        <div className="flex justify-between items-start">
+                            <span className="text-gray-400 font-mono text-xs mr-2">0{i + 1}</span>
+                            <p className="font-bold text-sm leading-tight hover:underline decoration-accent-yellow decoration-2 underline-offset-2 flex-1">
+                                {item.title}
+                            </p>
+                        </div>
+                        <span className="text-[10px] font-mono text-gray-500 bg-gray-100 px-1 rounded ml-6 mt-1 inline-block">
+                            #{item.tag}
+                        </span>
+                    </div>
+                ))}
+            </div>
+            <button className="w-full mt-4 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors border-t-2 border-black pt-2">
+                Read All Stories →
+            </button>
+        </NewspaperCard>
+    )
+}
+
 export function TrendingMarquee() {
     return (
-        <div className="bg-black text-white py-2 font-mono text-xs border-2 border-black my-6 shadow-neo-sm transform -rotate-1 overflow-hidden">
-            <Marquee speed={20}>
-                📣 ROBOTICS_COMPETITION_REGISTRATION_OPEN  ///  🚨 EXAM_SCHEDULE_OUT_CHECK_NOTES  ///  🛒 SOMEONE_IS_SELLING_A_BIKE_FOR_$50 ///
+        <div className="bg-black text-white py-2 font-mono text-xs border-y-2 border-black shadow-neo-sm overflow-hidden sticky z-40 top-[64px]">
+            <Marquee speed={30}>
+                📣 ROBOTICS_COMPETITION_REGISTRATION_OPEN  ///  🚨 EXAM_SCHEDULE_OUT_CHECK_NOTES  ///  🛒 SOMEONE_IS_SELLING_A_BIKE_FOR_$50 /// 🎤 KARAOKE_NIGHT_AT_HOSTEL
             </Marquee>
         </div>
     )

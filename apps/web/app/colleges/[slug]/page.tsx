@@ -7,6 +7,9 @@
  * - College-specific events and clubs
  * - Notice board and stats
  */
+import Navbar from "../../components/Navbar";
+import Container from "../../components/ui/Container";
+
 import {
   NewspaperCard,
   RetroButton,
@@ -58,22 +61,29 @@ export default async function CollegeHome({ params }: PageProps) {
   const upcomingEvents = events.slice(0, 5);
 
   return (
-    <div className="space-y-8">
-      {/* Newspaper Header */}
-      <div className="border-b-4 border-black pb-4 flex justify-between items-end">
-        <div>
-          <Badge className="mb-2">HEADLINES</Badge>
-          <h2 className="font-display text-4xl font-black">
-            THE DAILY {collegeName.toUpperCase()}
-          </h2>
+    <div className="bg-paper min-h-screen">
+      <div className="fixed inset-0 pointer-events-none opacity-5 z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+
+      <Navbar showLinks={true} />
+
+      <Container>
+        <div className="py-8 space-y-8">
+          {/* Newspaper Header */}
+          <div className="border-b-4 border-black pb-4 flex justify-between items-end">
+            <div>
+              <Badge className="mb-2">HEADLINES</Badge>
+              <h2 className="font-display text-4xl font-black">
+                THE DAILY {collegeName.toUpperCase()}
+              </h2>
+            </div>
+            <span className="font-serif italic text-gray-500">
+              Vol. 42 • {new Date().toLocaleDateString()}
+            </span>
+          </div>
+
+          <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
         </div>
-        <span className="font-serif italic text-gray-500">
-          Vol. 42 • {new Date().toLocaleDateString()}
-        </span>
-      </div>
-
-      <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
-
+      </Container>
     </div>
   );
 }
