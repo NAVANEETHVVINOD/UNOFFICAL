@@ -194,14 +194,13 @@ export class PostsService {
     if (existingVote) {
       throw new BadRequestException("You already voted.");
     }
-  }
 
     return this.prisma.pollVote.create({
-    data: {
-      userId,
-      pollId,
-      optionId
-    }
-  });
+      data: {
+        userId,
+        pollId,
+        optionId
+      }
+    });
   }
 }
