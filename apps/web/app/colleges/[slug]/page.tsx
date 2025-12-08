@@ -61,8 +61,14 @@ export default async function CollegeHome({ params }: PageProps) {
   const upcomingEvents = events.slice(0, 5);
 
   return (
-    <div className="bg-paper min-h-screen">
-      <div className="fixed inset-0 pointer-events-none opacity-5 z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+    <div className="bg-gray-100 min-h-screen">
+      {/* Grid Pattern Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }}>
+      </div>
 
       <Navbar showLinks={true} />
 

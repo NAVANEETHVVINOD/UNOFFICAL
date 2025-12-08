@@ -10,7 +10,7 @@ import {
   Tape,
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
-import DashboardNavbar from "../components/ui/DashboardNavbar";
+import Navbar from "../components/Navbar";
 import { api } from "../../lib/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -38,16 +38,24 @@ export default function MessagesClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <Doodle src="/doodles/loading.svg" className="w-16 h-16 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0]">
-      <DashboardNavbar />
-      <Container className="py-8">
+    <div className="min-h-screen bg-gray-100">
+      {/* Grid Pattern Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }}>
+      </div>
+
+      <Navbar showLinks={true} />
+      <Container className="py-8 relative z-10">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -92,8 +100,8 @@ export default function MessagesClient() {
                         <span className="text-xs font-mono text-gray-500">
                           {lastMessage
                             ? new Date(
-                                lastMessage.createdAt,
-                              ).toLocaleDateString()
+                              lastMessage.createdAt,
+                            ).toLocaleDateString()
                             : ""}
                         </span>
                       </div>

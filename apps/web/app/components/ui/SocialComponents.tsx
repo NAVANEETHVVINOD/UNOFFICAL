@@ -5,13 +5,13 @@ import { NewspaperCard, RetroButton, Badge, Sticker, Tape, Marquee } from "./New
 import Doodle from "./Doodle";
 import Link from "next/link";
 import { api } from "../../../lib/api";
+import { Home, Building2, Calendar, ShoppingBag, Mail, BookOpen, Users } from "lucide-react";
 
 // --- Left Sidebar Components ---
 
 export function MiniProfile({ user }: { user: any }) {
     if (!user) return null;
     const firstName = user.profile?.fullName?.split(" ")[0] || "Student";
-    // Fallback to a generative avatar if none exists
     const avatarUrl = user.profile?.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`;
 
     return (
@@ -44,27 +44,25 @@ export function MiniProfile({ user }: { user: any }) {
 
 export function NavStack({ user }: { user?: any }) {
     const collegeSlug = user?.profile?.college?.slug;
-    const collegeHref = collegeSlug ? `/colleges/${collegeSlug}` : '/my-college';
+    const collegeHref = collegeSlug ? `/colleges/${collegeSlug}` : '/onboarding';
 
     const navItems = [
-        { label: "Home", href: "/dashboard", icon: "/doodles/megaphone.svg" },
-        { label: "Campus", href: collegeHref, icon: "/icons/building.svg" },
-        { label: "Events", href: "/events", icon: "/doodles/calendar.svg" },
-        { label: "Market", href: "/marketplace", icon: "/doodles/shopping-bag.svg" },
-        { label: "Messages", href: "/messages", icon: "/icons/mail.svg" },
-        { label: "Notes", href: "/notes", icon: "/doodles/book.svg" },
-        { label: "Clubs", href: "/clubs", icon: "/doodles/group.svg" },
+        { label: "Home", href: "/dashboard", icon: Home },
+        { label: "Campus", href: collegeHref, icon: Building2 },
+        { label: "Events", href: "/events", icon: Calendar },
+        { label: "Market", href: "/marketplace", icon: ShoppingBag },
+        { label: "Messages", href: "/messages", icon: Mail },
+        { label: "Notes", href: "/notes", icon: BookOpen },
+        { label: "Clubs", href: "/clubs", icon: Users },
     ];
 
     return (
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 mb-8">
             {navItems.map((item) => (
                 <Link href={item.href} key={item.label} className="block group">
-                    <div className="flex items-center gap-3 px-4 py-2 hover:translate-x-1 transition-transform cursor-pointer">
-                        <span className="w-6 h-6 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Doodle src={item.icon} className="w-full h-full" />
-                        </span>
-                        <span className="font-bold text-lg uppercase tracking-wide group-hover:underline decoration-accent-yellow decoration-4 underline-offset-[-2px]">
+                    <div className="flex items-center gap-3 px-4 py-3 hover:translate-x-2 transition-transform cursor-pointer rounded-xl hover:bg-black hover:text-white border-2 border-transparent hover:border-black transition-colors">
+                        <item.icon className="w-6 h-6 stroke-[2.5px]" />
+                        <span className="font-bold text-lg uppercase tracking-wide">
                             {item.label}
                         </span>
                     </div>
@@ -148,17 +146,16 @@ export function PollCard({ post }: { post: any }) {
     const [optimisticTotalVotes, setOptimisticTotalVotes] = useState(
         post.poll?.options?.reduce((acc: number, opt: any) => acc + (opt._count?.votes || 0), 0) || 0
     );
-    const [votedOption, setVotedOption] = useState<string | null>(null); // In a real app, hydrate this from backend "myVote"
+    const [votedOption, setVotedOption] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleVote = async (optionId: string) => {
-        if (votedOption || isSubmitting) return; // Prevent double voting locally
+        if (votedOption || isSubmitting) return;
 
         setIsSubmitting(true);
         const previousOptions = [...optimisticOptions];
         const previousTotal = optimisticTotalVotes;
 
-        // Optimistic Update
         setOptimisticOptions((prev: any) => prev.map((opt: any) => {
             if (opt.id === optionId) {
                 return { ...opt, _count: { votes: (opt._count?.votes || 0) + 1 } };
@@ -170,10 +167,8 @@ export function PollCard({ post }: { post: any }) {
 
         try {
             await api.votePoll(post.id, optionId);
-            // Success - state matches reality
         } catch (e: any) {
             console.error(e);
-            // Revert on failure
             setOptimisticOptions(previousOptions);
             setOptimisticTotalVotes(previousTotal);
             setVotedOption(null);
@@ -208,7 +203,6 @@ export function PollCard({ post }: { post: any }) {
                             onClick={() => handleVote(option.id)}
                             className={`relative border-2 border-black p-3 transition-colors ${votedOption ? 'cursor-default' : 'cursor-pointer hover:bg-gray-50'} ${isSelected ? 'bg-blue-50' : 'bg-white'}`}
                         >
-                            {/* Progress Bar */}
                             <div
                                 className={`absolute top-0 left-0 h-full transition-all duration-500 ${isSelected ? 'bg-accent-blue/30' : 'bg-gray-200/50'}`}
                                 style={{ width: `${percentage}%` }}
@@ -259,7 +253,6 @@ export function CollabCard({ post }: { post: any }) {
 }
 
 export function PostCard({ post }: { post: any }) {
-    // Route to specialized cards
     if (post.type === 'POLL') return <PollCard post={post} />;
     if (post.type === 'COLLAB') return <CollabCard post={post} />;
 
@@ -276,7 +269,6 @@ export function PostCard({ post }: { post: any }) {
         return `${Math.floor(diff / 86400)}d ago`;
     };
 
-    // Check if post is new (< 24h)
     const isNew = (new Date().getTime() - new Date(post.createdAt).getTime()) < 86400000;
 
     return (
@@ -329,11 +321,9 @@ export function EventTicket({ event }: { event: any }) {
 
     return (
         <div className="mb-6 relative group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
-            {/* Ripped Edge Top (CSS Mask or SVG would be better, but border-style is simple) */}
             <div className="bg-accent-red h-full w-full absolute top-1 left-1 rounded-xl bg-black/10 z-0"></div>
 
             <NewspaperCard className="relative z-10 flex flex-col md:flex-row min-h-[160px]" noShadow>
-                {/* Left: Date Stub */}
                 <div className="bg-black text-white p-4 md:w-32 flex flex-col items-center justify-center border-r-2 border-dashed border-gray-600 relative overflow-hidden">
                     <div className="w-4 h-4 bg-white rounded-full absolute -top-2 -right-2 border-2 border-black"></div>
                     <div className="w-4 h-4 bg-white rounded-full absolute -bottom-2 -right-2 border-2 border-black"></div>
@@ -343,9 +333,7 @@ export function EventTicket({ event }: { event: any }) {
                     <span className="text-xs mt-2 text-gray-400">{date.getFullYear()}</span>
                 </div>
 
-                {/* Right: Info */}
                 <div className="p-5 flex-1 flex flex-col justify-between bg-white relative">
-                    {/* Punch Hole */}
                     <div className="w-4 h-4 bg-gray-100 rounded-full absolute top-1/2 -left-2 -translate-y-1/2 border-2 border-black"></div>
 
                     <div>
@@ -369,11 +357,13 @@ export function EventTicket({ event }: { event: any }) {
 
 export function CollegeRadar() {
     return (
-        <NewspaperCard className="bg-accent-yellow p-6 border-4 text-center group cursor-pointer hover:bg-yellow-400" rotate={2}>
-            <Doodle src="/icons/building.svg" className="w-16 h-16 mx-auto mb-2 opacity-80" />
+        <Link href="/colleges/my-college" className="block"> 
+           <NewspaperCard className="bg-accent-yellow p-6 border-4 text-center group cursor-pointer hover:bg-yellow-400" rotate={2}>
+            <Building2 className="w-16 h-16 mx-auto mb-2 opacity-80" strokeWidth={1.5} />
             <h3 className="font-display font-black text-2xl uppercase mb-1">My Campus Hub</h3>
             <p className="font-hand text-lg leading-none mb-0">Tap to teleport →</p>
         </NewspaperCard>
+        </Link>
     )
 }
 
@@ -416,9 +406,9 @@ export function LinkerNews() {
 
 export function TrendingMarquee() {
     return (
-        <div className="bg-black text-white py-2 font-mono text-xs border-y-2 border-black shadow-neo-sm overflow-hidden sticky z-40 top-[64px]">
-            <Marquee speed={30}>
-                📣 ROBOTICS_COMPETITION_REGISTRATION_OPEN  ///  🚨 EXAM_SCHEDULE_OUT_CHECK_NOTES  ///  🛒 SOMEONE_IS_SELLING_A_BIKE_FOR_$50 /// 🎤 KARAOKE_NIGHT_AT_HOSTEL
+        <div className="bg-black text-white py-4 font-display text-lg tracking-wider border-y-4 border-black shadow-neo-sm overflow-hidden sticky z-40 top-[64px]">
+            <Marquee speed={40}>
+                 📢 CAMPUS_FEST_REGISTRATIONS_OPEN /// 🍔 FREE_PIZZA_AT_HACKATHON /// 🚨 EXAM_RESULTS_OUT /// 🎸 LIVE_MUSIC_TONIGHT
             </Marquee>
         </div>
     )
