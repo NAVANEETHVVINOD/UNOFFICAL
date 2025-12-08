@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { College, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CollegesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findAll(): Promise<College[]> {
     return this.prisma.college.findMany();
@@ -25,7 +25,7 @@ export class CollegesService {
     });
 
     if (!college) {
-      throw new Error('College not found');
+      throw new NotFoundException(`College with slug '${slug}' not found`);
     }
 
     const [

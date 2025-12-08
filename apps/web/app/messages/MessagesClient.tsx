@@ -68,8 +68,11 @@ export default function MessagesClient() {
 
           <div className="grid gap-4">
             {conversations.map((conv) => {
-              const otherParticipant = conv.participants[0]; // Filtered in backend to be the other person
-              const lastMessage = conv.messages[0];
+              // Ensure participants exist and have length
+              if (!conv.participants || conv.participants.length === 0) return null;
+
+              const otherParticipant = conv.participants[0];
+              const lastMessage = conv.messages?.[0]; // Add optional chaining
               const unread =
                 lastMessage &&
                 !lastMessage.seen &&
