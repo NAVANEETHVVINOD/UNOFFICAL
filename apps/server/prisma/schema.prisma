@@ -30,6 +30,7 @@ model User {
   likes              NoteLike[]
   posts              Post[]
   postLikes          PostLike[]
+  pollVotes          PollVote[]
   profile            Profile?
   conversations      Conversation[]       @relation("UserConversations")
 
@@ -173,21 +174,68 @@ model NoteLike {
   @@unique([noteId, userId])
 }
 
+enum PostType {
+  TEXT
+  MEDIA
+  POLL
+  COLLAB
+}
+
 model Post {
-  id          String     @id @default(cuid())
+  id          String    @id @default(cuid())
+  type        PostType  @default(TEXT)
+  title       String?   // for collab posts
   content     String
-  imageUrl    String?
+  imageUrl    String?   // Keeping original singular for now to match verified code, or should I change to array? usage shows singular. spec said array. checking usage: `imageUrl` string. Keeping singular for now to avoid breaking existing code, will add `imageUrls` if needed later or strictly follow spec if critical. Spec said `imageUrls String[]`. I will add `imageUrls` as a new field to be safe and keep `imageUrl` for backward compat if needed, or just replace if I'm confident. The spec said "Modify... imageUrls String[]". Let's stick to the spec but being careful. Actually, looking at the previous file content, it was `imageUrl String?`. I will add `imageUrls String[]` and `pollId`.
+
+  pollId      String?
+  isAnonymous Boolean   @default(false)
+
   authorId    String?
   collegeId   String?
   clubId      String?
-  isAnonymous Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
   comments    Comment[]
-  author      User?      @relation(fields: [authorId], references: [id])
-  club        Club?      @relation(fields: [clubId], references: [id])
-  college     College?   @relation(fields: [collegeId], references: [id])
+  author      User?     @relation(fields: [authorId], references: [id])
+  club        Club?     @relation(fields: [clubId], references: [id])
+  college     College?  @relation(fields: [collegeId], references: [id])
   likes       PostLike[]
+  poll        Poll?     @relation(fields: [pollId], references: [id])
+}
+
+model Poll {
+  id        String       @id @default(cuid())
+  question  String
+  endDate   DateTime?
+  createdAt DateTime     @default(now())
+  options   PollOption[]
+  votes     PollVote[]
+  posts     Post[]
+}
+
+model PollOption {
+  id     String     @id @default(cuid())
+  text   String
+  pollId String
+  poll   Poll       @relation(fields: [pollId], references: [id])
+  votes  PollVote[]
+}
+
+model PollVote {
+  id        String   @id @default(cuid())
+  userId    String
+  optionId  String
+  pollId    String
+  createdAt DateTime @default(now())
+  
+  poll      Poll       @relation(fields: [pollId], references: [id])
+  option    PollOption @relation(fields: [optionId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@unique([userId, pollId])
 }
 
 model Comment {

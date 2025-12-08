@@ -14,6 +14,7 @@ import {
   Sticker,
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
+import Navbar from "../components/Navbar";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -61,7 +62,8 @@ export default function RegisterPage() {
 
   return (
     <Container>
-      <div className="min-h-screen flex items-center justify-center py-8 md:py-12">
+      <Navbar showLinks={false} />
+      <div className="min-h-[calc(100vh-100px)] flex items-center justify-center py-8 md:py-12">
         <div className="w-full max-w-5xl relative">
           {/* Floating Decor */}
           <Doodle

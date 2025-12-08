@@ -31,7 +31,7 @@ F:\kannan\projects\unoffical\apps\web\app\messages\[id]\ChatClient.tsx
   55:6  warning  React Hook useEffect has missing dependencies: 'fetchMessages' and 'markAsSeen'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\onboarding\page.tsx
-  146:9  warning  The 'handleNext' function makes the dependencies of useEffect Hook (at line 220) change on every render. To fix this, wrap the definition of 'handleNext' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  146:9  warning  The 'handleNext' function makes the dependencies of useEffect Hook (at line 232) change on every render. To fix this, wrap the definition of 'handleNext' in its own useCallback() Hook  react-hooks/exhaustive-deps
 
 ✖ 10 problems (0 errors, 10 warnings)
 

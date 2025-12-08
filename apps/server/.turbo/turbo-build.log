@@ -1,4 +1,6 @@
 
 > server@0.0.1 build
-> npx prisma db push --accept-data-loss && npx prisma generate && nest build
+> npx prisma generate && npx nest build
 
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma

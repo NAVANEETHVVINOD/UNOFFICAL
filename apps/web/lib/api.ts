@@ -265,7 +265,7 @@ export const api = {
 
   getPost: (id: string) => apiRequest(`/posts/${id}`),
 
-  createPost: (data: { content: string; imageUrl?: string; clubId?: string }) =>
+  createPost: (data: any) =>
     apiRequest("/posts", {
       method: "POST",
       body: JSON.stringify(data),
@@ -275,6 +275,12 @@ export const api = {
 
   unlikePost: (id: string) =>
     apiRequest(`/posts/${id}/like`, { method: "DELETE" }),
+
+  votePoll: (postId: string, optionId: string) =>
+    apiRequest(`/posts/${postId}/vote`, {
+      method: "POST",
+      body: JSON.stringify({ optionId })
+    }),
 
   // Messages
   sendMessage: (data: {

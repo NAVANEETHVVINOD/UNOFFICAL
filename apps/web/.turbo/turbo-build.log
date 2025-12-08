@@ -2,32 +2,35 @@
 > @college-connect/web@0.1.0 build
 > next build
 
-node:internal/modules/cjs/loader:1215
-  throw err;
-  ^
+   ▲ Next.js 16.0.7 (Turbopack)
+   - Experiments (use with caution):
+     · serverActions
 
-Error: Cannot find module 'styled-jsx/package.json'
-Require stack:
-- F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\require-hook.js
-- F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\bin\next
-    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)
-    at resolve (node:internal/modules/helpers:193:19)
-    at Object.<anonymous> (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\server\require-hook.js:39:32)
-    at Module._compile (node:internal/modules/cjs/loader:1529:14)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
-    at Module.load (node:internal/modules/cjs/loader:1275:32)
-    at Module._load (node:internal/modules/cjs/loader:1096:12)
-    at Module.require (node:internal/modules/cjs/loader:1298:19)
-    at require (node:internal/modules/helpers:182:18)
-    at Object.<anonymous> (F:\kannan\projects\unoffical\apps\web\node_modules\next\dist\bin\next:6:1) {
-  code: 'MODULE_NOT_FOUND',
-  requireStack: [
-    'F:\\kannan\\projects\\unoffical\\apps\\web\\node_modules\\next\\dist\\server\\require-hook.js',
-    'F:\\kannan\\projects\\unoffical\\apps\\web\\node_modules\\next\\dist\\bin\\next'
-  ]
-}
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
 
-Node.js v20.19.4
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./apps/web/app/page.tsx:57:11
+Parsing ecmascript source code failed
+[0m [90m 55 |[39m             [33mAcademic[39m [33mChaos[39m [36mas[39m a [33mService[39m[33m.[39m™
+ [90m 56 |[39m           [33m<[39m[33m/[39m[33mspan[39m[33m>[39m
+[31m[1m>[22m[39m[90m 57 |[39m         [33m<[39m[33m/[39m[33mh1[39m[33m>[39m
+ [90m    |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 58 |[39m
+ [90m    |[39m [31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 59 |[39m         [33m<[39m[33mp[39m className[33m=[39m[32m"text-lg md:text-2xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed font-serif italic px-4"[39m[33m>[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 60 |[39m           [33mFinally[39m[33m,[39m a place where chaos meets structure[33m.[39m
+ [90m 61 |[39m           [33m<[39m[33mspan[39m className[33m=[39m[32m"bg-accent-yellow/30 px-2 rounded-md mx-1 not-italic font-bold"[39m[33m>[39m
+ [90m 62 |[39m             ([33mBarely[39m[33m.[39m)[0m
+
+Expected '</', got 'jsx text (
+
+        )'
+
+
+    at <unknown> (./apps/web/app/page.tsx:57:11)
 npm error Lifecycle script `build` failed with error:
 npm error code 1
 npm error path F:\kannan\projects\unoffical\apps\web

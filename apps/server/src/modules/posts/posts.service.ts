@@ -3,12 +3,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import sanitizeHtml from 'sanitize-html';
+import { PostType, Poll, PollOption } from '@prisma/client';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
-  async create(createPostDto: CreatePostDto, userId: string) {
+  async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { profile: true },
@@ -18,24 +19,49 @@ export class PostsService {
       throw new NotFoundException('User or College not found');
     }
 
-    const sanitizedContent = sanitizeHtml(createPostDto.content, {
+    // Default to TEXT if not specified
+    const type: PostType = createPostDto.type || PostType.TEXT;
+
+    const sanitizedContent = createPostDto.content ? sanitizeHtml(createPostDto.content, {
       allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
       allowedAttributes: {
         ...sanitizeHtml.defaults.allowedAttributes,
         img: ['src', 'alt'],
       },
-    });
+    }) : "";
+
+    // Data object for Prisma
+    const postData: any = {
+      content: sanitizedContent,
+      authorId: userId,
+      collegeId: user.profile.collegeId,
+      type: type,
+      title: createPostDto.title, // For Collabs
+      isAnonymous: createPostDto.isAnonymous || false,
+      imageUrl: createPostDto.imageUrl,
+    };
+
+    // If Poll, create nested Poll + Options
+    if (type === PostType.POLL && createPostDto.poll) {
+      postData.poll = {
+        create: {
+          question: createPostDto.poll.question,
+          endDate: createPostDto.poll.endDate || null,
+          options: {
+            create: createPostDto.poll.options.map((opt: string) => ({ text: opt }))
+          }
+        }
+      };
+    }
 
     return this.prisma.post.create({
-      data: {
-        ...createPostDto,
-        content: sanitizedContent,
-        authorId: userId,
-        collegeId: user.profile.collegeId,
-      },
+      data: postData,
       include: {
         author: {
           include: { profile: true },
+        },
+        poll: {
+          include: { options: true }
         },
         _count: {
           select: { likes: true, comments: true },
@@ -45,13 +71,30 @@ export class PostsService {
   }
 
   async findAll(collegeSlug?: string) {
-    const whereClause = collegeSlug ? { college: { slug: collegeSlug } } : {};
+    const whereClause: any = {};
+    if (collegeSlug) {
+      whereClause.college = { slug: collegeSlug };
+    }
+
+    // V1.5 Implementation: Just fetch everything for now and let Frontend filter or simple sort.
+    // In strict smart feed, we would do complex SQL here.
+    // We will ensure we fetch the "type" and "poll" data.
 
     return this.prisma.post.findMany({
       where: whereClause,
       include: {
         author: {
           include: { profile: true },
+        },
+        poll: {
+          include: {
+            options: {
+              include: {
+                _count: { select: { votes: true } }
+              }
+            },
+            _count: { select: { votes: true } }
+          }
         },
         _count: {
           select: { likes: true, comments: true },
@@ -73,6 +116,15 @@ export class PostsService {
             author: { include: { profile: true } },
           },
           orderBy: { createdAt: 'asc' },
+        },
+        poll: {
+          include: {
+            options: {
+              include: {
+                _count: { select: { votes: true } }
+              }
+            }
+          }
         },
         _count: {
           select: { likes: true, comments: true },
@@ -114,5 +166,32 @@ export class PostsService {
     } catch (error) {
       return { message: 'Not liked yet' };
     }
+  }
+
+  async votePoll(userId: string, pollId: string, optionId: string) {
+    // Check if already voted
+    const existingVote = await this.prisma.pollVote.findUnique({
+      where: {
+        userId_pollId: { userId, pollId }
+      }
+    });
+
+    if (existingVote) {
+      // Change vote? Or throw error?
+      // Spec said "vote persists", usually allow changing.
+      // Let's allow changing just update the optionId
+      return this.prisma.pollVote.update({
+        where: { id: existingVote.id },
+        data: { optionId }
+      });
+    }
+
+    return this.prisma.pollVote.create({
+      data: {
+        userId,
+        pollId,
+        optionId
+      }
+    });
   }
 }

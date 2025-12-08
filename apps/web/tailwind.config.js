@@ -23,6 +23,8 @@ module.exports = {
         body: ["'Outfit'", "sans-serif"],
         pixel: ["'VT323'", "monospace"],
         serif: ["'Playfair Display'", "serif"],
+        hand: ["'Caveat'", "cursive"],
+        marker: ["'Permanent Marker'", "cursive"],
       },
       boxShadow: {
         neo: "4px 4px 0px 0px rgba(0,0,0,1)",
