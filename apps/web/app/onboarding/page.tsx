@@ -164,8 +164,8 @@ export default function OnboardingPage() {
         stepData.bio = formData.bio;
       } else if (currentStep === 2) {
         // Socials
-        stepData.githubUrl = formData.githubUrl;
-        stepData.instagram = formData.instagram;
+        if (formData.githubUrl?.trim()) stepData.githubUrl = formData.githubUrl.trim();
+        if (formData.instagram?.trim()) stepData.instagram = formData.instagram.trim();
       } else if (currentStep === 3) {
         // Interests
         stepData.interests = formData.interests;
@@ -334,11 +334,10 @@ export default function OnboardingPage() {
                     : [...formData.interests, interest];
                   setFormData({ ...formData, interests: newInterests });
                 }}
-                className={`p-3 border-2 border-black font-bold transition-all ${
-                  formData.interests.includes(interest)
+                className={`p-3 border-2 border-black font-bold transition-all ${formData.interests.includes(interest)
                     ? "bg-accent-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                     : "bg-white hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 {interest}
               </button>
@@ -385,11 +384,10 @@ export default function OnboardingPage() {
                       onClick={() =>
                         setFormData({ ...formData, collegeId: college.id })
                       }
-                      className={`p-4 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${
-                        formData.collegeId === college.id
+                      className={`p-4 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${formData.collegeId === college.id
                           ? "bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                           : "bg-white hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       <div>
                         <h3 className="font-bold text-sm">{college.name}</h3>
@@ -478,7 +476,7 @@ export default function OnboardingPage() {
                 {isCustomCollege
                   ? `${customCollegeData.name} (Custom)`
                   : colleges.find((c) => c.id === formData.collegeId)?.name ||
-                    "Not Selected"}
+                  "Not Selected"}
               </p>
             </div>
             <div className="p-4 bg-gray-50 border-2 border-black">
