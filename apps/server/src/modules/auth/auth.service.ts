@@ -225,21 +225,39 @@ export class AuthService {
         }
       }
 
-      user = await this.prisma.user.create({
-        data: {
-          supabaseId: sub,
-          email,
-          role: 'STUDENT',
-          profile: {
-            create: {
-              fullName: '', // Profile will be updated in onboarding
-              onboardingStep: 0,
-              isOnboarded: false,
+      try {
+        user = await this.prisma.user.create({
+          data: {
+            supabaseId: sub,
+            email,
+            role: 'STUDENT',
+            profile: {
+              create: {
+                fullName: '', // Profile will be updated in onboarding
+                onboardingStep: 0,
+                isOnboarded: false,
+              },
             },
-          },
-        } as any,
-        include: { profile: true },
-      });
+          } as any,
+          include: { profile: true },
+        });
+      } catch (error) {
+        // Handle race condition where user was created between findUnique and create
+        if (error.code === 'P2002' && email) {
+          const existingUser = await this.prisma.user.findUnique({
+            where: { email },
+          });
+          if (existingUser) {
+            user = await this.prisma.user.update({
+              where: { id: existingUser.id },
+              data: { supabaseId: sub } as any,
+              include: { profile: true },
+            });
+            return user;
+          }
+        }
+        throw error;
+      }
     }
 
     return user;

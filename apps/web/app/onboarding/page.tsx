@@ -163,9 +163,21 @@ export default function OnboardingPage() {
         // Vibe
         stepData.bio = formData.bio;
       } else if (currentStep === 2) {
-        // Socials
-        if (formData.githubUrl?.trim()) stepData.githubUrl = formData.githubUrl.trim();
-        if (formData.instagram?.trim()) stepData.instagram = formData.instagram.trim();
+        // Socials & URL Normalization
+        const normalizeUrl = (url?: string) => {
+          if (!url?.trim()) return undefined;
+          let cleaned = url.trim();
+          if (!/^https?:\/\//i.test(cleaned)) {
+            return `https://${cleaned}`;
+          }
+          return cleaned;
+        };
+
+        const github = normalizeUrl(formData.githubUrl);
+        const instagram = normalizeUrl(formData.instagram);
+
+        if (github) stepData.githubUrl = github;
+        if (instagram) stepData.instagram = instagram;
       } else if (currentStep === 3) {
         // Interests
         stepData.interests = formData.interests;
@@ -335,8 +347,8 @@ export default function OnboardingPage() {
                   setFormData({ ...formData, interests: newInterests });
                 }}
                 className={`p-3 border-2 border-black font-bold transition-all ${formData.interests.includes(interest)
-                    ? "bg-accent-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                    : "bg-white hover:bg-gray-50"
+                  ? "bg-accent-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  : "bg-white hover:bg-gray-50"
                   }`}
               >
                 {interest}
@@ -385,8 +397,8 @@ export default function OnboardingPage() {
                         setFormData({ ...formData, collegeId: college.id })
                       }
                       className={`p-4 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${formData.collegeId === college.id
-                          ? "bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                          : "bg-white hover:bg-gray-50"
+                        ? "bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                        : "bg-white hover:bg-gray-50"
                         }`}
                     >
                       <div>
