@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) { }
+  constructor(private readonly postsService: PostsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -53,7 +53,11 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/vote')
-  vote(@Param('id') id: string, @Body() body: { optionId: string }, @Request() req) {
+  vote(
+    @Param('id') id: string,
+    @Body() body: { optionId: string },
+    @Request() req,
+  ) {
     return this.postsService.votePoll(req.user.userId, id, body.optionId);
   }
 }

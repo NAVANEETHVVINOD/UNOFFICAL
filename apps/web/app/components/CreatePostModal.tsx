@@ -8,12 +8,13 @@ type Props = {
     isOpen: boolean;
     onClose: () => void;
     onPostCreated: () => void;
+    initialTab?: 'TEXT' | 'POLL' | 'COLLAB';
 };
 
 type PostType = 'TEXT' | 'POLL' | 'COLLAB';
 
-export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Props) {
-    const [activeTab, setActiveTab] = useState<PostType>('TEXT');
+export default function CreatePostModal({ isOpen, onClose, onPostCreated, initialTab = 'TEXT' }: Props) {
+    const [activeTab, setActiveTab] = useState<PostType>(initialTab);
     const [content, setContent] = useState("");
     const [title, setTitle] = useState(""); // For Collab
     const [pollQuestion, setPollQuestion] = useState("");
@@ -23,6 +24,13 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Prop
     const [imageUrl, setImageUrl] = useState("");
     const [uploading, setUploading] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    // Reset tab when modal opens or initialTab changes
+    React.useEffect(() => {
+        if (isOpen) {
+            setActiveTab(initialTab);
+        }
+    }, [isOpen, initialTab]);
 
     if (!isOpen) return null;
 

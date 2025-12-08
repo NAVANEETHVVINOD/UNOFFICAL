@@ -37,6 +37,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-duplicate-enum-values': 'off',
       "prettier/prettier": ["error", { endOfLine: "auto" }],
     },
   },

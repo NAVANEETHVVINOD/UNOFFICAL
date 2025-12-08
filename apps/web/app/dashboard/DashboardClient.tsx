@@ -16,6 +16,7 @@ import {
   MiniProfile,
   NavStack,
   QuickActions,
+  InlinePostCreate,
   PostCard,
   EventTicket,
   CollegeRadar,
@@ -35,10 +36,11 @@ type FeedItem = {
 
 function DashboardContent() {
   const { isAuthenticated, user, loading } = useAuth();
-  const router = useRouter();
+  // const router = useRouter(); // Unused
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [postModalTab, setPostModalTab] = useState<string>('TEXT'); // 'TEXT', 'MEDIA', 'POLL', 'COLLAB'
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -56,10 +58,8 @@ function DashboardContent() {
 
     try {
       // Fetch Posts and Events
-      // For Load More, we might only want posts? For now, fetch both to keep mix consistent or just posts?
-      // Let's just fetch posts for pagination to keep events at top.
       const postsPromise = api.getPosts(undefined, currentPage);
-      const eventsPromise = reset ? api.getEvents(undefined, undefined, 5) : Promise.resolve([]); // Only fetch events on initial load
+      const eventsPromise = reset ? api.getEvents(undefined, undefined, 5) : Promise.resolve([]);
 
       const [postsRes, events] = await Promise.all([
         postsPromise.catch(() => ({ data: [], meta: { lastPage: 0 } })),
@@ -97,7 +97,6 @@ function DashboardContent() {
 
   useEffect(() => {
     if (user) {
-      // Intentionally only run on mount/user change
       loadFeed(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,12 +106,16 @@ function DashboardContent() {
     loadFeed(true);
   }
 
+  const handleOpenPostModal = (type: string = 'TEXT') => {
+    setPostModalTab(type);
+    setIsPostModalOpen(true);
+  }
+
+  // Quick action handler from sidebar
   const handleQuickAction = (action: string) => {
-    if (action === 'post') {
-      setIsPostModalOpen(true);
-    } else {
-      console.log("Action not implemented yet:", action);
-    }
+    if (action === 'post') handleOpenPostModal('TEXT');
+    else if (action === 'note') alert("Upload Note Coming Soon!");
+    else if (action === 'event') alert("Create Event Coming Soon!");
   }
 
   if (loading) return <LoadingState />;
@@ -123,33 +126,33 @@ function DashboardContent() {
       {/* Texture Overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-5 z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
 
-      <Navbar showLinks={false} />
+      <Navbar showLinks={true} />
 
       <Container>
         <div className="grid md:grid-cols-12 gap-8 py-4 relative">
 
-          {/* --- LEFT SIDEBAR (3 cols) --- */}
+          {/* --- LEFT SIDEBAR (3 cols) - Minimal/Trending --- */}
           <div className="md:col-span-3 hidden md:block">
-            <div className="sticky top-8">
-              <MiniProfile user={user} />
-              <NavStack />
+            <div className="sticky top-24 space-y-6">
+              <TrendingMarquee />
               <QuickActions onAction={handleQuickAction} />
+
+              <div className="text-[10px] uppercase text-gray-400 font-mono leading-relaxed mt-8">
+                Linker OS v1.6<br />
+                © 2024 Campus Kerala
+              </div>
             </div>
           </div>
 
           {/* --- MAIN FEED (6 cols) --- */}
           <div className="md:col-span-6">
-            {/* Mobile Profile Toggle or View could go here */}
 
-            <div className="mb-8 flex items-end justify-between">
-              <div>
-                <h2 className="font-display font-black text-4xl uppercase leading-none">The Feed</h2>
-                <p className="font-hand text-xl text-gray-500 -mt-1 transform -rotate-1">What's chaotic today?</p>
-              </div>
-              {/* Toggle Switch Placeholder */}
-              <div className="hidden md:block">
-                <Badge className="bg-black text-white hover:bg-accent-retroAccent cursor-pointer">CHAOS MODE ⚡</Badge>
-              </div>
+            {/* Inline Create Post Widget */}
+            <InlinePostCreate user={user} onClick={handleOpenPostModal} />
+
+            <div className="mb-6 flex items-center justify-between border-b-2 border-dashed border-gray-300 pb-2">
+              <h2 className="font-display font-black text-2xl uppercase">Latest Chaos</h2>
+              <Badge className="bg-white border-gray-300 text-gray-400">Sort: Newest</Badge>
             </div>
 
             {/* Feed Content */}
@@ -184,58 +187,23 @@ function DashboardContent() {
                   <RetroButton
                     className="mt-4 mx-auto"
                     variant="secondary"
-                    onClick={() => setIsPostModalOpen(true)}
+                    onClick={() => handleOpenPostModal('TEXT')}
                   >
-                    Create Post
+                    Create First Post
                   </RetroButton>
                 </div>
               )}
             </div>
           </div>
 
-          {/* --- RIGHT SIDEBAR (3 cols) --- */}
+          {/* --- RIGHT SIDEBAR (3 cols) - Profile --- */}
           <div className="md:col-span-3 hidden md:block">
-            <div className="sticky top-8 space-y-8">
+            <div className="sticky top-24 space-y-6">
+              <MiniProfile user={user} />
               <CollegeRadar />
-
-              <TrendingMarquee />
-
-              {/* Suggested Clubs */}
-              <div className="border-t-4 border-black pt-4">
-                <h4 className="font-bold text-sm uppercase mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-accent-pink rounded-full"></span>
-                  Suggested Clubs
-                </h4>
-                <div className="space-y-3">
-                  {/* Mock Club 1 */}
-                  <div className="bg-white border text-left p-3 shadow-neo-sm hover:translate-x-1 transition-transform cursor-pointer flex items-center gap-3">
-                    <div className="w-8 h-8 bg-black rounded-full text-white flex items-center justify-center font-bold text-xs">R</div>
-                    <div className="flex-1">
-                      <h5 className="font-bold text-sm leading-none">Robotics</h5>
-                      <p className="text-[10px] text-gray-500">Tech • 240 Members</p>
-                    </div>
-                    <div className="text-lg">+</div>
-                  </div>
-                  {/* Mock Club 2 */}
-                  <div className="bg-white border text-left p-3 shadow-neo-sm hover:translate-x-1 transition-transform cursor-pointer flex items-center gap-3">
-                    <div className="w-8 h-8 bg-accent-blue rounded-full text-white flex items-center justify-center font-bold text-xs">D</div>
-                    <div className="flex-1">
-                      <h5 className="font-bold text-sm leading-none">Debate</h5>
-                      <p className="text-[10px] text-gray-500">Lit • 105 Members</p>
-                    </div>
-                    <div className="text-lg">+</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Credits */}
-              <div className="text-[10px] uppercase text-gray-400 font-mono leading-relaxed">
-                Linker OS v1.0<br />
-                Made with ☕ & 💻<br />
-                © 2024
-              </div>
             </div>
           </div>
+
         </div>
       </Container>
 
@@ -243,6 +211,7 @@ function DashboardContent() {
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
         onPostCreated={() => handlePostCreated()}
+        initialTab={postModalTab as any}
       />
     </div>
   );

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -7,7 +11,7 @@ import { PostType, Poll, PollOption } from '@prisma/client';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -22,13 +26,15 @@ export class PostsService {
     // Default to TEXT if not specified
     const type: PostType = createPostDto.type || PostType.TEXT;
 
-    const sanitizedContent = createPostDto.content ? sanitizeHtml(createPostDto.content, {
-      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-      allowedAttributes: {
-        ...sanitizeHtml.defaults.allowedAttributes,
-        img: ['src', 'alt'],
-      },
-    }) : "";
+    const sanitizedContent = createPostDto.content
+      ? sanitizeHtml(createPostDto.content, {
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ['src', 'alt'],
+          },
+        })
+      : '';
 
     // Data object for Prisma
     const postData: any = {
@@ -48,9 +54,11 @@ export class PostsService {
           question: createPostDto.poll.question,
           endDate: createPostDto.poll.endDate || null,
           options: {
-            create: createPostDto.poll.options.map((opt: string) => ({ text: opt }))
-          }
-        }
+            create: createPostDto.poll.options.map((opt: string) => ({
+              text: opt,
+            })),
+          },
+        },
       };
     }
 
@@ -61,7 +69,7 @@ export class PostsService {
           include: { profile: true },
         },
         poll: {
-          include: { options: true }
+          include: { options: true },
         },
         _count: {
           select: { likes: true, comments: true },
@@ -95,18 +103,18 @@ export class PostsService {
             include: {
               options: {
                 include: {
-                  _count: { select: { votes: true } }
-                }
+                  _count: { select: { votes: true } },
+                },
               },
-              _count: { select: { votes: true } }
-            }
+              _count: { select: { votes: true } },
+            },
           },
           _count: {
             select: { likes: true, comments: true },
           },
         },
         orderBy: { createdAt: 'desc' },
-      })
+      }),
     ]);
 
     return {
@@ -115,7 +123,7 @@ export class PostsService {
         total,
         page,
         lastPage: Math.ceil(total / limit),
-      }
+      },
     };
   }
 
@@ -136,10 +144,10 @@ export class PostsService {
           include: {
             options: {
               include: {
-                _count: { select: { votes: true } }
-              }
-            }
-          }
+                _count: { select: { votes: true } },
+              },
+            },
+          },
         },
         _count: {
           select: { likes: true, comments: true },
@@ -187,20 +195,20 @@ export class PostsService {
     // Check if already voted
     const existingVote = await this.prisma.pollVote.findUnique({
       where: {
-        userId_pollId: { userId, pollId }
-      }
+        userId_pollId: { userId, pollId },
+      },
     });
 
     if (existingVote) {
-      throw new BadRequestException("You already voted.");
+      throw new BadRequestException('You already voted.');
     }
 
     return this.prisma.pollVote.create({
       data: {
         userId,
         pollId,
-        optionId
-      }
+        optionId,
+      },
     });
   }
 }

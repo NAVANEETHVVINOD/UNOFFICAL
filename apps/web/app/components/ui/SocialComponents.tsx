@@ -42,15 +42,18 @@ export function MiniProfile({ user }: { user: any }) {
     );
 }
 
-export function NavStack() {
+export function NavStack({ user }: { user?: any }) {
+    const collegeSlug = user?.profile?.college?.slug;
+    const collegeHref = collegeSlug ? `/colleges/${collegeSlug}` : '/my-college';
+
     const navItems = [
-        { label: "Feed", href: "/dashboard", icon: "megaphone.svg" },
-        { label: "My College", href: "/my-college", icon: "building.svg" }, // Need to resolve slug dynamically in real app
-        { label: "Events", href: "/events", icon: "calendar.svg" },
-        { label: "Messages", href: "/messages", icon: "mail.svg" },
-        { label: "Market", href: "/marketplace", icon: "shopping-bag.svg" },
-        { label: "Notes", href: "/notes", icon: "book.svg" },
-        { label: "Clubs", href: "/clubs", icon: "group.svg" },
+        { label: "Feed", href: "/dashboard", icon: "/doodles/megaphone.svg" },
+        { label: "My College", href: collegeHref, icon: "/icons/building.svg" },
+        { label: "Events", href: "/events", icon: "/doodles/calendar.svg" },
+        { label: "Messages", href: "/messages", icon: "/icons/mail.svg" },
+        { label: "Market", href: "/marketplace", icon: "/doodles/shopping-bag.svg" },
+        { label: "Notes", href: "/notes", icon: "/doodles/book.svg" },
+        { label: "Clubs", href: "/clubs", icon: "/doodles/group.svg" },
     ];
 
     return (
@@ -59,7 +62,7 @@ export function NavStack() {
                 <Link href={item.href} key={item.label} className="block group">
                     <div className="flex items-center gap-3 px-4 py-2 hover:translate-x-1 transition-transform cursor-pointer">
                         <span className="w-6 h-6 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Doodle src={`/doodles/${item.icon}`} className="w-full h-full" />
+                            <Doodle src={item.icon} className="w-full h-full" />
                         </span>
                         <span className="font-bold text-lg uppercase tracking-wide group-hover:underline decoration-accent-yellow decoration-4 underline-offset-[-2px]">
                             {item.label}
@@ -69,6 +72,33 @@ export function NavStack() {
             ))}
         </div>
     );
+}
+
+export function InlinePostCreate({ user, onClick }: { user: any, onClick: (type?: string) => void }) {
+    return (
+        <NewspaperCard className="mb-8 p-4 flex items-center gap-4" rotate={0}>
+            <div className="w-12 h-12 rounded-full border-2 border-black overflow-hidden bg-gray-200 shrink-0 shadow-sm">
+                <img src={user?.profile?.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${user?.id}`} alt="Avatar" className="w-full h-full object-cover" />
+            </div>
+            <button
+                onClick={() => onClick()}
+                className="flex-1 text-left bg-gray-50 hover:bg-white border-2 border-gray-200 hover:border-black rounded-xl px-4 py-3 text-gray-500 font-bold transition-all"
+            >
+                Write something chaotic...
+            </button>
+            <div className="flex gap-1">
+                <button onClick={() => onClick('MEDIA')} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 font-bold text-lg" title="Upload Media">
+                    📷
+                </button>
+                <button onClick={() => onClick('POLL')} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 font-bold text-lg" title="Create Poll">
+                    📊
+                </button>
+                <button onClick={() => onClick('COLLAB')} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 font-bold text-lg" title="Collab Call">
+                    🤝
+                </button>
+            </div>
+        </NewspaperCard>
+    )
 }
 
 export function QuickActions({ onAction }: { onAction: (type: string) => void }) {

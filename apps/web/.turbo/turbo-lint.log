@@ -6,6 +6,9 @@
 F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\ClubDetailsClient.tsx
   46:6  warning  React Hook useEffect has a missing dependency: 'fetchClubDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
+F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\CollegeFeed.tsx
+  69:8  warning  React Hook useEffect has a missing dependency: 'loadFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
 F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\clubs\page.tsx
   40:6  warning  React Hook useEffect has a missing dependency: 'fetchClubs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
@@ -18,11 +21,11 @@ F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\marketplace\page.tsx
 F:\kannan\projects\unoffical\apps\web\app\context\AuthContext.tsx
   117:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\dashboard\DashboardClient.tsx
-  77:6  warning  React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
 F:\kannan\projects\unoffical\apps\web\app\events\[id]\EventDetailsClient.tsx
   63:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\layout.tsx
+  25:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
 
 F:\kannan\projects\unoffical\apps\web\app\marketplace\[id]\ItemDetailsClient.tsx
   49:6  warning  React Hook useEffect has a missing dependency: 'fetchItemDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
@@ -33,5 +36,5 @@ F:\kannan\projects\unoffical\apps\web\app\messages\[id]\ChatClient.tsx
 F:\kannan\projects\unoffical\apps\web\app\onboarding\page.tsx
   146:9  warning  The 'handleNext' function makes the dependencies of useEffect Hook (at line 232) change on every render. To fix this, wrap the definition of 'handleNext' in its own useCallback() Hook  react-hooks/exhaustive-deps
 
-✖ 10 problems (0 errors, 10 warnings)
+✖ 11 problems (0 errors, 11 warnings)
 
