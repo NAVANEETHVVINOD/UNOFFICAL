@@ -46,7 +46,7 @@ Go to **Render Dashboard → LINKER Service → Environment** and set:
 ### Render Build Command
 Ensure your build command matches:
 ```bash
-npm install && npx prisma generate && npx prisma db push --accept-data-loss && npm run build
+npm install && npx prisma generate && npm run build
 ```
 
 ---

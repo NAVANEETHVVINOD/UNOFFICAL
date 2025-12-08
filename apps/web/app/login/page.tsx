@@ -32,7 +32,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed");
@@ -139,6 +139,7 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
                     placeholder="student@college.edu"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -161,6 +162,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
                     placeholder="••••••••"
+                    autoComplete="current-password"
                     required
                   />
                 </div>

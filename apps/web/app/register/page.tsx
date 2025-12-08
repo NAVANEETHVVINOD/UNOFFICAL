@@ -44,9 +44,9 @@ export default function RegisterPage() {
 
       // Register using Supabase (via AuthContext)
       await register(
-        formData.email,
+        formData.email.trim(),
         formData.password,
-        formData.fullName
+        formData.fullName.trim()
       );
 
       // Redirect to Onboarding (AuthContext listener handles sync)
@@ -157,6 +157,7 @@ export default function RegisterPage() {
                     }
                     className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
                     placeholder="John Doe"
+                    autoComplete="name"
                     required
                   />
                 </div>
@@ -173,6 +174,7 @@ export default function RegisterPage() {
                     }
                     className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
                     placeholder="student@college.edu"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -189,6 +191,7 @@ export default function RegisterPage() {
                     }
                     className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     required
                   />
                 </div>
