@@ -3,7 +3,7 @@
 > **Connect. Learn. Live.** - Events, Clubs, Notes & Chaos — Organized.
 
 [![Deployment](https://img.shields.io/badge/Deploy-Vercel-black)](https://linker-inky.vercel.app)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7)](https://linker-backend-wx4i.onrender.com)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7)](https://linker-g0lw.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/NAVANEETHVVINOD/UNOFFICAL)
 
@@ -29,7 +29,7 @@
 ### **Live Demo**
 
 - 🌐 **Frontend**: [linker-inky.vercel.app](https://linker-inky.vercel.app)
-- 🔧 **Backend API**: [linker-backend-wx4i.onrender.com](https://linker-backend-wx4i.onrender.com)
+- 🔧 **Backend API**: [linker-g0lw.onrender.com](https://linker-g0lw.onrender.com)
 
 ### **Why LINKER?**
 
@@ -258,7 +258,7 @@ npx prisma db push             # Push schema changes (dev only)
 
 ### **Production URLs**
 - **Frontend**: https://linker-inky.vercel.app
-- **Backend**: https://linker-backend-wx4i.onrender.com
+- **Backend**: https://linker-g0lw.onrender.com
 
 ### **Configuration (Action Required)** ⚠️
 
@@ -322,7 +322,7 @@ UNOFFICAL/
 ### **Base URL**
 
 - Local: `http://localhost:4000`
-- Production: `https://linker-backend-wx4i.onrender.com`
+- Production: `https://linker-g0lw.onrender.com`
 
 ### **Authentication**
 

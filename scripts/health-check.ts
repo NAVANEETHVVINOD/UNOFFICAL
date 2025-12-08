@@ -4,7 +4,7 @@ import https from 'https';
 import http from 'http';
 
 const FRONTEND_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://linker-inky.vercel.app';
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://linker-backend-wx4i.onrender.com';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://linker-g0lw.onrender.com';
 
 console.log('🏥 Starting Health Check...');
 console.log(`Frontend: ${FRONTEND_URL}`);
