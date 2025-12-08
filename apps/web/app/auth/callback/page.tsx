@@ -13,23 +13,12 @@ export default function AuthCallback() {
 
   useEffect(() => {
     if (processed.current) return;
-    processed.current = true;
 
-    const handleCallback = async () => {
-      // 1. Check Supabase Session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        console.error("No session found after redirect");
-        router.replace("/login");
-        return;
-      }
+    const handleSession = async (session: any) => {
+      if (processed.current) return;
+      processed.current = true;
 
       try {
-        // 2. Exchange Token with Backend
-        // 2. Exchange Token with Backend
         const res = await fetch(`${API_URL}/auth/supabase/login`, {
           method: "POST",
           headers: {
@@ -40,11 +29,8 @@ export default function AuthCallback() {
 
         if (res.ok) {
           const data = await res.json();
-          // Store backend token
           localStorage.setItem("token", data.accessToken);
           localStorage.setItem("refreshToken", data.refreshToken);
-
-          // 3. Redirect to Dashboard
           router.replace("/dashboard");
         } else {
           console.error("Backend sync failed");
@@ -56,7 +42,22 @@ export default function AuthCallback() {
       }
     };
 
-    handleCallback();
+    // Check immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        handleSession(session);
+      } else {
+        // If no session immediate, wait for event (implicit flow/pkce exchange)
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === "SIGNED_IN" && session) {
+            handleSession(session);
+          }
+        });
+        return () => subscription.unsubscribe();
+      }
+    });
   }, [router]);
 
   return (

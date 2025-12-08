@@ -146,10 +146,14 @@ export default function RegisterPage() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
-                  <label className="font-bold text-xs uppercase tracking-wider text-gray-700">
+                  <label
+                    htmlFor="fullName"
+                    className="font-bold text-xs uppercase tracking-wider text-gray-700"
+                  >
                     Full Name
                   </label>
                   <input
+                    id="fullName"
                     type="text"
                     value={formData.fullName}
                     onChange={(e) =>
@@ -163,10 +167,14 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-bold text-xs uppercase tracking-wider text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="font-bold text-xs uppercase tracking-wider text-gray-700"
+                  >
                     Email Address
                   </label>
                   <input
+                    id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) =>
@@ -180,10 +188,14 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="font-bold text-xs uppercase tracking-wider text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="font-bold text-xs uppercase tracking-wider text-gray-700"
+                  >
                     Password
                   </label>
                   <input
+                    id="password"
                     type="password"
                     value={formData.password}
                     onChange={(e) =>
