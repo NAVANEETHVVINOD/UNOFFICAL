@@ -1,12 +1,37 @@
 
 > @college-connect/web@0.1.0 lint
-> next lint
+> eslint .
 
-Invalid project directory provided, no such directory: F:\kannan\projects\unoffical\apps\web\lint
-npm error Lifecycle script `lint` failed with error:
-npm error code 1
-npm error path F:\kannan\projects\unoffical\apps\web
-npm error workspace @college-connect/web@0.1.0
-npm error location F:\kannan\projects\unoffical\apps\web
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next lint
+
+F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\ClubDetailsClient.tsx
+  46:6  warning  React Hook useEffect has a missing dependency: 'fetchClubDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\clubs\page.tsx
+  40:6  warning  React Hook useEffect has a missing dependency: 'fetchClubs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\events\page.tsx
+  43:6  warning  React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\marketplace\page.tsx
+  42:6  warning  React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\context\AuthContext.tsx
+  116:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\dashboard\DashboardClient.tsx
+  77:6  warning  React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\events\[id]\EventDetailsClient.tsx
+  63:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\marketplace\[id]\ItemDetailsClient.tsx
+  49:6  warning  React Hook useEffect has a missing dependency: 'fetchItemDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\messages\[id]\ChatClient.tsx
+  55:6  warning  React Hook useEffect has missing dependencies: 'fetchMessages' and 'markAsSeen'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\onboarding\page.tsx
+  146:9  warning  The 'handleNext' function makes the dependencies of useEffect Hook (at line 220) change on every render. To fix this, wrap the definition of 'handleNext' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+✖ 10 problems (0 errors, 10 warnings)
+

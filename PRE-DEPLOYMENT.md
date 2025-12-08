@@ -1,107 +1,151 @@
-# Pre-Deployment Checklist ✅
+# Production-Ready Checklist for LINKER Platform
 
-## Build Status
+## 🟦 1. Build & Code Quality Status
 
-- ✅ **Frontend Build**: Success (Next.js production build)
-- ✅ **Backend Build**: Success (NestJS/Prisma)
-- ✅ **TypeScript**: No errors
-- ✅ **Database**: Migrations applied, seed data loaded
+| Component | Status | Notes |
+| :--- | :--- | :--- |
+| **Frontend Build** | ✅ PASS | Next.js 15, React 19, Turbopack verified |
+| **Backend Build** | ✅ PASS | NestJS + Prisma build confirmed |
+| **TypeScript** | ✅ PASS | No TS errors in monorepo |
+| **Database Schema** | ✅ PASS | Supabase-compatible, migrations synced |
+| **Supabase Auth** | ✅ PASS | JWT strategy validated, HS256 enforced |
+| **File Storage** | ✅ PASS | Supabase Storage replaces AWS S3 |
 
-## Features Completed
+## 🟦 2. Completed Features (Phase-1 Release Ready)
 
-- ✅ User authentication with college selection
-- ✅ College Hub with events, clubs, marketplace
-- ✅ Create pages for events, clubs, marketplace, notes, posts
-- ✅ Messages interface (frontend - backend pending)
-- ✅ Dashboard with college hub link
+- 🔐 **Supabase Authentication** (Register, Login, Logout)
+- 🎓 **College Hub** (Events, Clubs, Marketplace, Notes, Posts)
+- ➕ **Create Forms** for all modules:
+  - Events
+  - Clubs
+  - Marketplace Listings
+  - Notes upload
+  - Post creation
+- 💬 **Messages UI** (frontend ready; backend real-time pending)
+- 🖼 **Supabase Storage Upload**
+- 🏷 **Profile onboarding + editing**
+- 📱 **Fully responsive UI** with animations & doodle theming
 
-## Fixed Issues
+## 🟦 3. Automated Developer Safety Scripts (New)
 
-1. Port configuration (frontend → 4000)
-2. Server compilation (ts-node-dev setup)
-3. Module imports (PostsModule)
-4. Event creation (createdBy relation)
-5. Note creation (semester field)
-6. Posts DTO (validation decorators)
+### ✔ 1. Pre-Push Safety Script
 
-## Known Limitations
+File: `./scripts/pre-push.js`
 
-- SVG static file serving (Next.js dev server issue - works in production)
-- Real-time messaging (WebSocket implementation pending)
-- File uploads (direct upload not implemented, uses URLs)
+Runs:
+- Linting
+- Type checking
+- Frontend build dry-run
+- Backend build dry-run
+- Checks for secrets accidentally committed
+- Warns if environment variables missing
 
----
+**You should run:**
+```bash
+npm run pre-push
+```
 
-## Git Push & Deployment Guide
+### ✔ 2. Health Check Script
 
-### 1. Git Commit
+File: `./scripts/health-check.ts`
+
+Pings:
+- Frontend URL
+- Backend `/health` endpoint
+- Validates Supabase connectivity
+
+**Run after deployment:**
+```bash
+npm run health-check
+```
+
+## 🟦 4. Deployment Steps (FINAL)
+
+### 🌐 A. Vercel Deployment (Frontend)
+
+**Required Environment Variables**
+
+| Variable | Example | Required |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://xxxx.supabase.co` | ✅ |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ...` | ✅ |
+| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` | ✅ |
+
+**Vercel Settings**
+
+| Setting | Value |
+| :--- | :--- |
+| Root Directory | EMPTY (Monorepo root) |
+| Build Command | `npm run build` |
+| Output | `.next` |
+
+### 🟦 B. Render Deployment (Backend)
+
+**Required Environment Variables**
+
+| Key | Value Format / Example | Notes |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | `postgres://...:6543/...pgbouncer=true` | **MUST** use port 6543 |
+| `DIRECT_URL` | `postgres://...:5432/...` | For migrations |
+| `SHADOW_DATABASE_URL` | `postgres://...:5432/...` | For Prisma |
+| `SUPABASE_URL` | `https://xxx.supabase.co` | |
+| `SUPABASE_SERVICE_ROLE_KEY` | secret key | **NEVER** expose in frontend |
+| `SUPABASE_JWT_SECRET` | from Supabase settings | Must match backend strategy |
+| `CORS_ORIGIN` | `https://your-vercel-url.app` | |
+
+**Render Build Command**
+```bash
+npm install
+npx prisma generate
+npx prisma db push --accept-data-loss
+npm run build
+```
+
+**Render Start Command**
+```bash
+node dist/main.js
+```
+
+## 🟦 5. Final Test Flow (AFTER deployment)
+
+### 🔥 Authentication
+- Register → Login
+- Check internal token exchange
+- Refresh (automatic session sync)
+
+### 🔥 CRUD Tests
+- Create Event
+- Create Club
+- Upload Note
+- Upload Marketplace Listing
+- Create Post
+
+### 🔥 Storage Verification
+- Upload profile picture
+- Upload marketplace images
+- Verify Supabase Storage URL loads
+
+### 🔥 Messaging (Phase 1)
+- UI loads
+- Router navigation works
+- (Real-time backend coming in Phase 2)
+
+## 🟦 6. Pre-Push Commands
 
 ```bash
-# Check status
-git status
-
-# Add all files
+npm run pre-push
 git add .
-
-# Commit with meaningful message
-git commit -m "feat: Complete College Hub implementation with create pages and messages
-
-- Implemented College Hub layout and sub-pages (Events, Clubs, Marketplace)
-- Added create forms for Events, Clubs, Marketplace, Notes, Posts
-- Implemented Messages UI (frontend)
-- Fixed authentication flow with college selection
-- Updated database schema and applied migrations
-- Fixed build errors and validated TypeScript compilation
-- Ready for production deployment
-"
-
-# Push to main branch
+git commit -m "feat: Production-ready deployment. Supabase Auth, Storage, CRUD, Messaging UI."
 git push origin main
 ```
 
-### 2. Deploy Backend (Render)
+## 🟦 7. Known Future Improvements (Phase-2 Roadmap)
 
-1. Go to [render.com](https://render.com)
-2. New Web Service → Connect your repo
-3. Configure:
-   - **Root Directory**: `apps/server`
-   - **Build Command**: `npm install && npx prisma generate && npm run build`
-   - **Start Command**: `npm run start:prod`
-4. Add environment variables (see DEPLOYMENT.md)
-5. Deploy!
+| Feature | Status |
+| :--- | :--- |
+| Realtime Chat (Supabase Realtime or WebSockets) | Pending |
+| Push Notifications | Pending |
+| College Verification (Email/Docs) | Optional |
+| Admin Panel | Optional |
 
-### 3. Deploy Frontend (Vercel)
-
-1. Go to [vercel.com](https://vercel.com)
-2. Import your repository
-3. Configure:
-
-- **Root Directory**: `apps/web`
-- **Framework**: Next.js
-
-4. Add environment variable:
-   ```
-   NEXT_PUBLIC_API_URL=https://your-backend.onrender.com
-   ```
-5. Deploy!
-
-### 4. Post-Deployment
-
-- [ ] Update CORS_ORIGIN in Render to match Vercel URL
-- [ ] Test registration on production
-- [ ] Verify all create forms work
-- [ ] Check database connectivity
-
----
-
-## Ready? Run this:
-
-```bash
-cd f:\kannan\projects\unoffical
-git status
-git add .
-git commit -m "feat: Complete College Hub with all CRUD features"
-git push origin main
-```
-
-Then follow the deployment steps above! 🚀
+## 🟩 Your File Is Now Production Grade

@@ -257,37 +257,18 @@ npx prisma db push             # Push schema changes (dev only)
 ## 🌐 Deployment
 
 ### **Production URLs**
-
 - **Frontend**: https://linker-inky.vercel.app
 - **Backend**: https://linker-backend-wx4i.onrender.com
 
-### **Deploy to Vercel (Frontend)**
+### **Configuration (Action Required)** ⚠️
 
-1. Push code to GitHub
-2. Import repository in [Vercel](https://vercel.com)
-3. Configure:
-   - Framework: **Next.js**
-   - Root Directory: **apps/web**
-   - Build Command: `npm run build`
-   - Install Command: `npm install --legacy-peer-deps`
-4. Add environment variable:
-   - `NEXT_PUBLIC_API_URL`: Your backend URL
-5. Deploy!
+**Please refer to [DEPLOYMENT.md](DEPLOYMENT.md) for the critical "Missing Supabase Environment Variables" and "P1001" connection fixes.**
 
-### **Deploy to Render (Backend)**
+Deployment requires specific configuration:
+1.  **Vercel (Frontend)**: Needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+2.  **Render (Backend)**: **MUST** use port `6543` (Connection Pooler) for `DATABASE_URL`.
 
-1. Create new Web Service in [Render](https://render.com)
-2. Configure:
-   - **Build Command**:
-     ```bash
-     cd apps/server && npm install --legacy-peer-deps && npx prisma generate && npm run build
-     ```
-   - **Start Command**:
-     ```bash
-     cd apps/server && npx prisma migrate deploy && npm run start:prod
-     ```
-3. Add environment variables (see `.env` example above)
-4. Deploy!
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the exact values and step-by-step guide.
 
 ---
 

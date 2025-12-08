@@ -13,7 +13,9 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html}\"",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "pre-push": "node scripts/pre-push.js",
+    "health-check": "npx ts-node scripts/health-check.ts"
   },
   "devDependencies": {
     "@types/node": "^24.9.2",

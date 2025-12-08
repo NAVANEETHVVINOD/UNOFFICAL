@@ -1,102 +1,82 @@
-# Deployment Guide
+# Deployment Configuration Guide
 
-## Local Development (Already Working! ✅)
+## 🚨 Critical Requirements (Read First)
 
-Your application is configured correctly:
+### 1. Supabase Connection Pooling (Mandatory for Render)
+Render cannot connect directly to the database port `5432` reliably. You **MUST** use the connection pooler.
 
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:4000
+- **Frontend/Direct Access**: Use Port **5432**
+- **Backend (Render)**: Use Port **6543** (Connection Pooler) + `?pgbouncer=true`
 
-Both are already configured to work together.
-
----
-
-## Deploying to Production
-
-### Frontend → Vercel
-
-1. **Push your code to GitHub**
-
-   ```bash
-   git add .
-   git commit -m "Ready for deployment"
-   git push
-   ```
-
-2. **Connect to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Set **Root Directory** to: `apps/web`
-   - Framework Preset: **Next.js**
-
-3. **Environment Variables**
-   Add these in Vercel Dashboard → Project → Settings → Environment Variables:
-
-   ```
-   NEXT_PUBLIC_API_URL=https://your-render-backend-url.onrender.com
-   ```
-
-4. **Deploy**
-   - Click "Deploy"
-   - Vercel will automatically deploy on every push to main branch
+### 2. Environment Variable Scoping
+- **NEXT_PUBLIC_...**: Exposed to the browser.
+- Others: Server-only (Private).
 
 ---
 
-### Backend → Render
+## 🔧 Phase 1: Vercel Configuration (Frontend)
 
-1. **Connect to Render**
-   - Go to [render.com](https://render.com)
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository
+Go to **Vercel Dashboard → Project → Settings → Environment Variables** and set:
 
-2. **Configuration**
-   - **Root Directory**: `apps/server`
-   - **Build Command**: `npm install && npx prisma generate && npm run build`
-   - **Start Command**: `npm run start:prod`
-   - **Environment**: Node
+| Variable | Value Example | Description |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://xyz...supabase.co` | Your Supabase Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGci...` | Your Supabase Anon Key (Public) |
+| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` | URL of your deployed backend |
 
-3. **Environment Variables**
-   In Render Dashboard → Environment, add:
-
-   ```
-   DATABASE_URL=your_supabase_postgres_url
-   JWT_ACCESS_SECRET=super-secret-access-key
-   JWT_REFRESH_SECRET=super-secret-refresh-key
-   JWT_ACCESS_EXPIRES=15m
-   JWT_REFRESH_EXPIRES=7d
-   PORT=4000
-   CORS_ORIGIN=https://your-vercel-frontend-url.vercel.app
-   ```
-
-4. **Deploy**
-   - Click "Create Web Service"
-   - Render will build and deploy automatically
+> **Note**: After setting these, you must **Redeploy** for them to take effect.
 
 ---
 
-## Post-Deployment Checklist
+## 🔧 Phase 2: Render Configuration (Backend)
 
-- [ ] Update `CORS_ORIGIN` in Render with your Vercel URL
-- [ ] Update `NEXT_PUBLIC_API_URL` in Vercel with your Render URL
-- [ ] Test registration and login on production
-- [ ] Verify database connection (check Render logs)
-- [ ] Test College Hub navigation
+Go to **Render Dashboard → LINKER Service → Environment** and set:
+
+| Variable | Value Format / Example | Critical Notes |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | `postgres://...:6543/postgres?sslmode=require&pgbouncer=true` | **MUST** use port `6543` & `pgbouncer=true` |
+| `DIRECT_URL` | `postgres://...:5432/postgres?sslmode=require` | Use port `5432` for migrations |
+| `SHADOW_DATABASE_URL` | `postgres://...:5432/postgres?sslmode=require` | Same as `DIRECT_URL` (needed for Prisma) |
+| `SUPABASE_URL` | `https://xyz...supabase.co` | Same as frontend URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | **Secret** Service Role Key (NOT Anon Key) |
+| `SUPABASE_JWT_SECRET` | `super-secret...` | From Supabase API Settings |
+| `CORS_ORIGIN` | `https://your-frontend.vercel.app` | Your Vercel URL (no trailing slash) |
+| `PORT` | `4000` | Standard port |
+
+### Render Build Command
+Ensure your build command matches:
+```bash
+npm install && npx prisma generate && npx prisma db push --accept-data-loss && npm run build
+```
 
 ---
 
-## Troubleshooting
+## 🧪 Phase 3: Post-Deployment Verification Checklist
 
-**CORS Errors:**
+### Frontend (Vercel)
+- [ ] **"Something exploded" error is gone**: Indicates Supabase vars are present.
+- [ ] **College Hub loads**: Indicates `NEXT_PUBLIC_API_URL` is correct.
 
-- Make sure `CORS_ORIGIN` in Render matches your Vercel URL exactly
-- Include `https://` protocol
+### Backend (Render)
+- [ ] **Build Succeeded**: Indicates `npx prisma db push` worked (Database connection valid).
+- [ ] **Logs show "Nest application successfully started"**: Server is running.
+- [ ] **No P1001 Errors**: Connection pooler is working.
 
-**Database Connection:**
+### Manual Test Flow
+1. **Register** a new user.
+2. **Login** (should redirect to Dashboard).
+3. **Upload** a file in "Notes" (Testing Storage).
+4. **Create** an Event (Testing Database writes).
 
-- Verify `DATABASE_URL` is correctly set in Render
-- Run `npx prisma generate` in build command
+---
 
-**Build Failures:**
+## 🆘 Troubleshooting
 
-- Check Render logs for specific errors
-- Ensure all dependencies are in `package.json`
+**Error: P1001 Can't reach database server**
+- **Fix**: Check `DATABASE_URL` in Render. It MUST use port `6543`.
+
+**Error: Missing Supabase Environment Variables (Frontend)**
+- **Fix**: Check Vercel Environment Variables. Ensure they start with `NEXT_PUBLIC_`.
+
+**Error: CORS / Network Error**
+- **Fix**: Check `CORS_ORIGIN` in Render (must match Vercel URL) and `NEXT_PUBLIC_API_URL` in Vercel (must match Render URL).

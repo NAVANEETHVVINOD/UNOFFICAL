@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('clubs')
 export class ClubsController {
-  constructor(private readonly clubsService: ClubsService) { }
+  constructor(private readonly clubsService: ClubsService) {}
 
   @Get()
   async findAll(
@@ -31,11 +31,11 @@ export class ClubsController {
       ...(collegeSlug ? { college: { slug: collegeSlug } } : {}),
       ...(search
         ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-          ],
-        }
+            OR: [
+              { name: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+            ],
+          }
         : {}),
     };
 
@@ -87,7 +87,11 @@ export class ClubsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('CLUB_ADMIN' as Role, 'COLLEGE_ADMIN' as Role, 'PLATFORM_ADMIN' as Role)
+  @Roles(
+    'CLUB_ADMIN' as Role,
+    'COLLEGE_ADMIN' as Role,
+    'PLATFORM_ADMIN' as Role,
+  )
   @Post(':id/members/:userId')
   async updateMemberRole(
     @Param('id') clubId: string,

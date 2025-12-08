@@ -25,7 +25,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     // Hash password
@@ -171,7 +171,11 @@ export class AuthService {
     });
   }
 
-  private async generateTokens(userId: string, email: string | null, role: string) {
+  private async generateTokens(
+    userId: string,
+    email: string | null,
+    role: string,
+  ) {
     const payload = {
       sub: userId,
       email,
@@ -207,7 +211,9 @@ export class AuthService {
     if (!user) {
       // Create internal user
       if (email) {
-        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        const existingUser = await this.prisma.user.findUnique({
+          where: { email },
+        });
         if (existingUser) {
           // Link existing user to Supabase ID
           user = await this.prisma.user.update({

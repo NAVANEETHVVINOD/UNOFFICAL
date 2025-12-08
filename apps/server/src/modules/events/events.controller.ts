@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) { }
+  constructor(private readonly eventsService: EventsService) {}
 
   @Get()
   async findAll(

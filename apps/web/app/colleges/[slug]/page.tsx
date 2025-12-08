@@ -193,15 +193,15 @@ export default async function CollegeHome({ params }: PageProps) {
         <div className="bg-accent-yellow py-3 border-y-4 border-black">
           <Marquee speed={40}>
             <span className="font-bold text-xl mx-8 uppercase">
-              /// {collegeName} ///
+              {"///"} {collegeName} {"///"}
             </span>
             <span className="font-serif italic text-xl mx-8">Student Hub</span>
             <span className="font-bold text-xl mx-8 uppercase">
-              /// Events ///
+              {"///"} Events {"///"}
             </span>
             <span className="font-serif italic text-xl mx-8">Clubs</span>
             <span className="font-bold text-xl mx-8 uppercase">
-              /// Marketplace ///
+              {"///"} Marketplace {"///"}
             </span>
           </Marquee>
         </div>
