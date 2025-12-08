@@ -51,6 +51,7 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -212,6 +213,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listener will pick up session change
   }
 
+  async function loginWithGoogle() {
+    setIsLoadingUser(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      setIsLoadingUser(false);
+      throw error;
+    }
+  }
+
   async function logout() {
     setIsLoadingUser(true);
     await supabase.auth.signOut();
@@ -233,6 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         refreshUser: loadUser,
+        loginWithGoogle,
       }}
     >
       {isLoadingUser ? <Loading /> : children}

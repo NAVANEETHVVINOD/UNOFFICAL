@@ -16,7 +16,7 @@ F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\marketplace\page.tsx
   42:6  warning  React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\context\AuthContext.tsx
-  116:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  117:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\dashboard\DashboardClient.tsx
   77:6  warning  React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps

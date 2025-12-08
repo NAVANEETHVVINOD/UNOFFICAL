@@ -1,47 +1,76 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "../../context/AuthContext";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase";
+import Container from "../../components/ui/Container";
+import Loading from "../../loading";
+import { API_URL } from "../../lib/api"; // Ensure this internal helper or env var is available or inline it
 
-export default function AuthCallbackPage() {
+export default function AuthCallback() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { refreshUser } = useAuth();
+  const processed = useRef(false);
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    const refreshToken = searchParams.get("refreshToken");
+    if (processed.current) return;
+    processed.current = true;
 
-    if (token && refreshToken) {
-      localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken", refreshToken);
-      document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
+    const handleCallback = async () => {
+      // 1. Check Supabase Session
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      // Verify auth and redirect
-      refreshUser()
-        .then(() => {
-          router.replace("/dashboard");
-        })
-        .catch(() => {
-          router.replace("/login?error=auth_failed");
+      if (!session) {
+        console.error("No session found after redirect");
+        router.replace("/login");
+        return;
+      }
+
+      try {
+        // 2. Exchange Token with Backend
+        const backendUrl =
+          process.env.NEXT_PUBLIC_API_URL || "https://linker-g0lw.onrender.com";
+
+        const res = await fetch(`${backendUrl}/auth/supabase/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
         });
-    } else {
-      router.replace("/login?error=missing_token");
-    }
-  }, [searchParams, router, refreshUser]);
+
+        if (res.ok) {
+          const data = await res.json();
+          // Store backend token
+          localStorage.setItem("token", data.accessToken);
+          localStorage.setItem("refreshToken", data.refreshToken);
+
+          // 3. Redirect to Dashboard
+          router.replace("/dashboard");
+        } else {
+          console.error("Backend sync failed");
+          router.replace("/login?error=sync_failed");
+        }
+      } catch (err) {
+        console.error("Callback error:", err);
+        router.replace("/login?error=unknown");
+      }
+    };
+
+    handleCallback();
+  }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-accent-yellow">
-      <div className="bg-white p-8 border-4 border-black shadow-neo-lg text-center">
-        <h1 className="font-display text-4xl font-black mb-4">
-          AUTHENTICATING...
-        </h1>
-        <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="font-mono mt-4 text-gray-600">
-          Please wait while we log you in.
-        </p>
+    <Container>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loading />
+          <p className="mt-4 font-bold font-mono animate-pulse">
+            AUTHENTICATING WITH SATELLITE...
+          </p>
+        </div>
       </div>
-    </div>
+    </Container>
   );
 }

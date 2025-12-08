@@ -17,7 +17,7 @@ import Doodle from "../components/ui/Doodle";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login, register, user, isAuthenticated } = useAuth();
+  const { login, register, loginWithGoogle, user, isAuthenticated } = useAuth();
 
   if (isAuthenticated && user) {
     router.replace("/dashboard");
@@ -203,6 +203,32 @@ export default function RegisterPage() {
                 >
                   {loading ? "CREATING PROFILE..." : "START ONBOARDING ->"}
                 </RetroButton>
+
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-gray-500 font-bold tracking-widest">
+                      Or join with
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => loginWithGoogle()}
+                  className="w-full py-4 border-2 border-black bg-white hover:bg-gray-50 transition-colors rounded-lg font-bold flex items-center justify-center gap-3"
+                  disabled={loading}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27c3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10c5.35 0 9.25-3.67 9.25-9.09c0-1.15-.15-1.81-.15-1.81Z"
+                    />
+                  </svg>
+                  GOOGLE
+                </button>
               </form>
 
               <div className="mt-8 pt-8 border-t border-gray-100 text-center">
