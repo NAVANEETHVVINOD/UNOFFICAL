@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../../../lib/supabase";
 import Container from "../../components/ui/Container";
 import Loading from "../../loading";
-import { API_URL } from "../../lib/api"; // Ensure this internal helper or env var is available or inline it
+import { API_URL } from "../../../lib/api"; // Ensure this internal helper or env var is available or inline it
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -29,10 +29,8 @@ export default function AuthCallback() {
 
       try {
         // 2. Exchange Token with Backend
-        const backendUrl =
-          process.env.NEXT_PUBLIC_API_URL || "https://linker-g0lw.onrender.com";
-
-        const res = await fetch(`${backendUrl}/auth/supabase/login`, {
+        // 2. Exchange Token with Backend
+        const res = await fetch(`${API_URL}/auth/supabase/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

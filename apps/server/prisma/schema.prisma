@@ -1,13 +1,265 @@
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/@prisma/client"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id                 String               @id @default(cuid())
+  email              String?              @unique
+  password           String?
+  role               Role                 @default(STUDENT)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  hashedRefreshToken String?
+  supabaseId         String?              @unique
+  certificates       CertificateIssue[]
+  memberships        ClubMember[]
+  comments           Comment[]
+  createdEvents      Event[]
+  events             EventAttendance[]
+  listings           MarketplaceListing[] @relation("ListingOwner")
+  sentMessages       Message[]            @relation("SentMessages")
+  notes              Note[]               @relation("AuthorNotes")
+  likes              NoteLike[]
+  posts              Post[]
+  postLikes          PostLike[]
+  profile            Profile?
+  conversations      Conversation[]       @relation("UserConversations")
+
+  @@index([supabaseId])
+}
+
+model Profile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  fullName       String
+  collegeId      String?
+  bio            String?
+  avatarUrl      String?
+  tags           String[]
+  githubUrl      String?
+  instagram      String?
+  socials        Json?
+  interests      String[]
+  isOnboarded    Boolean  @default(false)
+  onboardingStep Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  linkedin       String?
+  college        College? @relation(fields: [collegeId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model College {
+  id        String               @id @default(cuid())
+  name      String
+  slug      String               @unique
+  city      String?
+  state     String?
+  createdAt DateTime             @default(now())
+  clubs     Club[]
+  events    Event[]
+  listings  MarketplaceListing[]
+  notes     Note[]
+  posts     Post[]
+  profiles  Profile[]
+}
+
+model Club {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  description String?
+  collegeId   String
+  createdAt   DateTime     @default(now())
+  college     College      @relation(fields: [collegeId], references: [id])
+  members     ClubMember[]
+  events      Event[]
+  posts       Post[]
+}
+
+model ClubMember {
+  id          String   @id @default(cuid())
+  userId      String
+  clubId      String
+  role        ClubRole @default(MEMBER)
+  displayRole String?
+  joinedAt    DateTime @default(now())
+  club        Club     @relation(fields: [clubId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, clubId])
+}
+
+model Event {
+  id           String             @id @default(cuid())
+  title        String
+  description  String?
+  startsAt     DateTime
+  endsAt       DateTime
+  venue        String?
+  clubId       String?
+  collegeId    String?
+  createdById  String
+  scope        EventScope         @default(COLLEGE)
+  qrToken      String?
+  certificates CertificateIssue[]
+  club         Club?              @relation(fields: [clubId], references: [id])
+  college      College?           @relation(fields: [collegeId], references: [id])
+  createdBy    User               @relation(fields: [createdById], references: [id])
+  attendees    EventAttendance[]
+}
+
+model EventAttendance {
+  id            String         @id @default(cuid())
+  eventId       String
+  userId        String
+  status        EventStatus    @default(GOING)
+  role          AttendanceRole @default(ATTENDEE)
+  checkInMethod String?
+  checkInTime   DateTime?
+  event         Event          @relation(fields: [eventId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model MarketplaceListing {
+  id            String           @id @default(cuid())
+  title         String
+  description   String?
+  price         Int
+  imageUrl      String?
+  ownerId       String
+  collegeId     String?
+  scope         MarketplaceScope @default(COLLEGE)
+  status        ListingStatus    @default(ACTIVE)
+  createdAt     DateTime         @default(now())
+  category      String           @default("OTHER")
+  conversations Conversation[]
+  college       College?         @relation(fields: [collegeId], references: [id])
+  owner         User             @relation("ListingOwner", fields: [ownerId], references: [id])
+}
+
+model Note {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  fileUrl     String
+  subject     String
+  semester    Int
+  authorId    String
+  collegeId   String?
+  createdAt   DateTime   @default(now())
+  author      User       @relation("AuthorNotes", fields: [authorId], references: [id])
+  college     College?   @relation(fields: [collegeId], references: [id])
+  likes       NoteLike[]
+}
+
+model NoteLike {
+  id     String @id @default(cuid())
+  noteId String
+  userId String
+  note   Note   @relation(fields: [noteId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([noteId, userId])
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  content     String
+  imageUrl    String?
+  authorId    String?
+  collegeId   String?
+  clubId      String?
+  isAnonymous Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  comments    Comment[]
+  author      User?      @relation(fields: [authorId], references: [id])
+  club        Club?      @relation(fields: [clubId], references: [id])
+  college     College?   @relation(fields: [collegeId], references: [id])
+  likes       PostLike[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+}
+
+model PostLike {
+  id     String @id @default(cuid())
+  postId String
+  userId String
+  post   Post   @relation(fields: [postId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  content   String
+  category  String
+  userId    String?
+  collegeId String?
+  createdAt DateTime @default(now())
+}
+
+model CertificateTemplate {
+  id        String             @id @default(cuid())
+  name      String
+  fileUrl   String
+  fields    String[]
+  createdAt DateTime           @default(now())
+  issues    CertificateIssue[]
+}
+
+model CertificateIssue {
+  id         String              @id @default(cuid())
+  templateId String
+  userId     String
+  eventId    String?
+  issuedAt   DateTime            @default(now())
+  fileUrl    String
+  event      Event?              @relation(fields: [eventId], references: [id])
+  template   CertificateTemplate @relation(fields: [templateId], references: [id])
+  user       User                @relation(fields: [userId], references: [id])
+}
+
+model Conversation {
+  id           String              @id @default(cuid())
+  listingId    String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  listing      MarketplaceListing? @relation(fields: [listingId], references: [id])
+  messages     Message[]
+  participants User[]              @relation("UserConversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+  seen           Boolean      @default(false)
+  seenAt         DateTime?
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
 }
 
 enum Role {
@@ -49,278 +301,4 @@ enum AttendanceRole {
   ATTENDEE
   VOLUNTEER
   SPEAKER
-}
-
-model User {
-  id          String   @id @default(cuid())
-  email       String?   @unique
-  password    String?
-  role        Role     @default(STUDENT)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  hashedRefreshToken String?
-  supabaseId  String?  @unique
-
-  profile     Profile?
-  memberships ClubMember[]
-  events      EventAttendance[]
-  createdEvents Event[]
-  listings    MarketplaceListing[] @relation("ListingOwner")
-  notes       Note[]               @relation("AuthorNotes")
-  likes       NoteLike[]
-  posts       Post[]
-  comments    Comment[]
-  postLikes   PostLike[]
-  
-  // Messaging
-  sentMessages     Message[] @relation("SentMessages")
-  conversations    Conversation[] @relation("UserConversations")
-  
-  // Certificates
-  certificates     CertificateIssue[]
-
-  @@index([supabaseId])
-}
-
-model Profile {
-  id          String  @id @default(cuid())
-  userId      String  @unique
-  fullName    String
-  collegeId   String?
-  bio         String?
-  avatarUrl   String?
-  tags        String[]
-  githubUrl   String?
-  instagram   String?
-  linkedin    String?
-  socials     Json?
-  interests   String[]
-  isOnboarded Boolean @default(false)
-  onboardingStep Int @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  college     College? @relation(fields: [collegeId], references: [id])
-}
-
-model College {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  city      String?
-  state     String?
-  createdAt DateTime @default(now())
-
-  clubs     Club[]
-  profiles  Profile[]
-  events    Event[]
-  listings  MarketplaceListing[]
-  notes     Note[]
-  posts     Post[]
-}
-
-model Club {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String        @unique
-  description String?
-  collegeId   String
-  createdAt   DateTime      @default(now())
-
-  college     College       @relation(fields: [collegeId], references: [id])
-  members     ClubMember[]
-  events      Event[]
-  posts       Post[]
-}
-
-model ClubMember {
-  id        String   @id @default(cuid())
-  userId    String
-  clubId    String
-  role      ClubRole @default(MEMBER)
-  displayRole String? // Chair, Lead, etc.
-  joinedAt  DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
-  club      Club     @relation(fields: [clubId], references: [id])
-
-  @@unique([userId, clubId])
-}
-
-model Event {
-  id          String              @id @default(cuid())
-  title       String
-  description String?
-  startsAt    DateTime
-  endsAt      DateTime
-  venue       String?
-  clubId      String?
-  collegeId   String?
-  createdById String
-  scope       EventScope @default(COLLEGE)
-  qrToken     String?
-  
-  club        Club?               @relation(fields: [clubId], references: [id])
-  college     College?            @relation(fields: [collegeId], references: [id])
-  createdBy   User                @relation(fields: [createdById], references: [id])
-  attendees   EventAttendance[]
-  certificates CertificateIssue[]
-}
-
-model EventAttendance {
-  id        String   @id @default(cuid())
-  eventId   String
-  userId    String
-  status    EventStatus @default(GOING)
-  role      AttendanceRole @default(ATTENDEE)
-  checkInMethod String? // QR, MANUAL
-  checkInTime   DateTime?
-  
-  event     Event    @relation(fields: [eventId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@unique([eventId, userId])
-}
-
-model MarketplaceListing {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  price       Int
-  category    String   @default("OTHER")
-  imageUrl    String?
-  ownerId     String
-  collegeId   String?
-  scope       MarketplaceScope @default(COLLEGE)
-  status      ListingStatus @default(ACTIVE)
-  createdAt   DateTime @default(now())
-
-  owner       User     @relation("ListingOwner", fields: [ownerId], references: [id])
-  college     College? @relation(fields: [collegeId], references: [id])
-  conversations Conversation[]
-}
-
-model Note {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  fileUrl     String
-  subject     String
-  semester    Int
-  authorId    String
-  collegeId   String?
-  createdAt   DateTime @default(now())
-
-  author      User     @relation("AuthorNotes", fields: [authorId], references: [id])
-  college     College? @relation(fields: [collegeId], references: [id])
-  likes       NoteLike[]
-}
-
-model NoteLike {
-  id     String @id @default(cuid())
-  noteId String
-  userId String
-
-  note   Note   @relation(fields: [noteId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
-
-  @@unique([noteId, userId])
-}
-
-model Post {
-  id          String   @id @default(cuid())
-  content     String
-  imageUrl    String?
-  authorId    String? // Nullable for anonymous
-  collegeId   String?
-  clubId      String?
-  isAnonymous Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  author      User?    @relation(fields: [authorId], references: [id])
-  college     College? @relation(fields: [collegeId], references: [id])
-  club        Club?    @relation(fields: [clubId], references: [id])
-  comments    Comment[]
-  likes       PostLike[]
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  postId    String
-  authorId  String
-  createdAt DateTime @default(now())
-
-  post      Post     @relation(fields: [postId], references: [id])
-  author    User     @relation(fields: [authorId], references: [id])
-}
-
-model PostLike {
-  id     String @id @default(cuid())
-  postId String
-  userId String
-
-  post   Post   @relation(fields: [postId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
-
-  @@unique([postId, userId])
-}
-
-model Feedback {
-  id        String   @id @default(cuid())
-  content   String
-  category  String // Event, Club, Academics, Facility
-  userId    String?
-  collegeId String?
-  createdAt DateTime @default(now())
-}
-
-model CertificateTemplate {
-  id        String   @id @default(cuid())
-  name      String
-  fileUrl   String // PDF/Image template
-  fields    String[] // JSON array of placeholders
-  createdAt DateTime @default(now())
-  
-  issues    CertificateIssue[]
-}
-
-model CertificateIssue {
-  id          String   @id @default(cuid())
-  templateId  String
-  userId      String
-  eventId     String?
-  issuedAt    DateTime @default(now())
-  fileUrl     String // Generated PDF
-  
-  template    CertificateTemplate @relation(fields: [templateId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
-  event       Event?   @relation(fields: [eventId], references: [id])
-}
-
-model Conversation {
-  id          String   @id @default(cuid())
-  listingId   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  listing     MarketplaceListing? @relation(fields: [listingId], references: [id])
-  participants User[] @relation("UserConversations")
-  messages    Message[]
-}
-
-model Message {
-  id             String   @id @default(cuid())
-  conversationId String
-  senderId       String
-  content        String
-  createdAt      DateTime @default(now())
-  
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
-  seen           Boolean      @default(false)
-  seenAt         DateTime?
 }
