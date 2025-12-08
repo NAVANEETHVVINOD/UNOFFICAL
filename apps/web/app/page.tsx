@@ -44,30 +44,9 @@ export default function Home() {
             </div>
             <Container>
                 <div className="py-8 pb-24 md:pb-8">
-                    {/* Custom Landing Navbar */}
-                    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b-2 border-gray-200">
-                        <Container className="py-4 flex justify-between items-center">
-                            {/* Logo */}
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-black text-xl font-display transform -rotate-3">
-                                    L
-                                </div>
-                                <span className="font-display font-black text-xl tracking-tight">LINKER OS</span>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Link href="/login" className="hidden md:block font-bold text-sm hover:text-gray-600 transition-colors">
-                                    Log In
-                                </Link>
-                                <Link href="/register">
-                                    <RetroButton className="px-6 py-2 text-sm !shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                        Get Started
-                                    </RetroButton>
-                                </Link>
-                            </div>
-                        </Container>
-                    </nav>
+                    {/* Navbar */}
 
-                    <div className="pt-24">
+                    <div>
                         <h1 className="text-center mb-6">
                             <span
                                 className="block uppercase moo-lah-lah-regular transform -rotate-2 hover:rotate-0 transition-transform duration-500 text-hero-moo"
@@ -77,17 +56,14 @@ export default function Home() {
                                     lineHeight: 1.2,
                                 }}
                             >
-                                THE OPERATING
-                                <br />
-                                SYSTEM FOR CAMPUS.
+                                Academic Chaos as a Service.™
                             </span>
                         </h1>
 
-                        <p className="text-lg md:text-2xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed font-serif italic px-4 text-center">
-                            Because colleges still run on WhatsApp groups.
-                            <br />
-                            <span className="font-bold text-black">
-                                We thought… maybe don't.
+                        <p className="text-lg md:text-2xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed font-serif italic px-4">
+                            Finally, a place where chaos meets structure.
+                            <span className="bg-accent-yellow/30 px-2 rounded-md mx-1 not-italic font-bold">
+                                (Barely.)
                             </span>
                         </p>
 
@@ -97,7 +73,7 @@ export default function Home() {
                                     variant="secondary"
                                     className="px-10 py-4 text-base shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1"
                                 >
-                                    Get Early Access
+                                    I&apos;m in.
                                 </RetroButton>
                             </Link>
                             <Link href="/dashboard">
@@ -105,150 +81,545 @@ export default function Home() {
                                     variant="outline"
                                     className="px-10 py-4 text-base"
                                 >
-                                    Deploy to Campus
+                                    Show me around.
                                 </RetroButton>
                             </Link>
                         </div>
                     </div>
 
-                    {/* Right Content (Visual Stack - Monochrome) */}
-                    <div className="absolute top-32 -right-10 md:top-24 md:right-12 z-20 scale-[0.6] md:scale-100 origin-top-right w-80 h-80 hidden md:block">
-                        {/* Card 1 (Back - Events) */}
-                        <div className="absolute top-0 right-0 w-64 h-64 rotate-6 hover:rotate-12 transition-all duration-500 z-10">
-                            <NewspaperCard className="bg-black text-white p-6 h-full flex flex-col justify-between">
-                                <div className="text-xs font-mono border border-white/30 rounded px-2 py-1 self-start">MODULE_01</div>
-                                <h3 className="font-display text-4xl">EVENTS</h3>
-                                <Doodle src="/doodles/calendar.svg" className="w-12 h-12 text-white/50 self-end" />
-                            </NewspaperCard>
-                        </div>
-
-                        {/* Card 2 (Middle - Market) */}
-                        <div className="absolute top-4 right-4 w-64 h-64 -rotate-3 hover:-rotate-6 transition-all duration-500 z-20">
-                            <NewspaperCard className="bg-white border-2 border-black p-6 h-full flex flex-col justify-between">
-                                <div className="text-xs font-mono border border-black/30 rounded px-2 py-1 self-start">MODULE_02</div>
-                                <h3 className="font-display text-4xl">MARKET</h3>
-                                <Doodle src="/doodles/shopping-bag.svg" className="w-12 h-12 text-black/50 self-end" />
-                            </NewspaperCard>
-                        </div>
-
-                        {/* Card 3 (Front - Clubs) */}
-                        <div className="absolute top-8 right-8 w-64 h-64 bg-accent-yellow rotate-2 hover:rotate-0 transition-all duration-300 z-30 shadow-2xl">
-                            <NewspaperCard className="bg-transparent border-0 p-6 h-full flex flex-col justify-between">
-                                <div className="text-xs font-mono border border-black/30 rounded px-2 py-1 self-start bg-white/50">MODULE_03</div>
-                                <h3 className="font-display text-4xl">CLUBS</h3>
-                                <Doodle src="/doodles/group.svg" className="w-12 h-12 text-black self-end" />
-                            </NewspaperCard>
-                        </div>
-                    </div>
-
-                    {/* Marquee Section (Full Width) */}
-                    <div className="mb-24 mt-24 w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] overflow-hidden bg-black py-6 border-y-4 border-black transform -rotate-1">
-                        <Marquee speed={40} direction="left">
-                            <span className="text-white font-pixel text-3xl mx-12">
-                                /// OPERATING_SYSTEM_FOR_CAMPUS ///
-                            </span>
-                            <span className="text-accent-yellow font-serif italic text-3xl mx-12">
-                                Zero Chaos.
-                            </span>
-                            <span className="text-white font-pixel text-3xl mx-12">
-                                /// VERTICAL_SAAS_V2.0 ///
-                            </span>
-                            <span className="text-accent-blue font-serif italic text-3xl mx-12">
-                                Less WhatsApp. More Life.
-                            </span>
-                        </Marquee>
-                    </div>
-
-                    {/* Feature 1: The Problem */}
-                    <div className="grid md:grid-cols-12 gap-8 mb-24">
-                        <div className="md:col-span-12">
-                            <div className="text-center mb-12">
-                                <Badge className="mb-4 bg-red-500 text-white border-black">
-                                    THE_PROBLEM
-                                </Badge>
-                                <h2 className="font-display text-5xl font-black mb-4">
-                                    COLLEGES RUN ON WHATSAPP.
-                                </h2>
-                                <p className="text-xl text-gray-600 font-serif italic">
-                                    (It's 2025. Please stop.)
-                                </p>
+                    {/* Left Card - Retro TV Style */}
+                    <div className="absolute top-12 -left-10 md:top-4 md:left-4 z-20 scale-[0.6] md:scale-100 origin-top-left">
+                        <HangingCard className="w-52 p-4 bg-gradient-to-br from-indigo-950 to-slate-900 text-white rotate-[-6deg] rounded-3xl shadow-xl border-2 border-indigo-800">
+                            <Sticker
+                                className="top-2 right-2 bg-accent-pink text-white"
+                                rotate={12}
+                            >
+                                LIVE
+                            </Sticker>
+                            <div className="border-4 border-white/10 rounded-2xl p-2 bg-black/40 backdrop-blur-sm">
+                                {/* TV Screen */}
+                                <div className="bg-white rounded-xl overflow-hidden border-2 border-white/20 relative">
+                                    <img
+                                        src="/doodles/welcome.jpg"
+                                        alt="Welcome"
+                                        className="w-full h-48 object-cover"
+                                        onError={(e) =>
+                                            console.error("Failed to load welcome:", e)
+                                        }
+                                    />
+                                    {/* TV Scanlines */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent pointer-events-none"></div>
+                                </div>
+                                {/* TV Base */}
+                                <div className="h-2 bg-white/30 mt-2 rounded-full"></div>
                             </div>
-                        </div>
+                        </HangingCard>
+                    </div>
 
-                        <div className="md:col-span-6 md:col-start-4">
+                    {/* Right Card - CD Album Style */}
+                    <div className="absolute top-24 -right-10 md:top-32 md:right-4 z-20 scale-[0.6] md:scale-100 origin-top-right">
+                        <HangingCard className="w-48 p-4 bg-gradient-to-br from-gray-800 to-black text-white rotate-[6deg] border-4 border-accent-yellow animate-border-color relative overflow-visible rounded-3xl shadow-xl">
+                            <Sticker
+                                className="-bottom-3 -left-3 bg-accent-green text-black font-black"
+                                rotate={-5}
+                            >
+                                LIVE
+                            </Sticker>
+
+                            <div className="aspect-square rounded-full mb-3 overflow-hidden border-4 border-accent-yellow flex items-center justify-center relative shadow-[0_0_20px_rgba(255,215,0,0.3)]">
+                                {/* CD Image with Spin */}
+                                <img
+                                    src="/doodles/CD.jpg"
+                                    alt="CD"
+                                    className="w-full h-full object-cover animate-spin-slow"
+                                    style={{ animationDuration: "8s" }}
+                                    onError={(e) => console.error("Failed to load CD:", e)}
+                                />
+                                {/* Center Hole */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-8 h-8 bg-black rounded-full border-2 border-white"></div>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="font-bold text-sm font-pixel text-accent-yellow drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                                    GAME_ON.EXE
+                                </span>
+                                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            </div>
+                        </HangingCard>
+                    </div>
+
+                    {/* Marquee Section */}
+                    <div className="mb-24 -mx-4 md:-mx-8 transform -rotate-1">
+                        <div className="bg-black py-4 border-y-4 border-accent-yellow shadow-xl">
+                            <Marquee speed={30}>
+                                <span className="text-white font-pixel text-3xl mx-8">
+                                    {"/// BREAKING_NEWS: HACKATHON REGISTRATIONS OPEN ///"}
+                                </span>
+                                <span className="text-accent-yellow font-serif italic text-3xl mx-8">
+                                    Don&apos;t miss out!
+                                </span>
+                                <span className="text-white font-pixel text-3xl mx-8">
+                                    {"/// NEW_CLUB_ALERT: ROBOTICS ///"}
+                                </span>
+                                <span className="text-accent-blue font-serif italic text-3xl mx-8">
+                                    Join the revolution
+                                </span>
+                                <span className="text-white font-pixel text-3xl mx-8">
+                                    {"/// EXAM_SCHEDULE_RELEASED ///"}
+                                </span>
+                                <span className="text-accent-pink font-serif italic text-3xl mx-8">
+                                    Panic mode: ON
+                                </span>
+                            </Marquee>
+                        </div>
+                    </div>
+
+                    {/* About Section */}
+                    <div className="grid md:grid-cols-12 gap-8 mb-24">
+                        <div className="md:col-span-7">
                             <NewspaperCard
                                 variant="curved"
-                                className="h-full p-8 md:p-12 bg-white relative overflow-hidden rotate-1 hover:rotate-0 transition-transform"
+                                className="h-full p-8 md:p-12 bg-white relative overflow-hidden"
                             >
                                 <Tape className="absolute -top-3 left-1/2 -translate-x-1/2" />
-                                <h2 className="font-display text-3xl font-bold mb-6">
-                                    Current Status: <span className="text-red-500">CHAOS</span>
+                                <Badge className="mb-6">ABOUT LINKER</Badge>
+                                <h2 className="font-display text-4xl md:text-5xl font-black mb-6">
+                                    NOT JUST ANOTHER
+                                    <br />
+                                    <span className="text-accent-blue">NOTICE BOARD.</span>
                                 </h2>
-                                <ul className="space-y-4">
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-6 h-6 bg-red-100 rounded text-red-500 flex items-center justify-center text-xs font-bold">X</div>
-                                        <span className="text-gray-600">Communication is scattered</span>
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-6 h-6 bg-red-100 rounded text-red-500 flex items-center justify-center text-xs font-bold">X</div>
-                                        <span className="text-gray-600">Clubs are unstructured</span>
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-6 h-6 bg-red-100 rounded text-red-500 flex items-center justify-center text-xs font-bold">X</div>
-                                        <span className="text-gray-600">Events are manual</span>
-                                    </li>
+                                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                                    LINKER is a campus-wide digital platform that centralizes all
+                                    student activities, academic resources, club operations,
+                                    events, and campus interactions into one integrated system. It
+                                    replaces scattered communication with a structured,
+                                    accessible, role-based platform.
+                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                                        <h4 className="font-bold mb-1">Student Ecosystem</h4>
+                                        <p className="text-sm text-gray-500">
+                                            Everything you need to survive college.
+                                        </p>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                                        <h4 className="font-bold mb-1">Community Hub</h4>
+                                        <p className="text-sm text-gray-500">
+                                            Connect, collaborate, and create.
+                                        </p>
+                                    </div>
+                                </div>
+                            </NewspaperCard>
+                        </div>
+                        <div className="md:col-span-5 flex flex-col gap-6">
+                            <NewspaperCard
+                                variant="curved"
+                                className="flex-1 bg-accent-yellow p-8 flex flex-col justify-center relative overflow-hidden group"
+                            >
+                                <Doodle
+                                    src="/doodles/megaphone.svg"
+                                    className="absolute -right-8 -bottom-8 w-48 h-48 opacity-20 group-hover:scale-110 transition-transform"
+                                />
+                                <h3 className="font-display text-6xl font-black mb-2">500+</h3>
+                                <p className="font-serif italic text-2xl">Students Connected</p>
+                            </NewspaperCard>
+                            <NewspaperCard
+                                variant="curved"
+                                className="flex-1 bg-black text-white p-8 flex flex-col justify-center relative overflow-hidden"
+                            >
+                                <div className="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                                <h3 className="font-pixel text-4xl mb-2 text-accent-pink">
+                                    LIVE_FEED
+                                </h3>
+                                <p className="text-gray-400">
+                                    Real-time updates from every club and department.
+                                </p>
+                            </NewspaperCard>
+                        </div>
+                    </div>
+
+                    {/* The Ecosystem (Roles) */}
+                    <div className="mb-32">
+                        <div className="text-center mb-12">
+                            <h2 className="font-display text-5xl font-black mb-4">
+                                THE ECOSYSTEM
+                            </h2>
+                            <p className="text-xl text-gray-600 font-serif italic">
+                                &quot;A role for everyone.&quot;
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-6">
+                            {/* Student */}
+                            <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
+                                <div className="w-12 h-12 bg-accent-blue rounded-full flex items-center justify-center mb-4 border-2 border-black">
+                                    <Doodle
+                                        src="/doodles/sparkle.svg"
+                                        className="w-6 h-6 text-white"
+                                    />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2">STUDENTS</h3>
+                                <ul className="text-sm space-y-2 text-gray-600 list-disc list-inside">
+                                    <li>Access all events</li>
+                                    <li>Join clubs & communities</li>
+                                    <li>Download notes & papers</li>
+                                    <li>Buy/Sell in Marketplace</li>
+                                </ul>
+                            </NewspaperCard>
+
+                            {/* Teacher */}
+                            <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
+                                <div className="w-12 h-12 bg-accent-pink rounded-full flex items-center justify-center mb-4 border-2 border-black">
+                                    <Doodle
+                                        src="/doodles/book.svg"
+                                        className="w-6 h-6 text-white"
+                                    />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2">TEACHERS</h3>
+                                <ul className="text-sm space-y-2 text-gray-600 list-disc list-inside">
+                                    <li>Upload study materials</li>
+                                    <li>Post announcements</li>
+                                    <li>Manage department events</li>
+                                    <li>Approve student posts</li>
+                                </ul>
+                            </NewspaperCard>
+
+                            {/* Club Leader */}
+                            <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
+                                <div className="w-12 h-12 bg-accent-yellow rounded-full flex items-center justify-center mb-4 border-2 border-black">
+                                    <Doodle
+                                        src="/doodles/group.svg"
+                                        className="w-6 h-6 text-black"
+                                    />
+                                </div>
+                                <h3 className="font-bold text-xl mb-2">CLUB LEADERS</h3>
+                                <ul className="text-sm space-y-2 text-gray-600 list-disc list-inside">
+                                    <li>Create & edit events</li>
+                                    <li>Manage club profile</li>
+                                    <li>Recruit members</li>
+                                    <li>Access event analytics</li>
                                 </ul>
                             </NewspaperCard>
                         </div>
                     </div>
 
-                    {/* Feature 2: The Solution (Modules) */}
+                    {/* FEATURE 1: EVENTS SYSTEM */}
                     <div className="mb-32">
-                        <div className="text-center mb-12">
-                            <Badge className="mb-4 bg-accent-green text-black border-black">
-                                THE_SOLUTION
-                            </Badge>
-                            <h2 className="font-display text-5xl font-black mb-4">
-                                LINKER OS
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                            <div className="order-2 md:order-1">
+                                <Badge className="mb-4 bg-accent-blue text-white border-black">
+                                    MODULE_01
+                                </Badge>
+                                <h2 className="font-display text-5xl font-black mb-6">
+                                    EVENTS SYSTEM
+                                </h2>
+                                <p className="text-xl text-gray-600 mb-8">
+                                    Never miss a beat. All college events in one place,
+                                    automatically sorted and easy to join.
+                                </p>
+                                <ul className="space-y-4 mb-8">
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">Automatic sorting by date</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">Registration/RSVP system</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            Event details & attachments
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">Save & bookmark events</span>
+                                    </li>
+                                </ul>
+                                <Link href="/events">
+                                    <RetroButton variant="secondary">Explore Events</RetroButton>
+                                </Link>
+                            </div>
+                            <div className="order-1 md:order-2">
+                                <NewspaperCard
+                                    variant="curved"
+                                    className="bg-accent-blue p-8 rotate-2 hover:rotate-0 transition-transform"
+                                >
+                                    <div className="bg-white rounded-3xl p-6 shadow-lg">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <span className="font-bold">UPCOMING_EVENTS</span>
+                                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-4">
+                                                <div className="w-12 h-12 bg-accent-yellow rounded-full flex items-center justify-center font-bold border border-black">
+                                                    24
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold">Freshers&apos; Night</h4>
+                                                    <p className="text-xs text-gray-500">
+                                                        Auditorium • 6 PM
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-4">
+                                                <div className="w-12 h-12 bg-accent-pink rounded-full flex items-center justify-center font-bold border border-black text-white">
+                                                    01
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold">Code Chaos</h4>
+                                                    <p className="text-xs text-gray-500">
+                                                        CS Lab • 9 AM
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </NewspaperCard>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* FEATURE 2: CLUBS SYSTEM */}
+                    <div className="mb-32">
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <NewspaperCard
+                                    variant="curved"
+                                    className="bg-accent-pink p-8 -rotate-2 hover:rotate-0 transition-transform"
+                                >
+                                    <div className="bg-white rounded-3xl p-6 shadow-lg text-center">
+                                        <div className="w-24 h-24 bg-black rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-accent-yellow">
+                                            <Doodle
+                                                src="/doodles/group.svg"
+                                                className="w-12 h-12 text-white"
+                                            />
+                                        </div>
+                                        <h3 className="font-display text-3xl font-black mb-2">
+                                            ROBOTICS CLUB
+                                        </h3>
+                                        <p className="text-sm text-gray-500 mb-6">
+                                            Building the future, one bot at a time.
+                                        </p>
+                                        <div className="flex justify-center gap-2">
+                                            <Badge className="bg-gray-100 border-gray-200">
+                                                Tech
+                                            </Badge>
+                                            <Badge className="bg-gray-100 border-gray-200">
+                                                Workshop
+                                            </Badge>
+                                        </div>
+                                        <div className="mt-6 pt-6 border-t border-gray-100">
+                                            <Link href="/clubs">
+                                                <RetroButton className="w-full" variant="outline">
+                                                    Join Club
+                                                </RetroButton>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </NewspaperCard>
+                            </div>
+                            <div>
+                                <Badge className="mb-4 bg-accent-pink text-white border-black">
+                                    MODULE_02
+                                </Badge>
+                                <h2 className="font-display text-5xl font-black mb-6">
+                                    CLUBS DIRECTORY
+                                </h2>
+                                <p className="text-xl text-gray-600 mb-8">
+                                    Find your tribe. A complete directory of all college clubs
+                                    with profiles, announcements, and member listings.
+                                </p>
+                                <ul className="space-y-4 mb-8">
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            Club profiles & descriptions
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            Club-specific announcements
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">Easy join requests</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            Member management for leaders
+                                        </span>
+                                    </li>
+                                </ul>
+                                <Link href="/clubs">
+                                    <RetroButton variant="secondary">Browse Clubs</RetroButton>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* FEATURE 3: ACADEMIC NOTES */}
+                    <div className="mb-32">
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                            <div className="order-2 md:order-1">
+                                <Badge className="mb-4 bg-accent-yellow text-black border-black">
+                                    MODULE_03
+                                </Badge>
+                                <h2 className="font-display text-5xl font-black mb-6">
+                                    ACADEMIC NOTES
+                                </h2>
+                                <p className="text-xl text-gray-600 mb-8">
+                                    No more begging for notes. Access study materials, previous
+                                    year papers, and resources organized by department.
+                                </p>
+                                <ul className="space-y-4 mb-8">
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            Department & semester organization
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            PDF viewer & download system
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">Teacher & student uploads</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-xs">
+                                            ✓
+                                        </div>
+                                        <span className="font-bold">
+                                            Previous year question papers
+                                        </span>
+                                    </li>
+                                </ul>
+                                <Link href="/notes">
+                                    <RetroButton variant="secondary">Find Notes</RetroButton>
+                                </Link>
+                            </div>
+                            <div className="order-1 md:order-2">
+                                <NewspaperCard
+                                    variant="curved"
+                                    className="bg-accent-yellow p-8 rotate-2 hover:rotate-0 transition-transform"
+                                >
+                                    <div className="bg-white rounded-3xl p-6 shadow-lg relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 bg-black text-white px-3 py-1 text-xs font-bold rounded-bl-xl">
+                                            PDF
+                                        </div>
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-300">
+                                                <Doodle
+                                                    src="/doodles/book.svg"
+                                                    className="w-6 h-6 opacity-50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold">Physics_101_Notes.pdf</h4>
+                                                <p className="text-xs text-gray-500">
+                                                    Uploaded by Prof. Smith
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="h-2 bg-gray-100 rounded-full w-full"></div>
+                                            <div className="h-2 bg-gray-100 rounded-full w-5/6"></div>
+                                            <div className="h-2 bg-gray-100 rounded-full w-4/6"></div>
+                                        </div>
+                                        <div className="mt-6 flex justify-between items-center">
+                                            <span className="text-xs font-bold text-gray-400">
+                                                2.4 MB
+                                            </span>
+                                            <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white">
+                                                ↓
+                                            </div>
+                                        </div>
+                                    </div>
+                                </NewspaperCard>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Upcoming Events List (Existing) */}
+                    <div className="max-w-5xl mx-auto mb-24">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 bg-accent-pink rounded-full border-2 border-black flex items-center justify-center">
+                                <Doodle
+                                    src="/doodles/calendar.svg"
+                                    className="w-6 h-6 text-white"
+                                />
+                            </div>
+                            <h2 className="font-display text-4xl font-black">
+                                UPCOMING EVENTS
                             </h2>
-                            <p className="text-xl text-gray-600 font-serif italic">
-                                Vertical SaaS for the modern university.
-                            </p>
                         </div>
 
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {/* Module 1 */}
-                            <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
-                                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mb-4 border-2 border-black">
-                                    01
-                                </div>
-                                <h3 className="font-bold text-xl mb-2">Social Feed</h3>
-                                <p className="text-sm text-gray-600">
-                                    Posts, polls, and collabs. The campus town square, digitized.
-                                </p>
-                            </NewspaperCard>
+                        <NewspaperCard variant="curved" className="p-0" noShadow>
+                            <EventRow
+                                date="Dec 01"
+                                time="9:00 AM"
+                                title="Hackathon: Code Chaos (24h)"
+                                icon="/doodles/book.svg"
+                                color="bg-accent-blue"
+                            />
+                            <EventRow
+                                date="Dec 02"
+                                time="4:00 PM"
+                                title="Debate Club: Is Cereal Soup?"
+                                icon="/doodles/megaphone.svg"
+                                color="bg-accent-pink"
+                            />
+                            <EventRow
+                                date="Dec 05"
+                                time="2:00 PM"
+                                title="Robotics Workshop: Building Bots"
+                                icon="/doodles/group.svg"
+                                color="bg-accent-purple"
+                            />
+                            <EventRow
+                                date="Dec 10"
+                                time="10:00 AM"
+                                title="Campus Market Day"
+                                icon="/doodles/shopping-bag.svg"
+                                color="bg-accent-yellow"
+                            />
+                        </NewspaperCard>
 
-                            {/* Module 2 */}
-                            <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
-                                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mb-4 border-2 border-black">
-                                    02
-                                </div>
-                                <h3 className="font-bold text-xl mb-2">Events Protocol</h3>
-                                <p className="text-sm text-gray-600">
-                                    Automated scheduling, QR check-ins, and analytics.
-                                </p>
-                            </NewspaperCard>
-
-                            {/* Module 3 */}
-                            <NewspaperCard className="p-6 hover:bg-gray-50 transition-colors">
-                                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mb-4 border-2 border-black">
-                                    03
-                                </div>
-                                <h3 className="font-bold text-xl mb-2">Asset Market</h3>
-                                <p className="text-sm text-gray-600">
-                                    Decentralized exchange for notes, drafters, and coupons.
-                                </p>
-                            </NewspaperCard>
+                        <div className="text-center mt-8">
+                            <Link href="/events">
+                                <RetroButton variant="outline">View Full Calendar</RetroButton>
+                            </Link>
                         </div>
                     </div>
 
@@ -267,6 +638,18 @@ export default function Home() {
                                 </span>
                                 <span className="text-gray-400 font-serif italic text-3xl mx-8">
                                     &quot;Coffee: The real MVP&quot;
+                                </span>
+                                <span className="text-black font-pixel text-4xl mx-8 uppercase">
+                                    Link. Learn. Live.
+                                </span>
+                                <span className="text-gray-400 font-serif italic text-3xl mx-8">
+                                    &quot;Is it too late to drop out?&quot;
+                                </span>
+                                <span className="text-black font-pixel text-4xl mx-8 uppercase">
+                                    Link. Learn. Live.
+                                </span>
+                                <span className="text-gray-400 font-serif italic text-3xl mx-8">
+                                    &quot;Due tomorrow? Do tomorrow.&quot;
                                 </span>
                             </Marquee>
                         </div>
