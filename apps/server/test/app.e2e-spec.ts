@@ -4,31 +4,20 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
-import { GoogleStrategy } from './../src/modules/auth/strategies/google.strategy';
-import { GithubStrategy } from './../src/modules/auth/strategies/github.strategy';
-
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeAll(() => {
-    process.env.GOOGLE_CLIENT_ID = 'mock_client_id';
-    process.env.GOOGLE_CLIENT_SECRET = 'mock_client_secret';
-    process.env.GITHUB_CLIENT_ID = 'mock_github_id';
-    process.env.GITHUB_CLIENT_SECRET = 'mock_github_secret';
     process.env.JWT_ACCESS_SECRET = 'mock_jwt_access_secret';
     process.env.JWT_REFRESH_SECRET = 'mock_jwt_refresh_secret';
+    process.env.SUPABASE_JWT_SECRET = 'mock_supabase_secret';
   });
 
   beforeEach(async () => {
     try {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
-      })
-        .overrideProvider(GoogleStrategy)
-        .useValue({ validate: () => {} })
-        .overrideProvider(GithubStrategy)
-        .useValue({ validate: () => {} })
-        .compile();
+      }).compile();
 
       app = moduleFixture.createNestApplication();
       await app.init();
