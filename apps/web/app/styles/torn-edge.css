@@ -1,0 +1,36 @@
+/* Torn Edge Utility */
+.torn-edge-mask {
+    mask-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H100 V95 L95 98 L90 95 L85 98 L80 95 L75 98 L70 95 L65 98 L60 95 L55 98 L50 95 L45 98 L40 95 L35 98 L30 95 L25 98 L20 95 L15 98 L10 95 L5 98 L0 95 Z' fill='black'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H100 V95 L95 98 L90 95 L85 98 L80 95 L75 98 L70 95 L65 98 L60 95 L55 98 L50 95 L45 98 L40 95 L35 98 L30 95 L25 98 L20 95 L15 98 L10 95 L5 98 L0 95 Z' fill='black'/%3E%3C/svg%3E");
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+}
+
+.torn-top {
+    mask-image: url("data:image/svg+xml,%3Csvg width='100%25' height='20' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 L5 0 L10 20 L15 5 L20 20 L25 0 L30 20 L35 5 L40 20 L45 0 L50 20 L55 5 L60 20 L65 0 L70 20 L75 5 L80 20 L85 0 L90 20 L95 5 L100 20 V100 H0 Z' fill='black'/%3E%3C/svg%3E");
+}
+
+/* Halftone Pattern */
+.bg-halftone {
+    background-image: radial-gradient(circle, #000 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 0.1;
+    /* Adjust opacity as needed */
+}
+
+/* Paper Texture Overlay */
+.texture-paper {
+    position: relative;
+}
+
+.texture-paper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 10;
+    mix-blend-mode: multiply;
+}

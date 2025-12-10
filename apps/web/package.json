@@ -29,6 +29,7 @@
     "postcss": "^8.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.68.0",
     "react-qr-reader": "^3.0.0-beta-1",
     "scheduler": "^0.27.0",
     "styled-components": "^6.1.19",

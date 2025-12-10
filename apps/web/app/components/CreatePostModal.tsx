@@ -1,237 +1,283 @@
 "use client";
 
-import React, { useState } from "react";
-import { NewspaperCard, RetroButton } from "./ui/NewspaperUI";
+import { useState, useRef } from "react";
+import { X, Image as ImageIcon, Smile, BarChart2, Calendar, ShoppingBag, Paperclip, Loader2 } from "lucide-react";
+import { RetroButton } from "./ui/NewspaperUI";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { api } from "../../lib/api";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-type Props = {
+interface CreatePostModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onPostCreated: () => void;
-    initialTab?: 'TEXT' | 'POLL' | 'COLLAB';
-};
+    onPostCreated?: () => void;
+    initialTab?: 'TEXT' | 'POLL' | 'MARKET' | 'EVENT';
+}
 
-type PostType = 'TEXT' | 'POLL' | 'COLLAB';
+// Schemas
+const postSchema = z.object({
+    content: z.string().min(1, "Post cannot be empty").max(500, "Too much chaos (max 500 chars)"),
+});
 
-export default function CreatePostModal({ isOpen, onClose, onPostCreated, initialTab = 'TEXT' }: Props) {
-    const [activeTab, setActiveTab] = useState<PostType>(initialTab);
-    const [content, setContent] = useState("");
-    const [title, setTitle] = useState(""); // For Collab
+const pollSchema = z.object({
+    question: z.string().min(5, "Question is too short"),
+    options: z.array(z.string().min(1, "Option cannot be empty")).min(2, "Need at least 2 options"),
+});
+
+const marketSchema = z.object({
+    title: z.string().min(3, "Title required"),
+    price: z.string().regex(/^\d+$/, "Price must be a number"), // Simple regex for now
+    description: z.string().optional(),
+});
+
+type PostFormValues = z.infer<typeof postSchema>;
+
+export default function CreatePostModal({ isOpen, onClose, onPostCreated, initialTab = 'TEXT' }: CreatePostModalProps) {
+    const [activeTab, setActiveTab] = useState(initialTab);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { toast } = useToast();
+    const { user } = useAuth();
+
+    // Forms
+    const { register: registerPost, handleSubmit: handlePostSubmit, reset: resetPost, formState: { errors: postErrors } } = useForm<PostFormValues>({
+        resolver: zodResolver(postSchema)
+    });
+
+    // Poll State (Simple controlled for now due to dynamic inputs complexity in quick prototype)
     const [pollQuestion, setPollQuestion] = useState("");
     const [pollOptions, setPollOptions] = useState(["", ""]);
-    const [isAnonymous, setIsAnonymous] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [imageUrl, setImageUrl] = useState("");
-    const [uploading, setUploading] = useState(false);
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    // Reset tab when modal opens or initialTab changes
-    React.useEffect(() => {
-        if (isOpen) {
-            setActiveTab(initialTab);
-        }
-    }, [isOpen, initialTab]);
+    // Market State
+    const [marketTitle, setMarketTitle] = useState("");
+    const [marketPrice, setMarketPrice] = useState("");
+    const [marketDesc, setMarketDesc] = useState("");
 
     if (!isOpen) return null;
 
-    const handleAddOption = () => {
-        if (pollOptions.length < 6) setPollOptions([...pollOptions, ""]);
-    };
-
-    const handleOptionChange = (idx: number, val: string) => {
-        const newOptions = [...pollOptions];
-        newOptions[idx] = val;
-        setPollOptions(newOptions);
-    };
-
-    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setUploading(true);
-            try {
-                const res = await api.uploadFile(e.target.files[0]);
-                setImageUrl(res.url); // Assumes backend returns { url: "..." }
-            } catch (err) {
-                console.error("Upload failed", err);
-                alert("Failed to upload image");
-            } finally {
-                setUploading(false);
+            const selected = e.target.files[0];
+            if (selected.size > 200 * 1024) { // 200kb limit
+                toast("File too large! Max 200kb.", "error");
+                return;
             }
+            setFile(selected);
         }
     };
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-
+    const onSubmitPost = async (data: PostFormValues) => {
+        setIsSubmitting(true);
         try {
-            const payload: any = {
-                type: activeTab,
-                content,
-                isAnonymous,
-                imageUrl
-            };
-
-            if (activeTab === 'POLL') {
-                payload.poll = {
-                    question: pollQuestion,
-                    options: pollOptions.filter(o => o.trim() !== "")
-                };
-                if (!payload.poll.question || payload.poll.options.length < 2) {
-                    alert("Poll needs a question and at least 2 options");
-                    setLoading(false);
-                    return;
-                }
+            let imageUrl;
+            if (file) {
+                const uploadRes = await api.uploadFile(file);
+                imageUrl = uploadRes.url;
             }
 
-            if (activeTab === 'COLLAB') {
-                payload.title = title;
-                if (!title) {
-                    alert("Collab needs a title");
-                    setLoading(false);
-                    return;
-                }
-            }
+            await api.createPost({
+                content: data.content,
+                image: imageUrl,
+                type: 'post',
+                collegeSlug: user?.profile?.college?.slug // Assuming context has this
+            });
 
-            await api.createPost(payload);
-
-            // Reset form
-            setContent("");
-            setTitle("");
-            setPollQuestion("");
-            setPollOptions(["", ""]);
-            setIsAnonymous(false);
-            setImageUrl("");
-            onPostCreated();
+            toast("Chaos unleashed! 🚀", "success");
+            onPostCreated?.();
+            resetPost();
+            setFile(null);
             onClose();
-        } catch (error) {
-            console.error("Failed to create post", error);
-            alert("Failed to create post");
+        } catch (e: any) {
+            console.error(e);
+            toast(e.message || "Failed to post.", "error");
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
         }
-    }
+    };
+
+    const onSubmitPoll = async () => {
+        if (!pollQuestion.trim()) return toast("Question missing", "error");
+        if (pollOptions.some(o => !o.trim())) return toast("Fill all options", "error");
+
+        setIsSubmitting(true);
+        try {
+            await api.createPost({
+                content: pollQuestion, // Poll question is content
+                type: 'poll',
+                pollOptions: pollOptions,
+                collegeSlug: user?.profile?.college?.slug
+            });
+            toast("Poll created!", "success");
+            onPostCreated?.();
+            onClose();
+        } catch (e: any) {
+            toast(e.message || "Failed to post poll.", "error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Switch submit handler based on tab
+    const handleMasterSubmit = () => {
+        if (activeTab === 'TEXT') {
+            handlePostSubmit(onSubmitPost)();
+        } else if (activeTab === 'POLL') {
+            onSubmitPoll();
+        } else {
+            toast("This feature is coming soon!", "warning");
+        }
+    };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <NewspaperCard className="w-full max-w-lg relative" rotate={0}>
-                <button
-                    onClick={onClose}
-                    className="absolute top-2 right-2 w-8 h-8 bg-black text-white font-bold border-2 border-white rounded-full flex items-center justify-center hover:scale-110 transition-transform z-10"
-                >
-                    X
-                </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
 
-                <h2 className="font-display font-black text-2xl uppercase mb-4 text-center">Broadcast Chaos</h2>
-
-                {/* TABS */}
-                <div className="flex border-b-2 border-black mb-4">
-                    {['TEXT', 'POLL', 'COLLAB'].map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab as PostType)}
-                            className={`flex-1 py-2 font-bold font-mono text-sm uppercase transition-colors ${activeTab === tab ? 'bg-black text-white' : 'hover:bg-gray-100'}`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="w-full max-w-2xl bg-paper border-thick border-black shadow-neo-lg relative z-10 flex flex-col max-h-[90vh]"
+            >
+                {/* Header */}
+                <div className="bg-black text-white p-3 flex justify-between items-center select-none cursor-move">
+                    <span className="font-mono font-bold uppercase tracking-widest pl-2">Create Chaos.exe</span>
+                    <button onClick={onClose} className="hover:text-accent-red transition-colors">
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Tabs */}
+                <div className="flex border-b-2 border-black bg-gray-100 overflow-x-auto">
+                    <TabButton icon={Smile} label="Post" active={activeTab === 'TEXT'} onClick={() => setActiveTab('TEXT')} />
+                    <TabButton icon={BarChart2} label="Poll" active={activeTab === 'POLL'} onClick={() => setActiveTab('POLL')} />
+                    <TabButton icon={ShoppingBag} label="Market" active={activeTab === 'MARKET'} onClick={() => setActiveTab('MARKET')} />
+                    <TabButton icon={Calendar} label="Event" active={activeTab === 'EVENT'} onClick={() => setActiveTab('EVENT')} />
+                </div>
 
-                    {activeTab === 'POLL' && (
-                        <div className="space-y-2">
-                            <input
-                                className="w-full p-2 border-2 border-black font-bold font-display uppercase"
-                                placeholder="Poll Question?"
-                                value={pollQuestion}
-                                onChange={e => setPollQuestion(e.target.value)}
-                            />
-                            {pollOptions.map((opt, idx) => (
-                                <input
-                                    key={idx}
-                                    className="w-full p-2 border border-gray-300 font-mono text-sm"
-                                    placeholder={`Option ${idx + 1}`}
-                                    value={opt}
-                                    onChange={e => handleOptionChange(idx, e.target.value)}
-                                />
-                            ))}
-                            {pollOptions.length < 6 && (
-                                <button type="button" onClick={handleAddOption} className="text-xs font-bold underline">+ Add Option</button>
-                            )}
-                        </div>
-                    )}
+                {/* Content Body */}
+                <div className="p-6 flex-1 overflow-y-auto bg-white min-h-[300px]">
 
-                    {activeTab === 'COLLAB' && (
-                        <div className="space-y-2">
-                            <input
-                                className="w-full p-2 border-2 border-black font-bold font-display uppercase"
-                                placeholder="Project Title (e.g. Robotics Team)"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                            />
-                        </div>
-                    )}
+                    {activeTab === 'TEXT' && (
+                        <div className="space-y-4">
+                            <textarea
+                                {...registerPost("content")}
+                                placeholder="What's happening on campus?"
+                                className="w-full h-40 resize-none border-2 border-dashed border-gray-300 p-4 font-body text-lg focus:outline-none focus:border-black focus:bg-yellow-50/20 rounded-xl transition-all placeholder:text-gray-300"
+                            ></textarea>
+                            {postErrors.content && <p className="text-red-500 font-mono text-xs">{postErrors.content.message}</p>}
 
-                    {/* Media Upload (Available for TEXT and maybe POLL?) */}
-                    {activeTab !== 'COLLAB' && (
-                        <div>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleFileSelect}
-                            />
-
-                            {imageUrl ? (
-                                <div className="relative mb-2 inline-block">
-                                    <img src={imageUrl} alt="Preview" className="h-32 w-auto border-2 border-black object-cover" />
-                                    <button
-                                        type="button"
-                                        onClick={() => setImageUrl("")}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full font-bold border-2 border-black flex items-center justify-center hover:scale-110"
-                                    >
-                                        X
+                            {/* File Preview */}
+                            {file && (
+                                <div className="relative inline-block border-2 border-black rotate-1">
+                                    <img src={URL.createObjectURL(file)} className="h-24 w-auto object-cover" />
+                                    <button onClick={() => setFile(null)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 border border-black">
+                                        <X className="w-3 h-3" />
                                     </button>
                                 </div>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="flex items-center gap-2 text-xs font-bold uppercase border border-dashed border-gray-400 p-2 hover:bg-gray-50 transition-colors"
-                                    disabled={uploading}
-                                >
-                                    {uploading ? "Uploading..." : "📎 Attach Image"}
-                                </button>
                             )}
                         </div>
                     )}
 
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder={activeTab === 'POLL' ? "Add some context (optional)..." : (activeTab === 'COLLAB' ? "Describe the role and skills needed..." : "What's happening on campus?")}
-                        className="w-full h-32 p-4 border-2 border-black font-mono text-sm focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow resize-none"
-                    />
-
-                    <div className="flex items-center justify-between">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                            <div className={`w-5 h-5 border-2 border-black ${isAnonymous ? 'bg-black' : 'bg-white'}`}>
-                                {isAnonymous && <span className="text-white flex justify-center items-center text-xs">✓</span>}
+                    {activeTab === 'POLL' && (
+                        <div className="space-y-4">
+                            <input
+                                value={pollQuestion}
+                                onChange={(e) => setPollQuestion(e.target.value)}
+                                className="w-full border-2 border-black p-3 font-bold font-display text-lg focus:shadow-neo outline-none"
+                                placeholder="Ask a question..."
+                            />
+                            <div className="space-y-2 pl-4 border-l-4 border-gray-200">
+                                {pollOptions.map((opt, i) => (
+                                    <div key={i} className="flex gap-2">
+                                        <input
+                                            value={opt}
+                                            onChange={(e) => {
+                                                const newOpts = [...pollOptions];
+                                                newOpts[i] = e.target.value;
+                                                setPollOptions(newOpts);
+                                            }}
+                                            className="w-full border-b-2 border-gray-300 p-2 focus:border-black outline-none bg-transparent"
+                                            placeholder={`Option ${i + 1}`}
+                                        />
+                                    </div>
+                                ))}
+                                <button
+                                    onClick={() => setPollOptions([...pollOptions, ""])}
+                                    className="text-sm font-bold text-accent-blue hover:underline"
+                                >
+                                    + Add Option
+                                </button>
                             </div>
-                            <input type="checkbox" className="hidden" checked={isAnonymous} onChange={e => setIsAnonymous(e.target.checked)} />
-                            <span className="font-bold text-xs uppercase">Post Anonymously</span>
-                        </label>
-
-                        <div className="flex gap-2">
-                            <RetroButton variant="ghost" onClick={onClose} type="button">Cancel</RetroButton>
-                            <RetroButton variant="secondary" type="submit" disabled={loading}>
-                                {loading ? "Posting..." : "POST IT"}
-                            </RetroButton>
                         </div>
+                    )}
+
+                    {activeTab === 'MARKET' && (
+                        <div className="space-y-4">
+                            <div className="flex gap-4">
+                                <div className="w-32 h-32 bg-gray-100 border-2 border-dashed border-gray-400 flex items-center justify-center cursor-pointer hover:bg-gray-200">
+                                    <ImageIcon className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <div className="flex-1 space-y-3">
+                                    <input value={marketTitle} onChange={e => setMarketTitle(e.target.value)} className="w-full border-2 border-black p-2 font-display font-bold" placeholder="Item Title" />
+                                    <input value={marketPrice} onChange={e => setMarketPrice(e.target.value)} className="w-full border-2 border-black p-2 font-mono" placeholder="Price (₹)" />
+                                </div>
+                            </div>
+                            <textarea value={marketDesc} onChange={e => setMarketDesc(e.target.value)} className="w-full border-2 border-gray-300 p-2 h-24" placeholder="Description/Condition..."></textarea>
+                        </div>
+                    )}
+
+                    {activeTab === 'EVENT' && (
+                        <div className="text-center py-10 opacity-50">
+                            <Calendar className="w-12 h-12 mx-auto mb-2" />
+                            <p>Event Creation is locked for Level 1 users.</p>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 bg-gray-50 border-t-2 border-black flex justify-between items-center">
+                    <div className="flex gap-2">
+                        <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-gray-200 rounded">
+                            <ImageIcon className="w-5 h-5" />
+                        </button>
+                        <button className="p-2 hover:bg-gray-200 rounded">
+                            <Paperclip className="w-5 h-5" />
+                        </button>
+                        <input type="file" ref={fileInputRef} className="hidden" accept="image/png, image/jpeg, image/gif" onChange={handleFileSelect} />
                     </div>
-                </form>
-            </NewspaperCard>
+
+                    <div className="flex gap-3">
+                        <RetroButton
+                            disabled={isSubmitting}
+                            onClick={handleMasterSubmit}
+                            className={`px-6 py-2 ${isSubmitting ? 'opacity-80' : ''}`}
+                        >
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "POST IT"}
+                        </RetroButton>
+                    </div>
+                </div>
+            </motion.div>
         </div>
     );
+}
+
+function TabButton({ icon: Icon, label, active, onClick }: any) {
+    return (
+        <button
+            onClick={onClick}
+            className={`
+                flex-1 flex items-center justify-center gap-2 py-3 font-bold font-display uppercase tracking-wide transition-colors
+                ${active ? 'bg-white text-black border-b-2 border-white translate-y-[2px]' : 'text-gray-500 hover:bg-gray-200 hover:text-black'}
+            `}
+        >
+            <Icon className="w-4 h-4" />
+            {label}
+        </button>
+    )
 }

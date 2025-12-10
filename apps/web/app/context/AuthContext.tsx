@@ -35,6 +35,8 @@ interface User {
       name: string;
       slug: string;
     };
+    level?: number;
+    karma?: number;
   };
 }
 

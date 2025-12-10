@@ -68,7 +68,7 @@ export default function MarketplaceClient() {
           }}>
         </div>
 
-        <Navbar showLinks={true} />
+        <Navbar />
 
         <Container>
           <div className="py-8">

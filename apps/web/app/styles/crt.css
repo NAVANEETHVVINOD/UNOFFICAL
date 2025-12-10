@@ -1,0 +1,130 @@
+/* CRT Mode Global Variables */
+:root[class~="dark"] {
+    --crt-green: #00ff41;
+    --crt-bg: #0d1117;
+    --crt-scanline-opacity: 0.15;
+}
+
+.crt-mode {
+    background-color: var(--crt-bg) !important;
+    color: var(--crt-green) !important;
+    font-family: 'VT323', monospace !important;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Scanline Overlay */
+.crt-scanlines {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom,
+            rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: var(--crt-scanline-opacity);
+}
+
+/* Flicker Animation */
+@keyframes flicker {
+    0% {
+        opacity: 0.97;
+    }
+
+    5% {
+        opacity: 0.95;
+    }
+
+    10% {
+        opacity: 0.9;
+    }
+
+    15% {
+        opacity: 0.95;
+    }
+
+    20% {
+        opacity: 0.99;
+    }
+
+    25% {
+        opacity: 0.95;
+    }
+
+    30% {
+        opacity: 0.9;
+    }
+
+    35% {
+        opacity: 0.96;
+    }
+
+    40% {
+        opacity: 0.98;
+    }
+
+    45% {
+        opacity: 0.95;
+    }
+
+    50% {
+        opacity: 0.99;
+    }
+
+    55% {
+        opacity: 0.93;
+    }
+
+    60% {
+        opacity: 0.9;
+    }
+
+    65% {
+        opacity: 0.96;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    75% {
+        opacity: 0.97;
+    }
+
+    80% {
+        opacity: 0.95;
+    }
+
+    85% {
+        opacity: 0.92;
+    }
+
+    90% {
+        opacity: 0.96;
+    }
+
+    95% {
+        opacity: 0.99;
+    }
+
+    100% {
+        opacity: 0.94;
+    }
+}
+
+.crt-flicker {
+    animation: flicker 0.15s infinite;
+}
+
+/* Bloom Effect */
+.crt-text-glow {
+    text-shadow: 0 0 4px var(--crt-green);
+}
+
+/* Chromatic Aberration */
+.text-chromatic {
+    text-shadow:
+        -2px 0 #ff00de,
+        2px 0 #00ffe4;
+}

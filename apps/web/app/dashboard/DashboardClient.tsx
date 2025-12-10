@@ -1,228 +1,129 @@
-/**
- * DashboardClient
- * 
- * 3-Column Social Feed Layout for Campus Kerala.
- */
 "use client";
 
-import Container from "../components/ui/Container";
-import { PageTransition } from "../providers/AnimationProvider";
 import { useAuth } from "../context/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
-import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
-import { api } from "../../lib/api";
-import {
-  MiniProfile,
-  NavStack,
-  QuickActions,
-  InlinePostCreate,
-  PostCard,
-  EventTicket,
-  CollegeRadar,
-  TrendingMarquee,
-  LinkerNews
-} from "../components/ui/SocialComponents";
-import { RetroButton, Badge } from "../components/ui/NewspaperUI";
-import Link from "next/link";
-import Navbar from "../components/Navbar";
-import CreatePostModal from "../components/CreatePostModal";
+import { ErrorBoundary } from "../components/ErrorBoundary";
+import { useState, useEffect } from "react";
 
-// Helper to determine feed item type
-type FeedItem = {
-  type: 'post' | 'event';
-  data: any;
-  date: Date;
-}
+// Navigation
+import Navbar from "../components/Navbar";
+import CategoryRibbon from "../components/CategoryRibbon";
+import OrbitNav from "../components/navigation/OrbitNav";
+
+// Sidebars
+import ToolsSidebar from "../components/dashboard/ToolsSidebar";
+import MarketplaceRail from "../components/dashboard/MarketplaceRail";
+import ProfileSidebar from "../components/dashboard/ProfileSidebar";
+import NewsTicker from "../components/dashboard/NewsTicker";
+import UpcomingEventsStack from "../components/dashboard/UpcomingEventsStack";
+
+// Feed
+import { useInfiniteFeed } from "../hooks/useInfiniteFeed";
+import FeedItemFactory from "../components/FeedItemFactory";
+import { RetroToastProvider } from "../context/ToastContext";
+
+// New Components
+import CreatePostModal from "../components/CreatePostModal";
+import FloatingCreateButton from "../components/ui/FloatingCreateButton";
+import CRTModeToggle from "../components/ui/CRTModeToggle";
 
 function DashboardContent() {
-  const { isAuthenticated, user, loading } = useAuth();
-  // const router = useRouter(); // Unused
-  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
-  const [loadingFeed, setLoadingFeed] = useState(true);
+  const { user, loading } = useAuth();
+  const { items, isLoading, loadMore, hasMore } = useInfiniteFeed({ category: 'feed' });
+
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [postModalTab, setPostModalTab] = useState<string>('TEXT'); // 'TEXT', 'MEDIA', 'POLL', 'COLLAB'
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [postModalTab, setPostModalTab] = useState<'TEXT' | 'POLL' | 'MARKET' | 'EVENT'>('TEXT');
 
-  const loadFeed = useCallback(async (reset = false) => {
-    if (!user) return;
-
-    const currentPage = reset ? 1 : page;
-
-    if (reset) {
-      setLoadingFeed(true);
-    } else {
-      setIsLoadingMore(true);
-    }
-
-    try {
-      // Fetch Posts and Events
-      const postsPromise = api.getPosts(undefined, currentPage);
-      const eventsPromise = reset ? api.getEvents(undefined, undefined, 5) : Promise.resolve([]);
-
-      const [postsRes, events] = await Promise.all([
-        postsPromise.catch(() => ({ data: [], meta: { lastPage: 0 } })),
-        eventsPromise.catch(() => [])
-      ]);
-
-      const postsData = postsRes.data || [];
-      const newItems: FeedItem[] = [
-        ...postsData.map((p: any) => ({ type: 'post', data: p, date: new Date(p.createdAt) } as FeedItem)),
-        ...(Array.isArray(events) ? events : []).map((e: any) => ({ type: 'event', data: e, date: new Date(e.createdAt || e.startsAt) } as FeedItem))
-      ];
-
-      setFeedItems(prev => {
-        const combined = reset ? newItems : [...prev, ...newItems];
-        // Remove duplicates just in case
-        const unique = Array.from(new Map(combined.map(item => [item.data.id, item])).values());
-        // Sort by date descending
-        return unique.sort((a, b) => b.date.getTime() - a.date.getTime());
-      });
-
-      if (postsRes.meta) {
-        setHasMore(currentPage < postsRes.meta.lastPage);
-        setPage(currentPage + 1);
-      } else {
-        setHasMore(false);
-      }
-
-    } catch (e) {
-      console.error("Feed load failed", e);
-    } finally {
-      setLoadingFeed(false);
-      setIsLoadingMore(false);
-    }
-  }, [user, page]);
-
+  // Listen for sidebar events
   useEffect(() => {
-    if (user) {
-      loadFeed(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    const handleOpenModal = (e: any) => {
+      setPostModalTab(e.detail?.type || 'TEXT');
+      setIsPostModalOpen(true);
+    };
+    document.addEventListener('open-create-modal', handleOpenModal);
+    return () => document.removeEventListener('open-create-modal', handleOpenModal);
+  }, []);
 
-  const handlePostCreated = () => {
-    loadFeed(true);
-  }
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen bg-paper">
+      <div className="font-display text-2xl animate-pulse">Loading Chaos...</div>
+    </div>
+  );
 
-  const handleOpenPostModal = (type: string = 'TEXT') => {
-    setPostModalTab(type);
-    setIsPostModalOpen(true);
-  }
-
-  // Quick action handler from sidebar
-  const handleQuickAction = (action: string) => {
-    if (action === 'post') handleOpenPostModal('TEXT');
-    else if (action === 'note') alert("Upload Note Coming Soon!");
-    else if (action === 'event') alert("Create Event Coming Soon!");
-    else if (action === 'market') alert("Marketplace Coming Soon!");
-    else if (action === 'club') alert("Clubs Coming Soon!");
-  }
-
-  if (loading) return <LoadingState />;
   if (!user) return null;
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-paper min-h-screen relative overflow-x-hidden selection:bg-accent-yellow selection:text-black">
       {/* Grid Pattern Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
-          backgroundSize: '24px 24px'
-        }}>
-      </div>
+      <div className="fixed inset-0 pointer-events-none z-0 bg-halftone"></div>
 
-      <Navbar showLinks={true} />
+      <Navbar />
 
-      {/* Full Width Marquee */}
-      <TrendingMarquee />
+      {/* Layout Container */}
+      <div className="max-w-[1400px] mx-auto px-4 relative z-10">
 
-      <Container>
-        <div className="grid md:grid-cols-12 gap-8 py-4 relative">
+        <CategoryRibbon />
 
-          {/* --- LEFT SIDEBAR (3 cols) - Minimal/Trending --- */}
-          <div className="md:col-span-3 hidden md:block">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 py-6 pb-24">
+
+          {/* --- LEFT SIDEBAR (Sticky) --- */}
+          <aside className="hidden md:block md:col-span-3 lg:col-span-3 space-y-6">
             <div className="sticky top-24 space-y-6">
-              <QuickActions onAction={handleQuickAction} />
-
-              <div className="text-[10px] uppercase text-gray-400 font-mono leading-relaxed mt-8">
-                Linker OS v1.6<br />
-                © 2024 Campus Kerala
-              </div>
+              <ToolsSidebar />
+              <MarketplaceRail />
             </div>
-          </div>
+          </aside>
 
-          {/* --- MAIN FEED (6 cols) --- */}
-          <div className="md:col-span-6">
-
-            {/* Inline Create Post Widget */}
-            <InlinePostCreate user={user} onClick={handleOpenPostModal} />
-
-            <div className="mb-6 flex items-center justify-between border-b-2 border-dashed border-gray-300 pb-2">
-              <h2 className="font-display font-black text-2xl uppercase">Latest Chaos</h2>
-              <Badge className="bg-white border-gray-300 text-gray-400">Sort: Newest</Badge>
-            </div>
-
-            {/* Feed Content */}
+          {/* --- CENTER FEED (Wide) --- */}
+          <main className="col-span-1 md:col-span-9 lg:col-span-6 min-h-[80vh]">
             <div className="space-y-6">
-              {loadingFeed ? (
-                <div className="text-center py-20 font-mono animate-pulse">
-                  Loading the chaos...
-                </div>
-              ) : feedItems.length > 0 ? (
-                <>
-                  {feedItems.map((item, idx) => {
-                    if (item.type === 'post') return <PostCard key={`post-${item.data.id || idx}`} post={item.data} />;
-                    if (item.type === 'event') return <EventTicket key={`event-${item.data.id || idx}`} event={item.data} />;
-                    return null;
-                  })}
+              {items.map((item) => (
+                <FeedItemFactory key={item.id} item={item} />
+              ))}
 
-                  {/* Load More Button */}
-                  <div className="text-center pt-8 pb-12">
-                    {isLoadingMore ? (
-                      <span className="font-mono text-gray-400 animate-pulse">Loading more...</span>
-                    ) : hasMore ? (
-                      <RetroButton onClick={() => loadFeed(false)} variant="outline">Load More</RetroButton>
-                    ) : (
-                      <span className="font-mono text-gray-400 text-xs uppercase tracking-widest">--- You've reached the end ---</span>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-20 border-4 border-dashed border-gray-300 rounded-xl">
-                  <h3 className="font-display text-2xl text-gray-400 uppercase">It's quiet... too quiet.</h3>
-                  <p className="text-gray-500">Be the first to post something!</p>
-                  <RetroButton
-                    className="mt-4 mx-auto"
-                    variant="secondary"
-                    onClick={() => handleOpenPostModal('TEXT')}
-                  >
-                    Create First Post
-                  </RetroButton>
+              {isLoading && (
+                <div className="p-4 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 animate-pulse">
+                  Loading more chaos...
+                </div>
+              )}
+
+              {!hasMore && items.length > 0 && (
+                <div className="text-center py-8 font-mono text-xs text-gray-400 uppercase tracking-widest">
+                  --- End of the internet ---
                 </div>
               )}
             </div>
-          </div>
+          </main>
 
-          {/* --- RIGHT SIDEBAR (3 cols) - Profile --- */}
-          <div className="md:col-span-3 hidden md:block">
+          {/* --- RIGHT SIDEBAR (Sticky) --- */}
+          <aside className="hidden lg:block lg:col-span-3 space-y-6">
             <div className="sticky top-24 space-y-6">
-              <MiniProfile user={user} />
-              <LinkerNews />
-              <CollegeRadar />
+              <ProfileSidebar />
+              <UpcomingEventsStack />
+              <NewsTicker />
             </div>
-          </div>
+          </aside>
 
         </div>
-      </Container>
+      </div>
 
+      <OrbitNav />
+      {/* Mobile Floating Action Button */}
+      <FloatingCreateButton onClick={() => {
+        setPostModalTab('TEXT');
+        setIsPostModalOpen(true);
+      }} />
+
+      {/* CRT Toggle (Desktop) */}
+      <CRTModeToggle />
+
+      {/* Modals */}
       <CreatePostModal
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
-        onPostCreated={() => handlePostCreated()}
-        initialTab={postModalTab as any}
+        initialTab={postModalTab}
+        onPostCreated={() => {
+          // refresh feed or show toast
+        }}
       />
     </div>
   );
@@ -230,8 +131,10 @@ function DashboardContent() {
 
 export default function DashboardClient() {
   return (
-    <ErrorBoundary>
-      <DashboardContent />
-    </ErrorBoundary>
+    <RetroToastProvider>
+      <ErrorBoundary>
+        <DashboardContent />
+      </ErrorBoundary>
+    </RetroToastProvider>
   );
 }

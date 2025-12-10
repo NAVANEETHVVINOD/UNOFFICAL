@@ -70,7 +70,7 @@ export default async function CollegeHome({ params }: PageProps) {
         }}>
       </div>
 
-      <Navbar showLinks={true} />
+      <Navbar />
 
       <Container>
         <div className="py-8 space-y-8">

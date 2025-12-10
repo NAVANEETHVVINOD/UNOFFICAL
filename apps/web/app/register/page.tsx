@@ -62,7 +62,7 @@ export default function RegisterPage() {
 
   return (
     <Container>
-      <Navbar showLinks={false} />
+      <Navbar />
       <div className="min-h-[calc(100vh-100px)] flex items-center justify-center py-8 md:py-12">
         <div className="w-full max-w-5xl relative">
           {/* Floating Decor */}

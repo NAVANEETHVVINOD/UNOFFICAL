@@ -54,7 +54,7 @@ export default function MessagesClient() {
         }}>
       </div>
 
-      <Navbar showLinks={true} />
+      <Navbar />
       <Container className="py-8 relative z-10">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">

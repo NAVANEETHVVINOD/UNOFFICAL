@@ -26,7 +26,7 @@ export default function NotesClient() {
           }}>
         </div>
 
-        <Navbar showLinks={true} />
+        <Navbar />
 
         <Container>
           <div className="py-8 min-h-screen">
