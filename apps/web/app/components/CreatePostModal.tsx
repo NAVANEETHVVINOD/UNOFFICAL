@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { X, Image as ImageIcon, Smile, BarChart2, Calendar, ShoppingBag, Paperclip, Loader2 } from "lucide-react";
+import { X, Image as ImageIcon, Smile, BarChart2, Calendar, ShoppingBag, Paperclip, Loader2, Users, Flag } from "lucide-react";
 import { RetroButton } from "./ui/NewspaperUI";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -15,7 +15,7 @@ interface CreatePostModalProps {
     isOpen: boolean;
     onClose: () => void;
     onPostCreated?: () => void;
-    initialTab?: 'TEXT' | 'POLL' | 'MARKET' | 'EVENT';
+    initialTab?: 'TEXT' | 'POLL' | 'MARKET' | 'EVENT' | 'COLLAB' | 'REPORT';
 }
 
 // Schemas
@@ -155,8 +155,12 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
                 <div className="flex border-b-2 border-black bg-gray-100 overflow-x-auto">
                     <TabButton icon={Smile} label="Post" active={activeTab === 'TEXT'} onClick={() => setActiveTab('TEXT')} />
                     <TabButton icon={BarChart2} label="Poll" active={activeTab === 'POLL'} onClick={() => setActiveTab('POLL')} />
-                    <TabButton icon={ShoppingBag} label="Market" active={activeTab === 'MARKET'} onClick={() => setActiveTab('MARKET')} />
+                    <TabButton icon={ShoppingBag} label="Market" active={activeTab === 'MARKET'} onClick={() => setActiveTab('MARKET')}
+                        disabled={typeof window !== 'undefined' && !window.location.pathname.includes('marketplace')}
+                    />
                     <TabButton icon={Calendar} label="Event" active={activeTab === 'EVENT'} onClick={() => setActiveTab('EVENT')} />
+                    <TabButton icon={Users} label="Collab" active={activeTab === 'COLLAB'} onClick={() => setActiveTab('COLLAB')} />
+                    <TabButton icon={Flag} label="Report" active={activeTab === 'REPORT'} onClick={() => setActiveTab('REPORT')} />
                 </div>
 
                 {/* Content Body */}
@@ -238,6 +242,28 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
                         </div>
                     )}
 
+                    {activeTab === 'COLLAB' && (
+                        <div className="space-y-4">
+                            <input className="w-full border-2 border-black p-3 font-bold font-display text-lg" placeholder="Project Title" />
+                            <textarea className="w-full border-2 border-gray-300 p-3 h-32" placeholder="Describe your project & what skills you need..."></textarea>
+                            <div className="flex gap-2">
+                                <span className="text-xs bg-gray-100 p-1 rounded">#React</span>
+                                <span className="text-xs bg-gray-100 p-1 rounded">#Design</span>
+                                <span className="text-xs text-blue-500 cursor-pointer">+ Add Tag</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'REPORT' && (
+                        <div className="bg-red-50 p-6 border-2 border-red-200 rounded-xl">
+                            <h3 className="flex items-center gap-2 font-bold text-red-700 mb-2">
+                                <Flag className="w-5 h-5" /> Report Issue
+                            </h3>
+                            <p className="text-sm text-red-600 mb-4">Reports are anonymous and sent directly to campus admin.</p>
+                            <textarea className="w-full border-2 border-red-100 p-3 h-32 bg-white" placeholder="What's going on?"></textarea>
+                        </div>
+                    )}
+
                 </div>
 
                 {/* Footer */}
@@ -267,14 +293,17 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
     );
 }
 
-function TabButton({ icon: Icon, label, active, onClick }: any) {
+function TabButton({ icon: Icon, label, active, onClick, disabled }: any) {
     return (
         <button
             onClick={onClick}
+            disabled={disabled}
             className={`
                 flex-1 flex items-center justify-center gap-2 py-3 font-bold font-display uppercase tracking-wide transition-colors
                 ${active ? 'bg-white text-black border-b-2 border-white translate-y-[2px]' : 'text-gray-500 hover:bg-gray-200 hover:text-black'}
+                ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-200 grayscale' : ''}
             `}
+            title={disabled ? "Available only on Market page" : label}
         >
             <Icon className="w-4 h-4" />
             {label}

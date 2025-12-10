@@ -13,6 +13,7 @@ import Doodle from "../../components/ui/Doodle";
 import DashboardNavbar from "../../components/ui/DashboardNavbar";
 import { api } from "../../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import { useSocket } from "../../context/SocketContext";
 
 interface Message {
   id: string;
@@ -30,6 +31,7 @@ interface Message {
 export default function ChatClient({ id }: { id: string }) {
   const router = useRouter();
   const { user } = useAuth();
+  const { socket } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -40,19 +42,50 @@ export default function ChatClient({ id }: { id: string }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Initial Load (REST)
   useEffect(() => {
     if (user) {
       fetchMessages();
       markAsSeen();
     }
-
-    // Poll for new messages every 5 seconds
-    const interval = setInterval(() => {
-      if (user) fetchMessages(false);
-    }, 5000);
-
-    return () => clearInterval(interval);
   }, [id, user]);
+
+  const [peerTyping, setPeerTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Socket Events
+  useEffect(() => {
+    if (!socket || !id || !user) return;
+
+    socket.emit('joinRoom', { roomId: id });
+
+    const handleNewMessage = (msg: Message) => {
+      // If message is from me, I already added it optimistically (or via Ack)
+      // So only add if it's from someone else to avoid duplication/jumpiness
+      // UNLESS I didn't add it optimistically? 
+      // Safe bet: if senderId != user.id, add it.
+      if (msg.senderId !== user.id) {
+        setMessages((prev) => [...prev, msg]);
+        markAsSeen(); // Mark as seen immediately if we are viewing
+        setPeerTyping(false); // Stop typing if message received
+      }
+    };
+
+    const handleUserTyping = (payload: { userId: string; isTyping: boolean }) => {
+      if (payload.userId !== user.id) {
+        setPeerTyping(payload.isTyping);
+      }
+    };
+
+    socket.on('newMessage', handleNewMessage);
+    socket.on('userTyping', handleUserTyping);
+
+    return () => {
+      socket.emit('leaveRoom', { roomId: id });
+      socket.off('newMessage', handleNewMessage);
+      socket.off('userTyping', handleUserTyping);
+    };
+  }, [socket, id, user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -63,16 +96,6 @@ export default function ChatClient({ id }: { id: string }) {
       if (showLoading) setLoading(true);
       const data = await api.getMessages(id);
       setMessages(data);
-
-      // Find the other user from the messages (if any exist)
-      // Ideally backend should return conversation details with participants
-      // For now, let's infer from the first message that isn't ours, OR fetch conversation details separately
-      // Since getMessages returns messages with sender included, we can find the other person.
-      // BUT, if no messages, we don't know who we are talking to.
-      // We should probably fetch conversation details.
-      // Let's assume getMessages returns just messages for now as per my service implementation.
-      // I should update service to return conversation details or make a separate call.
-      // For MVP, if there are messages, we pick the one that isn't us.
 
       const other = data.find((m: any) => m.senderId !== user?.id);
       if (other) {
@@ -87,15 +110,31 @@ export default function ChatClient({ id }: { id: string }) {
 
   const markAsSeen = async () => {
     try {
+      // We can also emit 'markSeen' socket event later
       await api.markAsSeen(id);
     } catch (error) {
       console.error("Failed to mark as seen:", error);
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+
+    if (!socket || !user) return;
+
+    // Emit typing
+    socket.emit('typing', { conversationId: id, userId: user.id, isTyping: true });
+
+    // Debounce stop typing
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('typing', { conversationId: id, userId: user.id, isTyping: false });
+    }, 2000);
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || !socket) return;
 
     const tempId = Date.now().toString();
     const optimisticMsg: Message = {
@@ -109,17 +148,20 @@ export default function ChatClient({ id }: { id: string }) {
       },
     };
 
-    setMessages([...messages, optimisticMsg]);
+    setMessages((prev) => [...prev, optimisticMsg]);
     setNewMessage("");
 
-    try {
-      await api.replyToConversation(id, optimisticMsg.content);
-      fetchMessages(false); // Refresh to get real ID and timestamp
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      alert("Failed to send message.");
-      setMessages((prev) => prev.filter((m) => m.id !== tempId)); // Revert
-    }
+    // Emit via Socket
+    socket.emit('sendMessage', {
+      conversationId: id,
+      content: optimisticMsg.content,
+      senderId: user.id
+    }, (response: any) => { // Ack Check
+      if (response && response.id) {
+        // Update the temporary message with real one
+        setMessages((prev) => prev.map(m => m.id === tempId ? response : m));
+      }
+    });
   };
 
   if (loading && messages.length === 0) {
@@ -172,11 +214,10 @@ export default function ChatClient({ id }: { id: string }) {
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[70%] p-4 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] ${
-                      isMe
-                        ? "bg-accent-yellow rounded-tr-none"
-                        : "bg-white rounded-tl-none"
-                    }`}
+                    className={`max-w-[70%] p-4 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] ${isMe
+                      ? "bg-accent-yellow rounded-tr-none"
+                      : "bg-white rounded-tl-none"
+                      }`}
                   >
                     <p className="font-serif text-sm md:text-base">
                       {msg.content}
@@ -202,7 +243,13 @@ export default function ChatClient({ id }: { id: string }) {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t-2 border-black bg-gray-50">
+          <div className="p-4 border-t-2 border-black bg-gray-50 relative">
+            {/* Typing Indicator */}
+            {peerTyping && (
+              <div className="absolute -top-8 left-6 bg-black text-white text-xs px-2 py-1 rounded-t-lg animate-pulse font-mono">
+                {otherUser?.profile?.fullName || "Someone"} is typing...
+              </div>
+            )}
             <form onSubmit={handleSend} className="flex gap-2">
               <input
                 type="text"

@@ -5,7 +5,7 @@ import { NewspaperCard, RetroButton, Badge, Sticker, Tape, Marquee } from "./New
 import Doodle from "./Doodle";
 import Link from "next/link";
 import { api } from "../../../lib/api";
-import { Home, Building2, Calendar, ShoppingBag, Mail, BookOpen, Users } from "lucide-react";
+import { Home, Building2, Calendar, ShoppingBag, Mail, BookOpen, Users, Flag } from "lucide-react";
 
 // --- Left Sidebar Components ---
 
@@ -54,6 +54,7 @@ export function NavStack({ user }: { user?: any }) {
         { label: "Messages", href: "/messages", icon: Mail },
         { label: "Notes", href: "/notes", icon: BookOpen },
         { label: "Clubs", href: "/clubs", icon: Users },
+        { label: "Communities", href: "/communities", icon: Flag },
     ];
 
     return (
@@ -284,7 +285,20 @@ export function PostCard({ post }: { post: any }) {
                     )}
                 </div>
                 <div>
-                    <h4 className="font-bold text-sm leading-none">{authorName}</h4>
+                    <h4 className="font-bold text-sm leading-none flex items-center gap-2">
+                        {authorName}
+                        {!isAnonymous && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    alert(`Linked with ${authorName}!`);
+                                }}
+                                className="text-[10px] bg-black text-white px-1.5 py-0.5 rounded hover:bg-accent-blue transition-colors uppercase tracking-wider"
+                            >
+                                Link +
+                            </button>
+                        )}
+                    </h4>
                     <p className="text-xs text-gray-500 font-mono mt-1">@{campus} • {timeAgo(post.createdAt)}</p>
                 </div>
             </div>
@@ -357,12 +371,25 @@ export function EventTicket({ event }: { event: any }) {
 
 export function CollegeRadar() {
     return (
-        <Link href="/colleges/my-college" className="block"> 
-           <NewspaperCard className="bg-accent-yellow p-6 border-4 text-center group cursor-pointer hover:bg-yellow-400" rotate={2}>
-            <Building2 className="w-16 h-16 mx-auto mb-2 opacity-80" strokeWidth={1.5} />
-            <h3 className="font-display font-black text-2xl uppercase mb-1">My Campus Hub</h3>
-            <p className="font-hand text-lg leading-none mb-0">Tap to teleport →</p>
-        </NewspaperCard>
+        <Link href="/colleges/my-college" className="block group mb-6">
+            <div className="relative border-4 border-black bg-white p-1 hover:-translate-y-1 hover:shadow-neo transition-all duration-300">
+                <div className="bg-accent-yellow p-4 border-b-2 border-black flex items-center justify-between">
+                    <h3 className="font-display font-black text-xl uppercase tracking-wider">Campus Radar</h3>
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse border border-black"></div>
+                </div>
+                <div className="p-4 flex gap-4 items-center">
+                    <div className="w-16 h-16 bg-gray-100 border-2 border-black rounded-full flex items-center justify-center group-hover:bg-accent-blue group-hover:text-white transition-colors">
+                        <Building2 className="w-8 h-8" />
+                    </div>
+                    <div>
+                        <p className="font-bold text-sm uppercase text-gray-500 group-hover:text-black">My Hub</p>
+                        <p className="font-display font-black text-2xl leading-none">GO TO CAMPUS</p>
+                    </div>
+                </div>
+                <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-100 transition-opacity">
+                    <Sticker className="bg-black text-white text-xs rotate-12">LIVE</Sticker>
+                </div>
+            </div>
         </Link>
     )
 }
@@ -408,7 +435,7 @@ export function TrendingMarquee() {
     return (
         <div className="bg-black text-white py-4 font-display text-lg tracking-wider border-y-4 border-black shadow-neo-sm overflow-hidden sticky z-40 top-[64px]">
             <Marquee speed={40}>
-                 📢 CAMPUS_FEST_REGISTRATIONS_OPEN /// 🍔 FREE_PIZZA_AT_HACKATHON /// 🚨 EXAM_RESULTS_OUT /// 🎸 LIVE_MUSIC_TONIGHT
+                📢 CAMPUS_FEST_REGISTRATIONS_OPEN /// 🍔 FREE_PIZZA_AT_HACKATHON /// 🚨 EXAM_RESULTS_OUT /// 🎸 LIVE_MUSIC_TONIGHT
             </Marquee>
         </div>
     )

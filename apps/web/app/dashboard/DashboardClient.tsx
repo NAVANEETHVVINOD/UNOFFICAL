@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import CategoryRibbon from "../components/CategoryRibbon";
 import OrbitNav from "../components/navigation/OrbitNav";
+import BottomNav from "../components/BottomNav";
 
 // Sidebars
 import ToolsSidebar from "../components/dashboard/ToolsSidebar";
@@ -19,11 +20,13 @@ import UpcomingEventsStack from "../components/dashboard/UpcomingEventsStack";
 // Feed
 import { useInfiniteFeed } from "../hooks/useInfiniteFeed";
 import FeedItemFactory from "../components/FeedItemFactory";
+import FeedComposer from "../components/feed/FeedComposer";
+import PinnedPaper from "../components/ui/PinnedPaper";
 import { RetroToastProvider } from "../context/ToastContext";
 
 // New Components
 import CreatePostModal from "../components/CreatePostModal";
-import FloatingCreateButton from "../components/ui/FloatingCreateButton";
+// import FloatingCreateButton from "../components/ui/FloatingCreateButton"; // Removed per user request
 import CRTModeToggle from "../components/ui/CRTModeToggle";
 
 function DashboardContent() {
@@ -52,30 +55,30 @@ function DashboardContent() {
   if (!user) return null;
 
   return (
-    <div className="bg-paper min-h-screen relative overflow-x-hidden selection:bg-accent-yellow selection:text-black">
+    <div className="bg-paper h-screen flex flex-col overflow-hidden relative selection:bg-accent-yellow selection:text-black">
       {/* Grid Pattern Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0 bg-halftone"></div>
+      <div className="fixed inset-0 pointer-events-none z-0 bg-halftone opacity-50"></div>
 
+      {/* Fixed Header */}
       <Navbar />
 
-      {/* Layout Container */}
-      <div className="max-w-[1400px] mx-auto px-4 relative z-10">
+      {/* Main Layout Container - Fixed Height with Flex */}
+      <div className="flex-1 flex overflow-hidden relative z-10 max-w-[1600px] w-full mx-auto">
 
-        <CategoryRibbon />
+        {/* --- LEFT SIDEBAR (Fixed) --- */}
+        <aside className="hidden md:flex md:w-64 lg:w-80 flex-col border-r-thick border-black bg-paper z-20 h-full overflow-y-auto custom-scrollbar p-4 space-y-6">
+          <ToolsSidebar />
+          <MarketplaceRail />
+        </aside>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 py-6 pb-24">
+        {/* --- CENTER FEED (Scrollable) --- */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-gray-50/50 relative" id="feed-container">
+          <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
+            <CategoryRibbon />
 
-          {/* --- LEFT SIDEBAR (Sticky) --- */}
-          <aside className="hidden md:block md:col-span-3 lg:col-span-3 space-y-6">
-            <div className="sticky top-24 space-y-6">
-              <ToolsSidebar />
-              <MarketplaceRail />
-            </div>
-          </aside>
-
-          {/* --- CENTER FEED (Wide) --- */}
-          <main className="col-span-1 md:col-span-9 lg:col-span-6 min-h-[80vh]">
-            <div className="space-y-6">
+            <div className="space-y-6 mt-6">
+              <PinnedPaper />
+              <FeedComposer />
               {items.map((item) => (
                 <FeedItemFactory key={item.id} item={item} />
               ))}
@@ -91,24 +94,28 @@ function DashboardContent() {
                   --- End of the internet ---
                 </div>
               )}
+              {/* Spacer for Bottom Nav */}
+              <div className="h-24 md:hidden"></div>
             </div>
-          </main>
+          </div>
+        </main>
 
-          {/* --- RIGHT SIDEBAR (Sticky) --- */}
-          <aside className="hidden lg:block lg:col-span-3 space-y-6">
-            <div className="sticky top-24 space-y-6">
-              <ProfileSidebar />
-              <UpcomingEventsStack />
-              <NewsTicker />
-            </div>
-          </aside>
+        {/* --- RIGHT SIDEBAR (Fixed) --- */}
+        <aside className="hidden lg:flex lg:w-80 flex-col border-l-thick border-black bg-paper z-20 h-full overflow-y-auto custom-scrollbar p-4 space-y-6">
+          <ProfileSidebar />
+          <UpcomingEventsStack />
+          <NewsTicker />
+        </aside>
 
-        </div>
       </div>
 
-      <OrbitNav />
-      {/* Mobile Floating Action Button */}
-      <FloatingCreateButton onClick={() => {
+      {/* OrbitNav (Desktop Only) */}
+      <div className="hidden md:block">
+        <OrbitNav />
+      </div>
+
+      {/* Mobile Bottom Nav */}
+      <BottomNav onCompose={() => {
         setPostModalTab('TEXT');
         setIsPostModalOpen(true);
       }} />

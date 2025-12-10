@@ -39,10 +39,13 @@ export default function CommentDrawer({ isOpen, onClose, postId }: CommentDrawer
             <div className="relative w-full max-w-md bg-paper border-l-thick border-black shadow-neo-lg h-full flex flex-col animate-in slide-in-from-right duration-300">
 
                 {/* Header */}
-                <div className="p-4 border-b-2 border-black bg-white flex items-center justify-between">
+                <div className="p-4 border-b-2 border-black bg-white flex items-center justify-between sticky top-0 z-10">
                     <h3 className="font-display font-black text-xl">COMMENTS (2)</h3>
-                    <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
-                        <X className="w-6 h-6" />
+                    <button
+                        onClick={onClose}
+                        className="w-8 h-8 flex items-center justify-center bg-red-500 text-white border-2 border-black hover:bg-red-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 

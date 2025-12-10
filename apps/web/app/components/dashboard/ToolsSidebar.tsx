@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "../../context/AuthContext";
-import { PenTool, BarChart2, Star, Megaphone, ShoppingBag, Plus } from "lucide-react";
+import { PenTool, BarChart2, Star, Megaphone, ShoppingBag, Plus, Flag } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function ToolsSidebar() {
@@ -12,25 +12,8 @@ export default function ToolsSidebar() {
     return (
         <div className="space-y-6">
 
-            {/* 1. Quick Composer (Sticky Note) */}
-            <div className="relative transform hover:-rotate-1 transition-transform duration-300">
-                <div className="bg-accent-yellow border-card border-black p-4 shadow-neo relative">
-                    {/* Tape */}
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 bg-white/40 rotate-1 backdrop-blur-sm border-white/20 border"></div>
-
-                    <h3 className="font-hand text-2xl font-bold mb-2 transform -rotate-2">Quick Note</h3>
-
-                    <button
-                        onClick={() => document.dispatchEvent(new CustomEvent('open-create-modal', { detail: { type: 'TEXT' } }))}
-                        className="w-full bg-white/50 border-2 border-black border-dashed rounded-lg p-3 text-left hover:bg-white transition-colors group"
-                    >
-                        <span className="font-hand text-xl text-gray-600 group-hover:text-black">
-                            Write something...
-                        </span>
-                        <PenTool className="w-4 h-4 absolute bottom-3 right-3 text-gray-500" />
-                    </button>
-                </div>
-            </div>
+            {/* 1. Quick Composer (Removed per user request) */}
+            {/* <div className="hidden">Sticky Note Removed</div> */}
 
             {/* 2. Pinned Quick Actions (Corkboard Style) */}
             <div className="relative pl-2">

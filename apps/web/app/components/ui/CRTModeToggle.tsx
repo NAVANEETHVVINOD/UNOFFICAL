@@ -27,7 +27,7 @@ export default function CRTModeToggle() {
     };
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 hidden md:block">
+        <div className="fixed bottom-20 left-4 z-[100] hidden md:block">
             <RetroButton
                 onClick={toggleCRT}
                 variant="ghost"

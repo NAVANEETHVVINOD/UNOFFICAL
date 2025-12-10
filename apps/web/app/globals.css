@@ -30,15 +30,17 @@ body {
 }
 
 /* Dot Matrix Texture */
+/* Dot Matrix Texture */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(var(--grid-color) 1px, transparent 1px);
-  background-size: 20px 20px;
-  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
   z-index: -1;
   pointer-events: none;
+  opacity: 0.6;
 }
 
 .neo-shadow-hover:hover {
