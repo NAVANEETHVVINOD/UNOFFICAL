@@ -272,7 +272,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
                         <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-gray-200 rounded">
                             <ImageIcon className="w-5 h-5" />
                         </button>
-                        <button className="p-2 hover:bg-gray-200 rounded">
+                        <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-gray-200 rounded">
                             <Paperclip className="w-5 h-5" />
                         </button>
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/png, image/jpeg, image/gif" onChange={handleFileSelect} />

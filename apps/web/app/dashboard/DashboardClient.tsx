@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import CategoryRibbon from "../components/CategoryRibbon";
 import OrbitNav from "../components/navigation/OrbitNav";
-import BottomNav from "../components/BottomNav";
+import ArcMenu from "../components/navigation/ArcMenu";
 
 // Sidebars
 import ToolsSidebar from "../components/dashboard/ToolsSidebar";
@@ -65,20 +65,42 @@ function DashboardContent() {
       {/* Main Layout Container - Fixed Height with Flex */}
       <div className="flex-1 flex overflow-hidden relative z-10 max-w-[1600px] w-full mx-auto">
 
-        {/* --- LEFT SIDEBAR (Fixed) --- */}
-        <aside className="hidden md:flex md:w-64 lg:w-80 flex-col border-r-thick border-black bg-paper z-20 h-full overflow-y-auto custom-scrollbar p-4 space-y-6">
-          <ToolsSidebar />
-          <MarketplaceRail />
+        {/* --- LEFT SIDEBAR (Consolidated "Desk") --- */}
+        <aside className="hidden lg:flex lg:w-[400px] flex-col border-r-thick border-black bg-paper z-20 h-full overflow-y-auto custom-scrollbar p-6 space-y-8 pb-32">
+
+          <ProfileSidebar />
+
+          {/* Widgets */}
+          <div className="space-y-6">
+            {/* Pinned Paper Widget */}
+            <div className="transform origin-left hover:scale-[1.02] transition-transform">
+              <PinnedPaper />
+            </div>
+
+            <ToolsSidebar />
+            <UpcomingEventsStack />
+            <NewsTicker />
+          </div>
+
+          <div className="text-xs font-mono text-gray-400 text-center opacity-50 pt-8">
+            LINKER v3.0.0 (BETA)
+          </div>
         </aside>
 
         {/* --- CENTER FEED (Scrollable) --- */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-gray-50/50 relative" id="feed-container">
-          <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
+          <div className="max-w-2xl mx-auto px-4 py-8 pb-32">
             <CategoryRibbon />
 
-            <div className="space-y-6 mt-6">
-              <PinnedPaper />
+            <div className="space-y-8 mt-6">
+              {/* Feed Header */}
+              <div className="flex items-center gap-3 px-2">
+                <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse"></div>
+                <h2 className="font-display font-black text-2xl uppercase tracking-tight">Campus Feed</h2>
+              </div>
+
               <FeedComposer />
+
               {items.map((item) => (
                 <FeedItemFactory key={item.id} item={item} />
               ))}
@@ -100,12 +122,7 @@ function DashboardContent() {
           </div>
         </main>
 
-        {/* --- RIGHT SIDEBAR (Fixed) --- */}
-        <aside className="hidden lg:flex lg:w-80 flex-col border-l-thick border-black bg-paper z-20 h-full overflow-y-auto custom-scrollbar p-4 space-y-6">
-          <ProfileSidebar />
-          <UpcomingEventsStack />
-          <NewsTicker />
-        </aside>
+        {/* Right Sidebar Removed (2-Column Layout) */}
 
       </div>
 
@@ -114,8 +131,8 @@ function DashboardContent() {
         <OrbitNav />
       </div>
 
-      {/* Mobile Bottom Nav */}
-      <BottomNav onCompose={() => {
+      {/* ArcMenu (Mobile Radial Nav) */}
+      <ArcMenu onCompose={() => {
         setPostModalTab('TEXT');
         setIsPostModalOpen(true);
       }} />

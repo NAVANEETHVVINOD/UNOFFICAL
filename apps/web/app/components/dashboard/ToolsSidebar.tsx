@@ -15,36 +15,9 @@ export default function ToolsSidebar() {
             {/* 1. Quick Composer (Removed per user request) */}
             {/* <div className="hidden">Sticky Note Removed</div> */}
 
-            {/* 2. Pinned Quick Actions (Corkboard Style) */}
-            <div className="relative pl-2">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-black/10 rounded-full"></div>
-
-                <div className="flex flex-col gap-3">
-                    <QuickActionItem
-                        icon={BarChart2}
-                        label="Poll"
-                        color="bg-accent-pink"
-                        onClick={() => document.dispatchEvent(new CustomEvent('open-create-modal', { detail: { type: 'POLL' } }))}
-                    />
-                    <QuickActionItem
-                        icon={ShoppingBag}
-                        label="Sell"
-                        color="bg-accent-green"
-                        onClick={() => document.dispatchEvent(new CustomEvent('open-create-modal', { detail: { type: 'MARKET' } }))}
-                    />
-                    <QuickActionItem
-                        icon={Megaphone}
-                        label="Event"
-                        color="bg-accent-blue"
-                        onClick={() => document.dispatchEvent(new CustomEvent('open-create-modal', { detail: { type: 'EVENT' } }))}
-                    />
-                    <QuickActionItem
-                        icon={Star}
-                        label="Club"
-                        color="bg-accent-purple"
-                        onClick={() => alert("Club creation coming soon!")}
-                    />
-                </div>
+            {/* 2. Pinned Quick Actions (Removed per V3 Request) */}
+            <div className="hidden">
+                {/* Quick Actions Removed */}
             </div>
 
         </div>
