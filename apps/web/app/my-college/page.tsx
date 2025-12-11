@@ -13,7 +13,8 @@ export default function MyCollegeRedirect() {
             if (user?.profile?.college?.slug) {
                 router.replace(`/colleges/${user.profile.college.slug}`);
             } else {
-                router.replace("/dashboard");
+                // If no college, go to onboarding instead of back to dashboard (avoids loop)
+                router.replace("/onboarding");
             }
         }
     }, [user, loading, router]);

@@ -7,6 +7,8 @@ import { MiniProfile, PostCard, EventTicket, PollCard, CollabCard } from "../../
 import CreatePostModal from "../../components/CreatePostModal";
 import Doodle from "../../components/ui/Doodle";
 
+import { motion } from "framer-motion";
+
 export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlug: string, initialEvents: any[] }) {
     const [feedItems, setFeedItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -69,7 +71,20 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
     }, [collegeSlug]);
 
     return (
-        <div className="grid md:grid-cols-12 gap-8">
+        <motion.div
+            className="grid md:grid-cols-12 gap-8"
+            onPanEnd={(e: any, info: any) => {
+                if (window.innerWidth < 768) {
+                    if (info.offset.x < -100) {
+                        // Next -> Events
+                        window.location.href = `/colleges/${collegeSlug}/events`;
+                    } else if (info.offset.x > 100) {
+                        // Prev -> Home
+                        window.location.href = '/dashboard';
+                    }
+                }
+            }}
+        >
             {/* LEFT: Quick Actions / Nav */}
             <div className="md:col-span-3 hidden md:block">
                 <div className="sticky top-8">
@@ -142,6 +157,6 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
                 onClose={() => setIsPostModalOpen(false)}
                 onPostCreated={() => loadFeed(true)}
             />
-        </div>
+        </motion.div>
     )
 }

@@ -3,6 +3,7 @@
 import { useAuth } from "../context/AuthContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 // Navigation
 import Navbar from "../components/Navbar";
@@ -66,29 +67,43 @@ function DashboardContent() {
       <div className="flex-1 flex overflow-hidden relative z-10 max-w-[1600px] w-full mx-auto">
 
         {/* --- LEFT SIDEBAR (Consolidated "Desk") --- */}
-        <aside className="hidden lg:flex lg:w-[400px] flex-col border-r-thick border-black bg-paper z-20 h-full overflow-y-auto custom-scrollbar p-6 space-y-8 pb-32">
+        <aside className="hidden lg:flex lg:w-[320px] flex-col border-r-thick border-black bg-paper z-20 h-full overflow-hidden p-4 space-y-4 pb-4">
 
-          <ProfileSidebar />
+          <div className="scale-90 origin-top-left w-[110%] h-full flex flex-col gap-4">
+            <ProfileSidebar />
 
-          {/* Widgets */}
-          <div className="space-y-6">
-            {/* Pinned Paper Widget */}
-            <div className="transform origin-left hover:scale-[1.02] transition-transform">
-              <PinnedPaper />
+            {/* Widgets */}
+            <div className="space-y-4 flex-1">
+              {/* Pinned Paper Widget */}
+              <div className="transform origin-left hover:scale-[1.02] transition-transform">
+                <PinnedPaper />
+              </div>
+
+              <ToolsSidebar />
+              <UpcomingEventsStack />
+              <NewsTicker />
             </div>
 
-            <ToolsSidebar />
-            <UpcomingEventsStack />
-            <NewsTicker />
-          </div>
-
-          <div className="text-xs font-mono text-gray-400 text-center opacity-50 pt-8">
-            LINKER v3.0.0 (BETA)
+            <div className="text-xs font-mono text-gray-400 text-center opacity-50">
+              LINKER v3.0.0 (BETA)
+            </div>
           </div>
         </aside>
 
         {/* --- CENTER FEED (Scrollable) --- */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-gray-50/50 relative" id="feed-container">
+        <motion.main
+          className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-gray-50/50 relative"
+          id="feed-container"
+          onPanEnd={(e: any, info: any) => {
+            // Mobile Swipe Logic (Only active on small screens)
+            if (window.innerWidth < 768) {
+              if (info.offset.x < -100) {
+                // Swipe Left -> Go to "Next" (Campus)
+                window.location.href = '/my-college';
+              }
+            }
+          }}
+        >
           <div className="max-w-2xl mx-auto px-4 py-8 pb-32">
             <CategoryRibbon />
 
@@ -120,7 +135,7 @@ function DashboardContent() {
               <div className="h-24 md:hidden"></div>
             </div>
           </div>
-        </main>
+        </motion.main>
 
         {/* Right Sidebar Removed (2-Column Layout) */}
 

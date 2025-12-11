@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function TiltedTicker() {
     return (
-        <div className="absolute -bottom-4 left-0 right-0 bg-accent-yellow border-t-2 border-b-2 border-black rotate-1 z-0 overflow-hidden py-1">
+        <div className="relative bg-accent-yellow border-t-2 border-b-2 border-black rotate-1 z-10 overflow-hidden py-1 shadow-sm mt-auto mb-2">
             <motion.div
                 animate={{ x: [0, -1000] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}

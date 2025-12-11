@@ -8,11 +8,11 @@
 
  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
    Creating an optimized production build ...
- ✓ Compiled successfully in 22.5s
+ ✓ Compiled successfully in 30.0s
    Running TypeScript ...
    Collecting page data using 7 workers ...
    Generating static pages using 7 workers (0/1) ...
- ✓ Generating static pages using 7 workers (1/1) in 2.4s
+ ✓ Generating static pages using 7 workers (1/1) in 1900.3ms
    Finalizing page optimization ...
 
 Route (app)
@@ -28,6 +28,7 @@ Route (app)
 ├ ƒ /colleges/[slug]/events/create
 ├ ƒ /colleges/[slug]/marketplace
 ├ ƒ /colleges/[slug]/marketplace/create
+├ ƒ /communities
 ├ ƒ /dashboard
 ├ ƒ /events
 ├ ƒ /events/[id]
@@ -40,13 +41,15 @@ Route (app)
 ├ ƒ /marketplace/create
 ├ ƒ /messages
 ├ ƒ /messages/[id]
+├ ƒ /my-college
 ├ ƒ /notes
 ├ ƒ /notes/[id]
 ├ ƒ /notes/upload
 ├ ƒ /onboarding
 ├ ƒ /profile
 ├ ƒ /profile/edit
-└ ƒ /register
+├ ƒ /register
+└ ƒ /settings
 
 
 ƒ Proxy (Middleware)
