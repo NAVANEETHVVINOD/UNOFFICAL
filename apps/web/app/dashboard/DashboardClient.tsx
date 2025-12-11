@@ -67,13 +67,14 @@ function DashboardContent() {
       <div className="flex-1 flex overflow-hidden relative z-10 max-w-[1600px] w-full mx-auto">
 
         {/* --- LEFT SIDEBAR (Consolidated "Desk") --- */}
-        <aside className="hidden lg:flex lg:w-[320px] flex-col border-r-thick border-black bg-paper z-20 h-full overflow-hidden p-4 space-y-4 pb-4">
+        {/* --- LEFT SIDEBAR (Consolidated "Desk") --- */}
+        <aside className="hidden lg:flex lg:w-[300px] flex-col border-r-thick border-black bg-paper z-20 h-[85vh] overflow-hidden p-4 space-y-4">
 
-          <div className="scale-90 origin-top-left w-[110%] h-full flex flex-col gap-4">
+          <div className="scale-[0.85] origin-top-left w-[115%] h-full flex flex-col gap-4">
             <ProfileSidebar />
 
-            {/* Widgets */}
-            <div className="space-y-4 flex-1">
+            {/* Widgets - Flex-1 so they take remaining space but don't overflow if possible */}
+            <div className="space-y-4 flex-1 min-h-0 overflow-y-auto scrollbar-hide">
               {/* Pinned Paper Widget */}
               <div className="transform origin-left hover:scale-[1.02] transition-transform">
                 <PinnedPaper />
@@ -151,9 +152,6 @@ function DashboardContent() {
         setPostModalTab('TEXT');
         setIsPostModalOpen(true);
       }} />
-
-      {/* CRT Toggle (Desktop) */}
-      <CRTModeToggle />
 
       {/* Modals */}
       <CreatePostModal

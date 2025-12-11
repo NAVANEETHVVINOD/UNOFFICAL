@@ -58,7 +58,7 @@ export default async function CollegeHome({ params }: PageProps) {
     api.getMarketplaceListings(undefined, slug).catch(() => []),
   ]);
 
-  const upcomingEvents = events.slice(0, 5);
+  const upcomingEvents = (Array.isArray(events) ? events : []).slice(0, 5);
 
   return (
     <div className="bg-gray-100 min-h-screen">

@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 
 export default function TiltedTicker() {
     return (
-        <div className="relative bg-accent-yellow border-t-2 border-b-2 border-black rotate-1 z-10 overflow-hidden py-1 shadow-sm mt-auto mb-2">
+        <div className="relative bg-accent-yellow border-t-2 border-b-2 border-black rotate-1 z-10 overflow-hidden py-3 shadow-md mt-auto -mb-1">
             <motion.div
                 animate={{ x: [0, -1000] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="whitespace-nowrap font-mono font-bold text-sm uppercase flex gap-8"
+                className="whitespace-nowrap font-mono font-black text-lg uppercase flex gap-8"
             >
                 {[...Array(10)].map((_, i) => (
                     <span key={i} className="flex items-center gap-2">

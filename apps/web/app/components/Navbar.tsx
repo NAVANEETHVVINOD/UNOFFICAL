@@ -72,15 +72,17 @@ export default function Navbar() {
                     </div>
 
                     {/* Profile */}
-                    <div className="w-10 h-10 bg-gray-200 rounded-full border-2 border-black overflow-hidden hover:scale-105 transition-transform cursor-pointer">
-                        {user?.profile?.avatarUrl ? (
-                            <img src={user.profile.avatarUrl} alt="User" className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full bg-accent-blue/20 flex items-center justify-center">
-                                <User className="w-5 h-5 text-black/50" />
-                            </div>
-                        )}
-                    </div>
+                    <Link href="/profile">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full border-2 border-black overflow-hidden hover:scale-105 transition-transform cursor-pointer">
+                            {user?.profile?.avatarUrl ? (
+                                <img src={user.profile.avatarUrl} alt="User" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-accent-blue/20 flex items-center justify-center">
+                                    <User className="w-5 h-5 text-black/50" />
+                                </div>
+                            )}
+                        </div>
+                    </Link>
 
                 </div>
 
