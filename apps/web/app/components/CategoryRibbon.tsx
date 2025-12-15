@@ -1,72 +1,117 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter, usePathname } from "next/navigation";
 import {
-    Newspaper,
     School,
     Calendar,
     ShoppingBag,
     MessageCircle,
-    Sparkles
+    Sparkles,
+    Home
 } from "lucide-react";
-import { useState } from "react";
+import { containerVariants, itemVariants } from "../../lib/animations";
 
 const CATEGORIES = [
-    { id: 'feed', label: 'Home', icon: Sparkles, color: 'bg-accent-yellow' },
-    { id: 'campus', label: 'Campus', icon: School, color: 'bg-accent-blue' },
-    { id: 'events', label: 'Events', icon: Calendar, color: 'bg-accent-red' },
-    { id: 'market', label: 'Market', icon: ShoppingBag, color: 'bg-accent-pink' },
-    { id: 'messages', label: 'Messages', icon: MessageCircle, color: 'bg-accent-purple' },
+    { id: 'feed', label: 'Home', icon: Home, color: 'bg-accent-yellow', path: '/dashboard' },
+    { id: 'campus', label: 'Campus', icon: School, color: 'bg-accent-blue', path: '/my-college' },
+    { id: 'events', label: 'Events', icon: Calendar, color: 'bg-accent-red', path: '/events' },
+    { id: 'market', label: 'Market', icon: ShoppingBag, color: 'bg-accent-pink', path: '/marketplace' },
+    { id: 'messages', label: 'Messages', icon: MessageCircle, color: 'bg-accent-purple', path: '/messages' },
 ];
 
-export default function CategoryRibbon() {
-    const [active, setActive] = useState('feed');
+interface CategoryRibbonProps {
+    className?: string;
+}
+
+export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) {
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // Determine active category based on current path
+    const getActiveCategory = () => {
+        if (pathname === '/dashboard' || pathname === '/') return 'feed';
+        if (pathname.startsWith('/my-college') || pathname.startsWith('/colleges')) return 'campus';
+        if (pathname.startsWith('/events')) return 'events';
+        if (pathname.startsWith('/marketplace')) return 'market';
+        if (pathname.startsWith('/messages')) return 'messages';
+        return 'feed';
+    };
+
+    const active = getActiveCategory();
+
+    const handleNavigation = (path: string) => {
+        router.push(path);
+    };
 
     return (
-        <div className="w-full overflow-x-auto pb-4 pt-2 -mt-4 z-30 relative scrollbar-hide">
-            <div className="flex gap-3 px-4 min-w-max">
+        <div className={`w-full overflow-x-auto pb-2 pt-4 z-30 relative scrollbar-hide ${className}`}>
+            {/* Scroll indicator for mobile */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none md:hidden z-10" />
+            
+            <motion.div
+                className="flex gap-2 md:gap-3 px-1 min-w-max"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
                 {CATEGORIES.map((cat, i) => {
                     const isActive = active === cat.id;
+                    const Icon = cat.icon;
 
                     return (
                         <motion.button
                             key={cat.id}
-                            onClick={() => setActive(cat.id)}
-                            initial={{ rotate: i % 2 === 0 ? -2 : 2 }}
-                            animate={{
-                                rotate: isActive ? 0 : [i % 2 === 0 ? -2 : 2, i % 2 === 0 ? 2 : -2],
+                            onClick={() => handleNavigation(cat.path)}
+                            variants={itemVariants}
+                            initial={{ rotate: i % 2 === 0 ? -1 : 1 }}
+                            whileHover={{ 
+                                scale: 1.05, 
+                                rotate: 0,
+                                transition: { type: "spring", stiffness: 400, damping: 17 }
                             }}
-                            transition={{
-                                rotate: {
-                                    duration: 3,
-                                    repeat: Infinity,
-                                    repeatType: "reverse",
-                                    ease: "easeInOut",
-                                    delay: i * 0.2
-                                },
-                            }}
-                            whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className={`
-                relative flex flex-col items-center justify-center
-                w-20 h-16 rounded-lg border-2 border-black
-                shadow-neo transition-all duration-200
-                ${isActive ? cat.color : 'bg-white hover:bg-gray-50'}
-              `}
+                                relative flex flex-col items-center justify-center
+                                min-w-[72px] h-14 md:min-w-[80px] md:h-16 
+                                rounded-lg border-2 border-black
+                                shadow-neo transition-colors duration-200
+                                ${isActive ? cat.color : 'bg-white hover:bg-gray-50'}
+                            `}
+                            aria-label={`Navigate to ${cat.label}`}
+                            aria-current={isActive ? 'page' : undefined}
                         >
-                            {/* Pin Top */}
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-black rounded-full shadow-sm z-20"></div>
-                            {/* String */}
-                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-black/20 z-0"></div>
+                            {/* Pin decoration */}
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-black rounded-full shadow-sm z-20" />
+                            
+                            {/* String decoration */}
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-px h-4 bg-black/20 z-0" />
 
-                            <cat.icon className={`w-5 h-5 mb-1 ${isActive ? 'text-black' : 'text-gray-600'}`} />
-                            <span className={`font-display text-xs font-bold ${isActive ? 'text-black' : 'text-gray-500'}`}>
+                            <Icon 
+                                className={`w-4 h-4 md:w-5 md:h-5 mb-0.5 transition-colors ${
+                                    isActive ? 'text-black' : 'text-gray-600'
+                                }`} 
+                            />
+                            <span 
+                                className={`font-display text-[10px] md:text-xs font-bold transition-colors ${
+                                    isActive ? 'text-black' : 'text-gray-500'
+                                }`}
+                            >
                                 {cat.label}
                             </span>
+
+                            {/* Active indicator dot */}
+                            {isActive && (
+                                <motion.div
+                                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-black rounded-full"
+                                    layoutId="activeIndicator"
+                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                />
+                            )}
                         </motion.button>
                     );
                 })}
-            </div>
+            </motion.div>
         </div>
     );
 }

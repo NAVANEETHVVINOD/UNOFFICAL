@@ -2,8 +2,8 @@
 
 import { useAuth } from "../context/AuthContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Navigation
 import Navbar from "../components/Navbar";
@@ -13,7 +13,6 @@ import ArcMenu from "../components/navigation/ArcMenu";
 
 // Sidebars
 import ToolsSidebar from "../components/dashboard/ToolsSidebar";
-import MarketplaceRail from "../components/dashboard/MarketplaceRail";
 import ProfileSidebar from "../components/dashboard/ProfileSidebar";
 import NewsTicker from "../components/dashboard/NewsTicker";
 import UpcomingEventsStack from "../components/dashboard/UpcomingEventsStack";
@@ -25,10 +24,12 @@ import FeedComposer from "../components/feed/FeedComposer";
 import PinnedPaper from "../components/ui/PinnedPaper";
 import { RetroToastProvider } from "../context/ToastContext";
 
-// New Components
+// Components
 import CreatePostModal from "../components/CreatePostModal";
-// import FloatingCreateButton from "../components/ui/FloatingCreateButton"; // Removed per user request
-import CRTModeToggle from "../components/ui/CRTModeToggle";
+import { FeedSkeleton } from "../components/ui/Skeleton";
+
+// Animations
+import { containerVariants, feedItemVariants, pageVariants } from "../../lib/animations";
 
 function DashboardContent() {
   const { user, loading } = useAuth();
@@ -47,99 +48,150 @@ function DashboardContent() {
     return () => document.removeEventListener('open-create-modal', handleOpenModal);
   }, []);
 
+  // Swipe handler for mobile navigation
+  const handleSwipe = useCallback((direction: 'left' | 'right') => {
+    if (window.innerWidth < 768) {
+      if (direction === 'left') {
+        window.location.href = '/my-college';
+      }
+    }
+  }, []);
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-paper">
-      <div className="font-display text-2xl animate-pulse">Loading Chaos...</div>
+      <motion.div
+        className="text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="font-display text-xl">Loading your feed...</p>
+      </motion.div>
     </div>
   );
 
   if (!user) return null;
 
   return (
-    <div className="bg-paper h-screen flex flex-col overflow-hidden relative selection:bg-accent-yellow selection:text-black">
+    <motion.div
+      className="bg-paper min-h-screen flex flex-col relative selection:bg-accent-yellow selection:text-black"
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+    >
       {/* Grid Pattern Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0 bg-halftone opacity-50"></div>
+      <div className="fixed inset-0 pointer-events-none z-0 bg-halftone opacity-30" />
 
       {/* Fixed Header */}
       <Navbar />
 
-      {/* Main Layout Container - Fixed Height with Flex */}
-      <div className="flex-1 flex overflow-hidden relative z-10 max-w-[1600px] w-full mx-auto">
-
-        {/* --- LEFT SIDEBAR (Consolidated "Desk") --- */}
-        {/* --- LEFT SIDEBAR (Consolidated "Desk") --- */}
-        <aside className="hidden lg:flex lg:w-[300px] flex-col border-r-thick border-black bg-paper z-20 h-[85vh] overflow-hidden p-4 space-y-4">
-
-          <div className="scale-[0.85] origin-top-left w-[115%] h-full flex flex-col gap-4">
+      {/* Main Layout Container */}
+      <div className="flex-1 flex relative z-10 max-w-[1400px] w-full mx-auto">
+        {/* LEFT SIDEBAR */}
+        <aside className="hidden lg:flex lg:w-[280px] flex-col border-r border-black/10 bg-paper/80 backdrop-blur-sm z-20 sticky top-[88px] h-[calc(100vh-88px)] p-4 overflow-y-auto scrollbar-hide">
+          <div className="space-y-4">
             <ProfileSidebar />
 
-            {/* Widgets - Flex-1 so they take remaining space but don't overflow if possible */}
-            <div className="space-y-4 flex-1 min-h-0 overflow-y-auto scrollbar-hide">
-              {/* Pinned Paper Widget */}
-              <div className="transform origin-left hover:scale-[1.02] transition-transform">
+            {/* Widgets */}
+            <motion.div
+              className="space-y-4"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={feedItemVariants}>
                 <PinnedPaper />
-              </div>
+              </motion.div>
+              <motion.div variants={feedItemVariants}>
+                <ToolsSidebar />
+              </motion.div>
+              <motion.div variants={feedItemVariants}>
+                <UpcomingEventsStack />
+              </motion.div>
+              <motion.div variants={feedItemVariants}>
+                <NewsTicker />
+              </motion.div>
+            </motion.div>
 
-              <ToolsSidebar />
-              <UpcomingEventsStack />
-              <NewsTicker />
-            </div>
-
-            <div className="text-xs font-mono text-gray-400 text-center opacity-50">
+            {/* Version */}
+            <div className="text-[10px] font-mono text-gray-400 text-center pt-4 border-t border-gray-200">
               LINKER v3.0.0 (BETA)
             </div>
           </div>
         </aside>
 
-        {/* --- CENTER FEED (Scrollable) --- */}
+        {/* CENTER FEED */}
         <motion.main
-          className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-gray-50/50 relative"
+          className="flex-1 min-h-screen bg-gray-50/50"
           id="feed-container"
-          onPanEnd={(e: any, info: any) => {
-            // Mobile Swipe Logic (Only active on small screens)
-            if (window.innerWidth < 768) {
-              if (info.offset.x < -100) {
-                // Swipe Left -> Go to "Next" (Campus)
-                window.location.href = '/my-college';
-              }
-            }
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.1}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -100) handleSwipe('left');
           }}
         >
-          <div className="max-w-2xl mx-auto px-4 py-8 pb-32">
+          <div className="max-w-2xl mx-auto px-4 py-6 pb-32">
             <CategoryRibbon />
 
-            <div className="space-y-8 mt-6">
+            <div className="space-y-6 mt-6">
               {/* Feed Header */}
-              <div className="flex items-center gap-3 px-2">
-                <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse"></div>
-                <h2 className="font-display font-black text-2xl uppercase tracking-tight">Campus Feed</h2>
+              <div className="flex items-center gap-3">
+                <div className="h-2.5 w-2.5 bg-red-500 rounded-full animate-pulse" />
+                <h2 className="font-display font-black text-xl uppercase tracking-tight">
+                  Campus Feed
+                </h2>
               </div>
 
               <FeedComposer />
 
-              {items.map((item) => (
-                <FeedItemFactory key={item.id} item={item} />
-              ))}
+              {/* Feed Items with Staggered Animation */}
+              <motion.div
+                className="space-y-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <AnimatePresence mode="popLayout">
+                  {items.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      variants={feedItemVariants}
+                      layout
+                    >
+                      <FeedItemFactory item={item} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
 
-              {isLoading && (
-                <div className="p-4 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 animate-pulse">
-                  Loading more chaos...
-                </div>
-              )}
+              {/* Loading State */}
+              {isLoading && <FeedSkeleton count={2} />}
 
+              {/* End of Feed */}
               {!hasMore && items.length > 0 && (
-                <div className="text-center py-8 font-mono text-xs text-gray-400 uppercase tracking-widest">
-                  --- End of the internet ---
+                <motion.div
+                  className="text-center py-8 font-mono text-xs text-gray-400 uppercase tracking-widest"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  — End of feed —
+                </motion.div>
+              )}
+
+              {/* Empty State */}
+              {!isLoading && items.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="font-display text-lg text-gray-500">No posts yet</p>
+                  <p className="text-sm text-gray-400 mt-2">Be the first to share something!</p>
                 </div>
               )}
-              {/* Spacer for Bottom Nav */}
-              <div className="h-24 md:hidden"></div>
+
+              {/* Mobile Bottom Spacer */}
+              <div className="h-24 md:hidden" />
             </div>
           </div>
         </motion.main>
-
-        {/* Right Sidebar Removed (2-Column Layout) */}
-
       </div>
 
       {/* OrbitNav (Desktop Only) */}
@@ -153,16 +205,16 @@ function DashboardContent() {
         setIsPostModalOpen(true);
       }} />
 
-      {/* Modals */}
+      {/* Create Post Modal */}
       <CreatePostModal
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
         initialTab={postModalTab}
         onPostCreated={() => {
-          // refresh feed or show toast
+          // TODO: Refresh feed or show toast
         }}
       />
-    </div>
+    </motion.div>
   );
 }
 

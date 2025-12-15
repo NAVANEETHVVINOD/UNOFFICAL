@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import Link from "next/link";
+import { Github, Instagram, Linkedin, MessageCircle, ExternalLink } from "lucide-react";
 
 function ProfileContent() {
   const { user, isAuthenticated, logout, loading } = useAuth();
@@ -208,33 +209,67 @@ function ProfileContent() {
                     <span>🔗</span> SOCIALS
                   </h3>
                   <div className="space-y-3">
-                    {user.profile?.githubUrl ? (
+                    {user.profile?.githubUrl && (
                       <a
-                        href={user.profile.githubUrl}
+                        href={user.profile.githubUrl.startsWith('http') ? user.profile.githubUrl : `https://github.com/${user.profile.githubUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow group"
                       >
+                        <Github className="w-5 h-5" />
                         <span className="font-bold">GitHub</span>
-                        <span className="text-sm text-gray-600 truncate">
-                          {user.profile.githubUrl}
-                        </span>
+                        <ExternalLink className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                       </a>
-                    ) : null}
-                    {user.profile?.instagram ? (
+                    )}
+                    {user.profile?.instagram && (
                       <a
-                        href={`https://instagram.com/${user.profile.instagram.replace("@", "")}`}
+                        href={user.profile.instagram.startsWith('http') ? user.profile.instagram : `https://instagram.com/${user.profile.instagram.replace("@", "")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow group"
                       >
+                        <Instagram className="w-5 h-5 text-pink-500" />
                         <span className="font-bold">Instagram</span>
-                        <span className="text-sm text-gray-600">
-                          {user.profile.instagram}
-                        </span>
+                        <ExternalLink className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                       </a>
-                    ) : null}
-                    {!user.profile?.githubUrl && !user.profile?.instagram && (
+                    )}
+                    {user.profile?.linkedin && (
+                      <a
+                        href={user.profile.linkedin.startsWith('http') ? user.profile.linkedin : `https://linkedin.com/in/${user.profile.linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow group"
+                      >
+                        <Linkedin className="w-5 h-5 text-blue-600" />
+                        <span className="font-bold">LinkedIn</span>
+                        <ExternalLink className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    )}
+                    {(user.profile?.socials as any)?.discord && (
+                      <a
+                        href={(user.profile?.socials as any).discord.startsWith('http') ? (user.profile?.socials as any).discord : `https://discord.gg/${(user.profile?.socials as any).discord}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow group"
+                      >
+                        <MessageCircle className="w-5 h-5 text-indigo-500" />
+                        <span className="font-bold">Discord</span>
+                        <ExternalLink className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    )}
+                    {(user.profile?.socials as any)?.whatsapp && (
+                      <a
+                        href={`https://wa.me/${(user.profile?.socials as any).whatsapp.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-white border-2 border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow group"
+                      >
+                        <MessageCircle className="w-5 h-5 text-green-500" />
+                        <span className="font-bold">WhatsApp</span>
+                        <ExternalLink className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    )}
+                    {!user.profile?.githubUrl && !user.profile?.instagram && !user.profile?.linkedin && !(user.profile?.socials as any)?.discord && !(user.profile?.socials as any)?.whatsapp && (
                       <p className="text-gray-500 font-mono text-sm">
                         No social links added yet.
                       </p>

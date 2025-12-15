@@ -1,20 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Container from "../components/ui/Container";
 import {
   NewspaperCard,
   RetroButton,
   Badge,
-  Staple,
-  Tape,
 } from "../components/ui/NewspaperUI";
-import Doodle from "../components/ui/Doodle";
 import { PageTransition } from "../providers/AnimationProvider";
 import Navbar from "../components/Navbar";
-import { motion } from "framer-motion";
+import CategoryRibbon from "../components/CategoryRibbon";
+import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../lib/api";
 import Link from "next/link";
+import { Search, Plus, Filter, ShoppingBag, User, Tag, Grid, List } from "lucide-react";
+import { containerVariants, itemVariants, pageVariants, cardHoverVariants } from "../../lib/animations";
+import { ListingSkeleton } from "../components/ui/Skeleton";
 
 interface Listing {
   id: string;
@@ -23,179 +24,359 @@ interface Listing {
   price: number;
   imageUrl: string | null;
   status: "ACTIVE" | "SOLD" | "HIDDEN";
+  category?: string;
   createdAt: string;
   owner: {
+    id: string;
     profile: {
       fullName: string;
+      avatarUrl?: string;
     };
   };
 }
 
+type CategoryFilter = "all" | "books" | "electronics" | "clothing" | "services" | "other";
+type SortOption = "newest" | "price-low" | "price-high";
+
 export default function MarketplaceClient() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     fetchListings();
   }, []);
 
   const fetchListings = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const data = await api.getMarketplaceListings();
       setListings(data);
-    } catch (error) {
-      console.error("Failed to fetch listings:", error);
+    } catch (err) {
+      console.error("Failed to fetch listings:", err);
+      setError("Failed to load listings. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredListings = listings.filter(
-    (item) =>
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.description?.toLowerCase().includes(search.toLowerCase()),
-  );
+  // Filter and sort listings
+  const filteredListings = useMemo(() => {
+    let result = listings.filter((item) => item.status === "ACTIVE");
+
+    // Search filter
+    if (search) {
+      const query = search.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.title.toLowerCase().includes(query) ||
+          item.description?.toLowerCase().includes(query)
+      );
+    }
+
+    // Category filter
+    if (category !== "all") {
+      result = result.filter((item) => 
+        item.category?.toLowerCase() === category || 
+        item.title.toLowerCase().includes(category)
+      );
+    }
+
+    // Sort
+    switch (sortBy) {
+      case "price-low":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "newest":
+      default:
+        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
+    return result;
+  }, [listings, search, category, sortBy]);
+
+  const formatPrice = (price: number) => {
+    if (price === 0) return "FREE";
+    return `₹${price.toLocaleString()}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
 
   return (
     <PageTransition>
-      <div className="bg-gray-100 min-h-screen">
-        {/* Grid Pattern Overlay */}
-        <div className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
-            backgroundSize: '24px 24px'
-          }}>
-        </div>
+      <motion.div
+        className="bg-paper min-h-screen"
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+      >
+        {/* Background Pattern */}
+        <div className="fixed inset-0 pointer-events-none z-0 bg-halftone opacity-30" />
 
         <Navbar />
 
         <Container>
-          <div className="py-8">
+          <div className="py-6 relative z-10">
+            <CategoryRibbon className="mb-6" />
 
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-12 text-center relative"
+              className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
             >
-              <Doodle
-                src="/doodles/shopping-bag.svg"
-                className="w-24 h-24 absolute -top-12 left-1/4 -z-10 opacity-20 -rotate-12"
-              />
-              <h1 className="font-display text-5xl md:text-7xl font-black mb-4">
-                MARKETPLACE
-              </h1>
-              <p className="font-hand text-xl text-gray-600 max-w-2xl mx-auto">
-                Buy. Sell. Trade. One student's trash is another's treasure.
-              </p>
-            </motion.div>
-
-            {/* Search & Filter */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="max-w-xl mx-auto mb-12 relative"
-            >
-              <Tape className="absolute -top-3 left-1/2 -translate-x-1/2 z-10" />
-              <div className="bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Search for books, gadgets..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="flex-grow p-2 font-mono focus:outline-none"
-                />
-                <RetroButton className="py-2 px-6">FIND</RetroButton>
-              </div>
-            </motion.div>
-
-            {/* Listings Grid */}
-            {loading ? (
-              <div className="text-center py-20">
-                <Doodle
-                  src="/doodles/loading.svg"
-                  className="w-16 h-16 mx-auto animate-spin"
-                />
-                <p className="font-mono mt-4">Loading items...</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredListings.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.1 * index }}
-                  >
-                    <Link href={`/marketplace/${item.id}`}>
-                      <NewspaperCard className="h-full hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group bg-white p-0 overflow-hidden flex flex-col">
-                        {/* Image Placeholder */}
-                        <div className="h-48 bg-gray-100 border-b-2 border-black flex items-center justify-center relative overflow-hidden">
-                          {item.imageUrl ? (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <Doodle
-                              src="/doodles/camera.svg"
-                              className="w-16 h-16 opacity-20"
-                            />
-                          )}
-                          <div className="absolute top-2 right-2">
-                            <Badge className="bg-accent-yellow text-black border-black shadow-sm">
-                              ₹{item.price}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        <div className="p-6 flex-grow flex flex-col">
-                          <h3 className="font-bold text-xl mb-2 group-hover:underline decoration-2 decoration-accent-blue line-clamp-1">
-                            {item.title}
-                          </h3>
-                          <p className="text-gray-600 line-clamp-2 font-body text-sm mb-4 flex-grow">
-                            {item.description || "No description available."}
-                          </p>
-
-                          <div className="flex justify-between items-center pt-4 border-t-2 border-dashed border-gray-200">
-                            <span className="font-mono text-xs text-gray-500 truncate max-w-[120px]">
-                              By {item.owner.profile.fullName}
-                            </span>
-                            <span className="font-bold text-xs bg-black text-white px-2 py-1">
-                              {item.status}
-                            </span>
-                          </div>
-                        </div>
-                      </NewspaperCard>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-            {!loading && filteredListings.length === 0 && (
-              <div className="text-center py-20">
-                <Doodle
-                  src="/doodles/sad-face.svg"
-                  className="w-24 h-24 mx-auto mb-4 opacity-50"
-                />
-                <h3 className="font-bold text-2xl mb-2">No Items Found</h3>
-                <p className="text-gray-600">
-                  The market is empty. Be the first to sell something!
+              <div>
+                <h1 className="font-display text-4xl md:text-5xl font-black mb-1">
+                  MARKETPLACE
+                </h1>
+                <p className="font-mono text-sm text-gray-600">
+                  Buy, sell, trade with fellow students
                 </p>
-                <div className="mt-6">
-                  <RetroButton>SELL AN ITEM</RetroButton>
+              </div>
+              <Link href="/marketplace/create">
+                <motion.button
+                  className="flex items-center gap-2 px-6 py-3 bg-accent-yellow border-2 border-black font-bold shadow-neo hover:shadow-neo-lg transition-all"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Plus className="w-5 h-5" />
+                  SELL ITEM
+                </motion.button>
+              </Link>
+            </motion.div>
+
+            {/* Search and Filters */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-8"
+            >
+              {/* Search Bar */}
+              <div className="flex gap-2 mb-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search for books, gadgets, services..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border-2 border-black bg-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent-yellow"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`px-4 py-3 border-2 border-black flex items-center gap-2 font-bold text-sm transition-colors ${
+                    showFilters ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  <span className="hidden sm:inline">Filters</span>
+                </button>
+                <div className="hidden md:flex border-2 border-black">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-3 ${viewMode === "grid" ? "bg-black text-white" : "bg-white"}`}
+                  >
+                    <Grid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-3 border-l-2 border-black ${viewMode === "list" ? "bg-black text-white" : "bg-white"}`}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
+
+              {/* Filter Options */}
+              <AnimatePresence>
+                {showFilters && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 bg-white border-2 border-black mb-4 space-y-4">
+                      {/* Categories */}
+                      <div>
+                        <span className="font-bold text-sm mr-3">Category:</span>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {(["all", "books", "electronics", "clothing", "services", "other"] as CategoryFilter[]).map((cat) => (
+                            <button
+                              key={cat}
+                              onClick={() => setCategory(cat)}
+                              className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black transition-colors ${
+                                category === cat ? "bg-accent-pink text-white" : "bg-white hover:bg-gray-100"
+                              }`}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Sort */}
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-sm">Sort by:</span>
+                        <select
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value as SortOption)}
+                          className="px-3 py-2 border-2 border-black font-mono text-sm bg-white"
+                        >
+                          <option value="newest">Newest First</option>
+                          <option value="price-low">Price: Low to High</option>
+                          <option value="price-high">Price: High to Low</option>
+                        </select>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Results Count */}
+              <div className="flex justify-between items-center text-sm font-mono text-gray-500">
+                <span>{filteredListings.length} items found</span>
+              </div>
+            </motion.div>
+
+            {/* Listings */}
+            {loading ? (
+              <div className={`grid ${viewMode === "grid" ? "md:grid-cols-2 lg:grid-cols-3" : ""} gap-6`}>
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <ListingSkeleton key={i} />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-red-500 font-bold mb-4">{error}</p>
+                <RetroButton onClick={fetchListings}>Try Again</RetroButton>
+              </div>
+            ) : (
+              <motion.div
+                className={`grid ${viewMode === "grid" ? "md:grid-cols-2 lg:grid-cols-3" : ""} gap-6`}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <AnimatePresence mode="popLayout">
+                  {filteredListings.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      variants={itemVariants}
+                      layout
+                      exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                      <Link href={`/marketplace/${item.id}`}>
+                        <motion.div
+                          className={`bg-white border-2 border-black shadow-neo overflow-hidden cursor-pointer group ${
+                            viewMode === "list" ? "flex" : ""
+                          }`}
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          whileTap="tap"
+                        >
+                          {/* Image */}
+                          <div className={`bg-gray-100 border-b-2 ${viewMode === "list" ? "w-32 h-32 border-b-0 border-r-2" : "h-48"} border-black flex items-center justify-center relative overflow-hidden`}>
+                            {item.imageUrl ? (
+                              <img
+                                src={item.imageUrl}
+                                alt={item.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <ShoppingBag className="w-12 h-12 text-gray-300" />
+                            )}
+                            {/* Price Badge */}
+                            <div className="absolute top-2 right-2">
+                              <Badge className={`${item.price === 0 ? "bg-green-400" : "bg-accent-yellow"} text-black border-black shadow-sm font-bold`}>
+                                {formatPrice(item.price)}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {/* Content */}
+                          <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
+                            <h3 className="font-bold text-lg mb-1 group-hover:text-accent-blue transition-colors line-clamp-1">
+                              {item.title}
+                            </h3>
+                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                              {item.description || "No description"}
+                            </p>
+
+                            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-gray-200 border border-black overflow-hidden">
+                                  {item.owner.profile.avatarUrl ? (
+                                    <img src={item.owner.profile.avatarUrl} alt="" className="w-full h-full object-cover" />
+                                  ) : (
+                                    <User className="w-full h-full p-1 text-gray-400" />
+                                  )}
+                                </div>
+                                <span className="font-mono text-xs text-gray-500 truncate max-w-[100px]">
+                                  {item.owner.profile.fullName}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-mono text-gray-400">
+                                {formatDate(item.createdAt)}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && filteredListings.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <h3 className="font-bold text-xl mb-2">No Items Found</h3>
+                <p className="text-gray-600 mb-6">
+                  {search ? "Try adjusting your search or filters" : "Be the first to list something!"}
+                </p>
+                <div className="flex gap-4 justify-center">
+                  {search && (
+                    <RetroButton variant="outline" onClick={() => setSearch("")}>
+                      Clear Search
+                    </RetroButton>
+                  )}
+                  <Link href="/marketplace/create">
+                    <RetroButton>Sell an Item</RetroButton>
+                  </Link>
+                </div>
+              </motion.div>
             )}
           </div>
         </Container>
-      </div>
+      </motion.div>
     </PageTransition>
   );
 }
