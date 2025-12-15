@@ -2,6 +2,8 @@ import "./globals.css";
 import BottomNav from "./components/ui/BottomNav";
 import { AuthProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
+import { RBACProvider } from "./context/RBACContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import ScrollRestoration from "./components/ScrollRestoration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -30,14 +32,18 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>
-          <SocketProvider>
-            <ScrollRestoration />
-            <div className="min-h-screen pb-16 md:pb-0">
-              {children}
-              <SpeedInsights />
-            </div>
-            <BottomNav />
-          </SocketProvider>
+          <RBACProvider>
+            <SocketProvider>
+              <NotificationProvider>
+                <ScrollRestoration />
+                <div className="min-h-screen pb-16 md:pb-0">
+                  {children}
+                  <SpeedInsights />
+                </div>
+                <BottomNav />
+              </NotificationProvider>
+            </SocketProvider>
+          </RBACProvider>
         </AuthProvider>
       </body>
     </html>

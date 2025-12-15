@@ -2,26 +2,20 @@
 
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications, formatNotificationTime, NOTIFICATION_ICONS } from "../context/NotificationContext";
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, Search, X, Check } from "lucide-react";
+import { Bell, User, Search, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltedTicker from "./ui/TiltedTicker";
+import GlobalSearch from "./GlobalSearch";
 import { dropdownVariants, iconButtonVariants, badgePulseVariants } from "../../lib/animations";
 
-// Mock notifications - will be replaced with real data from NotificationContext
-const mockNotifications = [
-    { id: "1", type: "like", message: "Sarah liked your post about React Hooks", time: "2m ago", read: false },
-    { id: "2", type: "comment", message: "Alex commented on your marketplace listing", time: "15m ago", read: false },
-    { id: "3", type: "event", message: "Tech Talk: AI in 2025 starts in 1 hour", time: "1h ago", read: true },
-];
-
 export default function Navbar() {
-    const { user, isAuthenticated } = useAuth();
+    const { user } = useAuth();
+    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-    const [notifications, setNotifications] = useState(mockNotifications);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const notificationRef = useRef<HTMLDivElement>(null);
-
-    const unreadCount = notifications.filter(n => !n.read).length;
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -34,13 +28,17 @@ export default function Navbar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const markAsRead = (id: string) => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    };
-
-    const markAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    };
+    // Keyboard shortcut for search (Cmd/Ctrl + K)
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+                event.preventDefault();
+                setIsSearchOpen(true);
+            }
+        }
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 bg-paper flex flex-col relative shadow-neo-lg transition-all">
@@ -62,15 +60,20 @@ export default function Navbar() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-3">
-                    {/* Search Button (Mobile) */}
+                    {/* Search Button */}
                     <motion.button
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors md:hidden"
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2"
                         variants={iconButtonVariants}
                         initial="rest"
                         whileHover="hover"
                         whileTap="tap"
+                        onClick={() => setIsSearchOpen(true)}
+                        aria-label="Search"
                     >
                         <Search className="w-5 h-5" />
+                        <span className="hidden md:flex items-center gap-1 text-xs text-gray-400 font-mono">
+                            <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">⌘K</kbd>
+                        </span>
                     </motion.button>
 
                     {/* Notifications */}
@@ -131,15 +134,15 @@ export default function Navbar() {
                                                     onClick={() => markAsRead(notification.id)}
                                                     whileHover={{ x: 4 }}
                                                 >
-                                                    <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
-                                                        notification.read ? "bg-gray-300" : "bg-accent-blue"
-                                                    }`} />
+                                                    <div className="w-8 h-8 flex items-center justify-center text-lg flex-shrink-0">
+                                                        {NOTIFICATION_ICONS[notification.type] || "🔔"}
+                                                    </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm leading-tight line-clamp-2">
                                                             {notification.message}
                                                         </p>
                                                         <span className="text-[10px] text-gray-400 font-mono">
-                                                            {notification.time}
+                                                            {formatNotificationTime(notification.createdAt)}
                                                         </span>
                                                     </div>
                                                     {!notification.read && (
@@ -198,6 +201,9 @@ export default function Navbar() {
 
             {/* Tilted Ticker */}
             <TiltedTicker />
+
+            {/* Global Search Modal */}
+            <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </header>
     );
 }

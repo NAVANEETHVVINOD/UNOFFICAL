@@ -2,252 +2,219 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Heart,
-    MessageCircle,
-    Bookmark,
-    Share2,
-    Copy,
-    Twitter,
-    Send,
-    Check,
-} from "lucide-react";
-import { likeVariants, bookmarkSlideVariants, dropdownVariants } from "../../../lib/animations";
+import { Heart, MessageCircle, Bookmark, Share2, Copy, Check } from "lucide-react";
+import { api } from "../../../lib/api";
+import { likeVariants } from "../../../lib/animations";
 
 interface PostActionsProps {
-    postId: string;
-    initialLiked?: boolean;
-    initialSaved?: boolean;
-    likeCount?: number;
-    commentCount?: number;
-    onLike?: (postId: string, liked: boolean) => Promise<void>;
-    onComment?: (postId: string) => void;
-    onSave?: (postId: string, saved: boolean) => Promise<void>;
-    onShare?: (postId: string) => void;
-    compact?: boolean;
+  postId: string;
+  initialLikeCount: number;
+  initialCommentCount: number;
+  initialIsLiked?: boolean;
+  initialIsSaved?: boolean;
+  onCommentClick?: () => void;
+  showCounts?: boolean;
+  size?: "sm" | "md" | "lg";
 }
 
 export default function PostActions({
-    postId,
-    initialLiked = false,
-    initialSaved = false,
-    likeCount = 0,
-    commentCount = 0,
-    onLike,
-    onComment,
-    onSave,
-    onShare,
-    compact = false,
+  postId,
+  initialLikeCount,
+  initialCommentCount,
+  initialIsLiked = false,
+  initialIsSaved = false,
+  onCommentClick,
+  showCounts = true,
+  size = "md",
 }: PostActionsProps) {
-    const [isLiked, setIsLiked] = useState(initialLiked);
-    const [isSaved, setIsSaved] = useState(initialSaved);
-    const [currentLikeCount, setCurrentLikeCount] = useState(likeCount);
-    const [isShareOpen, setIsShareOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const [isLiking, setIsLiking] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
+  const [isLiked, setIsLiked] = useState(initialIsLiked);
+  const [isSaved, setIsSaved] = useState(initialIsSaved);
+  const [likeCount, setLikeCount] = useState(initialLikeCount);
+  const [isLiking, setIsLiking] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const handleLike = useCallback(async () => {
-        if (isLiking) return;
+  const iconSize = size === "sm" ? "w-4 h-4" : size === "lg" ? "w-6 h-6" : "w-5 h-5";
+  const buttonPadding = size === "sm" ? "p-1.5" : size === "lg" ? "p-3" : "p-2";
+  const textSize = size === "sm" ? "text-xs" : size === "lg" ? "text-base" : "text-sm";
 
-        setIsLiking(true);
-        const newLikedState = !isLiked;
+  const handleLike = useCallback(async () => {
+    if (isLiking) return;
+    
+    setIsLiking(true);
+    const wasLiked = isLiked;
+    
+    // Optimistic update
+    setIsLiked(!wasLiked);
+    setLikeCount((prev) => (wasLiked ? prev - 1 : prev + 1));
 
-        // Optimistic update
-        setIsLiked(newLikedState);
-        setCurrentLikeCount((prev) => (newLikedState ? prev + 1 : prev - 1));
+    try {
+      if (wasLiked) {
+        await api.unlikePost(postId);
+      } else {
+        await api.likePost(postId);
+      }
+    } catch (error) {
+      // Revert on error
+      setIsLiked(wasLiked);
+      setLikeCount((prev) => (wasLiked ? prev + 1 : prev - 1));
+      console.error("Failed to toggle like:", error);
+    } finally {
+      setIsLiking(false);
+    }
+  }, [postId, isLiked, isLiking]);
 
-        try {
-            await onLike?.(postId, newLikedState);
-        } catch (error) {
-            // Revert on error
-            setIsLiked(!newLikedState);
-            setCurrentLikeCount((prev) => (newLikedState ? prev - 1 : prev + 1));
-            console.error("Failed to like post:", error);
-        } finally {
-            setIsLiking(false);
+  const handleSave = useCallback(async () => {
+    // Toggle saved state (API endpoint would be needed)
+    setIsSaved(!isSaved);
+    // TODO: Implement save API when available
+  }, [isSaved]);
+
+  const handleShare = useCallback(() => {
+    setShowShareMenu(!showShareMenu);
+  }, [showShareMenu]);
+
+  const handleCopyLink = useCallback(async () => {
+    const url = `${window.location.origin}/posts/${postId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+        setShowShareMenu(false);
+      }, 1500);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
+  }, [postId]);
+
+  const handleNativeShare = useCallback(async () => {
+    const url = `${window.location.origin}/posts/${postId}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Check out this post on LINKER",
+          url,
+        });
+        setShowShareMenu(false);
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          console.error("Share failed:", error);
         }
-    }, [isLiked, isLiking, onLike, postId]);
+      }
+    }
+  }, [postId]);
 
-    const handleSave = useCallback(async () => {
-        if (isSaving) return;
+  return (
+    <div className="flex items-center gap-1 relative">
+      {/* Like Button */}
+      <motion.button
+        onClick={handleLike}
+        disabled={isLiking}
+        className={`${buttonPadding} rounded-lg flex items-center gap-1.5 transition-colors ${
+          isLiked
+            ? "text-red-500 bg-red-50 hover:bg-red-100"
+            : "text-gray-600 hover:bg-gray-100"
+        }`}
+        variants={likeVariants}
+        animate={isLiked ? "liked" : "unliked"}
+        whileTap={{ scale: 0.9 }}
+        aria-label={isLiked ? "Unlike post" : "Like post"}
+      >
+        <Heart
+          className={`${iconSize} ${isLiked ? "fill-current" : ""}`}
+        />
+        {showCounts && likeCount > 0 && (
+          <span className={`${textSize} font-bold`}>{likeCount}</span>
+        )}
+      </motion.button>
 
-        setIsSaving(true);
-        const newSavedState = !isSaved;
+      {/* Comment Button */}
+      <motion.button
+        onClick={onCommentClick}
+        className={`${buttonPadding} rounded-lg flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 transition-colors`}
+        whileTap={{ scale: 0.9 }}
+        aria-label="View comments"
+      >
+        <MessageCircle className={iconSize} />
+        {showCounts && initialCommentCount > 0 && (
+          <span className={`${textSize} font-bold`}>{initialCommentCount}</span>
+        )}
+      </motion.button>
 
-        // Optimistic update
-        setIsSaved(newSavedState);
+      {/* Save Button */}
+      <motion.button
+        onClick={handleSave}
+        className={`${buttonPadding} rounded-lg flex items-center gap-1.5 transition-colors ${
+          isSaved
+            ? "text-accent-blue bg-blue-50 hover:bg-blue-100"
+            : "text-gray-600 hover:bg-gray-100"
+        }`}
+        whileTap={{ scale: 0.9 }}
+        aria-label={isSaved ? "Unsave post" : "Save post"}
+      >
+        <Bookmark
+          className={`${iconSize} ${isSaved ? "fill-current" : ""}`}
+        />
+      </motion.button>
 
-        try {
-            await onSave?.(postId, newSavedState);
-        } catch (error) {
-            // Revert on error
-            setIsSaved(!newSavedState);
-            console.error("Failed to save post:", error);
-        } finally {
-            setIsSaving(false);
-        }
-    }, [isSaved, isSaving, onSave, postId]);
+      {/* Share Button */}
+      <div className="relative">
+        <motion.button
+          onClick={handleShare}
+          className={`${buttonPadding} rounded-lg flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 transition-colors`}
+          whileTap={{ scale: 0.9 }}
+          aria-label="Share post"
+        >
+          <Share2 className={iconSize} />
+        </motion.button>
 
-    const handleComment = useCallback(() => {
-        onComment?.(postId);
-    }, [onComment, postId]);
-
-    const handleCopyLink = useCallback(async () => {
-        const url = `${window.location.origin}/posts/${postId}`;
-        try {
-            await navigator.clipboard.writeText(url);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (error) {
-            console.error("Failed to copy link:", error);
-        }
-    }, [postId]);
-
-    const handleShareTwitter = useCallback(() => {
-        const url = `${window.location.origin}/posts/${postId}`;
-        const text = "Check out this post on LINKER!";
-        window.open(
-            `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-            "_blank"
-        );
-        setIsShareOpen(false);
-    }, [postId]);
-
-    const handleShareWhatsApp = useCallback(() => {
-        const url = `${window.location.origin}/posts/${postId}`;
-        const text = "Check out this post on LINKER!";
-        window.open(
-            `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
-            "_blank"
-        );
-        setIsShareOpen(false);
-    }, [postId]);
-
-    const buttonClass = compact
-        ? "p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-        : "flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors";
-
-    return (
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            <div className="flex items-center gap-1">
-                {/* Like Button */}
-                <motion.button
-                    onClick={handleLike}
-                    className={buttonClass}
-                    variants={likeVariants}
-                    animate={isLiked ? "liked" : "unliked"}
-                    whileTap={{ scale: 0.9 }}
-                    disabled={isLiking}
-                    aria-label={isLiked ? "Unlike" : "Like"}
-                >
-                    <Heart
-                        className={`w-5 h-5 transition-colors ${
-                            isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
-                        }`}
-                    />
-                    {!compact && currentLikeCount > 0 && (
-                        <span className={`text-sm font-medium ${isLiked ? "text-red-500" : "text-gray-600"}`}>
-                            {currentLikeCount}
-                        </span>
-                    )}
-                </motion.button>
-
-                {/* Comment Button */}
-                <motion.button
-                    onClick={handleComment}
-                    className={buttonClass}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    aria-label="Comment"
-                >
-                    <MessageCircle className="w-5 h-5 text-gray-600" />
-                    {!compact && commentCount > 0 && (
-                        <span className="text-sm font-medium text-gray-600">{commentCount}</span>
-                    )}
-                </motion.button>
-
-                {/* Share Button */}
-                <div className="relative">
-                    <motion.button
-                        onClick={() => setIsShareOpen(!isShareOpen)}
-                        className={buttonClass}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        aria-label="Share"
-                    >
-                        <Share2 className="w-5 h-5 text-gray-600" />
-                    </motion.button>
-
-                    {/* Share Dropdown */}
-                    <AnimatePresence>
-                        {isShareOpen && (
-                            <>
-                                {/* Backdrop */}
-                                <div
-                                    className="fixed inset-0 z-40"
-                                    onClick={() => setIsShareOpen(false)}
-                                />
-                                <motion.div
-                                    className="absolute bottom-full left-0 mb-2 bg-white border-2 border-black shadow-neo rounded-lg overflow-hidden z-50 min-w-[160px]"
-                                    variants={dropdownVariants}
-                                    initial="hidden"
-                                    animate="visible"
-                                    exit="exit"
-                                >
-                                    <button
-                                        onClick={handleCopyLink}
-                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left"
-                                    >
-                                        {copied ? (
-                                            <Check className="w-4 h-4 text-green-500" />
-                                        ) : (
-                                            <Copy className="w-4 h-4" />
-                                        )}
-                                        <span className="text-sm">{copied ? "Copied!" : "Copy Link"}</span>
-                                    </button>
-                                    <button
-                                        onClick={handleShareTwitter}
-                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left"
-                                    >
-                                        <Twitter className="w-4 h-4" />
-                                        <span className="text-sm">Twitter</span>
-                                    </button>
-                                    <button
-                                        onClick={handleShareWhatsApp}
-                                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left"
-                                    >
-                                        <Send className="w-4 h-4" />
-                                        <span className="text-sm">WhatsApp</span>
-                                    </button>
-                                </motion.div>
-                            </>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-
-            {/* Save Button */}
-            <motion.button
-                onClick={handleSave}
-                className={buttonClass}
-                variants={bookmarkSlideVariants}
-                animate={isSaved ? "saved" : "unsaved"}
-                whileTap={{ scale: 0.9 }}
-                disabled={isSaving}
-                aria-label={isSaved ? "Unsave" : "Save"}
+        {/* Share Menu */}
+        <AnimatePresence>
+          {showShareMenu && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 10 }}
+              className="absolute bottom-full right-0 mb-2 bg-white border-2 border-black shadow-neo p-2 min-w-[160px] z-50"
             >
-                <Bookmark
-                    className={`w-5 h-5 transition-colors ${
-                        isSaved ? "fill-black text-black" : "text-gray-600"
-                    }`}
-                />
-            </motion.button>
-        </div>
-    );
-}
+              <button
+                onClick={handleCopyLink}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm font-bold hover:bg-gray-100 transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-green-500" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>Copy Link</span>
+                  </>
+                )}
+              </button>
+              {typeof navigator !== "undefined" && typeof navigator.share === "function" && (
+                <button
+                  onClick={handleNativeShare}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-bold hover:bg-gray-100 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>Share...</span>
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-// Compact version for use in lists
-export function PostActionsCompact(props: Omit<PostActionsProps, "compact">) {
-    return <PostActions {...props} compact />;
+      {/* Click outside to close share menu */}
+      {showShareMenu && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setShowShareMenu(false)}
+        />
+      )}
+    </div>
+  );
 }
