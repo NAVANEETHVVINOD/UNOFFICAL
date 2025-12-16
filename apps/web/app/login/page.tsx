@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
@@ -13,7 +13,11 @@ import {
   Sticker,
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
-import Navbar from "../components/Navbar";
+
+interface ValidationErrors {
+  email?: string;
+  password?: string;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +26,46 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<{ email: boolean; password: boolean }>({
+    email: false,
+    password: false,
+  });
+
+  const validateEmail = useCallback((value: string): string | undefined => {
+    if (!value.trim()) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "Invalid email format";
+    return undefined;
+  }, []);
+
+  const validatePassword = useCallback((value: string): string | undefined => {
+    if (!value) return "Password is required";
+    if (value.length < 6) return "Password must be at least 6 characters";
+    return undefined;
+  }, []);
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (touched.email) {
+      setValidationErrors((prev) => ({ ...prev, email: validateEmail(value) }));
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (touched.password) {
+      setValidationErrors((prev) => ({ ...prev, password: validatePassword(value) }));
+    }
+  };
+
+  const handleBlur = (field: "email" | "password") => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    if (field === "email") {
+      setValidationErrors((prev) => ({ ...prev, email: validateEmail(email) }));
+    } else {
+      setValidationErrors((prev) => ({ ...prev, password: validatePassword(password) }));
+    }
+  };
 
   if (isAuthenticated && user) {
     router.replace("/dashboard");
@@ -30,6 +74,15 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate all fields
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+    setValidationErrors({ email: emailError, password: passwordError });
+    setTouched({ email: true, password: true });
+
+    if (emailError || passwordError) return;
+
     setLoading(true);
 
     try {
@@ -44,7 +97,17 @@ export default function LoginPage() {
 
   return (
     <Container>
-      <Navbar />
+      {/* Simplified Auth Navbar */}
+      <div className="py-4 flex justify-between items-center">
+        <Link href="/" className="font-display text-2xl font-black">
+          LINKER
+        </Link>
+        <Link href="/register">
+          <RetroButton variant="outline" className="text-sm py-2 px-4">
+            Sign Up
+          </RetroButton>
+        </Link>
+      </div>
       <div className="min-h-[calc(100vh-100px)] flex items-center justify-center py-8 md:py-12">
         <div className="w-full max-w-5xl relative">
           {/* Floating Decor */}
@@ -142,12 +205,21 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    onBlur={() => handleBlur("email")}
+                    className={`w-full p-4 border-2 ${
+                      validationErrors.email && touched.email
+                        ? "border-red-500 bg-red-50"
+                        : "border-black bg-gray-50"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
                     placeholder="student@college.edu"
                     autoComplete="email"
-                    required
                   />
+                  {validationErrors.email && touched.email && (
+                    <p className="text-red-500 text-xs font-bold mt-1">
+                      {validationErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -169,12 +241,21 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
+                    onChange={(e) => handlePasswordChange(e.target.value)}
+                    onBlur={() => handleBlur("password")}
+                    className={`w-full p-4 border-2 ${
+                      validationErrors.password && touched.password
+                        ? "border-red-500 bg-red-50"
+                        : "border-black bg-gray-50"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    required
                   />
+                  {validationErrors.password && touched.password && (
+                    <p className="text-red-500 text-xs font-bold mt-1">
+                      {validationErrors.password}
+                    </p>
+                  )}
                 </div>
 
                 <RetroButton

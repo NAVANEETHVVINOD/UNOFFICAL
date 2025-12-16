@@ -7,4 +7,4 @@ import { ChatGateway } from './chat.gateway';
   controllers: [MessagesController],
   providers: [MessagesService, ChatGateway],
 })
-export class MessagesModule { }
+export class MessagesModule {}

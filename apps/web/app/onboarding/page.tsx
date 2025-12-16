@@ -67,9 +67,30 @@ export default function OnboardingPage() {
     name: "",
     city: "",
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Analytics: Duration Tracking
   const startTimeRef = useRef<number>(Date.now());
+
+  // Real-time validation functions
+  const validateField = (field: string, value: string) => {
+    let error = "";
+    switch (field) {
+      case "fullName":
+        if (!value.trim()) error = "Full name is required";
+        else if (value.trim().length < 2) error = "Name must be at least 2 characters";
+        break;
+      case "bio":
+        if (!value.trim()) error = "Bio is required";
+        else if (value.trim().length < 10) error = "Bio should be at least 10 characters";
+        break;
+      case "customCollegeName":
+        if (!value.trim()) error = "College name is required";
+        break;
+    }
+    setValidationErrors(prev => ({ ...prev, [field]: error }));
+    return !error;
+  };
 
   const fetchColleges = async () => {
     try {
@@ -207,6 +228,8 @@ export default function OnboardingPage() {
         }
         const duration = Date.now() - startTimeRef.current;
         logEvent("onboarding_completed", { duration_ms: duration });
+        // Set welcome flag for dashboard to show welcome toast
+        localStorage.setItem("showWelcome", "true");
         router.push("/dashboard");
       } else {
         setCurrentStep((prev) => prev + 1);
@@ -247,13 +270,19 @@ export default function OnboardingPage() {
               <input
                 type="text"
                 value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
-                className="w-full p-3 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all"
+                onChange={(e) => {
+                  setFormData({ ...formData, fullName: e.target.value });
+                  validateField("fullName", e.target.value);
+                }}
+                className={`w-full p-3 border-2 ${
+                  validationErrors.fullName ? "border-red-500 bg-red-50" : "border-black bg-gray-50"
+                } focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all`}
                 placeholder="John Doe"
                 autoFocus
               />
+              {validationErrors.fullName && (
+                <p className="text-red-500 text-xs font-bold mt-1">{validationErrors.fullName}</p>
+              )}
             </div>
             <div>
               <label className="block font-bold mb-2 uppercase text-sm tracking-wider">
@@ -279,13 +308,20 @@ export default function OnboardingPage() {
             </label>
             <textarea
               value={formData.bio}
-              onChange={(e) =>
-                setFormData({ ...formData, bio: e.target.value })
-              }
-              className="w-full p-3 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all h-32"
+              onChange={(e) => {
+                setFormData({ ...formData, bio: e.target.value });
+                validateField("bio", e.target.value);
+              }}
+              className={`w-full p-3 border-2 ${
+                validationErrors.bio ? "border-red-500 bg-red-50" : "border-black bg-gray-50"
+              } focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all h-32`}
               placeholder="I code, I coffee, I conquer..."
               autoFocus
             />
+            {validationErrors.bio && (
+              <p className="text-red-500 text-xs font-bold mt-1">{validationErrors.bio}</p>
+            )}
+            <p className="text-gray-400 text-xs mt-1">{formData.bio.length} characters</p>
           </div>
         );
       case 2: // Socials

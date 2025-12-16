@@ -139,10 +139,13 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       setLoading(true);
       try {
         // Parallel search across different endpoints
-        const [eventsData, listingsData, clubsData] = await Promise.allSettled([
+        const [eventsData, listingsData, clubsData, usersData] = await Promise.allSettled([
           api.getEvents(),
           api.getMarketplaceListings(searchQuery),
           api.getClubs(),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/users/search?q=${encodeURIComponent(searchQuery)}`)
+            .then(r => r.ok ? r.json() : [])
+            .catch(() => []),
         ]);
 
         const q = searchQuery.toLowerCase();
@@ -198,8 +201,31 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             });
         }
 
+        // Filter users - show name, college, and mutual connections
+        const users: SearchResult[] = [];
+        if (usersData.status === "fulfilled" && Array.isArray(usersData.value)) {
+          usersData.value
+            .slice(0, 5)
+            .forEach((u: any) => {
+              const collegeName = u.profile?.college?.name || u.college?.name || "";
+              const mutualCount = u.mutualConnections || 0;
+              let subtitle = collegeName;
+              if (mutualCount > 0) {
+                subtitle += subtitle ? ` • ${mutualCount} mutual` : `${mutualCount} mutual connections`;
+              }
+              users.push({
+                id: u.id,
+                type: "user",
+                title: u.profile?.fullName || u.fullName || u.email || "Unknown User",
+                subtitle: subtitle || undefined,
+                imageUrl: u.profile?.avatarUrl || u.avatarUrl,
+                url: `/profile/${u.id}`,
+              });
+            });
+        }
+
         setResults({
-          users: [],
+          users,
           events,
           listings,
           clubs,
@@ -283,6 +309,18 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               </div>
             )}
 
+            {/* Users */}
+            {results.users.length > 0 && (
+              <ResultSection
+                title="People"
+                results={results.users}
+                startIndex={currentIndex}
+                selectedIndex={selectedIndex}
+                onSelect={navigateToResult}
+              />
+            )}
+            {(currentIndex += results.users.length) && null}
+
             {/* Events */}
             {results.events.length > 0 && (
               <ResultSection
@@ -352,9 +390,22 @@ function ResultSection({ title, results, startIndex, selectedIndex, onSelect }: 
             }`}
             whileHover={{ x: 4 }}
           >
-            <div className={`w-10 h-10 ${colorClass} rounded-lg flex items-center justify-center text-white`}>
-              <Icon className="w-5 h-5" />
-            </div>
+            {/* Show avatar for users, icon for others */}
+            {result.type === "user" && result.imageUrl ? (
+              <img
+                src={result.imageUrl}
+                alt={result.title}
+                className="w-10 h-10 rounded-full object-cover border-2 border-black"
+              />
+            ) : result.type === "user" ? (
+              <div className={`w-10 h-10 ${colorClass} rounded-full flex items-center justify-center text-white font-bold border-2 border-black`}>
+                {result.title.charAt(0).toUpperCase()}
+              </div>
+            ) : (
+              <div className={`w-10 h-10 ${colorClass} rounded-lg flex items-center justify-center text-white`}>
+                <Icon className="w-5 h-5" />
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="font-bold truncate">{result.title}</p>
               {result.subtitle && (

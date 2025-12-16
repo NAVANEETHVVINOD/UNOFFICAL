@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "../../lib/api";
@@ -14,7 +14,12 @@ import {
   Sticker,
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
-import Navbar from "../components/Navbar";
+
+interface ValidationErrors {
+  fullName?: string;
+  email?: string;
+  password?: string;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -32,17 +37,67 @@ export default function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [touched, setTouched] = useState<{ fullName: boolean; email: boolean; password: boolean }>({
+    fullName: false,
+    email: false,
+    password: false,
+  });
+
+  const validateFullName = useCallback((value: string): string | undefined => {
+    if (!value.trim()) return "Full name is required";
+    if (value.trim().length < 2) return "Name must be at least 2 characters";
+    return undefined;
+  }, []);
+
+  const validateEmail = useCallback((value: string): string | undefined => {
+    if (!value.trim()) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "Invalid email format";
+    return undefined;
+  }, []);
+
+  const validatePassword = useCallback((value: string): string | undefined => {
+    if (!value) return "Password is required";
+    if (value.length < 8) return "Password must be at least 8 characters";
+    return undefined;
+  }, []);
+
+  const handleFieldChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (touched[field]) {
+      let error: string | undefined;
+      if (field === "fullName") error = validateFullName(value);
+      else if (field === "email") error = validateEmail(value);
+      else if (field === "password") error = validatePassword(value);
+      setValidationErrors((prev) => ({ ...prev, [field]: error }));
+    }
+  };
+
+  const handleBlur = (field: keyof typeof formData) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    let error: string | undefined;
+    if (field === "fullName") error = validateFullName(formData.fullName);
+    else if (field === "email") error = validateEmail(formData.email);
+    else if (field === "password") error = validatePassword(formData.password);
+    setValidationErrors((prev) => ({ ...prev, [field]: error }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate all fields
+    const fullNameError = validateFullName(formData.fullName);
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    setValidationErrors({ fullName: fullNameError, email: emailError, password: passwordError });
+    setTouched({ fullName: true, email: true, password: true });
+
+    if (fullNameError || emailError || passwordError) return;
+
     setLoading(true);
 
     try {
-      if (formData.password.length < 8) {
-        throw new Error("Password must be at least 8 characters long");
-      }
-
       // Register using Supabase (via AuthContext)
       await register(
         formData.email.trim(),
@@ -62,7 +117,17 @@ export default function RegisterPage() {
 
   return (
     <Container>
-      <Navbar />
+      {/* Simplified Auth Navbar */}
+      <div className="py-4 flex justify-between items-center">
+        <Link href="/" className="font-display text-2xl font-black">
+          LINKER
+        </Link>
+        <Link href="/login">
+          <RetroButton variant="outline" className="text-sm py-2 px-4">
+            Login
+          </RetroButton>
+        </Link>
+      </div>
       <div className="min-h-[calc(100vh-100px)] flex items-center justify-center py-8 md:py-12">
         <div className="w-full max-w-5xl relative">
           {/* Floating Decor */}
@@ -127,13 +192,13 @@ export default function RegisterPage() {
             </div>
 
             {/* RIGHT SIDE: Form */}
-            <div className="p-8 md:p-16 bg-white relative flex flex-col justify-center order-last md:order-first">
+            <div className="p-6 md:p-10 bg-white relative flex flex-col justify-center order-last md:order-first">
               <Tape className="absolute -top-3 left-1/2 -translate-x-1/2 -rotate-1" />
               <Sticker className="absolute top-4 left-4 bg-accent-yellow text-black -rotate-6 hidden md:block">
                 FREE
               </Sticker>
 
-              <div className="mb-8">
+              <div className="mb-6">
                 <h2 className="font-bold text-2xl mb-1">Create Account</h2>
                 <p className="text-gray-500 text-sm">
                   Join thousands of students on Linker.
@@ -146,8 +211,8 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1">
                   <label
                     htmlFor="fullName"
                     className="font-bold text-xs uppercase tracking-wider text-gray-700"
@@ -158,17 +223,24 @@ export default function RegisterPage() {
                     id="fullName"
                     type="text"
                     value={formData.fullName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fullName: e.target.value })
-                    }
-                    className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
+                    onChange={(e) => handleFieldChange("fullName", e.target.value)}
+                    onBlur={() => handleBlur("fullName")}
+                    className={`w-full p-3 border-2 ${
+                      validationErrors.fullName && touched.fullName
+                        ? "border-red-500 bg-red-50"
+                        : "border-black bg-gray-50"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
                     placeholder="John Doe"
                     autoComplete="name"
-                    required
                   />
+                  {validationErrors.fullName && touched.fullName && (
+                    <p className="text-red-500 text-xs font-bold mt-1">
+                      {validationErrors.fullName}
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label
                     htmlFor="email"
                     className="font-bold text-xs uppercase tracking-wider text-gray-700"
@@ -179,17 +251,24 @@ export default function RegisterPage() {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
+                    onChange={(e) => handleFieldChange("email", e.target.value)}
+                    onBlur={() => handleBlur("email")}
+                    className={`w-full p-3 border-2 ${
+                      validationErrors.email && touched.email
+                        ? "border-red-500 bg-red-50"
+                        : "border-black bg-gray-50"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
                     placeholder="student@college.edu"
                     autoComplete="email"
-                    required
                   />
+                  {validationErrors.email && touched.email && (
+                    <p className="text-red-500 text-xs font-bold mt-1">
+                      {validationErrors.email}
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label
                     htmlFor="password"
                     className="font-bold text-xs uppercase tracking-wider text-gray-700"
@@ -200,25 +279,32 @@ export default function RegisterPage() {
                     id="password"
                     type="password"
                     value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="w-full p-4 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium"
+                    onChange={(e) => handleFieldChange("password", e.target.value)}
+                    onBlur={() => handleBlur("password")}
+                    className={`w-full p-3 border-2 ${
+                      validationErrors.password && touched.password
+                        ? "border-red-500 bg-red-50"
+                        : "border-black bg-gray-50"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    required
                   />
+                  {validationErrors.password && touched.password && (
+                    <p className="text-red-500 text-xs font-bold mt-1">
+                      {validationErrors.password}
+                    </p>
+                  )}
                 </div>
 
                 <RetroButton
                   type="submit"
-                  className="w-full py-4 text-lg mt-4 bg-accent-green text-black hover:bg-green-400"
+                  className="w-full py-3 text-base mt-3 bg-accent-green text-black hover:bg-green-400"
                   disabled={loading}
                 >
                   {loading ? "CREATING PROFILE..." : "START ONBOARDING ->"}
                 </RetroButton>
 
-                <div className="relative my-4">
+                <div className="relative my-3">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-gray-300" />
                   </div>
@@ -232,7 +318,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => loginWithGoogle()}
-                  className="w-full py-4 border-2 border-black bg-white hover:bg-gray-50 transition-colors rounded-lg font-bold flex items-center justify-center gap-3"
+                  className="w-full py-3 border-2 border-black bg-white hover:bg-gray-50 transition-colors rounded-lg font-bold flex items-center justify-center gap-3"
                   disabled={loading}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -245,7 +331,7 @@ export default function RegisterPage() {
                 </button>
               </form>
 
-              <div className="mt-8 pt-8 border-t border-gray-100 text-center">
+              <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                 <p className="text-sm text-gray-600">
                   Already have an account?{" "}
                   <Link

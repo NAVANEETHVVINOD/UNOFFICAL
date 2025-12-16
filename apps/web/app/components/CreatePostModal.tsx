@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { X, Image as ImageIcon, Smile, BarChart2, Calendar, ShoppingBag, Paperclip, Loader2, Users, Flag } from "lucide-react";
+import { X, Image as ImageIcon, Smile, BarChart2, Calendar, ShoppingBag, Paperclip, Loader2, Users, Flag, EyeOff, AlertTriangle } from "lucide-react";
 import { RetroButton } from "./ui/NewspaperUI";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -49,6 +49,10 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
         resolver: zodResolver(postSchema)
     });
 
+    // Anonymous posting
+    const [isAnonymous, setIsAnonymous] = useState(false);
+    const [showAnonWarning, setShowAnonWarning] = useState(false);
+
     // Poll State (Simple controlled for now due to dynamic inputs complexity in quick prototype)
     const [pollQuestion, setPollQuestion] = useState("");
     const [pollOptions, setPollOptions] = useState(["", ""]);
@@ -84,7 +88,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
                 content: data.content,
                 image: imageUrl,
                 type: 'post',
-                collegeSlug: user?.profile?.college?.slug // Assuming context has this
+                collegeSlug: user?.profile?.college?.slug, // Assuming context has this
+                isAnonymous: isAnonymous,
             });
 
             toast("Chaos unleashed! 🚀", "success");
@@ -174,6 +179,67 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, initia
                                 className="w-full h-40 resize-none border-2 border-dashed border-gray-300 p-4 font-body text-lg focus:outline-none focus:border-black focus:bg-yellow-50/20 rounded-xl transition-all placeholder:text-gray-300"
                             ></textarea>
                             {postErrors.content && <p className="text-red-500 font-mono text-xs">{postErrors.content.message}</p>}
+
+                            {/* Anonymous Toggle */}
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (!isAnonymous) {
+                                            setShowAnonWarning(true);
+                                        } else {
+                                            setIsAnonymous(false);
+                                        }
+                                    }}
+                                    className={`flex items-center gap-2 px-3 py-2 border-2 transition-all ${
+                                        isAnonymous 
+                                            ? "border-purple-500 bg-purple-50 text-purple-700" 
+                                            : "border-gray-300 hover:border-gray-400"
+                                    }`}
+                                >
+                                    <EyeOff className="w-4 h-4" />
+                                    <span className="font-bold text-sm">Post Anonymously</span>
+                                </button>
+                                {isAnonymous && (
+                                    <span className="text-xs font-mono text-purple-600">
+                                        Your identity will be hidden
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Anonymous Warning Modal */}
+                            {showAnonWarning && (
+                                <div className="bg-yellow-50 border-2 border-yellow-400 p-4 rounded-lg">
+                                    <div className="flex items-start gap-3">
+                                        <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-yellow-800 mb-1">Community Guidelines</h4>
+                                            <p className="text-sm text-yellow-700 mb-3">
+                                                Anonymous posts are still subject to community guidelines. 
+                                                Harassment, hate speech, or illegal content may result in your 
+                                                identity being revealed to moderators.
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setIsAnonymous(true);
+                                                        setShowAnonWarning(false);
+                                                    }}
+                                                    className="px-3 py-1 bg-purple-600 text-white text-sm font-bold border-2 border-purple-700"
+                                                >
+                                                    I Understand
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowAnonWarning(false)}
+                                                    className="px-3 py-1 bg-white text-sm font-bold border-2 border-gray-300"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* File Preview */}
                             {file && (

@@ -1,210 +1,258 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications, formatNotificationTime, NOTIFICATION_ICONS } from "../context/NotificationContext";
-import { useState, useRef, useEffect } from "react";
-import { Bell, User, Search, Check } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Bell, User, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import TiltedTicker from "./ui/TiltedTicker";
 import GlobalSearch from "./GlobalSearch";
-import { dropdownVariants, iconButtonVariants, badgePulseVariants } from "../../lib/animations";
 
 export default function Navbar() {
-    const { user } = useAuth();
-    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const notificationRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { user } = useAuth();
+  const { filteredNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                setIsNotificationOpen(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  // Handle notification click
+  const handleNotificationClick = useCallback(async (notificationId: string, actionUrl?: string) => {
+    await markAsRead(notificationId);
+    setIsNotificationOpen(false);
+    if (actionUrl) {
+      router.push(actionUrl);
+    }
+  }, [markAsRead, router]);
 
-    // Keyboard shortcut for search (Cmd/Ctrl + K)
-    useEffect(() => {
-        function handleKeyDown(event: KeyboardEvent) {
-            if ((event.metaKey || event.ctrlKey) && event.key === "k") {
-                event.preventDefault();
-                setIsSearchOpen(true);
-            }
-        }
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, []);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setIsNotificationOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    return (
-        <header className="sticky top-0 z-50 bg-paper flex flex-col relative shadow-neo-lg transition-all">
-            {/* Top Bar */}
-            <div className="h-16 flex items-center justify-between px-4 lg:px-8 relative z-20 bg-paper border-b-2 border-black">
-                {/* Logo */}
-                <Link href="/dashboard" className="flex items-center gap-2 group">
-                    <motion.div
-                        className="w-10 h-10 bg-accent-yellow border-2 border-black flex items-center justify-center font-black text-xl shadow-neo-sm"
-                        whileHover={{ rotate: 12, scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        L
-                    </motion.div>
-                    <span className="font-display font-black text-2xl tracking-tight hidden md:block">
-                        LINKER
-                    </span>
-                </Link>
+  // Keyboard shortcut for search
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+        event.preventDefault();
+        setIsSearchOpen(true);
+      }
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+        setIsNotificationOpen(false);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
-                {/* Right Actions */}
-                <div className="flex items-center gap-3">
-                    {/* Search Button */}
-                    <motion.button
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2"
-                        variants={iconButtonVariants}
-                        initial="rest"
-                        whileHover="hover"
-                        whileTap="tap"
-                        onClick={() => setIsSearchOpen(true)}
-                        aria-label="Search"
-                    >
-                        <Search className="w-5 h-5" />
-                        <span className="hidden md:flex items-center gap-1 text-xs text-gray-400 font-mono">
-                            <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">⌘K</kbd>
+  return (
+    <header className="sticky top-0 z-50 bg-white border-b-2 border-ink">
+      <div className="max-w-[1400px] mx-auto">
+        {/* Main Navbar */}
+        <div className="h-16 flex items-center justify-between px-4 lg:px-6">
+          {/* Logo */}
+          <Link href="/dashboard" className="flex items-center gap-3 group">
+            <motion.div
+              className="w-10 h-10 bg-primary border-2 border-ink flex items-center justify-center font-display font-black text-xl shadow-neo-sm"
+              whileHover={{ rotate: -6, scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              L
+            </motion.div>
+            <div className="hidden sm:block">
+              <span className="font-display font-black text-2xl tracking-tight text-ink">
+                LINKER
+              </span>
+              <span className="hidden md:inline text-xs text-neutral-500 ml-2 font-mono">
+                beta
+              </span>
+            </div>
+          </Link>
+
+          {/* Center - Search (Desktop) */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl hover:border-ink hover:bg-white transition-all group"
+            >
+              <Search className="w-4 h-4 text-neutral-400 group-hover:text-ink" />
+              <span className="text-sm text-neutral-500 group-hover:text-neutral-700">
+                Search anything...
+              </span>
+              <kbd className="ml-auto px-2 py-0.5 bg-white border border-neutral-200 rounded text-[10px] font-mono text-neutral-400">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+            {/* Mobile Search */}
+            <motion.button
+              className="md:hidden p-2.5 hover:bg-neutral-100 rounded-xl transition-colors"
+              onClick={() => setIsSearchOpen(true)}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Search className="w-5 h-5" />
+            </motion.button>
+
+            {/* Notifications */}
+            <div className="relative" ref={notificationRef}>
+              <motion.button
+                className="relative p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <motion.span
+                    className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-accent-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500 }}
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </motion.span>
+                )}
+              </motion.button>
+
+              {/* Notification Dropdown */}
+              <AnimatePresence>
+                {isNotificationOpen && (
+                  <motion.div
+                    className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border-2 border-ink shadow-neo-lg z-50 rounded-xl overflow-hidden"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    {/* Header */}
+                    <div className="p-4 border-b-2 border-ink bg-primary/10 flex justify-between items-center">
+                      <h4 className="font-display font-bold text-sm uppercase">
+                        Notifications
+                      </h4>
+                      {unreadCount > 0 && (
+                        <span className="px-2 py-1 bg-ink text-white text-xs font-bold rounded-full">
+                          {unreadCount} New
                         </span>
-                    </motion.button>
-
-                    {/* Notifications */}
-                    <div className="relative" ref={notificationRef}>
-                        <motion.button
-                            className="relative p-2 hover:bg-yellow-50 rounded-full transition-colors"
-                            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                            variants={iconButtonVariants}
-                            initial="rest"
-                            whileHover="hover"
-                            whileTap="tap"
-                            aria-label="Notifications"
-                        >
-                            <Bell className="w-6 h-6" />
-                            {unreadCount > 0 && (
-                                <motion.span
-                                    className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white"
-                                    variants={badgePulseVariants}
-                                    animate="animate"
-                                >
-                                    {unreadCount}
-                                </motion.span>
+                      )}
+                    </div>
+                    
+                    {/* Notifications List */}
+                    <div className="max-h-80 overflow-y-auto scrollbar-thin">
+                      {filteredNotifications.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <div className="w-12 h-12 mx-auto mb-3 bg-neutral-100 rounded-xl flex items-center justify-center">
+                            <Bell className="w-6 h-6 text-neutral-400" />
+                          </div>
+                          <p className="text-sm text-neutral-500">No notifications yet</p>
+                        </div>
+                      ) : (
+                        filteredNotifications.map((notification) => (
+                          <motion.div
+                            key={notification.id}
+                            className={`p-4 border-b border-neutral-100 hover:bg-primary/5 cursor-pointer flex gap-3 ${
+                              !notification.read ? "bg-accent-blue/5" : ""
+                            }`}
+                            onClick={() => handleNotificationClick(notification.id, notification.actionUrl)}
+                            whileHover={{ x: 4 }}
+                          >
+                            <div className="w-10 h-10 flex items-center justify-center text-xl flex-shrink-0 bg-neutral-100 rounded-lg">
+                              {NOTIFICATION_ICONS[notification.type] || "🔔"}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium leading-tight text-ink">
+                                {notification.title}
+                              </p>
+                              <p className="text-sm text-neutral-600 leading-tight line-clamp-2 mt-0.5">
+                                {notification.message}
+                              </p>
+                              <span className="text-[10px] text-neutral-400 font-mono mt-1 block">
+                                {formatNotificationTime(notification.createdAt)}
+                              </span>
+                            </div>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-accent-coral rounded-full flex-shrink-0 mt-2" />
                             )}
-                        </motion.button>
-
-                        {/* Notification Dropdown */}
-                        <AnimatePresence>
-                            {isNotificationOpen && (
-                                <motion.div
-                                    className="absolute right-0 top-full mt-2 w-80 bg-white border-2 border-black shadow-neo-lg z-50 overflow-hidden"
-                                    variants={dropdownVariants}
-                                    initial="hidden"
-                                    animate="visible"
-                                    exit="exit"
-                                >
-                                    <div className="p-3 border-b-2 border-black bg-gray-50 flex justify-between items-center">
-                                        <h4 className="font-bold font-display uppercase text-sm">Notifications</h4>
-                                        {unreadCount > 0 && (
-                                            <span className="text-xs bg-black text-white px-2 py-0.5 rounded-full">
-                                                {unreadCount} New
-                                            </span>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="max-h-72 overflow-y-auto">
-                                        {notifications.length === 0 ? (
-                                            <div className="p-6 text-center text-gray-400">
-                                                <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                                                <p className="text-sm">No notifications yet</p>
-                                            </div>
-                                        ) : (
-                                            notifications.map((notification) => (
-                                                <motion.div
-                                                    key={notification.id}
-                                                    className={`p-3 border-b border-gray-100 hover:bg-yellow-50/50 cursor-pointer flex gap-3 ${
-                                                        !notification.read ? "bg-blue-50/30" : ""
-                                                    }`}
-                                                    onClick={() => markAsRead(notification.id)}
-                                                    whileHover={{ x: 4 }}
-                                                >
-                                                    <div className="w-8 h-8 flex items-center justify-center text-lg flex-shrink-0">
-                                                        {NOTIFICATION_ICONS[notification.type] || "🔔"}
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm leading-tight line-clamp-2">
-                                                            {notification.message}
-                                                        </p>
-                                                        <span className="text-[10px] text-gray-400 font-mono">
-                                                            {formatNotificationTime(notification.createdAt)}
-                                                        </span>
-                                                    </div>
-                                                    {!notification.read && (
-                                                        <button
-                                                            className="p-1 hover:bg-gray-200 rounded"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                markAsRead(notification.id);
-                                                            }}
-                                                        >
-                                                            <Check className="w-3 h-3" />
-                                                        </button>
-                                                    )}
-                                                </motion.div>
-                                            ))
-                                        )}
-                                    </div>
-
-                                    {notifications.length > 0 && (
-                                        <button
-                                            className="w-full p-2 text-center border-t-2 border-black bg-gray-50 hover:bg-gray-100 transition-colors"
-                                            onClick={markAllAsRead}
-                                        >
-                                            <span className="text-xs font-bold uppercase tracking-wider">
-                                                Mark all as read
-                                            </span>
-                                        </button>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                          </motion.div>
+                        ))
+                      )}
                     </div>
 
-                    {/* Profile */}
-                    <Link href="/profile">
-                        <motion.div
-                            className="w-10 h-10 bg-gray-200 rounded-full border-2 border-black overflow-hidden cursor-pointer"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {user?.profile?.avatarUrl ? (
-                                <img
-                                    src={user.profile.avatarUrl}
-                                    alt="Profile"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full bg-accent-blue/20 flex items-center justify-center">
-                                    <User className="w-5 h-5 text-black/50" />
-                                </div>
-                            )}
-                        </motion.div>
-                    </Link>
-                </div>
+                    {/* Footer */}
+                    {filteredNotifications.length > 0 && (
+                      <button
+                        className="w-full p-3 text-center border-t-2 border-ink bg-neutral-50 hover:bg-neutral-100 transition-colors"
+                        onClick={markAllAsRead}
+                      >
+                        <span className="text-xs font-bold uppercase tracking-wider">
+                          Mark all as read
+                        </span>
+                      </button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Tilted Ticker */}
-            <TiltedTicker />
+            {/* Profile */}
+            <Link href="/profile">
+              <motion.div
+                className="w-10 h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
+                whileHover={{ scale: 1.05, rotate: -3 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {user?.profile?.avatarUrl ? (
+                  <img
+                    src={user.profile.avatarUrl}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-primary/20 flex items-center justify-center">
+                    <User className="w-5 h-5 text-ink/50" />
+                  </div>
+                )}
+              </motion.div>
+            </Link>
+          </div>
+        </div>
 
-            {/* Global Search Modal */}
-            <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-        </header>
-    );
+        {/* Announcement Bar (Optional) */}
+        <div className="hidden sm:block bg-primary border-t-2 border-ink">
+          <div className="overflow-hidden">
+            <motion.div
+              className="flex items-center gap-8 py-1.5 px-4 whitespace-nowrap"
+              animate={{ x: [0, -1000] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              {[
+                "🎉 Welcome to LINKER - Your Campus Social Hub",
+                "📚 Share notes and help your peers",
+                "🎪 Check out upcoming campus events",
+                "💬 Connect with students from your college",
+                "🛒 Buy & sell in the marketplace",
+              ].map((text, i) => (
+                <span key={i} className="text-xs font-medium text-ink">
+                  {text}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Global Search Modal */}
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+    </header>
+  );
 }
-

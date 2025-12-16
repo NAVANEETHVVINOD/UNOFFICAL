@@ -31,12 +31,11 @@ export default function CreateEventPage({ params }: PageProps) {
     scope: "COLLEGE", // Default to college scope
   });
 
-  if (
-    !authLoading &&
-    user?.role !== "COLLEGE_ADMIN" &&
-    user?.role !== "CLUB_ADMIN" &&
-    user?.role !== "PLATFORM_ADMIN"
-  ) {
+  // Students can suggest events (pending approval), admins can create directly
+  const isAdmin = user?.role === "COLLEGE_ADMIN" || user?.role === "CLUB_ADMIN" || user?.role === "PLATFORM_ADMIN";
+  const canSuggestEvent = user?.role === "STUDENT" || isAdmin;
+
+  if (!authLoading && !canSuggestEvent) {
     router.replace(`/colleges/${slug}/events`);
     return null;
   }
@@ -46,10 +45,11 @@ export default function CreateEventPage({ params }: PageProps) {
     setLoading(true);
 
     try {
-      // In a real app, we would pass the collegeSlug to the API
+      // Students submit events as PENDING, admins create as APPROVED
       await api.createEvent({
         ...formData,
         collegeSlug: slug,
+        status: isAdmin ? "APPROVED" : "PENDING",
       });
       router.push(`/colleges/${slug}/events`);
     } catch (error) {
@@ -68,15 +68,20 @@ export default function CreateEventPage({ params }: PageProps) {
 
           <div className="text-center mb-8">
             <Badge className="mb-2 bg-accent-yellow text-black border-black">
-              NEW EVENT
+              {isAdmin ? "NEW EVENT" : "SUGGEST EVENT"}
             </Badge>
             <h1 className="font-display text-4xl font-black">
-              SUBMIT AN EVENT
+              {isAdmin ? "CREATE AN EVENT" : "SUGGEST AN EVENT"}
             </h1>
             <p className="font-serif text-gray-600 mt-2">
               Got something cool planned for{" "}
               {slug.replace(/-/g, " ").toUpperCase()}?
             </p>
+            {!isAdmin && (
+              <p className="text-sm text-amber-600 mt-2 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                ⚠️ Your event will be submitted for College Admin approval
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -174,7 +179,7 @@ export default function CreateEventPage({ params }: PageProps) {
                 className="flex-1 bg-black text-white hover:bg-accent-green hover:text-black"
                 disabled={loading}
               >
-                {loading ? "SUBMITTING..." : "CREATE EVENT"}
+                {loading ? "SUBMITTING..." : isAdmin ? "CREATE EVENT" : "SUBMIT FOR APPROVAL"}
               </RetroButton>
             </div>
           </form>

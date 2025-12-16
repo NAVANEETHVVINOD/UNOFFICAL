@@ -2,12 +2,16 @@
 > @college-connect/web@0.1.0 test
 > vitest
 
-'vitest' is not recognized as an internal or external command,
-operable program or batch file.
-npm error Lifecycle script `test` failed with error:
-npm error code 1
-npm error path F:\kannan\projects\unoffical\apps\web
-npm error workspace @college-connect/web@0.1.0
-npm error location F:\kannan\projects\unoffical\apps\web
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vitest
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90mF:/kannan/projects/unoffical/apps/web[39m
+
+ [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 228[2mms[22m[39m
+ [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 374[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m28 passed[39m[22m[90m (28)[39m
+[2m   Start at [22m 00:14:35
+[2m   Duration [22m 11.60s[2m (transform 739ms, setup 2.21s, import 4.76s, tests 677ms, environment 12.66s)[22m
+

@@ -152,9 +152,17 @@ export const api = {
   // Colleges
   getColleges: () => apiRequest("/colleges"),
 
+  getCollege: (id: string) => apiRequest(`/colleges/id/${id}`),
+
   getCollegeBySlug: (slug: string) => apiRequest(`/colleges/${slug}`),
 
   getCollegeStats: (slug: string) => apiRequest(`/colleges/${slug}/stats`),
+  
+  updateCollege: (id: string, data: any) =>
+    apiRequest(`/colleges/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 
   // Clubs
   getClubs: (collegeSlug?: string) => {
@@ -170,10 +178,27 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  updateClub: (id: string, data: any) =>
+    apiRequest(`/clubs/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
   joinClub: (id: string) => apiRequest(`/clubs/${id}/join`, { method: "POST" }),
 
   leaveClub: (id: string) =>
     apiRequest(`/clubs/${id}/leave`, { method: "POST" }),
+  
+  getClubMembers: (id: string) => apiRequest(`/clubs/${id}/members`),
+  
+  updateClubMember: (clubId: string, userId: string, data: { role: string }) =>
+    apiRequest(`/clubs/${clubId}/members/${userId}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  
+  removeClubMember: (clubId: string, userId: string) =>
+    apiRequest(`/clubs/${clubId}/members/${userId}`, { method: "DELETE" }),
 
   // Events
   getEvents: (collegeSlug?: string, cursor?: string, limit?: number) => {
@@ -309,6 +334,94 @@ export const api = {
 
   markAsSeen: (conversationId: string) =>
     apiRequest(`/messages/${conversationId}/seen`, { method: "PATCH" }),
+
+  // User Activity
+  getUserPosts: (userId: string) => apiRequest(`/users/${userId}/posts`),
+  
+  getUserEvents: (userId: string) => apiRequest(`/users/${userId}/events`),
+  
+  getUserClubs: (userId: string) => apiRequest(`/users/${userId}/clubs`),
+
+  // Notifications
+  getNotifications: () => apiRequest("/notifications"),
+  
+  markNotificationAsRead: (id: string) =>
+    apiRequest(`/notifications/${id}/read`, { method: "PATCH" }),
+  
+  markAllNotificationsAsRead: () =>
+    apiRequest("/notifications/read-all", { method: "PATCH" }),
+
+  // Admin - College Admin
+  getPendingEvents: () => apiRequest("/admin/events/pending"),
+  
+  getReports: () => apiRequest("/admin/reports"),
+  
+  approveEvent: (eventId: string) =>
+    apiRequest(`/admin/events/${eventId}/approve`, { method: "POST" }),
+  
+  rejectEvent: (eventId: string, reason?: string) =>
+    apiRequest(`/admin/events/${eventId}/reject`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+  
+  dismissReport: (reportId: string) =>
+    apiRequest(`/admin/reports/${reportId}/dismiss`, { method: "POST" }),
+  
+  hideContent: (reportId: string) =>
+    apiRequest(`/admin/reports/${reportId}/hide`, { method: "POST" }),
+  
+  resolveReport: (reportId: string, action: string) =>
+    apiRequest(`/admin/reports/${reportId}/resolve`, {
+      method: "POST",
+      body: JSON.stringify({ action }),
+    }),
+  
+  createReport: (data: { targetType: string; targetId: string; reason: string; description?: string }) =>
+    apiRequest("/reports", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  // User Blocking
+  getBlockedUsers: () => apiRequest("/users/blocked"),
+  
+  blockUser: (userId: string) =>
+    apiRequest(`/users/${userId}/block`, { method: "POST" }),
+  
+  unblockUser: (userId: string) =>
+    apiRequest(`/users/${userId}/block`, { method: "DELETE" }),
+
+  // Admin - Platform Admin
+  getAllUsers: () => apiRequest("/admin/users"),
+  
+  updateUserRole: (userId: string, role: string) =>
+    apiRequest(`/admin/users/${userId}/role`, {
+      method: "PATCH",
+      body: JSON.stringify({ role }),
+    }),
+  
+  banUser: (userId: string, ban: boolean, reason?: string) =>
+    apiRequest(`/admin/users/${userId}/${ban ? 'ban' : 'unban'}`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+  
+  getPlatformStats: () => apiRequest("/admin/stats"),
+  
+  getFeatureFlags: () => apiRequest("/admin/feature-flags"),
+  
+  updateFeatureFlag: (flag: string, enabled: boolean) =>
+    apiRequest(`/admin/feature-flags/${flag}`, {
+      method: "PATCH",
+      body: JSON.stringify({ enabled }),
+    }),
+  
+  createAnnouncement: (data: { title: string; message: string }) =>
+    apiRequest("/admin/announcements", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 
   // Upload
   uploadFile: async (file: File) => {

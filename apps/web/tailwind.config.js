@@ -5,20 +5,51 @@ module.exports = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: 'class', // Enable class-based dark mode for CRT
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        ink: "#1a1a1a",
-        paper: "#f7f1e3",
-        retroAccent: "#d66b33",
+        // Core Retro Palette
+        ink: "#0a0a0a",
+        paper: "#ffffff",
+        // Primary Yellow - The star of the show
+        primary: {
+          DEFAULT: "#FFEB3B",
+          50: "#FFFDE7",
+          100: "#FFF9C4",
+          200: "#FFF59D",
+          300: "#FFF176",
+          400: "#FFEE58",
+          500: "#FFEB3B",
+          600: "#FDD835",
+          700: "#FBC02D",
+          800: "#F9A825",
+          900: "#F57F17",
+        },
+        // Accent Colors
         accent: {
-          yellow: "#FFC567", // Senior UI Spec
-          pink: "#FB7DA8",   // Senior UI Spec
-          blue: "#058CD7",   // Senior UI Spec
-          green: "#00995E",  // Senior UI Spec
-          purple: "#552CB7", // Senior UI Spec
-          red: "#FD5A46",    // Senior UI Spec
+          yellow: "#FFEB3B",
+          coral: "#FF6B6B",
+          mint: "#4ECDC4",
+          blue: "#45B7D1",
+          purple: "#9B59B6",
+          pink: "#FF69B4",
+          orange: "#FF8C42",
+          green: "#2ECC71",
+          red: "#E74C3C",
+        },
+        // Neutral grays
+        neutral: {
+          50: "#FAFAFA",
+          100: "#F5F5F5",
+          200: "#EEEEEE",
+          300: "#E0E0E0",
+          400: "#BDBDBD",
+          500: "#9E9E9E",
+          600: "#757575",
+          700: "#616161",
+          800: "#424242",
+          900: "#212121",
         },
         crt: {
           green: "#00ff41",
@@ -26,22 +57,40 @@ module.exports = {
         }
       },
       fontFamily: {
-        display: ["'Nano Banan Pro'", "'Outfit'", "sans-serif"], // Updated Header Font
+        display: ["'Outfit'", "system-ui", "sans-serif"],
         body: ["'Outfit'", "sans-serif"],
         pixel: ["'VT323'", "monospace"],
         serif: ["'Playfair Display'", "serif"],
         hand: ["'Caveat'", "cursive"],
         marker: ["'Permanent Marker'", "cursive"],
+        mono: ["'JetBrains Mono'", "'VT323'", "monospace"],
       },
       boxShadow: {
-        neo: "4px 4px 0px 0px rgba(0,0,0,1)",
-        "neo-lg": "6px 6px 0px 0px rgba(0,0,0,1)",
-        "neo-sm": "2px 2px 0px 0px rgba(0,0,0,1)",
-        soft: "0px 4px 8px rgba(0,0,0,0.08)",
+        // Neo-brutalist shadows
+        neo: "4px 4px 0px 0px #0a0a0a",
+        "neo-lg": "6px 6px 0px 0px #0a0a0a",
+        "neo-xl": "8px 8px 0px 0px #0a0a0a",
+        "neo-sm": "2px 2px 0px 0px #0a0a0a",
+        // Yellow accent shadows
+        "neo-yellow": "4px 4px 0px 0px #FFEB3B",
+        "neo-yellow-lg": "6px 6px 0px 0px #FFEB3B",
+        // Soft shadows for cards
+        soft: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        "soft-lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+        // Glow effects
+        "glow-yellow": "0 0 20px rgba(255, 235, 59, 0.5)",
+        "glow-white": "0 0 20px rgba(255, 255, 255, 0.5)",
       },
       borderWidth: {
         thick: "4px",
         card: "3px",
+        DEFAULT: "2px",
+      },
+      borderRadius: {
+        'retro': '0px',
+        'retro-sm': '4px',
+        'retro-md': '8px',
+        'retro-lg': '12px',
       },
       zIndex: {
         navbar: "50",
@@ -50,18 +99,35 @@ module.exports = {
         tickers: "30",
         feed: "20",
         cards: "20",
+        modal: "100",
+        toast: "110",
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
       },
       animation: {
         float: "float 4s ease-in-out infinite",
+        "float-slow": "float 6s ease-in-out infinite",
         wiggle: "wiggle 0.4s ease-in-out",
+        "wiggle-slow": "wiggle 2s ease-in-out infinite",
         "tilt-in": "tiltIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards",
         "fade-up": "fadeUp 0.5s ease-out forwards",
-        "spin-slow": "spin-slow 12s linear infinite",
+        "fade-in": "fadeIn 0.3s ease-out forwards",
+        "slide-up": "slideUp 0.4s ease-out forwards",
+        "slide-down": "slideDown 0.4s ease-out forwards",
+        "scale-in": "scaleIn 0.3s ease-out forwards",
+        "spin-slow": "spin 12s linear infinite",
+        "pulse-slow": "pulse 3s ease-in-out infinite",
+        "bounce-subtle": "bounceSubtle 2s ease-in-out infinite",
+        shimmer: "shimmer 2s linear infinite",
+        "border-dance": "borderDance 3s linear infinite",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-6px)" },
+          "50%": { transform: "translateY(-8px)" },
         },
         wiggle: {
           "0%, 100%": { transform: "rotate(0deg)" },
@@ -73,14 +139,51 @@ module.exports = {
           "to": { opacity: "1", transform: "translateY(0) rotate(0)" },
         },
         fadeUp: {
-          "from": { opacity: "0", transform: "translateY(10px)" },
+          "from": { opacity: "0", transform: "translateY(20px)" },
           "to": { opacity: "1", transform: "translateY(0)" },
         },
-        "spin-slow": {
-          "from": { transform: "rotate(0deg)" },
-          "to": { transform: "rotate(360deg)" },
-        }
-      }
+        fadeIn: {
+          "from": { opacity: "0" },
+          "to": { opacity: "1" },
+        },
+        slideUp: {
+          "from": { opacity: "0", transform: "translateY(100%)" },
+          "to": { opacity: "1", transform: "translateY(0)" },
+        },
+        slideDown: {
+          "from": { opacity: "0", transform: "translateY(-100%)" },
+          "to": { opacity: "1", transform: "translateY(0)" },
+        },
+        scaleIn: {
+          "from": { opacity: "0", transform: "scale(0.9)" },
+          "to": { opacity: "1", transform: "scale(1)" },
+        },
+        bounceSubtle: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-4px)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        borderDance: {
+          "0%, 100%": { borderColor: "#FFEB3B" },
+          "33%": { borderColor: "#FF6B6B" },
+          "66%": { borderColor: "#4ECDC4" },
+        },
+      },
+      backgroundImage: {
+        'grid-pattern': `
+          linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
+        `,
+        'dots-pattern': 'radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px)',
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      },
+      backgroundSize: {
+        'grid': '24px 24px',
+        'dots': '16px 16px',
+      },
     },
   },
   plugins: [],

@@ -2,102 +2,127 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Calendar, ShoppingBag, User, X } from "lucide-react";
+import { Home, Calendar, ShoppingBag, MessageCircle, Plus, X, School } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
-export default function ArcMenu({ onCompose }: { onCompose: () => void }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const router = useRouter();
+interface ArcMenuProps {
+  onCompose: () => void;
+}
 
-    const menuItems = [
-        { icon: Calendar, label: "Events", href: "/events", color: "bg-accent-blue" },
-        { icon: ShoppingBag, label: "Market", href: "/marketplace", color: "bg-accent-green" },
-        { icon: User, label: "Profile", href: "/profile", color: "bg-accent-yellow" },
-        // { icon: Plus, label: "Create", action: onCompose, color: "bg-black text-white" } // Compose is now central or handled separately?
-        // User asked for 4 remaining options around Home.
-        // Let's add 'Campus' as the 4th
-        { icon: Home, label: "Campus", href: "/my-college", color: "bg-accent-pink" },
-    ];
+export default function ArcMenu({ onCompose }: ArcMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
-    // Radial flush positions (semi-circle above)
-    // -60deg, -20deg, +20deg, +60deg (roughly)
-    const positions = [
-        { x: -70, y: -40 },
-        { x: -30, y: -75 },
-        { x: 30, y: -75 },
-        { x: 70, y: -40 },
-    ];
+  const menuItems = [
+    { icon: School, label: "Campus", href: "/my-college", color: "bg-accent-blue" },
+    { icon: Calendar, label: "Events", href: "/events", color: "bg-accent-coral" },
+    { icon: ShoppingBag, label: "Market", href: "/marketplace", color: "bg-accent-mint" },
+    { icon: MessageCircle, label: "Chat", href: "/messages", color: "bg-accent-purple" },
+  ];
 
-    return (
-        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100]">
+  // Radial positions for the fan menu
+  const positions = [
+    { x: -80, y: -30 },
+    { x: -45, y: -70 },
+    { x: 45, y: -70 },
+    { x: 80, y: -30 },
+  ];
 
-            {/* Backdrop */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setIsOpen(false)}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-0"
-                    />
-                )}
-            </AnimatePresence>
+  const isActive = (href: string) => pathname.startsWith(href);
 
-            <div className="relative z-10">
-                {/* Fan Items */}
-                <AnimatePresence>
-                    {isOpen && menuItems.map((item, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
-                            animate={{
-                                x: positions[i].x,
-                                y: positions[i].y,
-                                scale: 1,
-                                opacity: 1
-                            }}
-                            exit={{ x: 0, y: 0, scale: 0, opacity: 0 }}
-                            transition={{ type: "spring", damping: 12, stiffness: 200, delay: i * 0.05 }}
-                            className="absolute top-0 left-0 -ml-6 -mt-6" // Center origin
-                        >
-                            {item.href ? (
-                                <Link href={item.href}>
-                                    <div className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center shadow-neo-sm ${item.color}`}>
-                                        <item.icon className="w-5 h-5 text-black" />
-                                    </div>
-                                    <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-black text-white px-1 rounded opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">
-                                        {item.label}
-                                    </span>
-                                </Link>
-                            ) : (
-                                <div className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center shadow-neo-sm ${item.color}`}>
-                                    <item.icon className="w-5 h-5 text-black" />
-                                </div>
-                            )}
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+  return (
+    <>
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-ink safe-area-pb">
+        <div className="flex items-center justify-around h-16 px-2">
+          {/* Home */}
+          <Link href="/dashboard" className="flex-1">
+            <motion.div
+              className={`flex flex-col items-center justify-center py-2 ${
+                pathname === '/dashboard' ? 'text-ink' : 'text-neutral-400'
+              }`}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Home className="w-5 h-5" />
+              <span className="text-[10px] font-medium mt-0.5">Home</span>
+              {pathname === '/dashboard' && (
+                <motion.div 
+                  className="absolute bottom-1 w-1 h-1 bg-primary rounded-full"
+                  layoutId="bottomNavIndicator"
+                />
+              )}
+            </motion.div>
+          </Link>
 
-                {/* Main Trigger Button */}
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsOpen(!isOpen)}
-                    // onLongPress could be simulated with touch events, but click toggle is safer for web
-                    className={`
-                        w-16 h-16 rounded-full border-thick border-black flex items-center justify-center shadow-neo-lg relative
-                        ${isOpen ? 'bg-red-500 rotate-45' : 'bg-black'}
-                        transition-colors duration-300
-                    `}
-                >
-                    {isOpen ? (
-                        <X className="w-8 h-8 text-white" />
-                    ) : (
-                        <Home className="w-7 h-7 text-white" />
-                    )}
-                </motion.button>
-            </div>
+          {/* Events */}
+          <Link href="/events" className="flex-1">
+            <motion.div
+              className={`flex flex-col items-center justify-center py-2 ${
+                isActive('/events') ? 'text-ink' : 'text-neutral-400'
+              }`}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Calendar className="w-5 h-5" />
+              <span className="text-[10px] font-medium mt-0.5">Events</span>
+            </motion.div>
+          </Link>
+
+          {/* Create Button (Center) */}
+          <div className="flex-1 flex justify-center -mt-6">
+            <motion.button
+              onClick={onCompose}
+              className="w-14 h-14 bg-primary border-2 border-ink rounded-xl shadow-neo flex items-center justify-center"
+              whileHover={{ scale: 1.05, rotate: -3 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Plus className="w-7 h-7 text-ink" />
+            </motion.button>
+          </div>
+
+          {/* Market */}
+          <Link href="/marketplace" className="flex-1">
+            <motion.div
+              className={`flex flex-col items-center justify-center py-2 ${
+                isActive('/marketplace') ? 'text-ink' : 'text-neutral-400'
+              }`}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span className="text-[10px] font-medium mt-0.5">Market</span>
+            </motion.div>
+          </Link>
+
+          {/* Messages */}
+          <Link href="/messages" className="flex-1">
+            <motion.div
+              className={`flex flex-col items-center justify-center py-2 relative ${
+                isActive('/messages') ? 'text-ink' : 'text-neutral-400'
+              }`}
+              whileTap={{ scale: 0.9 }}
+            >
+              <MessageCircle className="w-5 h-5" />
+              <span className="text-[10px] font-medium mt-0.5">Chat</span>
+              {/* Unread indicator - can be connected to context */}
+              {/* <span className="absolute top-1 right-1/4 w-2 h-2 bg-accent-coral rounded-full" /> */}
+            </motion.div>
+          </Link>
         </div>
-    )
+      </div>
+
+      {/* Floating Action Button (Alternative - Hidden by default) */}
+      {/* 
+      <div className="md:hidden fixed bottom-24 right-4 z-50">
+        <motion.button
+          onClick={onCompose}
+          className="w-14 h-14 bg-primary border-2 border-ink rounded-full shadow-neo-lg flex items-center justify-center"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <Plus className="w-6 h-6 text-ink" />
+        </motion.button>
+      </div>
+      */}
+    </>
+  );
 }

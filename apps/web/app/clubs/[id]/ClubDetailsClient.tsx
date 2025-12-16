@@ -175,6 +175,17 @@ export default function ClubDetailsClient() {
                             : "JOIN CLUB"}
                       </RetroButton>
                       <RetroButton variant="outline">CONTACT ADMIN</RetroButton>
+                      {/* Show manage button for club admins */}
+                      {club.members?.some(
+                        (m) => m.userId === user?.id && (m.role === "ADMIN" || m.role === "OWNER")
+                      ) && (
+                        <RetroButton
+                          onClick={() => router.push(`/clubs/${club.id}/manage`)}
+                          className="bg-accent-yellow text-black"
+                        >
+                          MANAGE CLUB
+                        </RetroButton>
+                      )}
                     </div>
                   </NewspaperCard>
                 </motion.div>

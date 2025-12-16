@@ -79,10 +79,12 @@ export default function CollegeEventsPage({ params }: PageProps) {
     };
   };
 
+  // Students can suggest events (pending approval), admins can create directly
   const canCreateEvent =
     user?.role === "COLLEGE_ADMIN" ||
     user?.role === "CLUB_ADMIN" ||
-    user?.role === "PLATFORM_ADMIN";
+    user?.role === "PLATFORM_ADMIN" ||
+    user?.role === "STUDENT";
 
   return (
     <div className="min-h-screen">
@@ -104,7 +106,7 @@ export default function CollegeEventsPage({ params }: PageProps) {
         {canCreateEvent && (
           <Link href={`/colleges/${slug}/events/create`}>
             <RetroButton className="bg-black text-white hover:bg-accent-yellow hover:text-black">
-              + SUBMIT EVENT
+              {user?.role === "STUDENT" ? "+ SUGGEST EVENT" : "+ CREATE EVENT"}
             </RetroButton>
           </Link>
         )}

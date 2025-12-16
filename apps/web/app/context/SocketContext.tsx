@@ -31,6 +31,20 @@ interface TypingUser {
   userName: string;
 }
 
+interface NotificationPayload {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  actionUrl?: string;
+  actor?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  };
+  createdAt: string;
+}
+
 interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
@@ -43,6 +57,7 @@ interface SocketContextType {
   onTyping: (callback: (data: TypingUser) => void) => () => void;
   onStopTyping: (callback: (data: TypingUser) => void) => () => void;
   onMessageSeen: (callback: (data: { conversationId: string; userId: string }) => void) => () => void;
+  onNotification: (callback: (notification: NotificationPayload) => void) => () => void;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -186,6 +201,17 @@ export function SocketProvider({ children }: SocketProviderProps) {
     [socket]
   );
 
+  const onNotification = useCallback(
+    (callback: (notification: NotificationPayload) => void) => {
+      if (!socket) return () => {};
+      socket.on("notification:new", callback);
+      return () => {
+        socket.off("notification:new", callback);
+      };
+    },
+    [socket]
+  );
+
   return (
     <SocketContext.Provider
       value={{
@@ -200,6 +226,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         onTyping,
         onStopTyping,
         onMessageSeen,
+        onNotification,
       }}
     >
       {children}
@@ -207,10 +234,24 @@ export function SocketProvider({ children }: SocketProviderProps) {
   );
 }
 
-export function useSocket() {
+// Default socket context for when used outside provider
+const defaultSocketContext: SocketContextType = {
+  socket: null,
+  isConnected: false,
+  sendMessage: () => {},
+  joinConversation: () => {},
+  leaveConversation: () => {},
+  startTyping: () => {},
+  stopTyping: () => {},
+  onNewMessage: () => () => {},
+  onTyping: () => () => {},
+  onStopTyping: () => () => {},
+  onMessageSeen: () => () => {},
+  onNotification: () => () => {},
+};
+
+export function useSocket(): SocketContextType {
   const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error("useSocket must be used within a SocketProvider");
-  }
-  return context;
+  // Return default context if not within SocketProvider (allows NotificationProvider to work independently)
+  return context || defaultSocketContext;
 }

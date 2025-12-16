@@ -5,22 +5,25 @@
    ▲ Next.js 16.0.7 (Turbopack)
    - Experiments (use with caution):
      · serverActions
-
  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
    Creating an optimized production build ...
- ✓ Compiled successfully in 34.6s
+ ✓ Compiled successfully in 22.9s
    Running TypeScript ...
    Collecting page data using 7 workers ...
    Generating static pages using 7 workers (0/1) ...
- ✓ Generating static pages using 7 workers (1/1) in 2.5s
+ ✓ Generating static pages using 7 workers (1/1) in 10.4s
    Finalizing page optimization ...
 
 Route (app)
 ┌ ƒ /
 ├ ƒ /_not-found
+├ ƒ /admin/college
+├ ƒ /admin/platform
 ├ ƒ /auth/callback
 ├ ƒ /clubs
 ├ ƒ /clubs/[id]
+├ ƒ /clubs/[id]/manage
 ├ ƒ /colleges/[slug]
 ├ ƒ /colleges/[slug]/clubs
 ├ ƒ /colleges/[slug]/clubs/create
@@ -32,9 +35,12 @@ Route (app)
 ├ ƒ /dashboard
 ├ ƒ /events
 ├ ƒ /events/[id]
+├ ƒ /events/[id]/certificates
+├ ƒ /events/[id]/checkin
 ├ ƒ /events/create
 ├ ƒ /feed
 ├ ƒ /feed/create
+├ ƒ /leaderboard
 ├ ƒ /login
 ├ ƒ /marketplace
 ├ ƒ /marketplace/[id]
@@ -49,6 +55,7 @@ Route (app)
 ├ ƒ /profile
 ├ ƒ /profile/edit
 ├ ƒ /register
+├ ƒ /saved
 └ ƒ /settings
 
 
