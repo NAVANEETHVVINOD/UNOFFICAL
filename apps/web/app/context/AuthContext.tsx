@@ -107,12 +107,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isLoadingUser) return;
 
     if (user) {
-      const isProfileComplete =
-        user.profile?.isOnboarded && user.profile?.collegeId;
+      const hasFullName = !!user.profile?.fullName?.trim();
+      const hasCollege = !!user.profile?.collegeId || !!user.profile?.college?.id;
+      const isProfileComplete = user.profile?.isOnboarded && hasFullName && hasCollege;
 
-      if (!isProfileComplete && pathname !== "/onboarding") {
-        router.replace("/onboarding");
-      } else if (isProfileComplete && pathname.startsWith("/onboarding")) {
+      // Skip redirect for auth callback and public pages
+      const publicPaths = ["/", "/login", "/register", "/auth/callback"];
+      const isPublicPath = publicPaths.some(p => pathname === p || pathname?.startsWith("/auth/"));
+
+      if (!isProfileComplete && !pathname?.startsWith("/onboarding") && !isPublicPath) {
+        // Redirect to specific step based on what's missing
+        if (!hasCollege && hasFullName) {
+          router.replace("/onboarding?step=college");
+        } else {
+          router.replace("/onboarding");
+        }
+      } else if (isProfileComplete && pathname?.startsWith("/onboarding")) {
         router.replace("/dashboard");
       }
     }
