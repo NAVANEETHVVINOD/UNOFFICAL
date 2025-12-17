@@ -18,7 +18,6 @@ import ProfileSidebar from "../components/dashboard/ProfileSidebar";
 import { useInfiniteFeed } from "../hooks/useInfiniteFeed";
 import FeedItemFactory from "../components/FeedItemFactory";
 import FeedComposer from "../components/feed/FeedComposer";
-import { RetroToastProvider } from "../context/ToastContext";
 
 // Components
 import CreatePostModal from "../components/CreatePostModal";
@@ -439,10 +438,8 @@ function DashboardContent() {
 
 export default function DashboardClient() {
   return (
-    <RetroToastProvider>
-      <ErrorBoundary>
-        <DashboardContent />
-      </ErrorBoundary>
-    </RetroToastProvider>
+    <ErrorBoundary>
+      <DashboardContent />
+    </ErrorBoundary>
   );
 }

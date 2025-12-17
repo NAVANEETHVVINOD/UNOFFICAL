@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { RBACProvider } from "./context/RBACContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import { RetroToastProvider } from "./context/ToastContext";
 import ScrollRestoration from "./components/ScrollRestoration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
@@ -55,12 +56,14 @@ export default function RootLayout({
           <RBACProvider>
             <SocketProvider>
               <NotificationProvider>
-                <ScrollRestoration />
-                <div className="min-h-screen pb-16 md:pb-0">
-                  {children}
-                  <SpeedInsights />
-                </div>
-                <BottomNav />
+                <RetroToastProvider>
+                  <ScrollRestoration />
+                  <div className="min-h-screen pb-16 md:pb-0">
+                    {children}
+                    <SpeedInsights />
+                  </div>
+                  <BottomNav />
+                </RetroToastProvider>
               </NotificationProvider>
             </SocketProvider>
           </RBACProvider>
