@@ -163,14 +163,14 @@
     - Redirect to college page or onboarding
     - _Requirements: 5.1, 5.4_
     - **DONE: Redirects to /colleges/{slug} or /onboarding**
-  - [ ]* 10.2 Write property test for my-college redirect
+  - [ ] 10.2 Write property test for my-college redirect
     - **Property 7: My-college redirect logic**
     - **Validates: Requirements 5.1, 5.4**
   - [x] 10.3 Display college-specific content
     - Show events, clubs, announcements
     - _Requirements: 5.2, 5.3_
     - **DONE: College page shows events, clubs, stats**
-  - [ ]* 10.4 Write property test for campus page data
+  - [ ] 10.4 Write property test for campus page data
     - **Property 8: Campus page data rendering**
     - **Validates: Requirements 5.2, 5.3**
   - [x] 10.5 Apply newspaper/retro design style
@@ -184,28 +184,28 @@
     - Implement date sorting logic
     - _Requirements: 6.1_
     - **DONE: Events sorted by startsAt ascending**
-  - [ ]* 11.2 Write property test for events sorting
+  - [ ] 11.2 Write property test for events sorting
     - **Property 9: Events sorted by date**
     - **Validates: Requirements 6.1**
   - [x] 11.3 Create complete event cards
     - Show date, time, venue, organizer, RSVP count
     - _Requirements: 6.2_
     - **DONE: Event cards with date, time, venue, club, attendee count**
-  - [ ]* 11.4 Write property test for event card completeness
+  - [ ] 11.4 Write property test for event card completeness
     - **Property 10: Event card data completeness**
     - **Validates: Requirements 6.2**
   - [x] 11.5 Implement RSVP functionality
     - Toggle attendance state, update count
     - _Requirements: 6.3_
     - **DONE: RSVP button with loading state**
-  - [ ]* 11.6 Write property test for RSVP toggle
+  - [ ] 11.6 Write property test for RSVP toggle
     - **Property 11: RSVP state toggle**
     - **Validates: Requirements 6.3**
   - [x] 11.7 Add event filtering
     - Filter by date range, category, college
     - _Requirements: 6.4_
     - **DONE: Date filters implemented**
-  - [ ]* 11.8 Write property test for event filtering
+  - [ ] 11.8 Write property test for event filtering
     - **Property 12: Event filter correctness**
     - **Validates: Requirements 6.4**
   - [x] 11.9 Create empty state for no events
@@ -223,21 +223,21 @@
     - Filter to show only ACTIVE status
     - _Requirements: 7.1_
     - **DONE: Listings filtered by ACTIVE status**
-  - [ ]* 13.2 Write property test for listing visibility
+  - [ ] 13.2 Write property test for listing visibility
     - **Property 13: Marketplace listing visibility**
     - **Validates: Requirements 7.1**
   - [x] 13.3 Create complete listing cards
     - Show image, title, price, seller, status
     - _Requirements: 7.2_
     - **DONE: Cards with image, title, price, seller, date**
-  - [ ]* 13.4 Write property test for listing card completeness
+  - [ ] 13.4 Write property test for listing card completeness
     - **Property 14: Listing card data completeness**
     - **Validates: Requirements 7.2**
   - [x] 13.5 Implement real-time search filtering
     - Filter by title and description
     - _Requirements: 7.3_
     - **DONE: Search filters by title and description**
-  - [ ]* 13.6 Write property test for marketplace search
+  - [ ] 13.6 Write property test for marketplace search
     - **Property 15: Marketplace search filter**
     - **Validates: Requirements 7.3**
   - [x] 13.7 Add listing detail navigation
@@ -302,21 +302,21 @@
     - Show name, bio, college, interests, social links
     - _Requirements: 9.1_
     - **DONE: Profile shows all user info**
-  - [ ]* 16.2 Write property test for profile data rendering
+  - [ ] 16.2 Write property test for profile data rendering
     - **Property 20: Profile data rendering**
     - **Validates: Requirements 9.1**
   - [x] 16.3 Create SocialIcons component
     - Display icons for Instagram, LinkedIn, GitHub, Discord, WhatsApp
     - _Requirements: 9.2_
     - **DONE: Social links with icons in ProfileClient.tsx**
-  - [ ]* 16.4 Write property test for social icons rendering
+  - [ ] 16.4 Write property test for social icons rendering
     - **Property 21: Social links icon rendering**
     - **Validates: Requirements 9.2**
   - [x] 16.5 Add edit button for own profile
     - Show edit button when viewing own profile
     - _Requirements: 9.3_
     - **DONE: Edit Profile button links to /profile/edit**
-  - [ ]* 16.6 Write property test for edit button visibility
+  - [ ] 16.6 Write property test for edit button visibility
     - **Property 22: Own profile edit visibility**
     - **Validates: Requirements 9.3**
   - [x] 16.7 Display user activity (posts, events, clubs)
@@ -327,7 +327,7 @@
     - Add target="_blank" and rel="noopener noreferrer"
     - _Requirements: 9.5_
     - **DONE: All social links have security attributes**
-  - [ ]* 16.9 Write property test for social link security
+  - [ ] 16.9 Write property test for social link security
     - **Property 23: Social link security attributes**
     - **Validates: Requirements 9.5**
 
@@ -341,14 +341,14 @@
     - Toggle state and update count
     - _Requirements: 10.1_
     - **DONE: Optimistic like toggle with API calls**
-  - [ ]* 17.3 Write property test for like toggle
+  - [ ] 17.3 Write property test for like toggle
     - **Property 24: Like toggle state**
     - **Validates: Requirements 10.1**
   - [x] 17.4 Implement save toggle functionality
     - Toggle saved state
     - _Requirements: 10.3_
     - **DONE: Save toggle in PostActions.tsx**
-  - [ ]* 17.5 Write property test for save toggle
+  - [ ] 17.5 Write property test for save toggle
     - **Property 25: Save toggle state**
     - **Validates: Requirements 10.3**
   - [x] 17.6 Implement comment expansion
@@ -363,7 +363,7 @@
     - Show like count, comment count, save status
     - _Requirements: 10.5_
     - **DONE: Counts displayed in PostActions.tsx**
-  - [ ]* 17.9 Write property test for interaction counts
+  - [ ] 17.9 Write property test for interaction counts
     - **Property 26: Post interaction counts display**
     - **Validates: Requirements 10.5**
 
@@ -398,7 +398,7 @@
 
     - Display clear error messages
     - _Requirements: 11.4_
-  - [ ]* 19.5 Write property test for validation errors
+  - [ ] 19.5 Write property test for validation errors
     - **Property 27: Form validation error display**
     - **Validates: Requirements 11.4**
 
@@ -413,7 +413,7 @@
     - Show current step out of total
     - _Requirements: 13.1_
     - **DONE: Progress bar with step indicator already implemented**
-  - [ ]* 20.2 Write property test for progress indicator
+  - [ ] 20.2 Write property test for progress indicator
     - **Property 28: Onboarding progress indicator**
     - **Validates: Requirements 13.1**
   - [x] 20.3 Add real-time input validation
@@ -424,14 +424,14 @@
     - Filter colleges by name and city
     - _Requirements: 13.3_
     - **DONE: College search filters by name and city**
-  - [ ]* 20.5 Write property test for college search
+  - [ ] 20.5 Write property test for college search
     - **Property 29: College search filter**
     - **Validates: Requirements 13.3**
   - [x] 20.6 Enhance interest selection
     - Allow multiple selections with visual feedback
     - _Requirements: 13.4_
     - **DONE: Multi-select with visual highlight**
-  - [ ]* 20.7 Write property test for interest selection
+  - [ ] 20.7 Write property test for interest selection
     - **Property 30: Interest multi-selection**
     - **Validates: Requirements 13.4**
   - [x] 20.8 Add welcome message on completion
@@ -500,7 +500,7 @@
     - Add/remove, assign roles, approve requests
     - _Requirements: 19.3_
     - **DONE: Member list with role assignment**
-  - [ ]* 24.4 Write property test for club admin scope
+  - [ ] 24.4 Write property test for club admin scope
     - **Property 37: Club admin scope restriction**
     - **Validates: Requirements 19.1, 19.2, 19.3**
   - [x] 24.5 Implement event creation for clubs
@@ -527,7 +527,7 @@
     - Hide posts, warn users, feature announcements
     - _Requirements: 20.3_
     - **DONE: Reports tab with hide/dismiss actions**
-  - [ ]* 25.4 Write property test for college admin scope
+  - [ ] 25.4 Write property test for college admin scope
     - **Property 38: College admin scope restriction**
     - **Validates: Requirements 20.2, 20.3**
   - [x] 25.5 Implement college info editing
@@ -574,7 +574,7 @@
     - Award points for positive actions
     - _Requirements: 22.1_
     - **DONE: KARMA_ACTIONS constants with point values**
-  - [ ]* 28.2 Write property test for karma awards
+  - [ ] 28.2 Write property test for karma awards
     - **Property 39: Karma point award**
     - **Validates: Requirements 22.1**
   - [x] 28.3 Display level and karma on profile
@@ -601,14 +601,14 @@
     - Create QR on event creation
     - _Requirements: 24.1_
     - **DONE: generateEventQRData function with unique IDs**
-  - [ ]* 29.2 Write property test for QR uniqueness
+  - [ ] 29.2 Write property test for QR uniqueness
     - **Property 40: Event QR code uniqueness**
     - **Validates: Requirements 24.1**
   - [x] 29.3 Implement QR scan check-in
     - Mark attendee as checked-in
     - _Requirements: 24.2_
     - **DONE: Manual check-in + QR display for scanning**
-  - [ ]* 29.4 Write property test for check-in state
+  - [ ] 29.4 Write property test for check-in state
     - **Property 41: QR check-in state update**
     - **Validates: Requirements 24.2**
   - [x] 29.5 Distinguish registered vs checked-in
@@ -660,7 +660,7 @@
     - Display "Anonymous" with no identifying info
     - _Requirements: 25.2_
     - **DONE: isAnonymous flag sent to API**
-  - [ ]* 31.3 Write property test for anonymous hiding
+  - [ ] 31.3 Write property test for anonymous hiding
     - **Property 42: Anonymous post author hiding**
     - **Validates: Requirements 25.2**
 
@@ -693,7 +693,7 @@
     - Filter by subject, semester, popularity
     - _Requirements: 26.2_
     - **DONE: Subject, semester, sort filters**
-  - [ ]* 33.3 Write property test for notes filtering
+  - [ ] 33.3 Write property test for notes filtering
     - **Property 43: Notes filter correctness**
     - **Validates: Requirements 26.2**
   - [x] 33.4 Display note details
@@ -771,6 +771,7 @@
 
 
 
+
     - Name, college, mutual connections
     - _Requirements: 28.3_
   - [x] 35.5 Show event search details
@@ -792,7 +793,7 @@
     - Posts, events, listings, notes
     - _Requirements: 29.2_
     - **DONE: Type badges and icons for each type**
-  - [ ]* 36.3 Write property test for saved content
+  - [ ] 36.3 Write property test for saved content
     - **Property 46: Saved content persistence**
     - **Validates: Requirements 29.1, 29.2**
   - [x] 36.4 Implement remove from saved
@@ -900,9 +901,149 @@
 
     - Validate platform-specific formats
     - _Requirements: 15.4_
-  - [ ] 40.2 Write property test for URL validation
+  - [x] 40.2 Write property test for URL validation
+
+
+
+
+
     - **Property 33: Social URL validation**
     - **Validates: Requirements 15.4**
 
 - [ ] 41. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+## Phase 11: Backend API Fixes & PWA Setup
+
+- [x] 42. Fix Backend API 404 Errors
+
+
+
+  - [x] 42.1 Add getUserClubs method to UsersService
+
+
+
+    - Query clubMember table for user's clubs
+    - Return array of club objects with member count
+    - _Requirements: 33.1_
+  - [x] 42.2 Write property test for getUserClubs API
+
+
+    - **Property 50: User clubs API response**
+    - **Validates: Requirements 33.1**
+
+  - [x] 42.3 Add getUserEvents method to UsersService
+    - Query eventParticipant table for user's events
+    - Return array of event objects with participant count
+    - _Requirements: 33.2_
+
+  - [x] 42.4 Write property test for getUserEvents API
+    - **Property 51: User events API response**
+    - **Validates: Requirements 33.2**
+
+  - [x] 42.5 Add getUserPosts method to UsersService
+    - Query posts table for user's non-anonymous posts
+    - Return array of post objects with like/comment counts
+    - _Requirements: 33.3_
+
+  - [x] 42.6 Write property test for getUserPosts API
+
+    - **Property 52: User posts API response**
+    - **Validates: Requirements 33.3**
+  - [x] 42.7 Fix notifications endpoint
+
+    - Ensure GET /notifications returns proper response
+    - _Requirements: 33.4_
+
+- [ ] 43. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 44. Implement Mandatory Onboarding Enforcement
+  - [ ] 44.1 Create useOnboardingGuard hook
+    - Check for fullName and collegeId presence
+    - Redirect to /onboarding if incomplete
+    - _Requirements: 34.1, 34.2, 34.3_
+  - [ ] 44.2 Write property test for onboarding redirect
+    - **Property 53: Mandatory onboarding redirect**
+    - **Validates: Requirements 34.1, 34.2**
+  - [ ] 44.3 Add onboarding guard to DashboardClient
+    - Use hook to enforce onboarding completion
+    - _Requirements: 34.2_
+  - [ ] 44.4 Update onboarding completion validation
+    - Prevent completion without mandatory fields
+    - _Requirements: 34.4_
+  - [ ] 44.5 Write property test for completion validation
+    - **Property 54: Onboarding completion validation**
+    - **Validates: Requirements 34.4**
+  - [ ] 44.6 Add visual indicators for mandatory fields
+    - Show asterisk and required text
+    - _Requirements: 34.5_
+
+- [ ] 45. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 46. Visual Design Refinements
+  - [ ] 46.1 Update Tailwind color palette
+    - Replace white with paper/cream tones
+    - Update background colors throughout
+    - _Requirements: 35.1_
+  - [ ] 46.2 Update form input styling
+    - Use muted background colors
+    - Ensure retro aesthetic consistency
+    - _Requirements: 35.2_
+  - [ ] 46.3 Replace emojis with icons/doodles
+    - Audit codebase for emoji usage
+    - Replace with SVG icons or doodle components
+    - _Requirements: 35.3_
+  - [ ] 46.4 Write property test for color contrast
+    - **Property 55: Color contrast compliance**
+    - **Validates: Requirements 35.4**
+  - [ ] 46.5 Fix carousel/ticker animation
+    - Ensure smooth timing and no glitches
+    - _Requirements: 35.5_
+
+- [ ] 47. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 48. PWA Configuration
+  - [ ] 48.1 Create PWA manifest.json
+    - Add name, icons, theme_color, display mode
+    - _Requirements: 36.1_
+  - [ ] 48.2 Write property test for manifest validity
+    - **Property 56: PWA manifest validity**
+    - **Validates: Requirements 36.1**
+  - [ ] 48.3 Create PWA icons
+    - Generate 192x192 and 512x512 icons
+    - _Requirements: 36.1_
+  - [ ] 48.4 Configure next-pwa
+    - Set up service worker registration
+    - Configure caching strategy
+    - _Requirements: 36.5_
+  - [ ] 48.5 Add offline fallback page
+    - Display message when offline
+    - _Requirements: 36.4_
+
+- [ ] 49. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 50. Login/Register Page Layout Fixes
+  - [ ] 50.1 Refactor login page layout
+    - Make form fit viewport without scroll
+    - Use compact spacing
+    - _Requirements: 37.1_
+  - [ ] 50.2 Write property test for login viewport fit
+    - **Property 57: Auth page viewport fit**
+    - **Validates: Requirements 37.1, 37.2**
+  - [ ] 50.3 Refactor register page layout
+    - Compact all fields in single view
+    - Optimize for desktop viewport
+    - _Requirements: 37.2_
+  - [ ] 50.4 Optimize auth pages for mobile
+    - Responsive layout for smaller viewports
+    - _Requirements: 37.3, 37.4_
+  - [ ] 50.5 Simplify navbar on auth pages
+    - Show only logo, remove other elements
+    - _Requirements: 37.5_
+
+- [ ] 51. Final Integration Checkpoint
   - Ensure all tests pass, ask the user if questions arise.

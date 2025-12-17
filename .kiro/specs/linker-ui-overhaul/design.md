@@ -360,7 +360,192 @@ export const shimmerVariants: Variants = {
 };
 ```
 
-### 6. Production Error Handling
+### 6. Backend User Endpoints
+
+```typescript
+// UsersService methods to add
+@Injectable()
+export class UsersService {
+  // ... existing methods ...
+
+  async getUserClubs(userId: string): Promise<Club[]> {
+    const memberships = await this.prisma.clubMember.findMany({
+      where: { userId },
+      include: {
+        club: {
+          include: {
+            _count: { select: { members: true } }
+          }
+        }
+      }
+    });
+    return memberships.map(m => m.club);
+  }
+
+  async getUserEvents(userId: string): Promise<Event[]> {
+    const participants = await this.prisma.eventParticipant.findMany({
+      where: { userId },
+      include: {
+        event: {
+          include: {
+            club: true,
+            _count: { select: { participants: true } }
+          }
+        }
+      }
+    });
+    return participants.map(p => p.event);
+  }
+
+  async getUserPosts(userId: string): Promise<Post[]> {
+    return this.prisma.post.findMany({
+      where: { authorId: userId, isAnonymous: false },
+      include: {
+        author: { include: { profile: true } },
+        _count: { select: { likes: true, comments: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+}
+```
+
+### 7. Onboarding Guard
+
+```typescript
+// Middleware to enforce mandatory onboarding
+interface OnboardingCheckResult {
+  isComplete: boolean;
+  missingFields: string[];
+}
+
+function checkOnboardingStatus(user: User): OnboardingCheckResult {
+  const missingFields: string[] = [];
+  
+  if (!user.profile?.fullName?.trim()) {
+    missingFields.push('fullName');
+  }
+  if (!user.profile?.collegeId) {
+    missingFields.push('collegeId');
+  }
+  
+  return {
+    isComplete: user.profile?.isOnboarded === true && missingFields.length === 0,
+    missingFields
+  };
+}
+
+// Dashboard page guard
+export function useOnboardingGuard() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!loading && user) {
+      const { isComplete } = checkOnboardingStatus(user);
+      if (!isComplete) {
+        router.replace('/onboarding');
+      }
+    }
+  }, [user, loading, router]);
+  
+  return { isReady: !loading && user && checkOnboardingStatus(user).isComplete };
+}
+```
+
+### 8. PWA Configuration
+
+```typescript
+// next.config.js PWA setup
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development'
+});
+
+// public/manifest.json
+interface PWAManifest {
+  name: string;
+  short_name: string;
+  description: string;
+  start_url: string;
+  display: 'standalone' | 'fullscreen' | 'minimal-ui' | 'browser';
+  background_color: string;
+  theme_color: string;
+  icons: Array<{
+    src: string;
+    sizes: string;
+    type: string;
+    purpose?: string;
+  }>;
+}
+
+const manifest: PWAManifest = {
+  name: 'LINKER - The Campus Collective',
+  short_name: 'LINKER',
+  description: 'Connect with your campus community',
+  start_url: '/',
+  display: 'standalone',
+  background_color: '#FDF6E3',
+  theme_color: '#000000',
+  icons: [
+    { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+  ]
+};
+```
+
+### 9. Color System Refinements
+
+```typescript
+// Updated color palette for reduced eye strain
+const colors = {
+  // Paper tones (instead of pure white)
+  paper: '#FDF6E3',        // Warm cream
+  paperLight: '#FAF3E0',   // Lighter cream
+  paperDark: '#F5ECD7',    // Slightly darker cream
+  
+  // Ink (instead of pure black for text)
+  ink: '#1A1A1A',          // Soft black
+  inkLight: '#4A4A4A',     // Gray for secondary text
+  
+  // Accents (muted versions)
+  accentYellow: '#F4D03F', // Muted yellow
+  accentBlue: '#5DADE2',   // Muted blue
+  accentPink: '#F1948A',   // Muted pink
+  accentGreen: '#82E0AA',  // Muted green
+  
+  // Form inputs
+  inputBg: '#FAF8F5',      // Slightly off-white
+  inputBorder: '#1A1A1A',  // Dark border
+  inputFocus: '#F4D03F',   // Yellow focus ring
+};
+
+// Tailwind config extension
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        paper: colors.paper,
+        'paper-light': colors.paperLight,
+        'paper-dark': colors.paperDark,
+        ink: colors.ink,
+        'ink-light': colors.inkLight,
+        'accent-yellow': colors.accentYellow,
+        'accent-blue': colors.accentBlue,
+        'accent-pink': colors.accentPink,
+        'accent-green': colors.accentGreen,
+      },
+      backgroundColor: {
+        DEFAULT: colors.paper,
+      }
+    }
+  }
+};
+```
+
+### 10. Production Error Handling
 
 ```typescript
 // Global error boundary with crash recovery
@@ -835,6 +1020,38 @@ enum ReportReason {
 ### Property 49: Staggered list animation
 *For any* list of feed items, the System SHALL apply staggered entrance animations with containerVariants and itemVariants.
 **Validates: Requirements 31.2**
+
+### Property 50: User clubs API response
+*For any* valid user ID, calling GET /users/:id/clubs SHALL return an array of club objects (possibly empty) with status 200.
+**Validates: Requirements 33.1**
+
+### Property 51: User events API response
+*For any* valid user ID, calling GET /users/:id/events SHALL return an array of event objects (possibly empty) with status 200.
+**Validates: Requirements 33.2**
+
+### Property 52: User posts API response
+*For any* valid user ID, calling GET /users/:id/posts SHALL return an array of post objects (possibly empty) with status 200.
+**Validates: Requirements 33.3**
+
+### Property 53: Mandatory onboarding redirect
+*For any* authenticated user without a collegeId, navigating to /dashboard SHALL redirect to /onboarding.
+**Validates: Requirements 34.1, 34.2**
+
+### Property 54: Onboarding completion validation
+*For any* onboarding completion attempt, the System SHALL reject completion if fullName or collegeId is empty.
+**Validates: Requirements 34.4**
+
+### Property 55: Color contrast compliance
+*For any* text element on a colored background, the contrast ratio SHALL be at least 4.5:1.
+**Validates: Requirements 35.4**
+
+### Property 56: PWA manifest validity
+*For any* PWA manifest load, the manifest SHALL contain name, short_name, icons array, theme_color, and display properties.
+**Validates: Requirements 36.1**
+
+### Property 57: Auth page viewport fit
+*For any* viewport height >= 600px, the login and register forms SHALL fit within the viewport without scrolling.
+**Validates: Requirements 37.1, 37.2**
 
 ## Error Handling
 

@@ -407,3 +407,63 @@ The platform supports a multi-tenant architecture with Role-Based Access Control
 5. WHEN reviewing log files THEN the System SHALL remove development log files (e.g., error.log, build_log.txt)
 6. WHEN organizing components THEN the System SHALL ensure consistent file naming and folder structure
 7. WHEN reviewing the codebase THEN the System SHALL preserve all image files (.jpg, .png, .gif) and SVG files (.svg)
+
+### Requirement 33: Backend API Completeness
+
+**User Story:** As a frontend developer, I want all API endpoints to be functional, so that the frontend can fetch user data without 404 errors.
+
+#### Acceptance Criteria
+
+1. WHEN the frontend calls GET /users/:id/clubs THEN the System SHALL return the list of clubs the user has joined
+2. WHEN the frontend calls GET /users/:id/events THEN the System SHALL return the list of events the user has attended or RSVP'd to
+3. WHEN the frontend calls GET /users/:id/posts THEN the System SHALL return the list of posts created by the user
+4. WHEN the frontend calls GET /notifications THEN the System SHALL return the user's notifications without 404 error
+5. WHEN any API endpoint is called THEN the System SHALL return appropriate error responses with status codes and messages
+
+### Requirement 34: Mandatory Onboarding Enforcement
+
+**User Story:** As a platform administrator, I want users to complete mandatory onboarding fields, so that all users have essential profile information.
+
+#### Acceptance Criteria
+
+1. WHEN a user logs in via Google OAuth without a college selected THEN the System SHALL redirect to the onboarding flow
+2. WHEN a user attempts to access the dashboard without completing mandatory fields (fullName, collegeId) THEN the System SHALL redirect to onboarding
+3. WHEN checking onboarding status THEN the System SHALL verify both isOnboarded flag AND presence of mandatory fields
+4. WHEN a user completes onboarding THEN the System SHALL validate that all mandatory fields are filled before allowing completion
+5. WHEN displaying onboarding THEN the System SHALL clearly mark mandatory fields with visual indicators
+
+### Requirement 35: Visual Design Refinements
+
+**User Story:** As a user, I want a visually comfortable interface, so that I can use the platform without eye strain.
+
+#### Acceptance Criteria
+
+1. WHEN displaying white backgrounds THEN the System SHALL use off-white or cream tones (paper color) instead of pure white
+2. WHEN displaying search inputs and form fields THEN the System SHALL use muted background colors that match the retro aesthetic
+3. WHEN displaying interactive elements THEN the System SHALL use black-outlined icons and doodles instead of emojis
+4. WHEN displaying text on colored backgrounds THEN the System SHALL ensure sufficient contrast ratio (minimum 4.5:1)
+5. WHEN the carousel/ticker renders THEN the System SHALL display smoothly with proper timing and no visual glitches
+
+### Requirement 36: PWA Configuration
+
+**User Story:** As a mobile user, I want to install the app on my device, so that I can access it like a native application.
+
+#### Acceptance Criteria
+
+1. WHEN the PWA manifest is loaded THEN the System SHALL include app name, icons, theme color, and display mode
+2. WHEN a user visits on mobile THEN the System SHALL prompt for PWA installation when criteria are met
+3. WHEN the app is installed THEN the System SHALL display the app icon and splash screen correctly
+4. WHEN offline THEN the System SHALL display a cached version or offline message
+5. WHEN the service worker is registered THEN the System SHALL cache essential assets for offline access
+
+### Requirement 37: Login/Register Page Layout
+
+**User Story:** As a new user, I want the login and register pages to fit on one screen, so that I can complete authentication without scrolling.
+
+#### Acceptance Criteria
+
+1. WHEN viewing the login page on desktop THEN the System SHALL display the entire form without vertical scrolling
+2. WHEN viewing the register page on desktop THEN the System SHALL display all fields in a compact layout without scrolling
+3. WHEN viewing auth pages on mobile THEN the System SHALL optimize the layout for the viewport height
+4. WHEN the form content exceeds viewport THEN the System SHALL use a compact design with smaller spacing
+5. WHEN displaying auth pages THEN the System SHALL show a minimal navbar with only the logo

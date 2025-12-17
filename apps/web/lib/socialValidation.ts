@@ -24,7 +24,7 @@ const SOCIAL_PATTERNS: Record<SocialPlatform, RegExp> = {
   linkedin: /^https?:\/\/(www\.)?linkedin\.com\/(in|company)\/[a-zA-Z0-9_-]+\/?$/,
   github: /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9_-]+\/?$/,
   discord: /^https?:\/\/(www\.)?(discord\.(gg|com\/invite)|discordapp\.com\/invite)\/[a-zA-Z0-9]+\/?$/,
-  whatsapp: /^https?:\/\/(wa\.me|api\.whatsapp\.com\/send\?phone=)\d+\/?$/,
+  whatsapp: /^https?:\/\/(wa\.me\/|api\.whatsapp\.com\/send\?phone=)\d+\/?$/,
   twitter: /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/?$/,
   website: /^https?:\/\/.+\..+/,
 };

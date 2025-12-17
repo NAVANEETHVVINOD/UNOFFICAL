@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -16,5 +16,20 @@ export class UsersController {
   async searchUsers(@Query('q') query: string, @Request() req) {
     const currentUserId = req.user?.userId;
     return this.usersService.search(query, currentUserId);
+  }
+
+  @Get(':id/clubs')
+  async getUserClubs(@Param('id') userId: string) {
+    return this.usersService.getUserClubs(userId);
+  }
+
+  @Get(':id/events')
+  async getUserEvents(@Param('id') userId: string) {
+    return this.usersService.getUserEvents(userId);
+  }
+
+  @Get(':id/posts')
+  async getUserPosts(@Param('id') userId: string) {
+    return this.usersService.getUserPosts(userId);
   }
 }

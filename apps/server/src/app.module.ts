@@ -26,6 +26,7 @@ import {
   utilities as nestWinstonModuleUtilities,
 } from 'nest-winston';
 import { MessagesModule } from './modules/messages/messages.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import * as winston from 'winston';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -71,6 +72,7 @@ import { join } from 'path';
     FeedbackModule,
     PostsModule,
     MessagesModule,
+    NotificationsModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
