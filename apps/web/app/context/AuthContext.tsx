@@ -102,31 +102,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Onboarding Check
+  // Onboarding Check - Runs after user is loaded
   useEffect(() => {
     if (isLoadingUser) return;
+    if (!user) return;
 
-    if (user) {
-      const hasFullName = !!user.profile?.fullName?.trim();
-      const hasCollege = !!user.profile?.collegeId || !!user.profile?.college?.id;
-      const isProfileComplete = user.profile?.isOnboarded && hasFullName && hasCollege;
+    const hasFullName = !!user.profile?.fullName?.trim();
+    const hasCollege = !!(user.profile?.collegeId || user.profile?.college?.id);
+    
+    // Profile is complete only if both fullName AND college are set
+    const isProfileComplete = hasFullName && hasCollege;
 
-      // Skip redirect for auth callback and public pages
-      const publicPaths = ["/", "/login", "/register", "/auth/callback"];
-      const isPublicPath = publicPaths.some(p => pathname === p || pathname?.startsWith("/auth/"));
+    // Skip redirect for auth callback and public pages
+    const publicPaths = ["/", "/login", "/register", "/auth/callback"];
+    const isPublicPath = publicPaths.some(p => pathname === p || pathname?.startsWith("/auth/"));
+    const isOnboardingPath = pathname?.startsWith("/onboarding");
 
-      if (!isProfileComplete && !pathname?.startsWith("/onboarding") && !isPublicPath) {
-        // Redirect to specific step based on what's missing
-        if (!hasCollege && hasFullName) {
-          router.replace("/onboarding?step=college");
-        } else {
-          router.replace("/onboarding");
-        }
-      } else if (isProfileComplete && pathname?.startsWith("/onboarding")) {
-        router.replace("/dashboard");
+    console.log("[Auth] Onboarding check:", { hasFullName, hasCollege, isProfileComplete, pathname });
+
+    if (!isProfileComplete && !isOnboardingPath && !isPublicPath) {
+      // Redirect to onboarding - specific step based on what's missing
+      if (hasFullName && !hasCollege) {
+        console.log("[Auth] Redirecting to college selection");
+        router.replace("/onboarding?step=college");
+      } else {
+        console.log("[Auth] Redirecting to onboarding");
+        router.replace("/onboarding");
       }
+    } else if (isProfileComplete && isOnboardingPath) {
+      console.log("[Auth] Profile complete, redirecting to dashboard");
+      router.replace("/dashboard");
     }
-  }, [user, isLoadingUser, pathname]);
+  }, [user, isLoadingUser, pathname, router]);
 
   async function syncSession(session: any) {
     try {
