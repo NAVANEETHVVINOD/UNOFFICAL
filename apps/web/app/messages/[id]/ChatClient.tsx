@@ -166,14 +166,14 @@ export default function ChatClient({ id }: { id: string }) {
 
   if (loading && messages.length === 0) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center">
+      <div className="min-h-screen bg-paper flex items-center justify-center">
         <Doodle src="/doodles/loading.svg" className="w-16 h-16 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] flex flex-col">
+    <div className="min-h-screen bg-paper flex flex-col">
       <DashboardNavbar />
 
       <Container className="flex-grow py-4 flex flex-col h-[calc(100vh-80px)]">
@@ -214,23 +214,23 @@ export default function ChatClient({ id }: { id: string }) {
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[70%] p-4 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] ${isMe
-                      ? "bg-accent-yellow rounded-tr-none"
-                      : "bg-white rounded-tl-none"
+                    className={`max-w-[70%] p-4 rounded-2xl border-2 border-ink/20 shadow-soft ${isMe
+                      ? "bg-primary-100 rounded-tr-none"
+                      : "bg-paper rounded-tl-none"
                       }`}
                   >
-                    <p className="font-serif text-sm md:text-base">
+                    <p className="font-serif text-sm md:text-base text-ink">
                       {msg.content}
                     </p>
-                    <div className="flex justify-end items-center gap-1 mt-1">
-                      <p className="text-[10px] font-mono opacity-50">
+                    <div className="flex justify-end items-center gap-1 mt-2">
+                      <p className="text-[10px] font-mono text-neutral-400">
                         {new Date(msg.createdAt).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </p>
                       {isMe && (
-                        <span className="text-[10px] font-bold text-black">
+                        <span className="text-[10px] font-bold text-neutral-500">
                           {msg.seen ? "✓✓" : "✓"}
                         </span>
                       )}

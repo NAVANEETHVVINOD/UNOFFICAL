@@ -50,7 +50,12 @@ export function useOnboardingGuard() {
             JSON.stringify(missingFields)
           );
         }
-        router.replace("/onboarding");
+        // Redirect to specific step if only college is missing
+        if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
+          router.replace("/onboarding?step=college");
+        } else {
+          router.replace("/onboarding");
+        }
       } else {
         setIsReady(true);
       }

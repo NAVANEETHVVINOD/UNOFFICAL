@@ -121,7 +121,7 @@ function DashboardContent() {
 
   return (
     <motion.div
-      className="min-h-screen bg-white relative"
+      className="min-h-screen bg-paper relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -169,7 +169,7 @@ function DashboardContent() {
               
               {/* Quick Actions */}
               <motion.div
-                className="bg-white border-2 border-ink shadow-neo p-4"
+                className="bg-paper border-2 border-ink shadow-neo p-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -207,7 +207,7 @@ function DashboardContent() {
 
               {/* Trending Widget */}
               <motion.div
-                className="bg-white border-2 border-ink shadow-neo overflow-hidden"
+                className="bg-paper border-2 border-ink shadow-neo overflow-hidden"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -285,7 +285,7 @@ function DashboardContent() {
               </div>
               
               {/* Live indicator */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-ink rounded-full shadow-neo-sm">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-paper border-2 border-ink rounded-full shadow-neo-sm">
                 <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
                 <span className="font-mono text-xs uppercase">Live</span>
               </div>
@@ -412,13 +412,7 @@ function DashboardContent() {
                 </a>
               </div>
 
-              {/* Ad/Promo Space */}
-              <div className="card-neo-yellow p-4 bg-primary/10">
-                <p className="font-display text-sm mb-2">🎓 Pro Tip</p>
-                <p className="text-sm text-neutral-700">
-                  Complete your profile to unlock all features and connect with more students!
-                </p>
-              </div>
+
             </div>
           </motion.aside>
         </div>

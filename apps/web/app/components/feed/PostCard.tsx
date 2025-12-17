@@ -23,7 +23,7 @@ export default function PostCard({ post }: { post: any }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="group relative bg-white border-2 border-black shadow-neo hover:shadow-neo-lg transition-all duration-300"
+            className="group relative bg-paper border-2 border-ink shadow-neo hover:shadow-neo-lg transition-all duration-300"
         >
 
             {/* Torn Paper Header Mask */}

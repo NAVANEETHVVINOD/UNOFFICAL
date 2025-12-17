@@ -206,14 +206,18 @@ body {
   box-shadow: 2px 2px 0px 0px var(--ink);
 }
 
-/* Primary Button (Yellow) */
+/* Primary Button (Yellow) - Updated with darker hover for visibility */
 .btn-primary {
   background: var(--primary);
   color: var(--ink);
 }
 
 .btn-primary:hover {
-  background: var(--primary-dark);
+  background: #F9A825; /* primary-800 - much darker for visibility */
+}
+
+.btn-primary:active {
+  background: #F57F17; /* primary-900 - even darker on press */
 }
 
 /* Dark Button */
@@ -223,7 +227,48 @@ body {
 }
 
 .btn-dark:hover {
-  background: #1a1a1a;
+  background: #333333;
+}
+
+/* ============================================
+   CARD PAPER VARIANTS
+   ============================================ */
+
+/* Card with paper/cream background */
+.card-paper {
+  background: #FDF6E3; /* paper color */
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-neo);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card-paper:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-neo-lg);
+}
+
+/* Elevated card with stronger shadow */
+.card-elevated {
+  background: #FDF6E3;
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-neo-lg);
+}
+
+.card-elevated:hover {
+  box-shadow: 8px 8px 0px 0px var(--ink);
+}
+
+/* Subtle card - less prominent */
+.card-subtle {
+  background: #FAF3E0; /* paper-light */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-fast);
+}
+
+.card-subtle:hover {
+  border-color: var(--ink);
+  box-shadow: var(--shadow-neo-sm);
 }
 
 /* ============================================

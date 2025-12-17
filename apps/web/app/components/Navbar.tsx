@@ -104,8 +104,8 @@ export default function Navbar() {
               <Search className="w-5 h-5" />
             </motion.button>
 
-            {/* Notifications */}
-            <div className="relative" ref={notificationRef}>
+            {/* Notifications - Hidden on mobile (bottom nav handles it) */}
+            <div className="relative hidden md:block" ref={notificationRef}>
               <motion.button
                 className="relative p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
@@ -204,8 +204,8 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Profile */}
-            <Link href="/profile">
+            {/* Profile - Hidden on mobile (bottom nav handles it) */}
+            <Link href="/profile" className="hidden md:block">
               <motion.div
                 className="w-10 h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
                 whileHover={{ scale: 1.05, rotate: -3 }}
