@@ -102,38 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Onboarding Check - Runs after user is loaded
-  useEffect(() => {
-    if (isLoadingUser) return;
-    if (!user) return;
-
-    const hasFullName = !!user.profile?.fullName?.trim();
-    const hasCollege = !!(user.profile?.collegeId || user.profile?.college?.id);
-    
-    // Profile is complete only if both fullName AND college are set
-    const isProfileComplete = hasFullName && hasCollege;
-
-    // Skip redirect for auth callback and public pages
-    const publicPaths = ["/", "/login", "/register", "/auth/callback"];
-    const isPublicPath = publicPaths.some(p => pathname === p || pathname?.startsWith("/auth/"));
-    const isOnboardingPath = pathname?.startsWith("/onboarding");
-
-    console.log("[Auth] Onboarding check:", { hasFullName, hasCollege, isProfileComplete, pathname });
-
-    if (!isProfileComplete && !isOnboardingPath && !isPublicPath) {
-      // Redirect to onboarding - specific step based on what's missing
-      if (hasFullName && !hasCollege) {
-        console.log("[Auth] Redirecting to college selection");
-        router.replace("/onboarding?step=college");
-      } else {
-        console.log("[Auth] Redirecting to onboarding");
-        router.replace("/onboarding");
-      }
-    } else if (isProfileComplete && isOnboardingPath) {
-      console.log("[Auth] Profile complete, redirecting to dashboard");
-      router.replace("/dashboard");
-    }
-  }, [user, isLoadingUser, pathname, router]);
+  // Note: Onboarding redirect is handled by useOnboardingGuard hook in protected pages
+  // This keeps the AuthContext focused on auth state management only
 
   async function syncSession(session: any) {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 
@@ -32,19 +32,6 @@ export function checkOnboardingStatus(user: any): OnboardingCheckResult {
     missingFields.push("collegeId");
   }
 
-  // Debug logging
-  if (typeof window !== 'undefined') {
-    console.log("[OnboardingGuard] Check:", {
-      fullName,
-      hasFullName,
-      collegeId,
-      collegeObjId,
-      hasCollege,
-      missingFields,
-      profile: user?.profile
-    });
-  }
-
   return {
     isComplete: missingFields.length === 0,
     missingFields,
@@ -59,25 +46,29 @@ export function useOnboardingGuard() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
-  const [hasRedirected, setHasRedirected] = useState(false);
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
     // Don't do anything while loading
-    if (loading) return;
+    if (loading) {
+      return;
+    }
     
     // If no user, redirect to login
     if (!user) {
-      console.log("[OnboardingGuard] No user, redirecting to login");
-      router.replace("/login");
+      if (!hasRedirectedRef.current) {
+        hasRedirectedRef.current = true;
+        router.replace("/login");
+      }
       return;
     }
 
     // Check onboarding status
     const { isComplete, missingFields } = checkOnboardingStatus(user);
-    
-    console.log("[OnboardingGuard] Status:", { isComplete, missingFields, hasRedirected });
 
-    if (!isComplete && !hasRedirected) {
+    if (!isComplete && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
+      
       // Store missing fields for onboarding page to highlight
       if (typeof window !== "undefined") {
         sessionStorage.setItem(
@@ -86,20 +77,16 @@ export function useOnboardingGuard() {
         );
       }
       
-      setHasRedirected(true);
-      
       // Redirect to specific step if only college is missing
       if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
-        console.log("[OnboardingGuard] Redirecting to college selection");
         router.replace("/onboarding?step=college");
       } else {
-        console.log("[OnboardingGuard] Redirecting to onboarding");
         router.replace("/onboarding");
       }
     } else if (isComplete) {
       setIsReady(true);
     }
-  }, [user, loading, router, hasRedirected]);
+  }, [user, loading, router]);
 
   return {
     isReady,

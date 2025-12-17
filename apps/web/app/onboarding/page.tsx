@@ -40,6 +40,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { user, refreshUser, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
+  const [initialStepSet, setInitialStepSet] = useState(false);
 
   // Auth Check
   useEffect(() => {
@@ -47,6 +48,23 @@ export default function OnboardingPage() {
       router.replace("/auth/login");
     }
   }, [user, authLoading, router]);
+
+  // Handle ?step=college query parameter
+  useEffect(() => {
+    if (initialStepSet) return;
+    
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get("step");
+    
+    if (stepParam === "college") {
+      // Find the campus step index
+      const campusStepIndex = STEPS.findIndex(s => s.id === "campus");
+      if (campusStepIndex !== -1) {
+        setCurrentStep(campusStepIndex);
+        setInitialStepSet(true);
+      }
+    }
+  }, [initialStepSet]);
 
   // Safety check
   const step = STEPS[currentStep];

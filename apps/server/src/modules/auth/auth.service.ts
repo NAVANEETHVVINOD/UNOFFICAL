@@ -79,7 +79,13 @@ export class AuthService {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
-      include: { profile: true },
+      include: { 
+        profile: {
+          include: {
+            college: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -205,7 +211,13 @@ export class AuthService {
     // Check if internal user exists
     let user = await this.prisma.user.findUnique({
       where: { supabaseId: sub } as any,
-      include: { profile: true },
+      include: { 
+        profile: {
+          include: {
+            college: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -219,7 +231,13 @@ export class AuthService {
           user = await this.prisma.user.update({
             where: { id: existingUser.id },
             data: { supabaseId: sub } as any,
-            include: { profile: true },
+            include: { 
+              profile: {
+                include: {
+                  college: true,
+                },
+              },
+            },
           });
           return user;
         }
@@ -239,7 +257,13 @@ export class AuthService {
               },
             },
           } as any,
-          include: { profile: true },
+          include: { 
+            profile: {
+              include: {
+                college: true,
+              },
+            },
+          },
         });
       } catch (error) {
         // Handle race condition where user was created between findUnique and create
@@ -251,7 +275,13 @@ export class AuthService {
             user = await this.prisma.user.update({
               where: { id: existingUser.id },
               data: { supabaseId: sub } as any,
-              include: { profile: true },
+              include: { 
+                profile: {
+                  include: {
+                    college: true,
+                  },
+                },
+              },
             });
             return user;
           }
