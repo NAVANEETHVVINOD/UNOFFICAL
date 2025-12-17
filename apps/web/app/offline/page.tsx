@@ -10,43 +10,48 @@ export default function OfflinePage() {
 
   return (
     <div className="min-h-screen bg-paper flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+        />
+      </div>
+
       <motion.div
-        className="max-w-md w-full text-center"
+        className="text-center z-10 max-w-md"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
-        {/* Icon */}
         <motion.div
-          className="w-24 h-24 mx-auto mb-8 bg-neutral-100 border-2 border-ink rounded-2xl flex items-center justify-center shadow-neo"
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-24 h-24 mx-auto mb-6 bg-neutral-100 border-4 border-ink rounded-full flex items-center justify-center"
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
         >
-          <WifiOff className="w-12 h-12 text-ink" />
+          <WifiOff className="w-12 h-12 text-neutral-400" />
         </motion.div>
 
-        {/* Title */}
         <h1 className="font-display text-3xl font-bold text-ink mb-4">
           You're Offline
         </h1>
-
-        {/* Description */}
-        <p className="text-ink-light mb-8 leading-relaxed">
-          It looks like you've lost your internet connection. 
-          Check your connection and try again.
+        
+        <p className="text-neutral-600 mb-8">
+          It looks like you've lost your internet connection. Check your network and try again.
         </p>
 
-        {/* Retry Button */}
         <button
           onClick={handleRetry}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-primary border-2 border-ink rounded-lg shadow-neo hover:shadow-neo-lg hover:-translate-y-0.5 transition-all font-bold"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary border-2 border-ink rounded-xl font-bold shadow-neo hover:shadow-neo-lg hover:-translate-y-1 transition-all"
         >
           <RefreshCw className="w-5 h-5" />
           Try Again
         </button>
 
-        {/* Footer */}
-        <p className="mt-12 text-xs text-neutral-400 font-mono uppercase">
+        <p className="mt-8 text-sm text-neutral-400 font-mono">
           LINKER • The Campus Collective
         </p>
       </motion.div>

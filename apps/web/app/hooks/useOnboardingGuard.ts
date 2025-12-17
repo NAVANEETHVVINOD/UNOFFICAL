@@ -11,7 +11,7 @@ interface OnboardingCheckResult {
 
 /**
  * Check if user has completed mandatory onboarding fields
- * Mandatory fields: fullName, collegeId
+ * Mandatory fields: fullName, collegeId (or college.id)
  */
 export function checkOnboardingStatus(user: any): OnboardingCheckResult {
   const missingFields: string[] = [];
@@ -19,13 +19,15 @@ export function checkOnboardingStatus(user: any): OnboardingCheckResult {
   if (!user?.profile?.fullName?.trim()) {
     missingFields.push("fullName");
   }
-  if (!user?.profile?.collegeId) {
+  
+  // Check both collegeId and college.id since the API might return either
+  const hasCollege = !!(user?.profile?.collegeId || user?.profile?.college?.id);
+  if (!hasCollege) {
     missingFields.push("collegeId");
   }
 
   return {
-    isComplete:
-      user?.profile?.isOnboarded === true && missingFields.length === 0,
+    isComplete: missingFields.length === 0,
     missingFields,
   };
 }
