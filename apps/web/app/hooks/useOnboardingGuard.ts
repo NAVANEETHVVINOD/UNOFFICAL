@@ -16,14 +16,33 @@ interface OnboardingCheckResult {
 export function checkOnboardingStatus(user: any): OnboardingCheckResult {
   const missingFields: string[] = [];
 
-  if (!user?.profile?.fullName?.trim()) {
+  const fullName = user?.profile?.fullName;
+  const hasFullName = typeof fullName === 'string' && fullName.trim().length > 0;
+  
+  if (!hasFullName) {
     missingFields.push("fullName");
   }
   
   // Check both collegeId and college.id since the API might return either
-  const hasCollege = !!(user?.profile?.collegeId || user?.profile?.college?.id);
+  const collegeId = user?.profile?.collegeId;
+  const collegeObjId = user?.profile?.college?.id;
+  const hasCollege = !!(collegeId || collegeObjId);
+  
   if (!hasCollege) {
     missingFields.push("collegeId");
+  }
+
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log("[OnboardingGuard] Check:", {
+      fullName,
+      hasFullName,
+      collegeId,
+      collegeObjId,
+      hasCollege,
+      missingFields,
+      profile: user?.profile
+    });
   }
 
   return {
@@ -40,35 +59,50 @@ export function useOnboardingGuard() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) {
-      const { isComplete, missingFields } = checkOnboardingStatus(user);
-      if (!isComplete) {
-        // Store missing fields for onboarding page to highlight
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem(
-            "onboarding_missing_fields",
-            JSON.stringify(missingFields)
-          );
-        }
-        // Redirect to specific step if only college is missing
-        if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
-          router.replace("/onboarding?step=college");
-        } else {
-          router.replace("/onboarding");
-        }
-      } else {
-        setIsReady(true);
-      }
-    } else if (!loading && !user) {
-      // Not logged in, redirect to login
+    // Don't do anything while loading
+    if (loading) return;
+    
+    // If no user, redirect to login
+    if (!user) {
+      console.log("[OnboardingGuard] No user, redirecting to login");
       router.replace("/login");
+      return;
     }
-  }, [user, loading, router]);
+
+    // Check onboarding status
+    const { isComplete, missingFields } = checkOnboardingStatus(user);
+    
+    console.log("[OnboardingGuard] Status:", { isComplete, missingFields, hasRedirected });
+
+    if (!isComplete && !hasRedirected) {
+      // Store missing fields for onboarding page to highlight
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "onboarding_missing_fields",
+          JSON.stringify(missingFields)
+        );
+      }
+      
+      setHasRedirected(true);
+      
+      // Redirect to specific step if only college is missing
+      if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
+        console.log("[OnboardingGuard] Redirecting to college selection");
+        router.replace("/onboarding?step=college");
+      } else {
+        console.log("[OnboardingGuard] Redirecting to onboarding");
+        router.replace("/onboarding");
+      }
+    } else if (isComplete) {
+      setIsReady(true);
+    }
+  }, [user, loading, router, hasRedirected]);
 
   return {
-    isReady: !loading && user && checkOnboardingStatus(user).isComplete,
+    isReady,
     loading,
     user,
   };
