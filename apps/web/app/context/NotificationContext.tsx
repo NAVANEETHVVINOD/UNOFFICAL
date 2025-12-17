@@ -392,21 +392,21 @@ function getMockNotifications(): Notification[] {
   ];
 }
 
-// Notification type icons mapping
+// Notification type icons mapping - using simple text symbols for consistency
 export const NOTIFICATION_ICONS: Record<NotificationType, string> = {
-  LIKE: "❤️",
-  COMMENT: "💬",
-  FOLLOW: "👤",
-  EVENT_REMINDER: "📅",
-  EVENT_APPROVED: "✅",
-  EVENT_REJECTED: "❌",
-  MESSAGE: "✉️",
-  CLUB_UPDATE: "🏛️",
-  CERTIFICATE_READY: "🎓",
-  KARMA_MILESTONE: "⭐",
-  ROLE_CHANGED: "🔑",
+  LIKE: "♥",
+  COMMENT: "◊",
+  FOLLOW: "●",
+  EVENT_REMINDER: "▣",
+  EVENT_APPROVED: "✓",
+  EVENT_REJECTED: "✗",
+  MESSAGE: "✉",
+  CLUB_UPDATE: "⌂",
+  CERTIFICATE_READY: "★",
+  KARMA_MILESTONE: "☆",
+  ROLE_CHANGED: "◈",
   MENTION: "@",
-  SYSTEM: "🔔",
+  SYSTEM: "◉",
 };
 
 // Format relative time

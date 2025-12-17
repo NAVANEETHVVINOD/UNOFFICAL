@@ -9,9 +9,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Core Retro Palette
-        ink: "#0a0a0a",
-        paper: "#ffffff",
+        // Core Retro Palette - Paper tones instead of pure white
+        ink: "#1A1A1A",           // Soft black for reduced eye strain
+        "ink-light": "#4A4A4A",   // Gray for secondary text
+        paper: "#FDF6E3",         // Warm cream (main background)
+        "paper-light": "#FAF3E0", // Lighter cream
+        "paper-dark": "#F5ECD7",  // Slightly darker cream
+        "input-bg": "#FAF8F5",    // Muted input background
         // Primary Yellow - The star of the show
         primary: {
           DEFAULT: "#FFEB3B",

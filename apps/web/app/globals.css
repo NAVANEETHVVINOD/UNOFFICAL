@@ -461,6 +461,82 @@ body {
 }
 
 /* ============================================
+   FORM INPUT STYLING (Retro Aesthetic)
+   ============================================ */
+
+.input-retro {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--ink);
+  background-color: #FAF8F5; /* Muted cream background */
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.input-retro:focus {
+  background-color: var(--paper);
+  box-shadow: var(--shadow-neo);
+}
+
+.input-retro::placeholder {
+  color: #9E9E9E;
+  font-style: italic;
+}
+
+.input-retro:disabled {
+  background-color: #E0E0E0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Error state */
+.input-retro.input-error {
+  border-color: #E74C3C;
+  background-color: #FEF2F2;
+}
+
+/* Success state */
+.input-retro.input-success {
+  border-color: #2ECC71;
+  background-color: #F0FDF4;
+}
+
+/* Textarea variant */
+textarea.input-retro {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Select variant */
+select.input-retro {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231A1A1A' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+/* Required field indicator */
+.required-indicator {
+  color: #E74C3C;
+  font-weight: bold;
+  margin-left: 0.25rem;
+}
+
+/* Form label styling */
+.label-retro {
+  display: block;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4A4A4A;
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================
    LOADING STATES
    ============================================ */
 

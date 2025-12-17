@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "../context/AuthContext";
+import { useOnboardingGuard } from "../hooks/useOnboardingGuard";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
@@ -66,6 +67,7 @@ const trendingTopics = [
 
 function DashboardContent() {
   const { user, loading } = useAuth();
+  const { isReady: onboardingComplete } = useOnboardingGuard();
   const { items, isLoading, loadMore, hasMore } = useInfiniteFeed({ category: 'feed' });
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -94,8 +96,8 @@ function DashboardContent() {
     }
   }, []);
 
-  // Loading State
-  if (loading) return (
+  // Loading State (includes onboarding check)
+  if (loading || !onboardingComplete) return (
     <div className="min-h-screen bg-white bg-grid flex items-center justify-center">
       <motion.div
         className="text-center"

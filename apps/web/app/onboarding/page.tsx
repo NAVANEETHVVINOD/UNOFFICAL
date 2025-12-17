@@ -209,7 +209,20 @@ export default function OnboardingPage() {
         );
         stepData.collegeId = formData.collegeId || null;
       } else if (currentStep === 5) {
-        // Review
+        // Review - Final validation before marking as onboarded
+        // Validate mandatory fields: fullName and collegeId
+        if (!formData.fullName?.trim()) {
+          alert("Full name is required. Please go back and fill it in.");
+          return;
+        }
+        if (!formData.collegeId && !isCustomCollege) {
+          alert("Please select a college before finishing.");
+          return;
+        }
+        if (isCustomCollege && !customCollegeData.name?.trim()) {
+          alert("Please enter your college name.");
+          return;
+        }
         stepData.isOnboarded = true;
       }
 
@@ -222,10 +235,6 @@ export default function OnboardingPage() {
       });
 
       if (currentStep === STEPS.length - 1) {
-        if (!formData.collegeId && !isCustomCollege) {
-          alert("Please select a college before finishing.");
-          return;
-        }
         const duration = Date.now() - startTimeRef.current;
         logEvent("onboarding_completed", { duration_ms: duration });
         // Set welcome flag for dashboard to show welcome toast
@@ -414,9 +423,10 @@ export default function OnboardingPage() {
                     placeholder="Search your college..."
                     autoFocus
                   />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    🔍
-                  </span>
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21l-4.35-4.35"/>
+                  </svg>
                 </div>
 
                 <div className="space-y-2 max-h-[300px] overflow-y-auto">
@@ -441,7 +451,11 @@ export default function OnboardingPage() {
                         <h3 className="font-bold text-sm">{college.name}</h3>
                         <p className="text-xs text-gray-600">{college.city}</p>
                       </div>
-                      {formData.collegeId === college.id && <span>✅</span>}
+                      {formData.collegeId === college.id && (
+                        <svg className="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                        </svg>
+                      )}
                     </div>
                   ))}
                 </div>

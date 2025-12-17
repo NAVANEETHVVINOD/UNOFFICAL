@@ -5,13 +5,18 @@
 
 [1m[46m RUN [49m[22m [36mv4.0.16 [39m[90mF:/kannan/projects/unoffical/apps/web[39m
 
- [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
- [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 47[2mms[22m[39m
- [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 228[2mms[22m[39m
- [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 374[2mms[22m[39m
+ [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 580[2mms[22m[39m
+ [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1019[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 31: Badge count equals number of unread notifications [33m 421[2mms[22m[39m
+ [32m✓[39m __tests__/properties/user-api.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1626[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 50: User clubs API response contains required fields [33m 317[2mms[22m[39m
+ [32m✓[39m __tests__/properties/social-url-validation.property.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 3617[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 33: Valid website URLs are accepted [33m 3430[2mms[22m[39m
 
-[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
-[2m      Tests [22m [1m[32m28 passed[39m[22m[90m (28)[39m
-[2m   Start at [22m 00:14:35
-[2m   Duration [22m 11.60s[2m (transform 739ms, setup 2.21s, import 4.76s, tests 677ms, environment 12.66s)[22m
+[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[32m62 passed[39m[22m[90m (62)[39m
+[2m   Start at [22m 18:16:36
+[2m   Duration [22m 21.16s[2m (transform 4.52s, setup 5.44s, import 17.27s, tests 6.92s, environment 28.29s)[22m
 

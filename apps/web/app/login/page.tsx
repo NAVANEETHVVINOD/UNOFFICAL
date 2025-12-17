@@ -97,18 +97,18 @@ export default function LoginPage() {
 
   return (
     <Container>
-      {/* Simplified Auth Navbar */}
-      <div className="py-4 flex justify-between items-center">
-        <Link href="/" className="font-display text-2xl font-black">
+      {/* Simplified Auth Navbar - Logo only */}
+      <div className="py-3 flex justify-between items-center">
+        <Link href="/" className="font-display text-xl font-black">
           LINKER
         </Link>
         <Link href="/register">
-          <RetroButton variant="outline" className="text-sm py-2 px-4">
+          <RetroButton variant="outline" className="text-xs py-1.5 px-3">
             Sign Up
           </RetroButton>
         </Link>
       </div>
-      <div className="min-h-[calc(100vh-100px)] flex items-center justify-center py-8 md:py-12">
+      <div className="min-h-[calc(100vh-70px)] flex items-center justify-center py-4 md:py-6">
         <div className="w-full max-w-5xl relative">
           {/* Floating Decor */}
           <Doodle
@@ -174,27 +174,30 @@ export default function LoginPage() {
             </div>
 
             {/* RIGHT SIDE: Form */}
-            <div className="p-8 md:p-16 bg-white relative flex flex-col justify-center">
+            <div className="p-6 md:p-10 bg-white relative flex flex-col justify-center">
               <Tape className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-1" />
-              <Sticker className="absolute top-4 right-4 bg-accent-blue text-white rotate-6 hidden md:block">
+              <Sticker className="absolute top-3 right-3 bg-accent-blue text-white rotate-6 hidden md:block text-xs">
                 SECURE
               </Sticker>
 
-              <div className="mb-8">
-                <h2 className="font-bold text-2xl mb-1">Access Your Account</h2>
-                <p className="text-gray-500 text-sm">
+              <div className="mb-5">
+                <h2 className="font-bold text-xl mb-1">Access Your Account</h2>
+                <p className="text-gray-500 text-xs">
                   Enter your credentials to continue.
                 </p>
               </div>
 
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-pulse">
-                  ⚠️ {error}
+                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-pulse flex items-center gap-2">
+                  <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+                  </svg>
+                  {error}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1">
                   <label
                     htmlFor="email"
                     className="font-bold text-xs uppercase tracking-wider text-gray-700"
@@ -207,22 +210,22 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => handleEmailChange(e.target.value)}
                     onBlur={() => handleBlur("email")}
-                    className={`w-full p-4 border-2 ${
+                    className={`w-full p-3 border-2 ${
                       validationErrors.email && touched.email
                         ? "border-red-500 bg-red-50"
-                        : "border-black bg-gray-50"
-                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
+                        : "border-black bg-input-bg"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium text-sm`}
                     placeholder="student@college.edu"
                     autoComplete="email"
                   />
                   {validationErrors.email && touched.email && (
-                    <p className="text-red-500 text-xs font-bold mt-1">
+                    <p className="text-red-500 text-xs font-bold">
                       {validationErrors.email}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div className="flex justify-between items-center">
                     <label
                       htmlFor="password"
@@ -243,16 +246,16 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     onBlur={() => handleBlur("password")}
-                    className={`w-full p-4 border-2 ${
+                    className={`w-full p-3 border-2 ${
                       validationErrors.password && touched.password
                         ? "border-red-500 bg-red-50"
-                        : "border-black bg-gray-50"
-                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium`}
+                        : "border-black bg-input-bg"
+                    } focus:bg-white focus:shadow-neo transition-all outline-none rounded-lg font-medium text-sm`}
                     placeholder="••••••••"
                     autoComplete="current-password"
                   />
                   {validationErrors.password && touched.password && (
-                    <p className="text-red-500 text-xs font-bold mt-1">
+                    <p className="text-red-500 text-xs font-bold">
                       {validationErrors.password}
                     </p>
                   )}
@@ -260,13 +263,13 @@ export default function LoginPage() {
 
                 <RetroButton
                   type="submit"
-                  className="w-full py-4 text-lg mt-4"
+                  className="w-full py-3 text-base mt-2"
                   disabled={loading}
                 >
                   {loading ? "AUTHENTICATING..." : "LOGIN ->"}
                 </RetroButton>
 
-                <div className="relative my-4">
+                <div className="relative my-3">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-gray-300" />
                   </div>
@@ -280,10 +283,10 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => loginWithGoogle()}
-                  className="w-full py-4 border-2 border-black bg-white hover:bg-gray-50 transition-colors rounded-lg font-bold flex items-center justify-center gap-3"
+                  className="w-full py-3 border-2 border-black bg-white hover:bg-gray-50 transition-colors rounded-lg font-bold flex items-center justify-center gap-2 text-sm"
                   disabled={loading}
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
                       fill="currentColor"
                       d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27c3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10c5.35 0 9.25-3.67 9.25-9.09c0-1.15-.15-1.81-.15-1.81Z"
@@ -293,7 +296,7 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              <div className="mt-8 pt-8 border-t border-gray-100 text-center">
+              <div className="mt-5 pt-5 border-t border-gray-100 text-center">
                 <p className="text-sm text-gray-600">
                   Don't have an account?{" "}
                   <Link

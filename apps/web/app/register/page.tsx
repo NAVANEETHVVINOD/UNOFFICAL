@@ -117,18 +117,18 @@ export default function RegisterPage() {
 
   return (
     <Container>
-      {/* Simplified Auth Navbar */}
-      <div className="py-4 flex justify-between items-center">
-        <Link href="/" className="font-display text-2xl font-black">
+      {/* Simplified Auth Navbar - Logo only */}
+      <div className="py-3 flex justify-between items-center">
+        <Link href="/" className="font-display text-xl font-black">
           LINKER
         </Link>
         <Link href="/login">
-          <RetroButton variant="outline" className="text-sm py-2 px-4">
+          <RetroButton variant="outline" className="text-xs py-1.5 px-3">
             Login
           </RetroButton>
         </Link>
       </div>
-      <div className="min-h-[calc(100vh-100px)] flex items-center justify-center py-8 md:py-12">
+      <div className="min-h-[calc(100vh-70px)] flex items-center justify-center py-4 md:py-6">
         <div className="w-full max-w-5xl relative">
           {/* Floating Decor */}
           <Doodle
@@ -206,8 +206,11 @@ export default function RegisterPage() {
               </div>
 
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-pulse">
-                  ⚠️ {error}
+                <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-pulse flex items-center gap-2">
+                  <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+                  </svg>
+                  {error}
                 </div>
               )}
 
