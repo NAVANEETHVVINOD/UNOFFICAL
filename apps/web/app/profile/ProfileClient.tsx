@@ -94,7 +94,7 @@ function ProfileContent() {
     degree: "Bachelor of Technology",
     field: "Computer Science",
     institution: user.profile.college.name,
-    location: user.profile.college.city || "",
+    location: "",
   }] : [];
   const experienceData: any[] = [];
   const volunteeringData: any[] = [];
