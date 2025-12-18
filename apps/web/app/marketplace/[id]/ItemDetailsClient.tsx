@@ -12,7 +12,8 @@ import {
 } from "../../components/ui/NewspaperUI";
 import Doodle from "../../components/ui/Doodle";
 import { PageTransition } from "../../providers/AnimationProvider";
-import DashboardNavbar from "../../components/ui/DashboardNavbar";
+import Navbar from "../../components/Navbar";
+import BottomNav from "../../components/ui/BottomNav";
 import { motion } from "framer-motion";
 import { api } from "../../../lib/api";
 import { useAuth } from "../../context/AuthContext";
@@ -110,11 +111,11 @@ export default function ItemDetailsClient() {
 
   return (
     <PageTransition>
-      <Container>
-        <div className="py-8 min-h-screen">
-          <DashboardNavbar />
-
-          <div className="max-w-4xl mx-auto mt-12">
+      <div className="min-h-screen bg-paper">
+        <Navbar />
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+            <div className="max-w-4xl mx-auto mt-4 md:mt-8">
             <RetroButton
               onClick={() => router.push("/marketplace")}
               variant="outline"
@@ -163,7 +164,7 @@ export default function ItemDetailsClient() {
                   <Badge className="bg-accent-yellow text-black border-black mb-2 text-lg px-4 py-1">
                     ₹{item.price}
                   </Badge>
-                  <h1 className="font-display text-4xl md:text-5xl font-black mb-4 leading-tight">
+                  <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-black mb-4 leading-tight">
                     {item.title}
                   </h1>
                   <div className="flex items-center gap-2 mb-6">
@@ -211,8 +212,10 @@ export default function ItemDetailsClient() {
               </motion.div>
             </div>
           </div>
-        </div>
-      </Container>
+          </div>
+        </Container>
+        <BottomNav />
+      </div>
     </PageTransition>
   );
 }

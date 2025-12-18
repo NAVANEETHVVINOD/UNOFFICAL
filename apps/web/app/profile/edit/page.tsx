@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { api } from "../../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { ArrowLeft, Save, User, FileText, Github, Instagram, Linkedin, Tag, Camera } from "lucide-react";
+import BottomNav from "../../components/ui/BottomNav";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -82,22 +83,22 @@ export default function EditProfilePage() {
       </div>
 
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-paper/95 backdrop-blur-sm border-b border-ink/10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="fixed top-0 left-0 right-0 z-30 bg-paper/95 backdrop-blur-sm border-b border-ink/10">
+        <div className="max-w-2xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 font-bold text-sm hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back
+            <span className="hidden sm:inline">Back</span>
           </button>
-          <h1 className="font-display text-lg font-bold uppercase">Edit Profile</h1>
-          <div className="w-16" />
+          <h1 className="font-display text-base md:text-lg font-bold uppercase">Edit Profile</h1>
+          <div className="w-10 md:w-16" />
         </div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-16 md:pt-20 pb-24 md:pb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -240,8 +241,7 @@ export default function EditProfilePage() {
         </motion.div>
       </div>
 
-      {/* Bottom padding for mobile */}
-      <div className="h-8" />
+      <BottomNav />
     </div>
   );
 }

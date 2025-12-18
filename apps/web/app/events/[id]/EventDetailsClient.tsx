@@ -12,7 +12,8 @@ import {
 } from "../../components/ui/NewspaperUI";
 import Doodle from "../../components/ui/Doodle";
 import { PageTransition } from "../../providers/AnimationProvider";
-import DashboardNavbar from "../../components/ui/DashboardNavbar";
+import Navbar from "../../components/Navbar";
+import BottomNav from "../../components/ui/BottomNav";
 import { motion } from "framer-motion";
 import { api } from "../../../lib/api";
 import { useAuth } from "../../context/AuthContext";
@@ -170,11 +171,11 @@ export default function EventDetailsClient() {
 
   return (
     <PageTransition>
-      <Container>
-        <div className="py-8 min-h-screen">
-          <DashboardNavbar />
-
-          <div className="max-w-4xl mx-auto mt-12">
+      <div className="min-h-screen bg-paper">
+        <Navbar />
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+            <div className="max-w-4xl mx-auto mt-4 md:mt-8">
             <RetroButton
               onClick={() => router.push("/events")}
               variant="outline"
@@ -199,7 +200,7 @@ export default function EventDetailsClient() {
                   <Badge className="bg-white text-black border-black mb-4">
                     {event.club?.name || "CAMPUS EVENT"}
                   </Badge>
-                  <h1 className="font-display text-4xl md:text-6xl font-black mb-4 leading-tight">
+                  <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-black mb-4 leading-tight">
                     {event.title}
                   </h1>
                   <div className="flex flex-col md:flex-row gap-4 md:gap-8 font-mono text-sm">
@@ -355,8 +356,10 @@ export default function EventDetailsClient() {
               onClose={() => setShowCertPreview(false)}
             />
           )}
-        </div>
-      </Container>
+          </div>
+        </Container>
+        <BottomNav />
+      </div>
     </PageTransition>
   );
 }

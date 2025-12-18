@@ -10,6 +10,7 @@ import {
 import Doodle from "../components/ui/Doodle";
 import { PageTransition } from "../providers/AnimationProvider";
 import Navbar from "../components/Navbar";
+import BottomNav from "../components/ui/BottomNav";
 import CategoryRibbon from "../components/CategoryRibbon";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../lib/api";
@@ -168,19 +169,19 @@ export default function EventsClient() {
         <Navbar />
 
         <Container>
-          <div className="py-6 relative z-10">
-            <CategoryRibbon className="mb-6" />
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8 relative z-10">
+            <CategoryRibbon className="mb-6 mt-4" />
 
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 text-center"
+              className="mb-6 md:mb-8 text-center"
             >
-              <h1 className="font-display text-4xl md:text-5xl font-black mb-2">
+              <h1 className="font-display text-3xl md:text-5xl font-black mb-2">
                 CAMPUS EVENTS
               </h1>
-              <p className="font-mono text-sm text-gray-600">
+              <p className="font-mono text-xs md:text-sm text-gray-600">
                 Don't miss out. Be there or be square.
               </p>
             </motion.div>
@@ -377,6 +378,8 @@ export default function EventsClient() {
             )}
           </div>
         </Container>
+
+        <BottomNav />
       </motion.div>
     </PageTransition>
   );

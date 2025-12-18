@@ -12,7 +12,8 @@ import {
 } from "../../components/ui/NewspaperUI";
 import Doodle from "../../components/ui/Doodle";
 import { PageTransition } from "../../providers/AnimationProvider";
-import DashboardNavbar from "../../components/ui/DashboardNavbar";
+import Navbar from "../../components/Navbar";
+import BottomNav from "../../components/ui/BottomNav";
 import { motion } from "framer-motion";
 import { api } from "../../../lib/api";
 import { useAuth } from "../../context/AuthContext";
@@ -112,11 +113,11 @@ export default function ClubDetailsClient() {
 
   return (
     <PageTransition>
-      <Container>
-        <div className="py-8 min-h-screen">
-          <DashboardNavbar />
-
-          <div className="max-w-4xl mx-auto mt-12">
+      <div className="min-h-screen bg-paper">
+        <Navbar />
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+            <div className="max-w-4xl mx-auto mt-4 md:mt-8">
             <RetroButton
               onClick={() => router.push("/clubs")}
               variant="outline"
@@ -142,7 +143,7 @@ export default function ClubDetailsClient() {
                         </span>
                       </div>
                       <div>
-                        <h1 className="font-display text-4xl md:text-5xl font-black mb-2">
+                        <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-black mb-2">
                           {club.name}
                         </h1>
                         <Badge className="bg-accent-yellow text-black border-black">
@@ -191,7 +192,7 @@ export default function ClubDetailsClient() {
                 </motion.div>
               </div>
 
-              {/* Right Column: Sidebar */}
+              {/* Right Column: Sidebar - Hidden on mobile */}
               <div className="space-y-8">
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -236,8 +237,10 @@ export default function ClubDetailsClient() {
               </div>
             </div>
           </div>
-        </div>
-      </Container>
+          </div>
+        </Container>
+        <BottomNav />
+      </div>
     </PageTransition>
   );
 }

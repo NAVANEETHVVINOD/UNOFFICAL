@@ -12,7 +12,8 @@ import {
 } from "../../components/ui/NewspaperUI";
 import Doodle from "../../components/ui/Doodle";
 import { PageTransition } from "../../providers/AnimationProvider";
-import DashboardNavbar from "../../components/ui/DashboardNavbar";
+import Navbar from "../../components/Navbar";
+import BottomNav from "../../components/ui/BottomNav";
 import { motion } from "framer-motion";
 import { api } from "../../../lib/api";
 
@@ -46,11 +47,11 @@ export default function CreateListingPage() {
 
   return (
     <PageTransition>
-      <Container>
-        <div className="py-8 min-h-screen">
-          <DashboardNavbar />
-
-          <div className="max-w-2xl mx-auto mt-12">
+      <div className="min-h-screen bg-paper">
+        <Navbar />
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+            <div className="max-w-2xl mx-auto mt-4 md:mt-8">
             <RetroButton
               onClick={() => router.push("/marketplace")}
               variant="outline"
@@ -67,7 +68,7 @@ export default function CreateListingPage() {
               <Tape className="absolute -top-4 left-1/2 -translate-x-1/2 z-10" />
               <NewspaperCard className="p-8 border-4">
                 <div className="text-center mb-8">
-                  <h1 className="font-display text-4xl font-black mb-2">
+                  <h1 className="font-display text-2xl sm:text-4xl font-black mb-2">
                     SELL AN ITEM
                   </h1>
                   <p className="font-hand text-xl text-gray-600">
@@ -231,8 +232,10 @@ export default function CreateListingPage() {
               </NewspaperCard>
             </motion.div>
           </div>
-        </div>
-      </Container>
+          </div>
+        </Container>
+        <BottomNav />
+      </div>
     </PageTransition>
   );
 }

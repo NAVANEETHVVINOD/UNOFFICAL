@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import Container from "../../components/ui/Container";
-import DashboardNavbar from "../../components/ui/DashboardNavbar";
+import Navbar from "../../components/Navbar";
+import BottomNav from "../../components/ui/BottomNav";
 import { NewspaperCard, RetroButton, Tape } from "../../components/ui/NewspaperUI";
 import { PageTransition } from "../../providers/AnimationProvider";
 import { ErrorBoundary, LoadingState } from "../../components/ErrorBoundary";
@@ -147,11 +148,11 @@ function UploadContent() {
 
   return (
     <PageTransition>
-      <Container>
-        <div className="py-8 min-h-screen">
-          <DashboardNavbar />
-
-          <div className="max-w-2xl mx-auto mt-12">
+      <div className="min-h-screen bg-paper">
+        <Navbar />
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+            <div className="max-w-2xl mx-auto mt-4 md:mt-8">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -161,8 +162,8 @@ function UploadContent() {
               <Link href="/notes" className="text-sm font-mono text-gray-500 hover:text-black mb-2 inline-block">
                 ← Back to Notes
               </Link>
-              <h1 className="font-display text-3xl md:text-4xl font-black uppercase flex items-center gap-3">
-                <Upload className="w-8 h-8" />
+              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-black uppercase flex items-center gap-2 sm:gap-3">
+                <Upload className="w-6 h-6 sm:w-8 sm:h-8" />
                 Upload Notes
               </h1>
               <p className="font-mono text-gray-500 mt-2">Share your knowledge with fellow students</p>
@@ -354,8 +355,10 @@ function UploadContent() {
               </ul>
             </motion.div>
           </div>
-        </div>
-      </Container>
+          </div>
+        </Container>
+        <BottomNav />
+      </div>
     </PageTransition>
   );
 }

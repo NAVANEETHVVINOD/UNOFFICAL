@@ -9,6 +9,7 @@ import {
 } from "../components/ui/NewspaperUI";
 import { PageTransition } from "../providers/AnimationProvider";
 import Navbar from "../components/Navbar";
+import BottomNav from "../components/ui/BottomNav";
 import CategoryRibbon from "../components/CategoryRibbon";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../lib/api";
@@ -139,20 +140,20 @@ export default function MarketplaceClient() {
         <Navbar />
 
         <Container>
-          <div className="py-6 relative z-10">
-            <CategoryRibbon className="mb-6" />
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8 relative z-10">
+            <CategoryRibbon className="mb-6 mt-4" />
 
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+              className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
             >
               <div>
-                <h1 className="font-display text-4xl md:text-5xl font-black mb-1">
+                <h1 className="font-display text-3xl md:text-5xl font-black mb-1">
                   MARKETPLACE
                 </h1>
-                <p className="font-mono text-sm text-gray-600">
+                <p className="font-mono text-xs md:text-sm text-gray-600">
                   Buy, sell, trade with fellow students
                 </p>
               </div>
@@ -381,6 +382,8 @@ export default function MarketplaceClient() {
             )}
           </div>
         </Container>
+
+        <BottomNav />
       </motion.div>
     </PageTransition>
   );

@@ -11,7 +11,8 @@ import {
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
 import { PageTransition } from "../providers/AnimationProvider";
-import DashboardNavbar from "../components/ui/DashboardNavbar";
+import Navbar from "../components/Navbar";
+import BottomNav from "../components/ui/BottomNav";
 import { motion } from "framer-motion";
 import { api } from "../../lib/api";
 import Link from "next/link";
@@ -55,28 +56,28 @@ export default function ClubsClient() {
 
   return (
     <PageTransition>
-      <Container>
-        <div className="py-8 min-h-screen">
-          <DashboardNavbar />
-
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-12 text-center relative"
-          >
-            <Doodle
-              src="/doodles/group.svg"
-              className="w-24 h-24 absolute -top-12 left-1/2 -translate-x-1/2 -z-10 opacity-20"
-            />
-            <h1 className="font-display text-5xl md:text-7xl font-black mb-4">
-              CAMPUS CLUBS
-            </h1>
-            <p className="font-hand text-xl text-gray-600 max-w-2xl mx-auto">
-              Find your tribe. Join a community. Make some noise.
-            </p>
-          </motion.div>
+      <div className="min-h-screen bg-paper">
+        <Navbar />
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8 md:mb-12 text-center relative mt-4"
+            >
+              <Doodle
+                src="/doodles/group.svg"
+                className="w-20 h-20 md:w-24 md:h-24 absolute -top-10 md:-top-12 left-1/2 -translate-x-1/2 -z-10 opacity-20"
+              />
+              <h1 className="font-display text-3xl md:text-5xl lg:text-7xl font-black mb-2 md:mb-4">
+                CAMPUS CLUBS
+              </h1>
+              <p className="font-hand text-base md:text-xl text-gray-600 max-w-2xl mx-auto px-4">
+                Find your tribe. Join a community. Make some noise.
+              </p>
+            </motion.div>
 
           {/* Search Bar */}
           <motion.div
@@ -108,7 +109,7 @@ export default function ClubsClient() {
               <p className="font-mono mt-4">Loading clubs...</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
               {filteredClubs.map((club, index) => (
                 <motion.div
                   key={club.id}
@@ -162,8 +163,10 @@ export default function ClubsClient() {
               </p>
             </div>
           )}
-        </div>
-      </Container>
+          </div>
+        </Container>
+        <BottomNav />
+      </div>
     </PageTransition>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from "../context/NotificationContext";
 import { useBlocking } from "../hooks/useBlocking";
 import Link from "next/link";
+import BottomNav from "../components/ui/BottomNav";
 
 function getNotificationIcon(type: NotificationType): string {
   return NOTIFICATION_ICONS[type] || "🔔";
@@ -89,22 +90,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-paper/95 backdrop-blur-sm border-b border-ink/10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="fixed top-0 left-0 right-0 z-30 bg-paper/95 backdrop-blur-sm border-b border-ink/10">
+        <div className="max-w-4xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 font-bold text-sm hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back
+            <span className="hidden sm:inline">Back</span>
           </button>
           <div className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
-            <h1 className="font-display text-lg font-bold uppercase">Settings</h1>
+            <h1 className="font-display text-base md:text-lg font-bold uppercase">Settings</h1>
           </div>
           <Link href="/profile">
             <motion.div
-              className="w-10 h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
+              className="w-9 h-9 md:w-10 md:h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -116,7 +117,7 @@ export default function SettingsPage() {
                 />
               ) : (
                 <div className="w-full h-full bg-primary/20 flex items-center justify-center">
-                  <User className="w-5 h-5 text-ink/50" />
+                  <User className="w-4 h-4 md:w-5 md:h-5 text-ink/50" />
                 </div>
               )}
             </motion.div>
@@ -125,7 +126,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 py-8">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 pt-16 md:pt-20 pb-24 md:pb-8">
         {/* User Info Card */}
         <motion.div
           className="card-paper p-6 rounded-xl mb-8"
@@ -157,34 +158,34 @@ export default function SettingsPage() {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
           {/* Sidebar */}
           <div className="md:col-span-1">
-            <div className="card-paper p-4 rounded-xl">
-              <nav className="space-y-1">
+            <div className="card-paper p-3 md:p-4 rounded-xl">
+              <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible scrollbar-hide">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                    className={`flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg transition-all ${
                       activeTab === tab.id
                         ? "bg-primary border-2 border-ink shadow-neo-sm"
-                        : "hover:bg-neutral-100"
+                        : "hover:bg-neutral-100 border-2 border-transparent"
                     }`}
                   >
-                    <tab.icon className="w-5 h-5" />
-                    <span className="font-bold text-sm">{tab.label}</span>
+                    <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
+                    <span className="font-bold text-xs md:text-sm whitespace-nowrap">{tab.label}</span>
                   </button>
                 ))}
                 
-                <hr className="my-4 border-neutral-200" />
+                <hr className="hidden md:block my-4 border-neutral-200" />
                 
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                  className="flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span className="font-bold text-sm">Log Out</span>
+                  <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="font-bold text-xs md:text-sm whitespace-nowrap">Log Out</span>
                 </button>
               </nav>
             </div>
@@ -399,8 +400,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Bottom padding for mobile */}
-      <div className="h-20 md:h-8" />
+      <BottomNav />
     </div>
   );
 }

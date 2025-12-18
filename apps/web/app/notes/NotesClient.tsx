@@ -10,7 +10,8 @@ import {
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
 import { PageTransition } from "../providers/AnimationProvider";
-import DashboardNavbar from "../components/ui/DashboardNavbar";
+import Navbar from "../components/Navbar";
+import BottomNav from "../components/ui/BottomNav";
 import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import { motion } from "framer-motion";
 import { containerVariants, itemVariants } from "../../lib/animations";
@@ -171,7 +172,7 @@ function NotesContent() {
 
   return (
     <PageTransition>
-      <div className="bg-gray-100 min-h-screen">
+      <div className="bg-paper min-h-screen">
         <div className="fixed inset-0 pointer-events-none z-0"
           style={{
             backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
@@ -179,25 +180,25 @@ function NotesContent() {
           }}>
         </div>
 
-        <Container>
-          <div className="py-8 min-h-screen relative z-10">
-            <DashboardNavbar />
+        <Navbar />
 
+        <Container>
+          <div className="pt-16 md:pt-20 pb-24 md:pb-8 min-h-screen relative z-10">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mt-12 mb-8 text-center relative"
+              className="mt-4 md:mt-8 mb-6 md:mb-8 text-center relative"
             >
               <Doodle
                 src="/doodles/book.svg"
-                className="w-24 h-24 absolute -top-12 left-1/4 -z-10 opacity-20 -rotate-12"
+                className="w-20 h-20 md:w-24 md:h-24 absolute -top-10 md:-top-12 left-1/4 -z-10 opacity-20 -rotate-12"
               />
-              <h1 className="font-display text-4xl md:text-5xl font-black mb-2">
+              <h1 className="font-display text-3xl md:text-5xl font-black mb-2">
                 STUDY NOTES
               </h1>
-              <p className="font-hand text-lg text-gray-600">
+              <p className="font-hand text-base md:text-lg text-gray-600">
                 Share knowledge, ace exams together
               </p>
             </motion.div>
@@ -362,10 +363,10 @@ function NotesContent() {
                 ))}
               </motion.div>
             ) : (
-              <NewspaperCard className="p-12 text-center border-4">
-                <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <h2 className="font-display text-2xl font-black mb-2">No Notes Found</h2>
-                <p className="text-gray-500 mb-6">
+              <NewspaperCard className="p-8 md:p-12 text-center border-4">
+                <FileText className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-300" />
+                <h2 className="font-display text-xl md:text-2xl font-black mb-2">No Notes Found</h2>
+                <p className="text-gray-500 mb-6 text-sm md:text-base">
                   {searchQuery 
                     ? `No notes match "${searchQuery}"`
                     : "Be the first to share notes for this subject!"}
@@ -380,6 +381,8 @@ function NotesContent() {
             )}
           </div>
         </Container>
+
+        <BottomNav />
       </div>
     </PageTransition>
   );
