@@ -56,7 +56,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-paper border-b-2 border-ink">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-paper border-b-2 border-ink">
       <div className="max-w-[1400px] mx-auto">
         {/* Main Navbar */}
         <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-4 lg:px-6">

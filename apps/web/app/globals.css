@@ -622,3 +622,78 @@ select.input-retro {
   height: 200px;
   border-radius: 8px;
 }
+
+
+/* ============================================
+   SAFE AREA PADDING (for mobile notches)
+   ============================================ */
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);
+}
+
+/* ============================================
+   MOBILE-FIRST UTILITIES
+   ============================================ */
+
+/* Fixed header spacing */
+.pt-navbar {
+  padding-top: 3.5rem; /* 56px - mobile navbar height */
+}
+
+@media (min-width: 768px) {
+  .pt-navbar {
+    padding-top: 4rem; /* 64px - desktop navbar height */
+  }
+}
+
+/* Chat bubble styles */
+.chat-bubble-sent {
+  background: var(--primary);
+  border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
+}
+
+.chat-bubble-received {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
+}
+
+/* Soft shadow for chat */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Typing indicator animation */
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+}
+
+.typing-dot {
+  animation: typing-bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0ms; }
+.typing-dot:nth-child(2) { animation-delay: 160ms; }
+.typing-dot:nth-child(3) { animation-delay: 320ms; }

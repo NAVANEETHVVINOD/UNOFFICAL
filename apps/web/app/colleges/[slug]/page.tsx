@@ -104,7 +104,7 @@ export default async function CollegeHome({ params }: PageProps) {
       <Navbar />
 
       <Container>
-        <div className="py-6 space-y-6 relative z-10">
+        <div className="pt-20 md:pt-24 pb-6 space-y-6 relative z-10">
           {/* Compact Header */}
           <div className="bg-white/80 backdrop-blur-sm border-2 border-ink rounded-2xl p-4 md:p-6 shadow-neo">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">

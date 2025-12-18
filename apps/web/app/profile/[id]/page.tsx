@@ -174,7 +174,7 @@ export default function UserProfilePage() {
       <Navbar />
 
       <Container>
-        <div className="py-6 relative z-10">
+        <div className="pt-20 md:pt-24 pb-6 relative z-10">
           {/* Back Button */}
           <button
             onClick={() => router.back()}

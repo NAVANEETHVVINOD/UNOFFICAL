@@ -152,8 +152,8 @@ function DashboardContent() {
       {/* Fixed Header */}
       <Navbar />
 
-      {/* Main Layout */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6">
+      {/* Main Layout - with top padding for fixed navbar */}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-16 md:pt-20">
         <div className="flex gap-6 pt-4">
           
           {/* LEFT SIDEBAR - Desktop Only */}
