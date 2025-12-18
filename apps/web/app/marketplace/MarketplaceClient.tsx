@@ -57,10 +57,15 @@ export default function MarketplaceClient() {
     setError(null);
     try {
       const data = await api.getMarketplaceListings();
-      setListings(data);
+      // Ensure data is an array and filter out invalid items
+      const validListings = Array.isArray(data) 
+        ? data.filter((item: any) => item && item.id && item.owner?.profile)
+        : [];
+      setListings(validListings);
     } catch (err) {
       console.error("Failed to fetch listings:", err);
       setError("Failed to load listings. Please try again.");
+      setListings([]);
     } finally {
       setLoading(false);
     }

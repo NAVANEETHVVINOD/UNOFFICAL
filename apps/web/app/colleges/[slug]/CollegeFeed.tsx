@@ -9,7 +9,7 @@ import Doodle from "../../components/ui/Doodle";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { containerVariants, itemVariants, cardHoverVariants } from "../../../lib/animations";
-import { Calendar, Users, BookOpen, ShoppingBag, Bell, TrendingUp, Megaphone } from "lucide-react";
+import { Calendar, Users, BookOpen, ShoppingBag, Bell, TrendingUp, Megaphone, Sparkles, Zap, ArrowRight, Hash } from "lucide-react";
 
 interface CollegeStats {
     totalClubs: number;
@@ -35,17 +35,18 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
     const [stats, setStats] = useState<CollegeStats | null>(null);
     const [clubs, setClubs] = useState<Club[]>([]);
+    const [error, setError] = useState<string | null>(null);
     const [announcements] = useState([
-        { id: 1, title: "Campus closed for maintenance", date: "Dec 20" },
-        { id: 2, title: "New semester registration open", date: "Jan 5" },
-        { id: 3, title: "Library hours extended", date: "Dec 18" },
+        { id: 1, title: "Campus closed for maintenance", date: "Dec 20", type: "warning" },
+        { id: 2, title: "New semester registration open", date: "Jan 5", type: "info" },
+        { id: 3, title: "Library hours extended", date: "Dec 18", type: "success" },
     ]);
 
     const loadFeed = async (reset = false) => {
         const currentPage = reset ? 1 : page;
-
         if (reset) {
             setLoading(true);
+            setError(null);
         } else {
             setIsLoadingMore(true);
         }
@@ -91,6 +92,7 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
 
         } catch (e) {
             console.error("Feed error", e);
+            setError("Failed to load feed. Please try again.");
         } finally {
             setLoading(false);
             setIsLoadingMore(false);
@@ -155,14 +157,14 @@ export default function CollegeFeed({ collegeSlug, initialEvents }: { collegeSlu
                             <RetroButton onClick={() => setIsPostModalOpen(true)} className="w-full text-xs py-2">
                                 + Create Post
                             </RetroButton>
-                            <Link href={`/colleges/${collegeSlug}/events`}>
+                            <Link href="/notes">
                                 <RetroButton variant="outline" className="w-full text-xs py-2">
-                                    <Calendar className="w-3 h-3" /> Events
+                                    <BookOpen className="w-3 h-3" /> Notes
                                 </RetroButton>
                             </Link>
-                            <Link href={`/colleges/${collegeSlug}/marketplace`}>
+                            <Link href={`/clubs?college=${collegeSlug}`}>
                                 <RetroButton variant="outline" className="w-full text-xs py-2">
-                                    <ShoppingBag className="w-3 h-3" /> Market
+                                    <Users className="w-3 h-3" /> Clubs
                                 </RetroButton>
                             </Link>
                         </div>
