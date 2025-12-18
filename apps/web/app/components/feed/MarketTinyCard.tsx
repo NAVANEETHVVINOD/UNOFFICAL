@@ -13,7 +13,7 @@ export default function MarketTinyCard({ listing }: { listing: any }) {
     };
 
     return (
-        <div className="flex bg-white border-2 border-black shadow-neo hover:shadow-neo-lg transition-all group overflow-hidden h-32">
+        <div className="flex bg-paper border-2 border-black shadow-neo hover:shadow-neo-lg transition-all group overflow-hidden h-32 rounded-card-lg">
             {/* Left: Image */}
             <div className="w-32 h-full relative border-r-2 border-black">
                 <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />

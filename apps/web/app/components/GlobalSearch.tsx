@@ -241,8 +241,6 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
   if (!isOpen) return null;
 
-  let currentIndex = 0;
-
   return (
     <AnimatePresence>
       <motion.div
@@ -262,7 +260,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
         {/* Search Modal */}
         <motion.div
-          className="relative w-full max-w-2xl mx-4 bg-white border-4 border-black shadow-neo-lg overflow-hidden"
+          className="relative w-full max-w-2xl mx-4 bg-paper border-2 border-ink shadow-neo-lg overflow-hidden rounded-card-xl"
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -314,43 +312,40 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               <ResultSection
                 title="People"
                 results={results.users}
-                startIndex={currentIndex}
+                startIndex={0}
                 selectedIndex={selectedIndex}
                 onSelect={navigateToResult}
               />
             )}
-            {(currentIndex += results.users.length) && null}
 
             {/* Events */}
             {results.events.length > 0 && (
               <ResultSection
                 title="Events"
                 results={results.events}
-                startIndex={currentIndex}
+                startIndex={results.users.length}
                 selectedIndex={selectedIndex}
                 onSelect={navigateToResult}
               />
             )}
-            {(currentIndex += results.events.length) && null}
 
             {/* Clubs */}
             {results.clubs.length > 0 && (
               <ResultSection
                 title="Clubs"
                 results={results.clubs}
-                startIndex={currentIndex}
+                startIndex={results.users.length + results.events.length}
                 selectedIndex={selectedIndex}
                 onSelect={navigateToResult}
               />
             )}
-            {(currentIndex += results.clubs.length) && null}
 
             {/* Marketplace */}
             {results.listings.length > 0 && (
               <ResultSection
                 title="Marketplace"
                 results={results.listings}
-                startIndex={currentIndex}
+                startIndex={results.users.length + results.events.length + results.clubs.length}
                 selectedIndex={selectedIndex}
                 onSelect={navigateToResult}
               />

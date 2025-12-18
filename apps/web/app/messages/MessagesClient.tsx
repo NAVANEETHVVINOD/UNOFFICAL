@@ -231,8 +231,8 @@ export default function MessagesClient() {
                 const isUnread = lastMessage && !lastMessage.seen && lastMessage.senderId !== user?.id;
                 const isFromMe = lastMessage?.senderId === user?.id;
                 const avatarUrl = conv.isGroup ? conv.groupAvatar : otherParticipant?.profile?.avatarUrl;
-                const name = conv.isGroup ? conv.groupName : otherParticipant?.profile?.fullName || "Unknown";
-                const initial = name[0]?.toUpperCase() || "?";
+                const name = conv.isGroup ? (conv.groupName || "Group") : (otherParticipant?.profile?.fullName || "Unknown");
+                const initial = name?.[0]?.toUpperCase() || "?";
 
                 return (
                   <Link key={conv.id} href={`/messages/${conv.id}`}>

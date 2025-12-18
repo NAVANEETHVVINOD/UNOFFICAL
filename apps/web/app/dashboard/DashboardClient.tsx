@@ -125,26 +125,14 @@ function DashboardContent() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Background Pattern */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Grid */}
+      {/* Background Pattern - Subtle dots for main content area */}
+      <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+        {/* Subtle dot pattern - only on main content, not header */}
         <div 
-          className="absolute inset-0 opacity-40"
+          className="absolute inset-0"
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
-            `,
-            backgroundSize: '32px 32px'
-          }}
-        />
-        {/* Yellow accent dots */}
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: 'radial-gradient(circle, #FFEB3B 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
-            backgroundPosition: '16px 16px'
+            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
           }}
         />
       </div>
@@ -168,7 +156,7 @@ function DashboardContent() {
               
               {/* Quick Actions */}
               <motion.div
-                className="bg-paper border-2 border-ink shadow-neo p-4"
+                className="bg-paper border-2 border-ink shadow-neo p-4 rounded-card-lg"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -206,7 +194,7 @@ function DashboardContent() {
 
               {/* Trending Widget */}
               <motion.div
-                className="bg-paper border-2 border-ink shadow-neo overflow-hidden"
+                className="bg-paper border-2 border-ink shadow-neo overflow-hidden rounded-card-lg"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -387,7 +375,7 @@ function DashboardContent() {
           >
             <div className="sticky top-24 space-y-4">
               {/* Upcoming Events Widget */}
-              <div className="card-neo p-4">
+              <div className="card-neo p-4 rounded-card-lg">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-4 h-4" />
                   <h3 className="font-display text-sm uppercase">Upcoming</h3>

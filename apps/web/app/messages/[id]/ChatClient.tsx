@@ -99,9 +99,14 @@ export default function ChatClient({ id }: { id: string }) {
       const data = await api.getMessages(id);
       setMessages(data);
 
-      const other = data.find((m: any) => m.senderId !== user?.id);
-      if (other) {
-        setOtherUser(other.sender);
+      // Find the other user from messages
+      const otherMessage = data.find((m: any) => m.senderId !== user?.id);
+      if (otherMessage) {
+        // Set otherUser with both id and profile info
+        setOtherUser({
+          id: otherMessage.senderId,
+          profile: otherMessage.sender?.profile
+        });
       }
     } catch (error) {
       console.error("Failed to fetch messages:", error);

@@ -26,7 +26,7 @@ export default function PollCard({ poll }: { poll: any }) {
                 <div className="w-16 h-1 bg-gray-600 rounded-full"></div>
             </div>
 
-            <div className="bg-white border-2 border-black shadow-neo p-6 pt-8 mt-2">
+            <div className="bg-paper border-2 border-black shadow-neo p-6 pt-8 mt-2 rounded-card-lg">
                 <h4 className="font-display font-black text-xl mb-4 text-center">
                     {poll?.question || "Best canteen food?"}
                 </h4>

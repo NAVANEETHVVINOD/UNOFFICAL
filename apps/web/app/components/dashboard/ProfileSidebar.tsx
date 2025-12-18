@@ -21,7 +21,7 @@ export default function ProfileSidebar() {
 
   return (
     <motion.div
-      className="bg-white border-2 border-ink shadow-neo overflow-hidden"
+      className="bg-paper border-2 border-ink shadow-neo overflow-hidden rounded-card-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}

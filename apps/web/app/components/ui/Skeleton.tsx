@@ -38,7 +38,7 @@ function Skeleton({
 // Card Skeleton - for post cards, event cards, etc.
 function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-white border-2 border-black p-4 shadow-neo", className)}>
+    <div className={cn("bg-paper border-2 border-black p-4 shadow-neo", className)}>
       <div className="flex items-center gap-3 mb-4">
         <Skeleton className="w-10 h-10 rounded-full" />
         <div className="flex-1">
@@ -61,7 +61,7 @@ function CardSkeleton({ className }: { className?: string }) {
 // Profile Sidebar Skeleton
 function ProfileSidebarSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-white p-4 border-2 border-black shadow-neo", className)}>
+    <div className={cn("bg-paper p-4 border-2 border-black shadow-neo", className)}>
       <Skeleton className="w-full aspect-square mb-4" />
       <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
       <Skeleton className="h-4 w-1/2 mx-auto mb-4" />
@@ -119,7 +119,7 @@ function ConversationSkeleton({ className }: { className?: string }) {
 // Event Card Skeleton
 function EventCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-white border-2 border-black p-4 shadow-neo", className)}>
+    <div className={cn("bg-paper border-2 border-black p-4 shadow-neo", className)}>
       <Skeleton className="h-32 w-full mb-4" />
       <Skeleton className="h-5 w-3/4 mb-2" />
       <div className="flex items-center gap-2 mb-3">
@@ -141,7 +141,7 @@ function EventCardSkeleton({ className }: { className?: string }) {
 // Marketplace Listing Skeleton
 function ListingSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-white border-2 border-black shadow-neo overflow-hidden", className)}>
+    <div className={cn("bg-paper border-2 border-black shadow-neo overflow-hidden", className)}>
       <Skeleton className="h-40 w-full" />
       <div className="p-3">
         <Skeleton className="h-5 w-3/4 mb-2" />
@@ -184,7 +184,7 @@ function TableRowSkeleton({ columns = 4 }: { columns?: number }) {
 // Stats Card Skeleton
 function StatsCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-white border-2 border-black p-4 shadow-neo", className)}>
+    <div className={cn("bg-paper border-2 border-black p-4 shadow-neo", className)}>
       <Skeleton className="h-4 w-20 mb-2" />
       <Skeleton className="h-8 w-16 mb-1" />
       <Skeleton className="h-3 w-24" />

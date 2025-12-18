@@ -12,10 +12,17 @@
 :root {
   /* Core Colors */
   --ink: #0a0a0a;
-  --paper: #ffffff;
+  --paper: #FDF6E3;           /* Warm cream instead of pure white */
+  --paper-light: #FAF3E0;     /* Lighter cream */
+  --paper-dark: #F5ECD7;      /* Darker cream */
   --primary: #FFEB3B;
   --primary-dark: #FDD835;
   --primary-light: #FFF59D;
+  
+  /* Accessible Hover Colors - darker than primary for visibility */
+  --hover-primary: #E6D435;
+  --hover-muted: #D4C92F;
+  --hover-dark: #C4B82A;
   
   /* Accent Colors */
   --accent-coral: #FF6B6B;
@@ -697,3 +704,51 @@ select.input-retro {
 .typing-dot:nth-child(1) { animation-delay: 0ms; }
 .typing-dot:nth-child(2) { animation-delay: 160ms; }
 .typing-dot:nth-child(3) { animation-delay: 320ms; }
+
+
+/* ============================================
+   ACCESSIBLE HOVER STATES
+   Override bright yellow hovers with darker, visible colors
+   ============================================ */
+
+/* Primary hover - use darker yellow for visibility */
+.hover\:bg-primary\/20:hover {
+  background-color: rgba(230, 212, 53, 0.25) !important; /* Darker yellow */
+}
+
+.hover\:bg-primary:hover {
+  background-color: var(--hover-primary) !important;
+}
+
+.hover\:text-primary:hover {
+  color: var(--hover-dark) !important;
+}
+
+/* Button hover states - darker for visibility */
+.btn-neo.btn-primary:hover {
+  background-color: var(--hover-muted);
+}
+
+/* Interactive element hover - use muted colors */
+.hover-accessible:hover {
+  background-color: var(--hover-primary);
+  color: var(--ink);
+}
+
+/* Link hover - darker shade */
+a:hover {
+  color: var(--hover-dark);
+}
+
+/* Card hover - subtle background change */
+.card-neo:hover,
+.card-paper:hover {
+  background-color: var(--paper-light);
+}
+
+/* Input focus - use paper-light instead of white */
+input:focus,
+textarea:focus,
+select:focus {
+  background-color: var(--paper-light) !important;
+}

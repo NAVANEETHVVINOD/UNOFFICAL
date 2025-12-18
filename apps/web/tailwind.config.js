@@ -58,6 +58,12 @@ module.exports = {
         crt: {
           green: "#00ff41",
           black: "#0d1117",
+        },
+        // Hover colors - accessible alternatives to bright yellow
+        hover: {
+          primary: "#E6D435",    // Darker yellow for hover states
+          muted: "#D4C92F",      // Even more muted yellow
+          dark: "#C4B82A",       // Dark yellow for active states
         }
       },
       fontFamily: {
@@ -95,6 +101,10 @@ module.exports = {
         'retro-sm': '4px',
         'retro-md': '8px',
         'retro-lg': '12px',
+        // Card-specific rounded corners
+        'card': '12px',
+        'card-lg': '16px',
+        'card-xl': '20px',
       },
       zIndex: {
         navbar: "50",
@@ -182,11 +192,14 @@ module.exports = {
           linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
         `,
         'dots-pattern': 'radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px)',
+        // Subtle dot pattern for main content background
+        'dots-subtle': 'radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px)',
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
       backgroundSize: {
         'grid': '24px 24px',
         'dots': '16px 16px',
+        'dots-subtle': '20px 20px',
       },
     },
   },

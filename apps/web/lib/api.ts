@@ -321,6 +321,12 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  createConversation: (participantId: string, listingId?: string) =>
+    apiRequest("/messaging/conversations", {
+      method: "POST",
+      body: JSON.stringify({ participantId, listingId }),
+    }),
+
   replyToConversation: (conversationId: string, content: string) =>
     apiRequest(`/messages/${conversationId}/reply`, {
       method: "POST",

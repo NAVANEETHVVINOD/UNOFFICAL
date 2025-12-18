@@ -240,23 +240,27 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Announcement Bar - Desktop only */}
-        <div className="hidden md:block bg-primary border-t-2 border-ink">
+        {/* Announcement Bar - Black/Yellow Theme with // decorators */}
+        <div className="hidden md:block bg-ink border-t-2 border-primary">
           <div className="overflow-hidden">
             <motion.div
-              className="flex items-center gap-8 py-1.5 px-4 whitespace-nowrap"
-              animate={{ x: [0, -1000] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="flex items-center gap-6 py-2.5 px-4 whitespace-nowrap"
+              animate={{ x: [0, -1200] }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
             >
               {[
-                "🎉 Welcome to LINKER - Your Campus Social Hub",
-                "📚 Share notes and help your peers",
-                "🎪 Check out upcoming campus events",
-                "💬 Connect with students from your college",
-                "🛒 Buy & sell in the marketplace",
+                "Welcome to LINKER - Your Campus Social Hub",
+                "Share notes and help your peers",
+                "Check out upcoming campus events",
+                "Connect with students from your college",
+                "Buy & sell in the marketplace",
+                "Join clubs and communities",
               ].map((text, i) => (
-                <span key={i} className="text-xs font-medium text-ink">
-                  {text}
+                <span key={i} className="flex items-center gap-6">
+                  <span className="text-sm font-bold text-primary uppercase tracking-wide">
+                    {text}
+                  </span>
+                  <span className="text-primary/60 font-mono text-lg">//</span>
                 </span>
               ))}
             </motion.div>

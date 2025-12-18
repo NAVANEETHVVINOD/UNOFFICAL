@@ -2,13 +2,9 @@
  * CollegeHome (Dynamic Route)
  *
  * The specific dashboard for a single college (/colleges/[slug]).
- * Displays:
- * - College-specific news ("The Daily [College]")
- * - College-specific events and clubs
- * - Notice board and stats
+ * Modern redesign matching the global dashboard aesthetic.
  */
 import Navbar from "../../components/Navbar";
-import Container from "../../components/ui/Container";
 import { redirect } from "next/navigation";
 import { getServerProfile } from "../../../lib/server-utils";
 import { api } from "../../../lib/api";
@@ -47,20 +43,17 @@ export default async function CollegeHome({ params }: PageProps) {
   let stats = null;
   let events: any[] = [];
   let clubs: any[] = [];
-  let listings: any[] = [];
 
   try {
     const results = await Promise.allSettled([
       api.getCollegeStats(slug),
       api.getEvents(slug),
       api.getClubs(slug),
-      api.getMarketplaceListings(undefined, slug),
     ]);
 
     stats = results[0].status === 'fulfilled' ? results[0].value : null;
     events = results[1].status === 'fulfilled' ? results[1].value : [];
     clubs = results[2].status === 'fulfilled' ? results[2].value : [];
-    listings = results[3].status === 'fulfilled' ? results[3].value : [];
   } catch (error) {
     console.error("Failed to fetch college data:", error);
   }
@@ -69,44 +62,26 @@ export default async function CollegeHome({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-paper relative">
-      {/* Animated Background Pattern - Smaller dots with color */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Primary yellow dots - smaller */}
-        <div 
-          className="absolute inset-0 opacity-30"
+      {/* Background Pattern - Subtle dots matching global dashboard */}
+      <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+        {/* Subtle dot pattern - only on main content, not header */}
+        <div
+          className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle, #FFEB3B 1.5px, transparent 1.5px)`,
-            backgroundSize: '32px 32px',
+            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
           }}
         />
-        {/* Secondary coral dots */}
-        <div 
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: `radial-gradient(circle, #FF6B6B 1px, transparent 1px)`,
-            backgroundSize: '48px 48px',
-            backgroundPosition: '24px 24px',
-          }}
-        />
-        {/* Blue accent dots */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `radial-gradient(circle, #45B7D1 1px, transparent 1px)`,
-            backgroundSize: '64px 64px',
-            backgroundPosition: '16px 16px',
-          }}
-        />
-        {/* Gradient overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-paper/60 via-transparent to-paper/80" />
       </div>
 
+      {/* Fixed Header */}
       <Navbar />
 
-      <Container>
-        <div className="pt-20 md:pt-24 pb-6 space-y-6 relative z-10">
-          {/* Compact Header */}
-          <div className="bg-white/80 backdrop-blur-sm border-2 border-ink rounded-2xl p-4 md:p-6 shadow-neo">
+      {/* Main Layout - with top padding for fixed navbar */}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-16 md:pt-20">
+        <div className="pt-4 space-y-6">
+          {/* Compact Header with Glass Effect */}
+          <div className="bg-paper/80 backdrop-blur-sm border-2 border-ink rounded-card-lg p-4 md:p-6 shadow-neo">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
               <div>
                 {/* Badge */}
@@ -114,16 +89,20 @@ export default async function CollegeHome({ params }: PageProps) {
                   <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
                   <span className="font-mono text-xs font-bold uppercase tracking-wider">Campus Feed</span>
                 </div>
-                
+
                 <h1 className="font-display text-2xl md:text-3xl font-black leading-tight">
                   {collegeName.toUpperCase()}
                 </h1>
               </div>
-              
-              <div className="flex items-center gap-2 text-sm">
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-paper border-2 border-ink rounded-full shadow-neo-sm">
+                  <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
+                  <span className="font-mono text-xs uppercase">Live</span>
+                </div>
                 <span className="font-mono text-xs text-neutral-500">
-                  {new Date().toLocaleDateString('en-US', { 
-                    month: 'short', 
+                  {new Date().toLocaleDateString('en-US', {
+                    month: 'short',
                     day: 'numeric',
                     year: 'numeric'
                   })}
@@ -132,9 +111,10 @@ export default async function CollegeHome({ params }: PageProps) {
             </div>
           </div>
 
+          {/* College Feed Component - handles mobile nav internally */}
           <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
         </div>
-      </Container>
+      </div>
     </div>
   );
 }

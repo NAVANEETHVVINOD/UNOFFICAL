@@ -25,7 +25,7 @@ export function NewspaperCard({
 
   return (
     <div
-      className={`bg-white border-2 border-black transition-all duration-300 ${radius} ${noShadow ? "" : "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"} ${className}`}
+      className={`bg-paper border-2 border-black transition-all duration-300 ${radius} ${noShadow ? "" : "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"} ${className}`}
       style={{ transform: rotate ? `rotate(${rotate}deg)` : undefined }}
       {...props}
     >
@@ -59,7 +59,7 @@ export function HangingCard({
       <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-0.5 h-16 bg-black/20"></div>
 
       <div
-        className={`bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] h-full`}
+        className={`bg-paper border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] h-full`}
         style={{ transform: rotate ? `rotate(${rotate}deg)` : undefined }}
       >
         {children}
@@ -120,7 +120,7 @@ export function RetroButton({
     secondary:
       "bg-accent-yellow text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-400",
     outline:
-      "bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-50",
+      "bg-paper text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-paper-dark",
     ghost:
       "bg-transparent border-transparent shadow-none hover:bg-black/5 !px-4",
   };

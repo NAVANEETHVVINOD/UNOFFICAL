@@ -13,7 +13,7 @@ export default function EventTicket({ event }: { event: any }) {
     };
 
     return (
-        <div className="relative flex flex-col md:flex-row bg-white border-2 border-black shadow-neo hover:shadow-neo-lg transition-transform hover:-translate-y-1 duration-300 cursor-pointer group">
+        <div className="relative flex flex-col md:flex-row bg-paper border-2 border-black shadow-neo hover:shadow-neo-lg transition-transform hover:-translate-y-1 duration-300 cursor-pointer group rounded-card-lg overflow-hidden">
 
             {/* Left: Image / Visual */}
             <div className="relative md:w-1/3 min-h-[160px] overflow-hidden border-b-2 md:border-b-0 md:border-r-2 border-black border-dashed">

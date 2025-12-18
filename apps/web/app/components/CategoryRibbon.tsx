@@ -38,9 +38,9 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
   const active = getActiveCategory();
 
   return (
-    <div className={`w-full ${className}`}>
-      {/* Desktop View */}
-      <div className="hidden sm:flex items-center gap-2 p-1 bg-white border-2 border-ink rounded-xl shadow-neo">
+    <div className={`w-full hidden md:block ${className}`}>
+      {/* Desktop View - Hidden on mobile, ArcMenu handles navigation */}
+      <div className="flex items-center gap-2 p-1 bg-paper border-2 border-ink rounded-card shadow-neo">
         {CATEGORIES.map((cat) => {
           const isActive = active === cat.id;
           const Icon = cat.icon;
@@ -75,38 +75,6 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
         })}
       </div>
 
-      {/* Mobile View - Scrollable Pills */}
-      <div className="sm:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
-        <div className="flex gap-2 pb-2 min-w-max">
-          {CATEGORIES.map((cat) => {
-            const isActive = active === cat.id;
-            const Icon = cat.icon;
-
-            return (
-              <motion.button
-                key={cat.id}
-                onClick={() => router.push(cat.path)}
-                className={`
-                  flex items-center gap-2 px-4 py-3 rounded-xl
-                  font-medium text-sm whitespace-nowrap
-                  border-2 transition-all min-w-[100px] justify-center
-                  ${isActive 
-                    ? `${cat.color} border-ink shadow-neo-sm` 
-                    : 'bg-white border-neutral-200 text-neutral-600'
-                  }
-                `}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{cat.label}</span>
-              </motion.button>
-            );
-          })}
-        </div>
-        
-        {/* Scroll indicator gradient */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
-      </div>
     </div>
   );
 }

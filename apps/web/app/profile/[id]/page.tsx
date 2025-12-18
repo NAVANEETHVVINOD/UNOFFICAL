@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 import Navbar from "../../components/Navbar";
 import Container from "../../components/ui/Container";
+import { api } from "../../../lib/api";
 import { 
   User, MapPin, Calendar, Link as LinkIcon, Github, Instagram, Linkedin,
   MessageCircle, UserPlus, UserCheck, QrCode, Share2, ArrowLeft,
-  Briefcase, GraduationCap, Heart, Users, FileText, ShoppingBag
+  Briefcase, GraduationCap, Heart, Users, FileText, ShoppingBag, Loader2
 } from "lucide-react";
 import Link from "next/link";
 
@@ -42,6 +44,8 @@ export default function UserProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [stats, setStats] = useState({ posts: 0, clubs: 0, events: 0 });
+  const [isMessaging, setIsMessaging] = useState(false);
+  const { toast } = useToast();
 
   const userId = params.id as string;
   const isOwnProfile = currentUser?.id === userId;
@@ -104,8 +108,28 @@ export default function UserProfilePage() {
     setIsConnected(!isConnected);
   };
 
-  const handleMessage = () => {
-    router.push(`/messages?user=${userId}`);
+  const handleMessage = async () => {
+    if (!currentUser) {
+      toast("Please log in to send messages", "error");
+      router.push("/login");
+      return;
+    }
+
+    setIsMessaging(true);
+    try {
+      // Create or get existing conversation with this user
+      const conversation = await api.createConversation(userId);
+      
+      // Navigate to the conversation
+      router.push(`/messages/${conversation.id}`);
+      
+      toast(`Starting conversation with ${profile?.profile?.fullName || "user"}`, "success");
+    } catch (error: any) {
+      console.error("Failed to create conversation:", error);
+      toast(error.message || "Failed to start conversation", "error");
+    } finally {
+      setIsMessaging(false);
+    }
   };
 
   const handleShare = async () => {
@@ -186,7 +210,7 @@ export default function UserProfilePage() {
 
           {/* Profile Card */}
           <motion.div
-            className="bg-white border-2 border-ink shadow-neo rounded-xl overflow-hidden"
+            className="bg-paper border-2 border-ink shadow-neo rounded-xl overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -254,12 +278,17 @@ export default function UserProfilePage() {
                   </motion.button>
                   <motion.button
                     onClick={handleMessage}
-                    className="flex items-center gap-2 px-4 py-2 bg-white font-bold text-sm border-2 border-ink shadow-neo-sm hover:bg-neutral-50 transition-all"
+                    disabled={isMessaging}
+                    className="flex items-center gap-2 px-4 py-2 bg-paper font-bold text-sm border-2 border-ink shadow-neo-sm hover:bg-paper-dark transition-all disabled:opacity-60"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <MessageCircle className="w-4 h-4" />
-                    Message
+                    {isMessaging ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <MessageCircle className="w-4 h-4" />
+                    )}
+                    {isMessaging ? "Opening..." : "Message"}
                   </motion.button>
                   <motion.button
                     onClick={handleShare}
