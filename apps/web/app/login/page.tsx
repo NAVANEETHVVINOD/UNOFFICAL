@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import { checkOnboardingStatus } from "../hooks/useOnboardingGuard";
 import Container from "../components/ui/Container";
 import {
   NewspaperCard,
@@ -21,7 +22,7 @@ interface ValidationErrors {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loginWithGoogle, user, isAuthenticated } = useAuth();
+  const { login, loginWithGoogle, user, isAuthenticated, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,6 +32,22 @@ export default function LoginPage() {
     email: false,
     password: false,
   });
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      const { isComplete, missingFields } = checkOnboardingStatus(user);
+      if (!isComplete) {
+        if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
+          router.replace("/onboarding?step=college");
+        } else {
+          router.replace("/onboarding");
+        }
+      } else {
+        router.replace("/dashboard");
+      }
+    }
+  }, [authLoading, isAuthenticated, user, router]);
 
   const validateEmail = useCallback((value: string): string | undefined => {
     if (!value.trim()) return "Email is required";
@@ -67,8 +84,18 @@ export default function LoginPage() {
     }
   };
 
-  if (isAuthenticated && user) {
-    router.replace("/dashboard");
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <Container>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-black border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="font-mono text-sm">Loading...</p>
+          </div>
+        </div>
+      </Container>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

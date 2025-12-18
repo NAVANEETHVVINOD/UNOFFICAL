@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import Container from "../../components/ui/Container";
 import Loading from "../../loading";
-import { API_URL } from "../../../lib/api"; // Ensure this internal helper or env var is available or inline it
+import { API_URL } from "../../../lib/api";
+import { checkOnboardingStatus } from "../../hooks/useOnboardingGuard";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -32,7 +33,26 @@ export default function AuthCallback() {
           localStorage.setItem("token", data.accessToken);
           localStorage.setItem("refreshToken", data.refreshToken);
           document.cookie = `token=${data.accessToken}; path=/; max-age=86400; SameSite=Lax`;
-          router.replace("/dashboard");
+          
+          // Check onboarding status and redirect accordingly
+          const { isComplete, missingFields } = checkOnboardingStatus(data.user);
+          
+          if (!isComplete) {
+            // Store missing fields for onboarding page
+            sessionStorage.setItem(
+              "onboarding_missing_fields",
+              JSON.stringify(missingFields)
+            );
+            
+            // Redirect to specific step if only college is missing
+            if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
+              router.replace("/onboarding?step=college");
+            } else {
+              router.replace("/onboarding");
+            }
+          } else {
+            router.replace("/dashboard");
+          }
         } else {
           console.error("Backend sync failed");
           router.replace("/login?error=sync_failed");
