@@ -56,14 +56,14 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b-2 border-ink">
+    <header className="sticky top-0 z-50 bg-paper border-b-2 border-ink">
       <div className="max-w-[1400px] mx-auto">
         {/* Main Navbar */}
-        <div className="h-16 flex items-center justify-between px-4 lg:px-6">
+        <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-4 lg:px-6">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-3 group">
+          <Link href="/dashboard" className="flex items-center gap-2 md:gap-3 group">
             <motion.div
-              className="w-10 h-10 bg-primary border-2 border-ink flex items-center justify-center font-display font-black text-xl shadow-neo-sm"
+              className="w-9 h-9 md:w-10 md:h-10 bg-primary border-2 border-ink flex items-center justify-center font-display font-black text-lg md:text-xl shadow-neo-sm rounded-lg"
               whileHover={{ rotate: -6, scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -79,7 +79,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Center - Search (Desktop) */}
+          {/* Center - Search (Desktop only) */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <button
               onClick={() => setIsSearchOpen(true)}
@@ -95,11 +95,11 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* Right Actions - Mobile: Search, QR, Notifications, Profile only */}
+          <div className="flex items-center gap-1 md:gap-2">
             {/* Search - Always visible */}
             <motion.button
-              className="p-2 sm:p-2.5 hover:bg-neutral-100 rounded-xl transition-colors"
+              className="p-2 md:p-2.5 hover:bg-neutral-100 rounded-xl transition-colors md:hidden"
               onClick={() => setIsSearchOpen(true)}
               whileTap={{ scale: 0.95 }}
               aria-label="Search"
@@ -107,12 +107,12 @@ export default function Navbar() {
               <Search className="w-5 h-5" />
             </motion.button>
 
-            {/* QR Code Button */}
+            {/* QR Code Button - Prominent on mobile */}
             <motion.button
-              className="p-2 sm:p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
+              className="p-2 md:p-2.5 hover:bg-primary/20 rounded-xl transition-colors bg-primary/10"
               onClick={() => setIsQRModalOpen(true)}
               whileTap={{ scale: 0.95 }}
-              aria-label="QR Code"
+              aria-label="QR Code - Connect with others"
             >
               <QrCode className="w-5 h-5" />
             </motion.button>
@@ -120,7 +120,7 @@ export default function Navbar() {
             {/* Notifications */}
             <div className="relative" ref={notificationRef}>
               <motion.button
-                className="relative p-2 sm:p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
+                className="relative p-2 md:p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 whileTap={{ scale: 0.95 }}
                 aria-label="Notifications"
@@ -128,7 +128,7 @@ export default function Navbar() {
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
                   <motion.span
-                    className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] bg-accent-coral text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white"
+                    className="absolute top-0 right-0 min-w-[18px] h-[18px] bg-accent-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-paper"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500 }}
@@ -142,7 +142,7 @@ export default function Navbar() {
               <AnimatePresence>
                 {isNotificationOpen && (
                   <motion.div
-                    className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border-2 border-ink shadow-neo-lg z-50 rounded-xl overflow-hidden"
+                    className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 max-w-[380px] bg-paper border-2 border-ink shadow-neo-lg z-50 rounded-xl overflow-hidden"
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -220,7 +220,7 @@ export default function Navbar() {
             {/* Profile */}
             <Link href="/profile">
               <motion.div
-                className="w-8 h-8 sm:w-10 sm:h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
+                className="w-8 h-8 md:w-10 md:h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
                 whileHover={{ scale: 1.05, rotate: -3 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -232,7 +232,7 @@ export default function Navbar() {
                   />
                 ) : (
                   <div className="w-full h-full bg-primary/20 flex items-center justify-center">
-                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-ink/50" />
+                    <User className="w-4 h-4 md:w-5 md:h-5 text-ink/50" />
                   </div>
                 )}
               </motion.div>
@@ -240,8 +240,8 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Announcement Bar (Optional) */}
-        <div className="hidden sm:block bg-primary border-t-2 border-ink">
+        {/* Announcement Bar - Desktop only */}
+        <div className="hidden md:block bg-primary border-t-2 border-ink">
           <div className="overflow-hidden">
             <motion.div
               className="flex items-center gap-8 py-1.5 px-4 whitespace-nowrap"
