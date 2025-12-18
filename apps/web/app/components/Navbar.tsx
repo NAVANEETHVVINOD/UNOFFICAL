@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications, formatNotificationTime, NOTIFICATION_ICONS } from "../context/NotificationContext";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Bell, User, Search } from "lucide-react";
+import { Bell, User, Search, QrCode } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import GlobalSearch from "./GlobalSearch";
+import QRCodeModal from "./QRCodeModal";
 
 export default function Navbar() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function Navbar() {
   const { filteredNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
   // Handle notification click
@@ -94,20 +96,31 @@ export default function Navbar() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2">
-            {/* Mobile Search */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Search - Always visible */}
             <motion.button
-              className="md:hidden p-2.5 hover:bg-neutral-100 rounded-xl transition-colors"
+              className="p-2 sm:p-2.5 hover:bg-neutral-100 rounded-xl transition-colors"
               onClick={() => setIsSearchOpen(true)}
               whileTap={{ scale: 0.95 }}
+              aria-label="Search"
             >
               <Search className="w-5 h-5" />
             </motion.button>
 
-            {/* Notifications - Hidden on mobile (bottom nav handles it) */}
-            <div className="relative hidden md:block" ref={notificationRef}>
+            {/* QR Code Button */}
+            <motion.button
+              className="p-2 sm:p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
+              onClick={() => setIsQRModalOpen(true)}
+              whileTap={{ scale: 0.95 }}
+              aria-label="QR Code"
+            >
+              <QrCode className="w-5 h-5" />
+            </motion.button>
+
+            {/* Notifications */}
+            <div className="relative" ref={notificationRef}>
               <motion.button
-                className="relative p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
+                className="relative p-2 sm:p-2.5 hover:bg-primary/20 rounded-xl transition-colors"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 whileTap={{ scale: 0.95 }}
                 aria-label="Notifications"
@@ -115,7 +128,7 @@ export default function Navbar() {
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
                   <motion.span
-                    className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-accent-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white"
+                    className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] bg-accent-coral text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500 }}
@@ -204,10 +217,10 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Profile - Hidden on mobile (bottom nav handles it) */}
-            <Link href="/profile" className="hidden md:block">
+            {/* Profile */}
+            <Link href="/profile">
               <motion.div
-                className="w-10 h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
                 whileHover={{ scale: 1.05, rotate: -3 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -219,7 +232,7 @@ export default function Navbar() {
                   />
                 ) : (
                   <div className="w-full h-full bg-primary/20 flex items-center justify-center">
-                    <User className="w-5 h-5 text-ink/50" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-ink/50" />
                   </div>
                 )}
               </motion.div>
@@ -253,6 +266,9 @@ export default function Navbar() {
 
       {/* Global Search Modal */}
       <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
+      {/* QR Code Modal */}
+      <QRCodeModal isOpen={isQRModalOpen} onClose={() => setIsQRModalOpen(false)} />
     </header>
   );
 }

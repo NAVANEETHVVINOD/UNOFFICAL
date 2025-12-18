@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request, Query, Param } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query, Param, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -16,6 +16,17 @@ export class UsersController {
   async searchUsers(@Query('q') query: string, @Request() req) {
     const currentUserId = req.user?.userId;
     return this.usersService.search(query, currentUserId);
+  }
+
+  @Get(':id')
+  async getUserById(@Param('id') userId: string) {
+    const user = await this.usersService.findOne({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    // Remove sensitive data
+    const { password, hashedRefreshToken, ...safeUser } = user as any;
+    return safeUser;
   }
 
   @Get(':id/clubs')

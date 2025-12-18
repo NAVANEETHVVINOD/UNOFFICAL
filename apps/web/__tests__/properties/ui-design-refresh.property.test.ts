@@ -112,37 +112,37 @@ describe("UI Design Refresh Properties", () => {
    * **Feature: ui-design-refresh, Property 5: Mobile navbar simplification**
    * **Validates: Requirements 4.1, 4.2**
    * 
-   * For any viewport width below 768px, the navbar SHALL hide notification 
-   * and profile buttons.
+   * For any viewport, the navbar SHALL show search, QR, notification, and profile buttons.
+   * Mobile layout shows all essential actions in the top navbar.
    */
-  describe("Property 5: Mobile navbar simplification", () => {
-    it("should have notification button hidden on mobile", () => {
+  describe("Property 5: Mobile navbar with all actions", () => {
+    it("should have search button visible on all viewports", () => {
       fc.assert(
         fc.property(fc.constant(null), () => {
           const navbarPath = path.join(process.cwd(), "app/components/Navbar.tsx");
           const navbarContent = fs.readFileSync(navbarPath, "utf-8");
           
-          // Check that notification wrapper has hidden md:block class
-          const hasHiddenNotification = navbarContent.includes("hidden md:block") && 
-            navbarContent.includes("Notifications");
+          // Check that search button exists and is not hidden on mobile
+          const hasSearchButton = navbarContent.includes("Search") && 
+            navbarContent.includes("setIsSearchOpen");
           
-          expect(hasHiddenNotification).toBe(true);
+          expect(hasSearchButton).toBe(true);
         }),
         { numRuns: 100 }
       );
     });
 
-    it("should have profile button hidden on mobile", () => {
+    it("should have QR code button in navbar", () => {
       fc.assert(
         fc.property(fc.constant(null), () => {
           const navbarPath = path.join(process.cwd(), "app/components/Navbar.tsx");
           const navbarContent = fs.readFileSync(navbarPath, "utf-8");
           
-          // Check that profile link has hidden md:block class
-          const hasHiddenProfile = navbarContent.includes('className="hidden md:block"') ||
-            navbarContent.includes("hidden md:block");
+          // Check that QR button exists
+          const hasQRButton = navbarContent.includes("QrCode") && 
+            navbarContent.includes("setIsQRModalOpen");
           
-          expect(hasHiddenProfile).toBe(true);
+          expect(hasQRButton).toBe(true);
         }),
         { numRuns: 100 }
       );
