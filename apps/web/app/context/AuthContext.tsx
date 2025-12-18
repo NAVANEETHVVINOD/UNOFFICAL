@@ -244,7 +244,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginWithGoogle,
       }}
     >
-      {isLoadingUser ? <Loading /> : children}
+      {children}
     </AuthContext.Provider>
   );
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "../../lib/api";
 import { useAuth } from "../context/AuthContext";
+import { checkOnboardingStatus } from "../hooks/useOnboardingGuard";
 import Container from "../components/ui/Container";
+import Loading from "../loading";
 import {
   NewspaperCard,
   RetroButton,
@@ -23,10 +25,27 @@ interface ValidationErrors {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login, register, loginWithGoogle, user, isAuthenticated } = useAuth();
+  const { login, register, loginWithGoogle, user, isAuthenticated, loading: authLoading } = useAuth();
 
-  if (isAuthenticated && user) {
-    router.replace("/dashboard");
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      const { isComplete, missingFields } = checkOnboardingStatus(user);
+      if (!isComplete) {
+        if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
+          router.replace("/onboarding?step=college");
+        } else {
+          router.replace("/onboarding");
+        }
+      } else {
+        router.replace("/dashboard");
+      }
+    }
+  }, [authLoading, isAuthenticated, user, router]);
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return <Loading />;
   }
 
   const [formData, setFormData] = useState({

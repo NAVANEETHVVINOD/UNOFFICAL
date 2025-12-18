@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { checkOnboardingStatus } from "../hooks/useOnboardingGuard";
 import Container from "../components/ui/Container";
+import Loading from "../loading";
 import {
   NewspaperCard,
   RetroButton,
@@ -86,16 +87,7 @@ export default function LoginPage() {
 
   // Show loading while checking auth
   if (authLoading) {
-    return (
-      <Container>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-black border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="font-mono text-sm">Loading...</p>
-          </div>
-        </div>
-      </Container>
-    );
+    return <Loading />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

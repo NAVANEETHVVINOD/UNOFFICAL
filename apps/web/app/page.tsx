@@ -16,21 +16,47 @@ import {
 import Doodle from "./components/ui/Doodle";
 import BottomNav from "./components/ui/BottomNav";
 import Navbar from "./components/Navbar";
+import Loading from "./loading";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./context/AuthContext";
+import { checkOnboardingStatus } from "./hooks/useOnboardingGuard";
 
 export default function Home() {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
+    const [showLanding, setShowLanding] = useState(false);
 
     useEffect(() => {
-        if (isAuthenticated && user) {
-            router.replace("/dashboard");
-        }
-    }, [isAuthenticated, user, router]);
+        // Wait for auth to finish loading
+        if (loading) return;
 
+        if (isAuthenticated && user) {
+            // Check onboarding status and redirect accordingly
+            const { isComplete, missingFields } = checkOnboardingStatus(user);
+            
+            if (!isComplete) {
+                if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
+                    router.replace("/onboarding?step=college");
+                } else {
+                    router.replace("/onboarding");
+                }
+            } else {
+                router.replace("/dashboard");
+            }
+        } else {
+            // Not authenticated - show landing page
+            setShowLanding(true);
+        }
+    }, [isAuthenticated, user, loading, router]);
+
+    // Show loading while checking auth
+    if (loading || (!showLanding && !isAuthenticated)) {
+        return <Loading />;
+    }
+
+    // Show landing page for non-authenticated users
     return (
 
         <Container>
