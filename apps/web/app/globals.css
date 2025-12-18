@@ -154,6 +154,7 @@ body {
   background: var(--paper);
   border: 2px solid var(--ink);
   box-shadow: var(--shadow-neo);
+  border-radius: 12px;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -165,6 +166,20 @@ body {
 .card-neo:active {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0px 0px var(--ink);
+}
+
+/* Rounded Card Variant */
+.card-rounded {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-neo);
+  border-radius: 16px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card-rounded:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-neo-lg);
 }
 
 /* Yellow Accent Card */

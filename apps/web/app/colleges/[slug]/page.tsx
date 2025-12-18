@@ -69,86 +69,67 @@ export default async function CollegeHome({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-paper relative">
-      {/* Animated Background Pattern */}
+      {/* Animated Background Pattern - Smaller dots with color */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Primary dot grid */}
+        {/* Primary yellow dots - smaller */}
         <div 
-          className="absolute inset-0 opacity-40"
+          className="absolute inset-0 opacity-30"
           style={{
-            backgroundImage: `
-              radial-gradient(circle, #FFEB3B 2px, transparent 2px),
-              radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)
-            `,
-            backgroundSize: '48px 48px, 24px 24px',
-            backgroundPosition: '0 0, 12px 12px'
+            backgroundImage: `radial-gradient(circle, #FFEB3B 1.5px, transparent 1.5px)`,
+            backgroundSize: '32px 32px',
           }}
         />
-        {/* Subtle grid lines */}
+        {/* Secondary coral dots */}
         <div 
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-15"
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
-            `,
-            backgroundSize: '48px 48px'
+            backgroundImage: `radial-gradient(circle, #FF6B6B 1px, transparent 1px)`,
+            backgroundSize: '48px 48px',
+            backgroundPosition: '24px 24px',
+          }}
+        />
+        {/* Blue accent dots */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `radial-gradient(circle, #45B7D1 1px, transparent 1px)`,
+            backgroundSize: '64px 64px',
+            backgroundPosition: '16px 16px',
           }}
         />
         {/* Gradient overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-paper/50 to-paper" />
+        <div className="absolute inset-0 bg-gradient-to-b from-paper/60 via-transparent to-paper/80" />
       </div>
 
       <Navbar />
 
       <Container>
-        <div className="py-8 space-y-8 relative z-10">
-          {/* Newspaper Header - Redesigned */}
-          <div className="relative">
-            {/* Decorative corner elements */}
-            <div className="absolute -top-2 -left-2 w-8 h-8 border-l-4 border-t-4 border-ink" />
-            <div className="absolute -top-2 -right-2 w-8 h-8 border-r-4 border-t-4 border-ink" />
-            
-            <div className="border-b-4 border-ink pb-6 pt-4">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                <div>
-                  {/* Badge with animation */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary border-2 border-ink rounded-full shadow-neo-sm mb-3">
-                    <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider">Campus Headlines</span>
-                  </div>
-                  
-                  <h1 className="font-display text-4xl md:text-5xl font-black leading-tight">
-                    THE DAILY{" "}
-                    <span className="relative inline-block">
-                      <span className="relative z-10">{collegeName.toUpperCase()}</span>
-                      <span className="absolute bottom-1 left-0 right-0 h-3 bg-primary/40 -z-0" />
-                    </span>
-                  </h1>
-                  
-                  <p className="font-serif italic text-neutral-600 mt-2">
-                    Your campus, your stories, your community.
-                  </p>
+        <div className="py-6 space-y-6 relative z-10">
+          {/* Compact Header */}
+          <div className="bg-white/80 backdrop-blur-sm border-2 border-ink rounded-2xl p-4 md:p-6 shadow-neo">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+              <div>
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary border-2 border-ink rounded-full shadow-neo-sm mb-2">
+                  <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider">Campus Feed</span>
                 </div>
                 
-                <div className="flex flex-col items-end gap-1">
-                  <span className="font-mono text-xs text-neutral-500 uppercase tracking-wider">
-                    Vol. 42 • Issue {new Date().getDate()}
-                  </span>
-                  <span className="font-serif italic text-neutral-400">
-                    {new Date().toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </span>
-                </div>
+                <h1 className="font-display text-2xl md:text-3xl font-black leading-tight">
+                  {collegeName.toUpperCase()}
+                </h1>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-mono text-xs text-neutral-500">
+                  {new Date().toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </span>
               </div>
             </div>
-            
-            {/* Decorative bottom corners */}
-            <div className="absolute -bottom-2 -left-2 w-8 h-8 border-l-4 border-b-4 border-ink" />
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 border-r-4 border-b-4 border-ink" />
           </div>
 
           <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
