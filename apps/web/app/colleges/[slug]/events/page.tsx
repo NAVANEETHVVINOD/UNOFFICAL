@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "../../../../lib/api";
 import { EventTicket } from "../../../components/ui/SocialComponents";
-import { Calendar, Sparkles, Users, Plus } from "lucide-react";
+import { Calendar, Sparkles, Users, Plus, History } from "lucide-react";
 import { FeedSkeleton } from "../../../components/ui/Skeleton";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -32,14 +32,28 @@ export default function CollegeEventsPage({ params }: PageProps) {
   const { slug } = use(params);
   const { user } = useAuth();
 
-  const [events, setEvents] = useState<Event[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
     const loadEvents = async () => {
       try {
         const data = await api.getEvents(slug);
-        setEvents(data);
+        const now = new Date();
+
+        const upcoming = data.filter((e: Event) => new Date(e.startsAt) >= now);
+        const past = data.filter((e: Event) => new Date(e.startsAt) < now);
+
+        // Sort upcoming by soonest first
+        upcoming.sort((a: Event, b: Event) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+
+        // Sort past by most recent first
+        past.sort((a: Event, b: Event) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime());
+
+        setUpcomingEvents(upcoming);
+        setPastEvents(past);
       } catch (e) {
         console.error(e);
       } finally {
@@ -52,8 +66,9 @@ export default function CollegeEventsPage({ params }: PageProps) {
   const canCreateEvent =
     user?.role === "COLLEGE_ADMIN" ||
     user?.role === "CLUB_ADMIN" ||
-    user?.role === "PLATFORM_ADMIN" ||
-    user?.role === "STUDENT";
+    user?.role === "PLATFORM_ADMIN";
+
+  const displayedEvents = activeTab === "upcoming" ? upcomingEvents : pastEvents;
 
   return (
     <motion.div
@@ -80,8 +95,8 @@ export default function CollegeEventsPage({ params }: PageProps) {
         ].map((tab) => (
           <Link key={tab.id} href={tab.path} className="flex-1">
             <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all ${tab.id === 'events'
-                ? 'bg-accent-coral text-ink border-ink shadow-neo-sm'
-                : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
+              ? 'bg-accent-coral text-ink border-ink shadow-neo-sm'
+              : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
               }`}>
               <tab.icon className="w-4 h-4" />
               <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'events' ? 'text-ink' : 'text-neutral-500'}`}>
@@ -108,6 +123,28 @@ export default function CollegeEventsPage({ params }: PageProps) {
         )}
       </div>
 
+      {/* Filter Tabs */}
+      <div className="flex gap-4 mb-6 border-b-2 border-dashed border-neutral-200 pb-1">
+        <button
+          onClick={() => setActiveTab("upcoming")}
+          className={`px-4 py-2 font-bold text-sm border-b-2 transition-colors ${activeTab === "upcoming"
+              ? "border-accent-coral text-ink"
+              : "border-transparent text-neutral-400 hover:text-ink"
+            }`}
+        >
+          UPCOMING ({upcomingEvents.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("past")}
+          className={`px-4 py-2 font-bold text-sm border-b-2 transition-colors ${activeTab === "past"
+              ? "border-neutral-500 text-ink"
+              : "border-transparent text-neutral-400 hover:text-ink"
+            }`}
+        >
+          PAST EVENTS ({pastEvents.length})
+        </button>
+      </div>
+
       {/* Events Grid */}
       {loading ? (
         <div className="grid gap-6 md:grid-cols-2">
@@ -115,19 +152,34 @@ export default function CollegeEventsPage({ params }: PageProps) {
             <div key={i} className="h-64 bg-paper rounded-xl border-2 border-neutral-100 animate-pulse" />
           ))}
         </div>
-      ) : events.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2">
-          {events.map((event) => (
+      ) : displayedEvents.length > 0 ? (
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid gap-6 md:grid-cols-2"
+        >
+          {displayedEvents.map((event) => (
             <Link key={event.id} href={`/events/${event.id}`}>
-              <EventTicket event={event} />
+              <div className={activeTab === "past" ? "opacity-75 grayscale hover:grayscale-0 transition-all" : ""}>
+                <EventTicket event={event} />
+              </div>
             </Link>
           ))}
-        </div>
+        </motion.div>
       ) : (
         <div className="text-center py-20 bg-paper rounded-xl border-2 border-dashed border-neutral-300">
-          <Calendar className="w-12 h-12 mx-auto text-neutral-300 mb-4" />
-          <h3 className="font-bold text-lg text-neutral-600">No Events Scheduled</h3>
-          <p className="text-neutral-400 text-sm">Check back later for updates.</p>
+          {activeTab === "upcoming" ? (
+            <Calendar className="w-12 h-12 mx-auto text-neutral-300 mb-4" />
+          ) : (
+            <History className="w-12 h-12 mx-auto text-neutral-300 mb-4" />
+          )}
+          <h3 className="font-bold text-lg text-neutral-600">
+            {activeTab === "upcoming" ? "No Events Scheduled" : "No Past Events"}
+          </h3>
+          <p className="text-neutral-400 text-sm">
+            {activeTab === "upcoming" ? "Check back later for updates." : "Events will appear here after they finish."}
+          </p>
         </div>
       )}
     </motion.div>

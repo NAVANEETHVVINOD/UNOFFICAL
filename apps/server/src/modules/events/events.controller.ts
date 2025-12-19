@@ -45,7 +45,11 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('CLUB_ADMIN' as Role, 'COLLEGE_ADMIN' as Role)
+  @Roles(
+    'CLUB_ADMIN' as Role,
+    'COLLEGE_ADMIN' as Role,
+    'PLATFORM_ADMIN' as Role,
+  )
   @Post()
   async create(
     @Request() req,

@@ -8,10 +8,10 @@ import { useToast } from "../../context/ToastContext";
 import Navbar from "../../components/Navbar";
 import Container from "../../components/ui/Container";
 import { api } from "../../../lib/api";
-import { 
+import {
   User, MapPin, Calendar, Link as LinkIcon, Github, Instagram, Linkedin,
   MessageCircle, UserPlus, UserCheck, QrCode, Share2, ArrowLeft,
-  Briefcase, GraduationCap, Heart, Users, FileText, ShoppingBag, Loader2
+  Briefcase, GraduationCap, Heart, Users, FileText, ShoppingBag, Loader2, Send
 } from "lucide-react";
 import Link from "next/link";
 
@@ -65,7 +65,7 @@ export default function UserProfilePage() {
     try {
       const token = localStorage.getItem("token");
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-      
+
       // Fetch user profile
       const res = await fetch(`${API_URL}/users/${userId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -119,10 +119,10 @@ export default function UserProfilePage() {
     try {
       // Create or get existing conversation with this user
       const conversation = await api.createConversation(userId);
-      
+
       // Navigate to the conversation
       router.push(`/messages/${conversation.id}`);
-      
+
       toast(`Starting conversation with ${profile?.profile?.fullName || "user"}`, "success");
     } catch (error: any) {
       console.error("Failed to create conversation:", error);
@@ -186,7 +186,7 @@ export default function UserProfilePage() {
     <div className="min-h-screen bg-paper">
       {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div 
+        <div
           className="absolute inset-0 opacity-30"
           style={{
             backgroundImage: `radial-gradient(circle, #FFEB3B 2px, transparent 2px)`,
@@ -256,23 +256,22 @@ export default function UserProfilePage() {
                 <div className="flex gap-2">
                   <motion.button
                     onClick={handleConnect}
-                    className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-ink shadow-neo-sm transition-all ${
-                      isConnected
-                        ? "bg-neutral-100 text-ink"
-                        : "bg-primary text-ink hover:bg-primary-600"
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-ink shadow-neo-sm transition-all ${isConnected
+                      ? "bg-neutral-100 text-ink"
+                      : "bg-primary text-ink hover:bg-primary-600"
+                      }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     {isConnected ? (
                       <>
                         <UserCheck className="w-4 h-4" />
-                        Connected
+                        Linked
                       </>
                     ) : (
                       <>
-                        <UserPlus className="w-4 h-4" />
-                        Connect
+                        <LinkIcon className="w-4 h-4" />
+                        Link
                       </>
                     )}
                   </motion.button>
@@ -296,7 +295,7 @@ export default function UserProfilePage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Send className="w-4 h-4" />
                   </motion.button>
                 </div>
               </div>

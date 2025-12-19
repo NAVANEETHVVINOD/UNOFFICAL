@@ -142,6 +142,7 @@ model MarketplaceListing {
   collegeId     String?
   scope         MarketplaceScope @default(COLLEGE)
   status        ListingStatus    @default(ACTIVE)
+  type          ListingType      @default(PRODUCT)
   createdAt     DateTime         @default(now())
   category      String           @default("OTHER")
   conversations Conversation[]
@@ -333,6 +334,12 @@ enum ListingStatus {
   ACTIVE
   SOLD
   HIDDEN
+}
+
+enum ListingType {
+  PRODUCT
+  SERVICE
+  JOB
 }
 
 enum EventScope {
