@@ -79,7 +79,7 @@ export class AuthService {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
-      include: { 
+      include: {
         profile: {
           include: {
             college: true,
@@ -211,7 +211,7 @@ export class AuthService {
     // Check if internal user exists
     let user = await this.prisma.user.findUnique({
       where: { supabaseId: sub } as any,
-      include: { 
+      include: {
         profile: {
           include: {
             college: true,
@@ -231,7 +231,7 @@ export class AuthService {
           user = await this.prisma.user.update({
             where: { id: existingUser.id },
             data: { supabaseId: sub } as any,
-            include: { 
+            include: {
               profile: {
                 include: {
                   college: true,
@@ -257,7 +257,7 @@ export class AuthService {
               },
             },
           } as any,
-          include: { 
+          include: {
             profile: {
               include: {
                 college: true,
@@ -275,7 +275,7 @@ export class AuthService {
             user = await this.prisma.user.update({
               where: { id: existingUser.id },
               data: { supabaseId: sub } as any,
-              include: { 
+              include: {
                 profile: {
                   include: {
                     college: true,

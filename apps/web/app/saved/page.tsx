@@ -44,37 +44,36 @@ function SavedContent() {
   }, [isAuthenticated, router, authLoading]);
 
   useEffect(() => {
+    const generateMockSaved = (): SavedItem[] => {
+      return [
+        { id: "s1", type: "post", savedAt: new Date().toISOString(), item: { id: "p1", content: "Just finished my final project! So relieved 😅 #campuslife", imageUrl: undefined } },
+        { id: "s2", type: "event", savedAt: new Date(Date.now() - 86400000).toISOString(), item: { id: "e1", title: "Tech Talk: AI in 2025", startsAt: new Date(Date.now() + 86400000 * 3).toISOString() } },
+        { id: "s3", type: "listing", savedAt: new Date(Date.now() - 86400000 * 2).toISOString(), item: { id: "l1", title: "MacBook Pro 2023", price: 45000, imageUrl: undefined } },
+        { id: "s4", type: "note", savedAt: new Date(Date.now() - 86400000 * 3).toISOString(), item: { id: "n1", title: "Data Structures Complete Notes" } },
+        { id: "s5", type: "post", savedAt: new Date(Date.now() - 86400000 * 5).toISOString(), item: { id: "p2", content: "This content is no longer available", isDeleted: true } },
+      ];
+    };
+
+    const fetchSavedItems = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/saved");
+        if (res.ok) {
+          const data = await res.json();
+          setSavedItems(data);
+        } else {
+          setSavedItems(generateMockSaved());
+        }
+      } catch (error) {
+        console.error("Failed to fetch saved items:", error);
+        setSavedItems(generateMockSaved());
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSavedItems();
   }, []);
-
-  const fetchSavedItems = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/saved");
-      if (res.ok) {
-        const data = await res.json();
-        setSavedItems(data);
-      } else {
-        // Mock data
-        setSavedItems(generateMockSaved());
-      }
-    } catch (error) {
-      console.error("Failed to fetch saved items:", error);
-      setSavedItems(generateMockSaved());
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateMockSaved = (): SavedItem[] => {
-    return [
-      { id: "s1", type: "post", savedAt: new Date().toISOString(), item: { id: "p1", content: "Just finished my final project! So relieved 😅 #campuslife", imageUrl: undefined } },
-      { id: "s2", type: "event", savedAt: new Date(Date.now() - 86400000).toISOString(), item: { id: "e1", title: "Tech Talk: AI in 2025", startsAt: new Date(Date.now() + 86400000 * 3).toISOString() } },
-      { id: "s3", type: "listing", savedAt: new Date(Date.now() - 86400000 * 2).toISOString(), item: { id: "l1", title: "MacBook Pro 2023", price: 45000, imageUrl: undefined } },
-      { id: "s4", type: "note", savedAt: new Date(Date.now() - 86400000 * 3).toISOString(), item: { id: "n1", title: "Data Structures Complete Notes" } },
-      { id: "s5", type: "post", savedAt: new Date(Date.now() - 86400000 * 5).toISOString(), item: { id: "p2", content: "This content is no longer available", isDeleted: true } },
-    ];
-  };
 
   const handleRemove = async (savedId: string) => {
     try {
@@ -82,7 +81,7 @@ function SavedContent() {
     } catch (error) {
       console.error("Failed to remove:", error);
     }
-    
+
     setSavedItems(prev => prev.filter(item => item.id !== savedId));
   };
 
@@ -113,8 +112,8 @@ function SavedContent() {
     }
   };
 
-  const filteredItems = filter === "all" 
-    ? savedItems 
+  const filteredItems = filter === "all"
+    ? savedItems
     : savedItems.filter(item => item.type === filter);
 
   if (authLoading) return <LoadingState />;
@@ -158,9 +157,8 @@ function SavedContent() {
                 <button
                   key={type}
                   onClick={() => setFilter(type)}
-                  className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-black transition-all ${
-                    filter === type ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-black transition-all ${filter === type ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+                    }`}
                 >
                   {type === "all" ? <Filter className="w-4 h-4" /> : getTypeIcon(type)}
                   <span className="capitalize">{type === "all" ? "All" : `${type}s`}</span>
@@ -246,7 +244,7 @@ function SavedContent() {
                 <Bookmark className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <h2 className="font-display text-2xl font-black mb-2">No Saved Items</h2>
                 <p className="text-gray-500 mb-6">
-                  {filter === "all" 
+                  {filter === "all"
                     ? "Start saving posts, events, and listings to find them here!"
                     : `No saved ${filter}s yet.`}
                 </p>

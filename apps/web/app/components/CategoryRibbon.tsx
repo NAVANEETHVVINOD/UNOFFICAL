@@ -8,14 +8,16 @@ import {
   Calendar,
   ShoppingBag,
   MessageCircle,
+  BookOpen, // Added icon
 } from "lucide-react";
 
 const CATEGORIES = [
   { id: 'feed', label: 'Home', icon: Home, color: 'bg-primary', path: '/dashboard' },
   { id: 'campus', label: 'Campus', icon: School, color: 'bg-accent-blue', path: '/my-college' },
   { id: 'events', label: 'Events', icon: Calendar, color: 'bg-accent-coral', path: '/events' },
+  { id: 'resources', label: 'Resources', icon: BookOpen, color: 'bg-accent-purple', path: '/resources' },
   { id: 'market', label: 'Market', icon: ShoppingBag, color: 'bg-accent-mint', path: '/marketplace' },
-  { id: 'messages', label: 'Chat', icon: MessageCircle, color: 'bg-accent-purple', path: '/messages' },
+  { id: 'messages', label: 'Chat', icon: MessageCircle, color: 'bg-accent-orange', path: '/messages' },
 ];
 
 interface CategoryRibbonProps {
@@ -30,6 +32,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
     if (pathname === '/dashboard' || pathname === '/') return 'feed';
     if (pathname.startsWith('/my-college') || pathname.startsWith('/colleges')) return 'campus';
     if (pathname.startsWith('/events')) return 'events';
+    if (pathname.startsWith('/resources')) return 'resources';
     if (pathname.startsWith('/marketplace')) return 'market';
     if (pathname.startsWith('/messages')) return 'messages';
     return 'feed';
@@ -40,7 +43,10 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
   return (
     <div className={`w-full hidden md:block ${className}`}>
       {/* Desktop View - Hidden on mobile, ArcMenu handles navigation */}
-      <div className="flex items-center gap-2 p-1 bg-paper border-2 border-ink rounded-card shadow-neo">
+      <div
+        className="flex items-center gap-2 p-1.5 bg-paper border-2 border-ink rounded-xl shadow-neo transform -rotate-1"
+        style={{ transformOrigin: 'center left' }}
+      >
         {CATEGORIES.map((cat) => {
           const isActive = active === cat.id;
           const Icon = cat.icon;
@@ -52,8 +58,8 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
               className={`
                 relative flex items-center gap-2 px-4 py-2.5 rounded-lg
                 font-medium text-sm transition-all
-                ${isActive 
-                  ? `${cat.color} text-ink border-2 border-ink shadow-neo-sm` 
+                ${isActive
+                  ? `${cat.color} text-ink border-2 border-ink shadow-neo-sm`
                   : 'text-neutral-600 hover:bg-neutral-100'
                 }
               `}
@@ -62,7 +68,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
             >
               <Icon className="w-4 h-4" />
               <span>{cat.label}</span>
-              
+
               {isActive && (
                 <motion.div
                   className="absolute -bottom-1 left-1/2 w-2 h-2 bg-ink rounded-full"

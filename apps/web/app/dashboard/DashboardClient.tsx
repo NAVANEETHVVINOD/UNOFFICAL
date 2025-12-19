@@ -120,19 +120,24 @@ function DashboardContent() {
 
   return (
     <motion.div
-      className="min-h-screen bg-paper relative"
+      className="min-h-screen bg-[#F2F2F2] relative" // Changed from bg-paper to a light gray for contrast
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Background Pattern - Subtle dots for main content area */}
+      {/* Background Pattern - Smooth tilted grid */}
       <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
-        {/* Subtle dot pattern - only on main content, not header */}
-        <div 
-          className="absolute inset-0"
+        <div
+          className="absolute inset-0 opacity-40"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
+            backgroundImage: `
+              linear-gradient(45deg, #E0E0E0 25%, transparent 25%), 
+              linear-gradient(-45deg, #E0E0E0 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #E0E0E0 75%), 
+              linear-gradient(-45deg, transparent 75%, #E0E0E0 75%)
+            `,
+            backgroundSize: '20px 20px',
+            backgroundPosition: '0 0, 10px 0, 10px -10px, 0px 10px'
           }}
         />
       </div>
@@ -140,12 +145,12 @@ function DashboardContent() {
       {/* Fixed Header */}
       <Navbar />
 
-      {/* Main Layout - with top padding for fixed navbar */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-16 md:pt-20">
+      {/* Main Layout - with increased top padding for fixed navbar and ticker if present */}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-20 md:pt-24">
         <div className="flex gap-6 pt-4">
-          
+
           {/* LEFT SIDEBAR - Desktop Only */}
-          <motion.aside 
+          <motion.aside
             className="hidden lg:block w-[280px] flex-shrink-0"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -153,7 +158,7 @@ function DashboardContent() {
           >
             <div className="sticky top-24 space-y-4">
               <ProfileSidebar />
-              
+
               {/* Quick Actions */}
               <motion.div
                 className="bg-paper border-2 border-ink shadow-neo p-4 rounded-card-lg"
@@ -232,7 +237,7 @@ function DashboardContent() {
                   </div>
                 </Link>
               </motion.div>
-              
+
               {/* Footer */}
               <div className="text-center py-4">
                 <p className="font-mono text-[10px] text-neutral-400 uppercase tracking-wider">
@@ -270,7 +275,7 @@ function DashboardContent() {
                   </p>
                 </div>
               </div>
-              
+
               {/* Live indicator */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-paper border-2 border-ink rounded-full shadow-neo-sm">
                 <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
@@ -307,7 +312,7 @@ function DashboardContent() {
 
             {/* Load More */}
             {hasMore && !isLoading && items.length > 0 && (
-              <motion.div 
+              <motion.div
                 className="flex justify-center py-8"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -367,7 +372,7 @@ function DashboardContent() {
           </motion.main>
 
           {/* RIGHT SIDEBAR - Desktop Only (Optional) */}
-          <motion.aside 
+          <motion.aside
             className="hidden xl:block w-[280px] flex-shrink-0"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}

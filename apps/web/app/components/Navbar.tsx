@@ -159,7 +159,7 @@ export default function Navbar() {
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Notifications List */}
                     <div className="max-h-80 overflow-y-auto scrollbar-thin">
                       {filteredNotifications.length === 0 ? (
@@ -173,9 +173,8 @@ export default function Navbar() {
                         filteredNotifications.map((notification) => (
                           <motion.div
                             key={notification.id}
-                            className={`p-4 border-b border-neutral-100 hover:bg-primary/5 cursor-pointer flex gap-3 ${
-                              !notification.read ? "bg-accent-blue/5" : ""
-                            }`}
+                            className={`p-4 border-b border-neutral-100 hover:bg-primary/5 cursor-pointer flex gap-3 ${!notification.read ? "bg-accent-blue/5" : ""
+                              }`}
                             onClick={() => handleNotificationClick(notification.id, notification.actionUrl)}
                             whileHover={{ x: 4 }}
                           >
@@ -260,7 +259,7 @@ export default function Navbar() {
                   <span className="text-sm font-bold text-primary uppercase tracking-wide">
                     {text}
                   </span>
-                  <span className="text-primary/60 font-mono text-lg">//</span>
+                  <span className="text-primary/60 font-mono text-lg">{"//"}</span>
                 </span>
               ))}
             </motion.div>

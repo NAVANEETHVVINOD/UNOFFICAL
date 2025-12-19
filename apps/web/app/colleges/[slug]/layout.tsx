@@ -1,14 +1,5 @@
 import { ReactNode, use } from "react";
-import Link from "next/link";
-import Container from "../../components/ui/Container";
-import {
-  NewspaperCard,
-  RetroButton,
-  Badge,
-  Tape,
-} from "../../components/ui/NewspaperUI";
-import CollegeTabs from "../../components/ui/CollegeTabs";
-import CollegeHeader from "../../components/ui/CollegeHeader";
+import Navbar from "../../components/Navbar";
 
 interface CollegeLayoutProps {
   children: ReactNode;
@@ -21,26 +12,37 @@ export default function CollegeLayout({
   children,
   params,
 }: CollegeLayoutProps) {
-  const { slug } = use(params);
-  const collegeName = slug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  // We don't really need slug/params here if we are just a shell, 
+  // but we keep the signature correct.
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] pb-20">
-      {/* College Header */}
-      <CollegeHeader slug={slug} collegeName={collegeName} />
+    <div className="min-h-screen bg-[#F2F2F2] relative">
+      {/* Background Pattern - Smooth tilted grid */}
+      <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `
+              linear-gradient(45deg, #E0E0E0 25%, transparent 25%), 
+              linear-gradient(-45deg, #E0E0E0 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #E0E0E0 75%), 
+              linear-gradient(-45deg, transparent 75%, #E0E0E0 75%)
+            `,
+            backgroundSize: '20px 20px',
+            backgroundPosition: '0 0, 10px 0, 10px -10px, 0px 10px'
+          }}
+        />
+      </div>
 
-      <Container>
-        {/* Navigation Tabs */}
-        <div className="mt-8">
-          <CollegeTabs slug={slug} />
+      {/* Global Navbar */}
+      <Navbar />
+
+      {/* Main Content Container - with top padding for fixed navbar */}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-16 md:pt-20">
+        <div className="pt-4 space-y-6">
+          {children}
         </div>
-      </Container>
-
-      {/* Main Content */}
-      <Container className="pt-8">{children}</Container>
+      </div>
     </div>
   );
 }

@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import {
-  NewspaperCard,
-  RetroButton,
-  Badge,
-} from "../../../components/ui/NewspaperUI";
-import { Skeleton } from "../../../components/ui/Skeleton";
-import Doodle from "../../../components/ui/Doodle";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { api } from "../../../../lib/api";
+import { EventTicket } from "../../../components/ui/SocialComponents";
+import { Calendar, Sparkles, Users, Plus } from "lucide-react";
+import { FeedSkeleton } from "../../../components/ui/Skeleton";
 import { useAuth } from "../../../context/AuthContext";
 
 interface Event {
@@ -31,55 +28,27 @@ interface PageProps {
 }
 
 export default function CollegeEventsPage({ params }: PageProps) {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [cursor, setCursor] = useState<string | undefined>(undefined);
-  const [hasMore, setHasMore] = useState(true);
+  const router = useRouter();
   const { slug } = use(params);
   const { user } = useAuth();
 
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const data = await api.getEvents(slug);
+        setEvents(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadEvents();
   }, [slug]);
 
-  const loadEvents = async (currentCursor?: string) => {
-    try {
-      const limit = 5;
-      const data = await api.getEvents(slug, currentCursor, limit);
-
-      if (data.length < limit) {
-        setHasMore(false);
-      }
-
-      if (currentCursor) {
-        setEvents((prev) => [...prev, ...data]);
-      } else {
-        setEvents(data);
-      }
-
-      if (data.length > 0) {
-        setCursor(data[data.length - 1].id);
-      }
-    } catch (error) {
-      console.error("Failed to fetch events:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      day: date.getDate(),
-      month: date.toLocaleString("default", { month: "short" }).toUpperCase(),
-      time: date.toLocaleTimeString("default", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
-
-  // Students can suggest events (pending approval), admins can create directly
   const canCreateEvent =
     user?.role === "COLLEGE_ADMIN" ||
     user?.role === "CLUB_ADMIN" ||
@@ -87,132 +56,80 @@ export default function CollegeEventsPage({ params }: PageProps) {
     user?.role === "STUDENT";
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mb-12 flex justify-between items-end"
-      >
+    <motion.div
+      className="min-h-screen pb-20"
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.1}
+      onDragEnd={(_, info) => {
+        if (info.offset.x > 100) {
+          // Swipe Right -> Feed
+          router.push(`/colleges/${slug}`);
+        } else if (info.offset.x < -100) {
+          // Swipe Left -> Clubs
+          router.push(`/colleges/${slug}/clubs`);
+        }
+      }}
+    >
+      {/* Local Navigation Tabs */}
+      <div className="flex items-center justify-between gap-2 mb-6">
+        {[
+          { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${slug}` },
+          { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${slug}/events` },
+          { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${slug}/clubs` }
+        ].map((tab) => (
+          <Link key={tab.id} href={tab.path} className="flex-1">
+            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all ${tab.id === 'events'
+                ? 'bg-accent-coral text-ink border-ink shadow-neo-sm'
+                : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
+              }`}>
+              <tab.icon className="w-4 h-4" />
+              <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'events' ? 'text-ink' : 'text-neutral-500'}`}>
+                {tab.label}
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Header & Action */}
+      <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="font-display text-4xl md:text-6xl font-black mb-2">
-            CAMPUS EVENTS
-          </h1>
-          <p className="font-serif text-xl text-gray-600">
-            What's happening at {slug.replace(/-/g, " ").toUpperCase()}
-          </p>
+          <h1 className="font-display text-3xl font-black text-ink">Campus Events</h1>
+          <p className="text-neutral-500">Don't miss out on upcoming activities.</p>
         </div>
         {canCreateEvent && (
           <Link href={`/colleges/${slug}/events/create`}>
-            <RetroButton className="bg-black text-white hover:bg-accent-yellow hover:text-black">
-              {user?.role === "STUDENT" ? "+ SUGGEST EVENT" : "+ CREATE EVENT"}
-            </RetroButton>
+            <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-bold hover:bg-neutral-800 transition-colors shadow-neo-sm">
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Create Event</span>
+            </button>
           </Link>
         )}
-      </motion.div>
+      </div>
 
-      {/* Events List */}
+      {/* Events Grid */}
       {loading ? (
-        <div className="grid gap-6">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="border-4 border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col md:flex-row h-[200px]"
-            >
-              <Skeleton className="w-full md:w-[120px] h-32 md:h-full rounded-none" />
-              <div className="p-6 flex-grow space-y-4">
-                <div className="flex justify-between">
-                  <Skeleton className="h-6 w-24" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-64 bg-paper rounded-xl border-2 border-neutral-100 animate-pulse" />
+          ))}
+        </div>
+      ) : events.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2">
+          {events.map((event) => (
+            <Link key={event.id} href={`/events/${event.id}`}>
+              <EventTicket event={event} />
+            </Link>
           ))}
         </div>
       ) : (
-        <div className="grid gap-6">
-          {events.map((event, index) => {
-            const { day, month, time } = formatDate(event.startsAt);
-            return (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 * index }}
-              >
-                <Link href={`/events/${event.id}`}>
-                  <NewspaperCard className="hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group bg-white p-0 overflow-hidden">
-                    <div className="flex flex-col md:flex-row">
-                      {/* Date Column */}
-                      <div className="bg-accent-blue text-white p-6 flex flex-col items-center justify-center min-w-[120px] border-b-2 md:border-b-0 md:border-r-2 border-black">
-                        <span className="text-sm font-bold tracking-widest">
-                          {month}
-                        </span>
-                        <span className="text-5xl font-black">{day}</span>
-                        <span className="text-xs font-mono mt-2">{time}</span>
-                      </div>
-
-                      {/* Content Column */}
-                      <div className="p-6 flex-grow">
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge className="bg-accent-yellow text-black border-black text-[10px]">
-                            {event.club?.name || "CAMPUS EVENT"}
-                          </Badge>
-                          {event.venue && (
-                            <span className="font-mono text-xs text-gray-500 flex items-center gap-1">
-                              📍 {event.venue}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-bold text-2xl mb-2 group-hover:underline decoration-2 decoration-accent-blue">
-                          {event.title}
-                        </h3>
-                        <p className="text-gray-600 line-clamp-2 font-body text-sm mb-4">
-                          {event.description || "No description available."}
-                        </p>
-                        <div className="flex justify-end">
-                          <span className="font-bold text-sm group-hover:translate-x-1 transition-transform">
-                            GET TICKETS / RSVP -&gt;
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </NewspaperCard>
-                </Link>
-              </motion.div>
-            );
-          })}
+        <div className="text-center py-20 bg-paper rounded-xl border-2 border-dashed border-neutral-300">
+          <Calendar className="w-12 h-12 mx-auto text-neutral-300 mb-4" />
+          <h3 className="font-bold text-lg text-neutral-600">No Events Scheduled</h3>
+          <p className="text-neutral-400 text-sm">Check back later for updates.</p>
         </div>
       )}
-
-      {hasMore && !loading && events.length > 0 && (
-        <div className="text-center pt-8">
-          <RetroButton
-            onClick={() => loadEvents(cursor)}
-            className="bg-white border-black hover:bg-gray-100"
-          >
-            Load More Events
-          </RetroButton>
-        </div>
-      )}
-
-      {!loading && events.length === 0 && (
-        <div className="text-center py-20">
-          <Doodle
-            src="/doodles/sad-face.svg"
-            className="w-24 h-24 mx-auto mb-4 opacity-50"
-          />
-          <h3 className="font-bold text-2xl mb-2">No Events Scheduled</h3>
-          <p className="text-gray-600">
-            Looks like a quiet week. Check back later!
-          </p>
-        </div>
-      )}
-    </div>
+    </motion.div>
   );
 }

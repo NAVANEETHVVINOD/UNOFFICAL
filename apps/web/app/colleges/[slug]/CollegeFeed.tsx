@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import { api } from "../../../lib/api";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Components
 import ProfileSidebar from "../../components/dashboard/ProfileSidebar";
 import CreatePostModal from "../../components/CreatePostModal";
+
 import FeedComposer from "../../components/feed/FeedComposer";
-import CategoryRibbon from "../../components/CategoryRibbon";
 import ArcMenu from "../../components/navigation/ArcMenu";
 import { PostCard, EventTicket } from "../../components/ui/SocialComponents";
 import { FeedSkeleton } from "../../components/ui/Skeleton";
@@ -105,6 +106,7 @@ export default function CollegeFeed({
     collegeSlug: string;
     initialEvents: any[];
 }) {
+    const router = useRouter();
     const [feedItems, setFeedItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -452,9 +454,39 @@ export default function CollegeFeed({
             </motion.aside>
 
             {/* CENTER FEED */}
-            <motion.main className="flex-1 min-w-0 pb-32 lg:pb-8" variants={itemVariants}>
-                {/* Category Navigation - Desktop Only */}
-                <CategoryRibbon />
+            <motion.main
+                className="flex-1 min-w-0 pb-32 lg:pb-8"
+                variants={itemVariants}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.1}
+                onDragEnd={(_, info) => {
+                    // Swipe Left (dragged content left) -> Go to Events
+                    if (info.offset.x < -100) {
+                        router.push(`/colleges/${collegeSlug}/events`);
+                    }
+                }}
+            >
+                {/* Local Navigation Tabs */}
+                <div className="flex items-center justify-between gap-2 mb-6">
+                    {[
+                        { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${collegeSlug}` },
+                        { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${collegeSlug}/events` },
+                        { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${collegeSlug}/clubs` }
+                    ].map((tab) => (
+                        <Link key={tab.id} href={tab.path} className="flex-1">
+                            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all ${tab.id === 'feed'
+                                ? 'bg-primary border-ink shadow-neo-sm'
+                                : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
+                                }`}>
+                                <tab.icon className="w-4 h-4" />
+                                <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'feed' ? 'text-ink' : 'text-neutral-500'}`}>
+                                    {tab.label}
+                                </span>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
 
                 {/* Upcoming Events Ribbon */}
                 {initialEvents.length > 0 && (

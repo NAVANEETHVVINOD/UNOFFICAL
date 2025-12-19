@@ -149,9 +149,7 @@ export class NotificationsService {
     }
 
     // Sort by createdAt descending
-    notifications.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
+    notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     return notifications;
   }

@@ -9,23 +9,26 @@ import ScrollRestoration from "./components/ScrollRestoration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 
+import { Metadata, Viewport } from "next";
+
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 
-export const metadata = {
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export const metadata: Metadata = {
   title: "LINKER - The Campus Collective",
   description: "Events, Clubs, Notes & Chaos — Organized.",
   manifest: "/manifest.json",
-  themeColor: "#000000",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "LINKER",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
 };
 

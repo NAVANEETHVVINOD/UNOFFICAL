@@ -7,25 +7,16 @@ F:\kannan\projects\unoffical\apps\web\app\admin\college\page.tsx
   66:6  warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\ClubDetailsClient.tsx
-  46:6  warning  React Hook useEffect has a missing dependency: 'fetchClubDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  47:6  warning  React Hook useEffect has a missing dependency: 'fetchClubDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\manage\page.tsx
   76:6  warning  React Hook useEffect has a missing dependency: 'fetchClub'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\CollegeFeed.tsx
-  102:8  warning  React Hook useEffect has a missing dependency: 'loadFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\clubs\page.tsx
-  40:6  warning  React Hook useEffect has a missing dependency: 'fetchClubs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\events\page.tsx
-  43:6  warning  React Hook useEffect has a missing dependency: 'loadEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  221:8  warning  React Hook useEffect has a missing dependency: 'loadFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\marketplace\page.tsx
   42:6  warning  React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\components\CreatePostModal.tsx
-  247:37  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
 
 F:\kannan\projects\unoffical\apps\web\app\components\GlobalSearch.tsx
   95:6  warning  React Hook useEffect has missing dependencies: 'getResultAtIndex', 'getTotalResults', 'navigateToResult', and 'onClose'. Either include them or remove the dependency array. If 'onClose' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
@@ -37,17 +28,14 @@ F:\kannan\projects\unoffical\apps\web\app\components\feed\InlineCommentSection.t
   45:41  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
   61:50  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
 
-F:\kannan\projects\unoffical\apps\web\app\context\AuthContext.tsx
-  119:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
 F:\kannan\projects\unoffical\apps\web\app\context\SocketContext.tsx
   115:6  warning  React Hook useEffect has a missing dependency: 'socket'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\events\EventsClient.tsx
-  119:6  warning  React Hook useMemo has an unnecessary dependency: 'categoryFilter'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  120:6  warning  React Hook useMemo has an unnecessary dependency: 'categoryFilter'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\events\[id]\EventDetailsClient.tsx
-  63:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  64:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\events\[id]\certificates\page.tsx
    76:6   warning  React Hook useEffect has a missing dependency: 'fetchEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
@@ -61,29 +49,29 @@ F:\kannan\projects\unoffical\apps\web\app\hooks\useInfiniteFeed.ts
   97:8  warning  React Hook useCallback has an unnecessary dependency: 'category'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\layout.tsx
-  28:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+  45:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
 
 F:\kannan\projects\unoffical\apps\web\app\leaderboard\page.tsx
   43:6  warning  React Hook useEffect has a missing dependency: 'fetchLeaderboard'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\marketplace\[id]\ItemDetailsClient.tsx
-  49:6  warning  React Hook useEffect has a missing dependency: 'fetchItemDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  50:6  warning  React Hook useEffect has a missing dependency: 'fetchItemDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\messages\[id]\ChatClient.tsx
-  51:6  warning  React Hook useEffect has missing dependencies: 'fetchMessages' and 'markAsSeen'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
-  88:6  warning  React Hook useEffect has a missing dependency: 'markAsSeen'. Either include it or remove the dependency array                        react-hooks/exhaustive-deps
+  61:6  warning  React Hook useEffect has missing dependencies: 'fetchMessages' and 'markAsSeen'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  90:6  warning  React Hook useEffect has a missing dependency: 'markAsSeen'. Either include it or remove the dependency array                        react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\notes\NotesClient.tsx
-  90:6  warning  React Hook useEffect has a missing dependency: 'fetchNotes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  91:6  warning  React Hook useEffect has a missing dependency: 'fetchNotes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\onboarding\page.tsx
-  167:9  warning  The 'handleNext' function makes the dependencies of useEffect Hook (at line 255) change on every render. To fix this, wrap the definition of 'handleNext' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  185:9  warning  The 'handleNext' function makes the dependencies of useEffect Hook (at line 282) change on every render. To fix this, wrap the definition of 'handleNext' in its own useCallback() Hook  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\profile\ProfileClient.tsx
-  48:6  warning  React Hook useEffect has a missing dependency: 'fetchUserActivity'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  45:6  warning  React Hook useEffect has a missing dependency: 'fetchUserActivity'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\saved\page.tsx
-  48:6  warning  React Hook useEffect has a missing dependency: 'fetchSavedItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+F:\kannan\projects\unoffical\apps\web\app\profile\[id]\page.tsx
+  60:6  warning  React Hook useEffect has missing dependencies: 'fetchUserProfile' and 'router'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
-✖ 30 problems (0 errors, 30 warnings)
+✖ 26 problems (0 errors, 26 warnings)
 
