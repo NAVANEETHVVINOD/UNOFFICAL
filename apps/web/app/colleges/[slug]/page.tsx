@@ -50,13 +50,9 @@ export default async function CollegeHome({ params }: PageProps) {
   const upcomingEvents = (Array.isArray(events) ? events : []).slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-paper dark:bg-dark-bg relative transition-colors duration-300">
-      {/* Background Pattern */}
-      <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
-        <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
-      </div>
-
-      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-24 md:pt-36">
+    <div className="relative z-10 max-w-[1400px] mx-auto px-2 md:px-4">
+      {/* Reduced padding top significantly since layout handles navbar spacing */}
+      <div className="pt-4">
         <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
       </div>
     </div>

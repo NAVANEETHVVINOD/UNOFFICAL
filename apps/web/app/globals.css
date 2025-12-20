@@ -77,6 +77,9 @@
   --dark-text-muted: #A0A0A0;
   --dark-text-subtle: #666666;
 
+  /* Card Colors - Lighter Grey for contrast against Dark BG */
+  --card-bg: #1E1E1E;
+
   /* Primary stays yellow but adjusted for dark mode contrast */
   --primary: #FFEB3B;
   --primary-dark: #FBC02D;
@@ -100,6 +103,14 @@
   --glow-sm: 0 0 10px rgba(255, 235, 59, 0.15);
   --glow-md: 0 0 20px rgba(255, 235, 59, 0.25);
   --glow-lg: 0 0 30px rgba(255, 235, 59, 0.35);
+}
+
+/* Update Card Styles to use the new variable */
+.dark .card-neo,
+.dark .card-rounded,
+.dark .card-paper {
+  background: var(--card-bg);
+  border-color: var(--dark-border);
 }
 
 /* Base Reset */
