@@ -57,7 +57,7 @@ export default function AppSidebar() {
 
                             <span className={`
                 font-display font-bold text-base tracking-wide
-                ${isActive ? 'text-ink' : 'text-neutral-500 group-hover:text-ink'}
+                ${isActive ? 'text-black' : 'text-neutral-500 group-hover:text-ink'}
               `}>
                                 {item.label}
                             </span>

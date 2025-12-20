@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import Link from "next/link";
-import { Settings, Send, MapPin, Github, Briefcase, GraduationCap, Heart, Star, Calendar } from "lucide-react";
+import { Settings, Send, MapPin, Github, Briefcase, GraduationCap, Heart, Star, Calendar, ArrowLeft } from "lucide-react";
 import { api } from "../../lib/api";
 import {
   ActivitiesTab,
@@ -104,75 +104,25 @@ function ProfileContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-[#121212] flex flex-col">
-      {/* 
-        INVERTED LAYOUT STRATEGY:
-        1. Sticky Tabs at Top
-        2. Content Area (Scrollable)
-        3. Identity Card at Bottom (or after content)
-      */}
-
-      {/* STICKY HEADER & TABS */}
-      <div className="sticky top-0 z-40 bg-paper dark:bg-[#1E1E1E] border-b-2 border-ink shadow-neo-sm">
-        {/* Settings / Back Nav */}
-        <div className="px-4 py-2 flex justify-between items-center border-b border-ink/10">
-          <button onClick={() => router.back()} className="text-xs font-bold font-mono hover:text-primary">&larr; BACK</button>
+    <div className="min-h-screen bg-neutral-100 dark:bg-[#121212] flex flex-col pt-16 md:pt-20">
+      <div className="max-w-3xl mx-auto w-full px-4 mb-4">
+        <div className="flex justify-between items-center py-2">
+          <button onClick={() => router.back()} className="text-sm font-bold font-mono hover:text-primary flex items-center gap-1">
+            <ArrowLeft className="w-4 h-4" /> BACK
+          </button>
           <Link href="/settings">
             <Settings className="w-5 h-5 text-neutral-500 hover:text-ink transition-colors" />
           </Link>
         </div>
-
-        {/* Scrollable Tabs */}
-        <div className="flex overflow-x-auto scrollbar-hide p-2 bg-neutral-50 dark:bg-black/20">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as ProfileTabId)}
-                className={`flex items-center gap-2 px-4 py-2 mx-1 rounded-full border-2 transition-all whitespace-nowrap ${isActive
-                    ? "bg-primary border-ink text-black shadow-neo-sm transform -translate-y-0.5"
-                    : "bg-white dark:bg-[#2D2D2D] border-transparent dark:border-white/10 text-neutral-500 hover:border-ink/20"
-                  }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span className="text-sm font-bold font-display">{tab.label}</span>
-              </button>
-            )
-          })}
-        </div>
       </div>
 
-      {/* SCROLLABLE MAIN CONTENT */}
-      <main className="flex-1 max-w-2xl w-full mx-auto p-4 space-y-6">
-
-        {/* Content View */}
-        <div className="min-h-[300px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-            >
-              {activeTab === "activities" && <ActivitiesTab activities={activitiesData} isLoading={activityLoading} />}
-              {activeTab === "projects" && <ProjectsTab projects={projectsData} isOwnProfile={true} />}
-              {activeTab === "experience" && <ExperienceTab experience={experienceData} isOwnProfile={true} />}
-              {activeTab === "education" && <EducationTab education={educationData} isOwnProfile={true} />}
-              {activeTab === "volunteering" && <VolunteeringTab volunteering={volunteeringData} isOwnProfile={true} />}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* IDENTITY CARD (AT BOTTOM) */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-paper dark:bg-[#1E1E1E] border-2 border-ink rounded-xl shadow-neo p-6 relative overflow-hidden"
-        >
+      {/* 1. PROFILE HEADER (Identity Card) - Now at Top */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-3xl mx-auto w-full px-4 mb-6"
+      >
+        <div className="bg-paper dark:bg-[#1E1E1E] border-2 border-ink rounded-xl shadow-neo p-6 relative overflow-hidden">
           {/* Decorative Background */}
           <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/20 via-accent-coral/20 to-accent-blue/20" />
 
@@ -196,7 +146,6 @@ function ProfileContent() {
                   <MapPin className="w-3 h-3 text-accent-coral" />
                   <span>{collegeName}</span>
                 </div>
-                {/* Onboarding Details Stub */}
                 <div className="flex items-center gap-1 px-3 py-1 bg-neutral-100 dark:bg-white/10 rounded-lg text-neutral-500">
                   <span>🎓 Student</span>
                 </div>
@@ -216,25 +165,78 @@ function ProfileContent() {
                     <Github className="w-5 h-5" />
                   </a>
                 )}
-                <button className="p-2 bg-accent-blue/10 text-accent-blue rounded-lg hover:bg-accent-blue/20 transition-colors">
-                  <Send className="w-5 h-5" />
-                </button>
               </div>
             </div>
           </div>
+        </div>
+      </motion.div>
 
-          {/* GitHub Contributions Graph */}
-          {user.profile?.githubUrl && (
-            <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-white/10">
-              <h4 className="font-bold text-xs uppercase text-neutral-400 mb-4">Contribution Graph</h4>
-              <GitHubContributions username={user.profile.githubUrl.replace("https://github.com/", "").replace("/", "")} />
-            </div>
-          )}
+      {/* 2. STICKY TABS ("Nav Box") - Scrollable */}
+      <div className="sticky top-16 md:top-20 z-40 bg-neutral-100/95 dark:bg-[#121212]/95 backdrop-blur-sm border-b border-ink/10 mb-6">
+        <div className="max-w-3xl mx-auto w-full px-4 py-2">
+          <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as ProfileTabId)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all whitespace-nowrap flex-shrink-0 ${isActive
+                    ? "bg-primary border-ink text-black shadow-neo-sm"
+                    : "bg-white dark:bg-[#2D2D2D] border-transparent dark:border-white/10 text-neutral-500 hover:border-ink/20"
+                    }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="text-sm font-bold font-display">{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. SCROLLABLE MAIN CONTENT with Swipe */}
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 pb-20 overflow-hidden">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(_, info) => {
+            const swipeThreshold = 50;
+            if (info.offset.x < -swipeThreshold) {
+              // Swipe Left (Next Tab)
+              const currentIndex = tabs.findIndex(t => t.id === activeTab);
+              if (currentIndex < tabs.length - 1) setActiveTab(tabs[currentIndex + 1].id as ProfileTabId);
+            } else if (info.offset.x > swipeThreshold) {
+              // Swipe Right (Prev Tab)
+              const currentIndex = tabs.findIndex(t => t.id === activeTab);
+              if (currentIndex > 0) setActiveTab(tabs[currentIndex - 1].id as ProfileTabId);
+            }
+          }}
+          className="min-h-[300px] touch-pan-y"
+        >
+          {activeTab === "activities" && <ActivitiesTab activities={activitiesData} isLoading={activityLoading} />}
+          {activeTab === "projects" && <ProjectsTab projects={projectsData} isOwnProfile={true} />}
+          {activeTab === "experience" && <ExperienceTab experience={experienceData} isOwnProfile={true} />}
+          {activeTab === "education" && <EducationTab education={educationData} isOwnProfile={true} />}
+          {activeTab === "volunteering" && <VolunteeringTab volunteering={volunteeringData} isOwnProfile={true} />}
         </motion.div>
 
-        {/* Bottom Spacer */}
-        <div className="h-24 md:h-12" />
-
+        {/* GitHub Graph at bottom of content if exists */}
+        {user.profile?.githubUrl && (
+          <div className="mt-12 pt-8 border-t border-ink/10">
+            <h4 className="font-bold text-xs uppercase text-neutral-400 mb-4 text-center">Contribution Graph</h4>
+            <div className="bg-paper p-4 rounded-xl border border-ink/10 overflow-x-auto">
+              <GitHubContributions username={user.profile.githubUrl.replace("https://github.com/", "").replace("/", "")} />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

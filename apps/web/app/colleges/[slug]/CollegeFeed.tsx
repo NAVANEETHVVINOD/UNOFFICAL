@@ -15,6 +15,8 @@ import ArcMenu from "../../components/navigation/ArcMenu";
 import CollegeNav from "../../components/navigation/CollegeNav";
 import { PostCard, EventTicket } from "../../components/ui/SocialComponents";
 import { FeedSkeleton } from "../../components/ui/Skeleton";
+import FeedItemFactory from "../../components/FeedItemFactory";
+import type { FeedItemData } from "../../hooks/useInfiniteFeed";
 
 // Icons
 import {
@@ -109,7 +111,7 @@ export default function CollegeFeed({
     initialEvents: any[];
 }) {
     const router = useRouter();
-    const [feedItems, setFeedItems] = useState<any[]>([]);
+    const [feedItems, setFeedItems] = useState<FeedItemData[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -182,25 +184,28 @@ export default function CollegeFeed({
             const postsData = postsRes.data || [];
 
             // Combine and sort
-            const newItems = [
+            // Combine and sort
+            const newItems: FeedItemData[] = [
                 ...postsData.map((p: any) => ({
-                    type: "post",
+                    id: `post-${p.id}`,
+                    type: "post" as const,
                     data: p,
-                    date: new Date(p.createdAt),
+                    createdAt: p.createdAt,
                 })),
                 ...(Array.isArray(events) ? events : []).map((e: any) => ({
-                    type: "event",
+                    id: `event-${e.id}`,
+                    type: "event" as const,
                     data: e,
-                    date: new Date(e.createdAt),
+                    createdAt: e.createdAt,
                 })),
             ];
 
             setFeedItems((prev) => {
                 const combined = reset ? newItems : [...prev, ...newItems];
                 const unique = Array.from(
-                    new Map(combined.map((item) => [item.data.id, item])).values()
+                    new Map(combined.map((item) => [item.id, item])).values()
                 );
-                return unique.sort((a, b) => b.date.getTime() - a.date.getTime());
+                return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             });
 
             if (postsRes.meta) {
@@ -590,13 +595,12 @@ export default function CollegeFeed({
                     <motion.div className="space-y-4 mt-6" variants={containerVariants}>
                         {feedItems.map((item) => (
                             <motion.div
-                                key={`${item.type}-${item.data.id}`}
+                                key={item.id}
                                 variants={itemVariants}
                                 layout
                                 className="transform-gpu"
                             >
-                                {item.type === "post" && <PostCard post={item.data} />}
-                                {item.type === "event" && <EventTicket event={item.data} />}
+                                <FeedItemFactory item={item} />
                             </motion.div>
                         ))}
                     </motion.div>

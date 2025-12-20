@@ -96,23 +96,23 @@ function DashboardContent() {
   }, []);
 
   // Loading State (includes onboarding check)
+  // Loading State - Render Skeleton Shell instead of blocking screen
   if (loading || !onboardingComplete) return (
-    <div className="min-h-screen bg-white bg-grid flex items-center justify-center">
-      <motion.div
-        className="text-center"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: "spring", stiffness: 200 }}
-      >
-        <div className="relative w-16 h-16 mx-auto mb-6">
-          <div className="absolute inset-0 bg-primary rounded-lg animate-pulse" />
-          <div className="absolute inset-2 bg-white rounded border-2 border-ink flex items-center justify-center">
-            <Zap className="w-6 h-6 text-ink animate-pulse" />
+    <div className="min-h-screen bg-paper flex flex-col font-sans">
+      <Navbar />
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-24 md:pt-36 w-full">
+        <div className="flex gap-6">
+          <div className="hidden lg:block w-[280px] space-y-4">
+            <FeedSkeleton count={1} />
+          </div>
+          <div className="flex-1">
+            <FeedSkeleton count={3} />
+          </div>
+          <div className="hidden xl:block w-[280px]">
+            <FeedSkeleton count={1} />
           </div>
         </div>
-        <p className="font-display text-xl text-ink">Loading your feed...</p>
-        <p className="text-sm text-neutral-500 mt-1">Hang tight!</p>
-      </motion.div>
+      </div>
     </div>
   );
 

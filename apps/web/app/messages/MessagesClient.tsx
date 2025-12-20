@@ -161,7 +161,7 @@ export default function MessagesClient() {
       <div className="flex-1 flex overflow-hidden pt-24 md:pt-36 max-w-[1600px] mx-auto w-full px-4 lg:px-6 gap-4">
 
         {/* APP NAVIGATION SIDEBAR - Visible only on Large Screens */}
-        <div className="hidden xl:block w-[280px] flex-shrink-0 flex flex-col gap-4 overflow-y-auto pb-4">
+        <div className="hidden lg:block w-[280px] flex-shrink-0 flex flex-col gap-4 overflow-y-auto pb-4">
           <AppSidebar />
         </div>
 

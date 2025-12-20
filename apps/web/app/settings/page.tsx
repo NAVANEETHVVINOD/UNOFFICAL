@@ -12,6 +12,7 @@ import {
   NotificationPreferences,
   NOTIFICATION_ICONS
 } from "../context/NotificationContext";
+import ThemeToggle from "../components/ThemeToggle";
 import { useBlocking } from "../hooks/useBlocking";
 import Link from "next/link";
 import BottomNav from "../components/ui/BottomNav";
@@ -383,16 +384,16 @@ export default function SettingsPage() {
                 <h2 className="font-display text-2xl font-bold mb-6">Appearance</h2>
                 <p className="text-neutral-600 mb-4">Customize how LINKER looks</p>
                 <div className="space-y-4">
-                  <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
                     <div className="flex items-center gap-3">
                       <Moon className="w-5 h-5" />
                       <div>
                         <p className="font-bold">Dark Mode</p>
-                        <p className="text-sm text-neutral-500">Coming soon</p>
+                        <p className="text-sm text-neutral-500">Switch between light and dark themes</p>
                       </div>
                     </div>
-                    <input type="checkbox" disabled className="w-5 h-5 accent-primary opacity-50" />
-                  </label>
+                    <ThemeToggle size="md" />
+                  </div>
                 </div>
               </div>
             )}
