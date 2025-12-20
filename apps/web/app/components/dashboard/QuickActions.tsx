@@ -1,18 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  PenSquare, 
-  Calendar, 
-  ShoppingBag, 
-  FileText, 
+import {
+  PenSquare,
+  Calendar,
+  ShoppingBag,
+  FileText,
   Bookmark,
   Users
 } from "lucide-react";
 import Link from "next/link";
 
 interface QuickActionsProps {
-  onCreatePost: () => void;
+  onCreatePost?: () => void;
 }
 
 const actions = [
@@ -24,7 +24,7 @@ const actions = [
   { icon: Users, label: "Clubs", color: "bg-accent-orange", href: "/clubs" },
 ];
 
-export default function QuickActions({ onCreatePost }: QuickActionsProps) {
+export default function QuickActions({ onCreatePost = () => { } }: QuickActionsProps) {
   return (
     <motion.div
       className="bg-white border-2 border-ink shadow-neo p-4"
@@ -36,11 +36,11 @@ export default function QuickActions({ onCreatePost }: QuickActionsProps) {
         <span className="w-2 h-2 bg-primary rounded-full" />
         Quick Actions
       </h3>
-      
+
       <div className="grid grid-cols-3 gap-2">
         {actions.map((item, index) => {
           const Icon = item.icon;
-          
+
           const content = (
             <motion.div
               className={`
