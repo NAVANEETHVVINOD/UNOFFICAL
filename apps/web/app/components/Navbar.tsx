@@ -9,6 +9,7 @@ import { Bell, User, Search, QrCode } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import GlobalSearch from "./GlobalSearch";
 import QRCodeModal from "./QRCodeModal";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const router = useRouter();
@@ -97,6 +98,11 @@ export default function Navbar() {
 
           {/* Right Actions - Mobile: Search, QR, Notifications, Profile only */}
           <div className="flex items-center gap-1 md:gap-2">
+            {/* Theme Toggle - Desktop */}
+            <div className="hidden md:block mr-2">
+              <ThemeToggle size="md" />
+            </div>
+
             {/* Search - Always visible */}
             <motion.button
               className="p-2 md:p-2.5 hover:bg-neutral-100 rounded-xl transition-colors md:hidden"
@@ -116,6 +122,11 @@ export default function Navbar() {
             >
               <QrCode className="w-5 h-5" />
             </motion.button>
+
+            {/* Theme Toggle - Mobile */}
+            <div className="md:hidden">
+              <ThemeToggle size="sm" />
+            </div>
 
             {/* Notifications */}
             <div className="relative" ref={notificationRef}>

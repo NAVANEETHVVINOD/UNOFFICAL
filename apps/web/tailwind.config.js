@@ -16,6 +16,21 @@ module.exports = {
         "paper-light": "#FAF3E0", // Lighter cream
         "paper-dark": "#F5ECD7",  // Slightly darker cream
         "input-bg": "#FAF8F5",    // Muted input background
+        
+        // Dark Mode Colors - Professional Black & Yellow
+        dark: {
+          bg: "#0D0D0D",          // Deep black background
+          surface: "#161616",     // Card/surface background
+          elevated: "#1F1F1F",    // Elevated elements
+          border: "#2A2A2A",      // Subtle borders
+          "border-bright": "#3D3D3D", // Brighter borders
+          text: "#F5F5F5",        // Primary text
+          "text-muted": "#A0A0A0", // Secondary text
+          "text-subtle": "#6B6B6B", // Tertiary text
+          input: "#1A1A1A",       // Input background
+          hover: "#252525",       // Hover state
+        },
+        
         // Primary Yellow - The star of the show
         primary: {
           DEFAULT: "#FFEB3B",
@@ -84,6 +99,14 @@ module.exports = {
         // Yellow accent shadows
         "neo-yellow": "4px 4px 0px 0px #FFEB3B",
         "neo-yellow-lg": "6px 6px 0px 0px #FFEB3B",
+        // Dark mode shadows - yellow glow
+        "neo-dark": "4px 4px 0px 0px #FFEB3B",
+        "neo-dark-lg": "6px 6px 0px 0px #FFEB3B",
+        "neo-dark-sm": "2px 2px 0px 0px #FFEB3B",
+        // Glow shadows for dark mode
+        "glow-sm": "0 0 10px rgba(255, 235, 59, 0.3)",
+        "glow-md": "0 0 20px rgba(255, 235, 59, 0.4)",
+        "glow-lg": "0 0 30px rgba(255, 235, 59, 0.5)",
         // Soft shadows for cards
         soft: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
         "soft-lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
@@ -195,6 +218,16 @@ module.exports = {
         // Subtle dot pattern for main content background
         'dots-subtle': 'radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px)',
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        // Dark mode patterns
+        'grid-dark': `
+          linear-gradient(to right, rgba(255,235,59,0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255,235,59,0.05) 1px, transparent 1px)
+        `,
+        'dots-dark': 'radial-gradient(circle, rgba(255,235,59,0.08) 1px, transparent 1px)',
+        'dots-dark-subtle': 'radial-gradient(circle, rgba(255,235,59,0.04) 1px, transparent 1px)',
+        // Yellow gradient for dark mode accents
+        'gradient-yellow': 'linear-gradient(135deg, #FFEB3B 0%, #FBC02D 50%, #F9A825 100%)',
+        'gradient-yellow-dark': 'linear-gradient(135deg, #F9A825 0%, #F57F17 100%)',
       },
       backgroundSize: {
         'grid': '24px 24px',

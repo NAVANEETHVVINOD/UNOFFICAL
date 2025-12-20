@@ -1,6 +1,7 @@
 import "./globals.css";
 import BottomNav from "./components/ui/BottomNav";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { SocketProvider } from "./context/SocketContext";
 import { RBACProvider } from "./context/RBACContext";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -56,20 +57,22 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>
-          <RBACProvider>
-            <SocketProvider>
-              <NotificationProvider>
-                <RetroToastProvider>
-                  <ScrollRestoration />
-                  <div className="min-h-screen pb-16 md:pb-0">
-                    {children}
-                    <SpeedInsights />
-                  </div>
-                  <BottomNav />
-                </RetroToastProvider>
-              </NotificationProvider>
-            </SocketProvider>
-          </RBACProvider>
+          <ThemeProvider>
+            <RBACProvider>
+              <SocketProvider>
+                <NotificationProvider>
+                  <RetroToastProvider>
+                    <ScrollRestoration />
+                    <div className="min-h-screen pb-16 md:pb-0 bg-paper dark:bg-dark-bg text-ink dark:text-dark-text transition-colors duration-300">
+                      {children}
+                      <SpeedInsights />
+                    </div>
+                    <BottomNav />
+                  </RetroToastProvider>
+                </NotificationProvider>
+              </SocketProvider>
+            </RBACProvider>
+          </ThemeProvider>
         </AuthProvider>
         {/* Service Worker Registration */}
         <Script id="sw-register" strategy="afterInteractive">

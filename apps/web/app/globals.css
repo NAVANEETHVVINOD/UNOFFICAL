@@ -53,6 +53,55 @@
   --transition-slow: 400ms ease;
 }
 
+/* ============================================
+   DARK MODE VARIABLES
+   Professional Black & Retro Yellow Theme
+   ============================================ */
+
+.dark {
+  /* Core Dark Colors */
+  --ink: #F5F5F5;
+  --paper: #0D0D0D;
+  --paper-light: #161616;
+  --paper-dark: #1F1F1F;
+  
+  /* Dark Mode Surfaces */
+  --dark-bg: #0D0D0D;
+  --dark-surface: #161616;
+  --dark-elevated: #1F1F1F;
+  --dark-border: #2A2A2A;
+  --dark-border-bright: #3D3D3D;
+  
+  /* Text Colors */
+  --dark-text: #F5F5F5;
+  --dark-text-muted: #A0A0A0;
+  --dark-text-subtle: #6B6B6B;
+  
+  /* Primary stays yellow but with glow */
+  --primary: #FFEB3B;
+  --primary-dark: #FBC02D;
+  --primary-light: #FFF176;
+  
+  /* Hover Colors - brighter in dark mode */
+  --hover-primary: #FFF176;
+  --hover-muted: #FFEB3B;
+  --hover-dark: #FDD835;
+  
+  /* Grid/Pattern - Yellow tinted */
+  --grid-color: rgba(255, 235, 59, 0.05);
+  --dot-color: rgba(255, 235, 59, 0.08);
+  
+  /* Shadows - Yellow glow */
+  --shadow-neo: 4px 4px 0px 0px var(--primary);
+  --shadow-neo-lg: 6px 6px 0px 0px var(--primary);
+  --shadow-neo-yellow: 0 0 20px rgba(255, 235, 59, 0.3);
+  
+  /* Glow effects */
+  --glow-sm: 0 0 10px rgba(255, 235, 59, 0.3);
+  --glow-md: 0 0 20px rgba(255, 235, 59, 0.4);
+  --glow-lg: 0 0 30px rgba(255, 235, 59, 0.5);
+}
+
 /* Base Reset */
 *,
 *::before,
@@ -76,6 +125,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Dark mode body */
+.dark body,
+body.dark {
+  color: var(--dark-text);
+  background-color: var(--dark-bg);
+}
+
+/* Ensure html also gets dark background */
+.dark {
+  background-color: var(--dark-bg);
+  color-scheme: dark;
 }
 
 /* ============================================
@@ -869,4 +932,329 @@ input:focus,
 textarea:focus,
 select:focus {
   background-color: var(--paper-light) !important;
+}
+
+
+/* ============================================
+   DARK MODE COMPONENT STYLES
+   Professional Black & Retro Yellow Theme
+   ============================================ */
+
+/* Dark Mode Background Patterns */
+.dark .bg-grid,
+.dark .bg-retro-pattern::before {
+  background-image:
+    linear-gradient(to right, rgba(255, 235, 59, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 235, 59, 0.03) 1px, transparent 1px);
+}
+
+.dark .bg-dots,
+.dark .bg-retro-pattern::after {
+  background-image: radial-gradient(circle, rgba(255, 235, 59, 0.06) 1.5px, transparent 1.5px);
+}
+
+/* Dark Mode Cards */
+.dark .card-neo,
+.dark .card-paper,
+.dark .card-rounded {
+  background: var(--dark-surface);
+  border-color: var(--dark-border);
+  box-shadow: var(--shadow-neo);
+}
+
+.dark .card-neo:hover,
+.dark .card-paper:hover,
+.dark .card-rounded:hover {
+  background: var(--dark-elevated);
+  box-shadow: var(--shadow-neo-lg);
+  border-color: var(--primary);
+}
+
+.dark .card-neo-yellow {
+  background: var(--dark-surface);
+  border-color: var(--primary);
+  box-shadow: var(--glow-sm);
+}
+
+.dark .card-neo-yellow:hover {
+  box-shadow: var(--glow-md);
+}
+
+.dark .card-subtle {
+  background: var(--dark-elevated);
+  border-color: var(--dark-border);
+}
+
+.dark .card-subtle:hover {
+  border-color: var(--primary);
+}
+
+/* Dark Mode Buttons */
+.dark .btn-neo {
+  background: var(--dark-surface);
+  border-color: var(--primary);
+  color: var(--dark-text);
+  box-shadow: var(--shadow-neo);
+}
+
+.dark .btn-neo:hover {
+  background: var(--dark-elevated);
+  box-shadow: var(--shadow-neo-lg);
+}
+
+.dark .btn-primary {
+  background: var(--primary);
+  color: var(--dark-bg);
+  border-color: var(--primary);
+}
+
+.dark .btn-primary:hover {
+  background: var(--primary-light);
+  box-shadow: var(--glow-sm);
+}
+
+.dark .btn-dark {
+  background: var(--dark-elevated);
+  color: var(--dark-text);
+  border-color: var(--dark-border-bright);
+}
+
+.dark .btn-dark:hover {
+  background: var(--dark-border);
+  border-color: var(--primary);
+}
+
+/* Dark Mode Inputs */
+.dark .input-retro {
+  background-color: var(--dark-input, #1A1A1A);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+.dark .input-retro:focus {
+  background-color: var(--dark-elevated);
+  border-color: var(--primary);
+  box-shadow: var(--glow-sm);
+}
+
+.dark .input-retro::placeholder {
+  color: var(--dark-text-subtle);
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--dark-surface);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background-color: var(--dark-elevated) !important;
+  border-color: var(--primary) !important;
+  box-shadow: var(--glow-sm);
+}
+
+/* Dark Mode Text */
+.dark .text-ink {
+  color: var(--dark-text);
+}
+
+.dark .text-ink-light {
+  color: var(--dark-text-muted);
+}
+
+.dark .text-neutral-500,
+.dark .text-neutral-600 {
+  color: var(--dark-text-muted);
+}
+
+.dark .text-neutral-400 {
+  color: var(--dark-text-subtle);
+}
+
+/* Dark Mode Backgrounds */
+.dark .bg-paper {
+  background-color: var(--dark-bg);
+}
+
+.dark .bg-paper-light {
+  background-color: var(--dark-surface);
+}
+
+.dark .bg-paper-dark {
+  background-color: var(--dark-elevated);
+}
+
+.dark .bg-white {
+  background-color: var(--dark-surface);
+}
+
+.dark .bg-neutral-50,
+.dark .bg-neutral-100 {
+  background-color: var(--dark-elevated);
+}
+
+.dark .bg-neutral-200 {
+  background-color: var(--dark-border);
+}
+
+/* Dark Mode Borders */
+.dark .border-ink {
+  border-color: var(--dark-border-bright);
+}
+
+.dark .border-neutral-100,
+.dark .border-neutral-200 {
+  border-color: var(--dark-border);
+}
+
+.dark .border-neutral-300 {
+  border-color: var(--dark-border-bright);
+}
+
+/* Dark Mode Shadows */
+.dark .shadow-neo {
+  box-shadow: 4px 4px 0px 0px var(--primary);
+}
+
+.dark .shadow-neo-lg {
+  box-shadow: 6px 6px 0px 0px var(--primary);
+}
+
+.dark .shadow-neo-sm {
+  box-shadow: 2px 2px 0px 0px var(--primary);
+}
+
+/* Dark Mode Scrollbar */
+.dark .scrollbar-thin {
+  scrollbar-color: var(--primary) var(--dark-surface);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--dark-surface);
+}
+
+/* Dark Mode Selection */
+.dark ::selection {
+  background: var(--primary);
+  color: var(--dark-bg);
+}
+
+.dark ::-moz-selection {
+  background: var(--primary);
+  color: var(--dark-bg);
+}
+
+/* Dark Mode Focus */
+.dark :focus-visible {
+  outline-color: var(--primary);
+}
+
+/* Dark Mode Skeleton Loading */
+.dark .skeleton {
+  background: linear-gradient(90deg, var(--dark-surface) 25%, var(--dark-elevated) 50%, var(--dark-surface) 75%);
+  background-size: 200% 100%;
+}
+
+/* Dark Mode Chat Bubbles */
+.dark .chat-bubble-sent {
+  background: var(--primary);
+  color: var(--dark-bg);
+}
+
+.dark .chat-bubble-received {
+  background: var(--dark-elevated);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+/* Dark Mode Hover States */
+.dark .hover\:bg-neutral-100:hover {
+  background-color: var(--dark-elevated) !important;
+}
+
+.dark .hover\:bg-neutral-50:hover {
+  background-color: var(--dark-surface) !important;
+}
+
+.dark .hover\:bg-primary\/20:hover {
+  background-color: rgba(255, 235, 59, 0.15) !important;
+}
+
+.dark .hover\:bg-primary:hover {
+  background-color: var(--primary) !important;
+  color: var(--dark-bg) !important;
+}
+
+/* Dark Mode Glass Effect */
+.dark .glass {
+  background: rgba(13, 13, 13, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dark Mode Gradient Text */
+.dark .text-gradient-yellow {
+  background: linear-gradient(135deg, var(--primary) 0%, #FBC02D 50%, #F9A825 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Dark Mode Dividers */
+.dark hr,
+.dark .divide-y > * + * {
+  border-color: var(--dark-border);
+}
+
+/* Dark Mode Modal/Overlay */
+.dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Dark Mode Accent Colors - Slightly brighter for visibility */
+.dark .bg-accent-coral {
+  background-color: #FF7B7B;
+}
+
+.dark .bg-accent-mint {
+  background-color: #5EDDD4;
+}
+
+.dark .bg-accent-blue {
+  background-color: #55C7E1;
+}
+
+.dark .bg-accent-purple {
+  background-color: #AB69C6;
+}
+
+/* Dark Mode Ring/Outline */
+.dark .ring-primary {
+  --tw-ring-color: var(--primary);
+}
+
+.dark .focus\:ring-primary:focus {
+  --tw-ring-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.3);
+}
+
+/* Dark Mode Transitions */
+.dark * {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Prevent transition on page load */
+.dark.no-transition *,
+.no-transition * {
+  transition: none !important;
 }

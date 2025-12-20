@@ -5,6 +5,7 @@ import { User, Settings, Zap, MapPin, ChevronRight, Star } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ProfileSidebarSkeleton } from "../ui/Skeleton";
+import { ThemeToggleInline } from "../ThemeToggle";
 
 export default function ProfileSidebar() {
   const { user, loading } = useAuth();
@@ -146,6 +147,11 @@ export default function ProfileSidebar() {
               <ChevronRight className="w-4 h-4" />
             </motion.div>
           </Link>
+
+          <div className="flex items-center justify-between p-3 border-2 border-ink rounded-lg bg-paper dark:bg-dark-surface hover:bg-neutral-50 dark:hover:bg-dark-elevated transition-colors">
+            <span className="font-medium text-sm dark:text-dark-text">Dark Mode</span>
+            <ThemeToggleInline />
+          </div>
         </div>
       </div>
     </motion.div>
