@@ -67,7 +67,7 @@ export default function EventsClient() {
     try {
       const data = await api.getEvents();
       // Sort by date ascending
-      const sorted = data.sort((a: Event, b: Event) => 
+      const sorted = data.sort((a: Event, b: Event) =>
         new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
       );
       setEvents(sorted);
@@ -122,7 +122,7 @@ export default function EventsClient() {
   const handleRSVP = useCallback(async (eventId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setRsvpLoading(eventId);
     try {
       await api.rsvpEvent(eventId, "GOING");
@@ -164,12 +164,15 @@ export default function EventsClient() {
         animate="animate"
       >
         {/* Background Pattern */}
-        <div className="fixed inset-0 pointer-events-none z-0 bg-halftone opacity-30" />
+        {/* Background Pattern */}
+        <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+          <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
+        </div>
 
         <Navbar />
 
         <Container>
-          <div className="pt-16 md:pt-20 pb-24 md:pb-8 relative z-10">
+          <div className="pt-24 md:pt-36 pb-24 md:pb-8 relative z-10">
             <CategoryRibbon className="mb-6 mt-4" />
 
             {/* Header */}
@@ -207,9 +210,8 @@ export default function EventsClient() {
                 </div>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`px-4 py-3 border-2 border-black flex items-center gap-2 font-bold text-sm transition-colors ${
-                    showFilters ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-                  }`}
+                  className={`px-4 py-3 border-2 border-black flex items-center gap-2 font-bold text-sm transition-colors ${showFilters ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+                    }`}
                 >
                   <Filter className="w-4 h-4" />
                   <span className="hidden sm:inline">Filters</span>
@@ -231,11 +233,10 @@ export default function EventsClient() {
                         <button
                           key={filter}
                           onClick={() => setDateFilter(filter)}
-                          className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black transition-colors ${
-                            dateFilter === filter
+                          className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black transition-colors ${dateFilter === filter
                               ? "bg-accent-yellow"
                               : "bg-white hover:bg-gray-100"
-                          }`}
+                            }`}
                         >
                           {filter.replace("-", " ")}
                         </button>
@@ -286,9 +287,8 @@ export default function EventsClient() {
                       >
                         <Link href={`/events/${event.id}`}>
                           <NewspaperCard
-                            className={`hover:-translate-y-1 hover:shadow-neo-lg transition-all cursor-pointer group bg-white p-0 overflow-hidden ${
-                              isPast ? "opacity-60" : ""
-                            }`}
+                            className={`hover:-translate-y-1 hover:shadow-neo-lg transition-all cursor-pointer group bg-white p-0 overflow-hidden ${isPast ? "opacity-60" : ""
+                              }`}
                           >
                             <div className="flex flex-col md:flex-row">
                               {/* Date Column */}

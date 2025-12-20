@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { api } from "../../../../lib/api";
 import { Home, Sparkles, Calendar, Users } from "lucide-react";
+import CollegeNav from "../../../components/navigation/CollegeNav";
 
 interface MarketplaceItem {
   id: string;
@@ -57,22 +58,10 @@ export default function CollegeMarketplacePage({ params }: PageProps) {
     <div className="min-h-screen">
       {/* Header */}
       {/* Local Navigation Tabs */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
-        {[
-          { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
-          { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${slug}` },
-          { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${slug}/events` },
-          { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${slug}/clubs` }
-        ].map((tab) => (
-          <Link key={tab.id} href={tab.path} className="flex-1 min-w-[100px] md:min-w-0">
-            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all whitespace-nowrap bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50`}>
-              <tab.icon className="w-4 h-4 text-neutral-500" />
-              <span className="font-display font-bold text-sm uppercase tracking-wide text-neutral-500">
-                {tab.label}
-              </span>
-            </div>
-          </Link>
-        ))}
+      {/* Header */}
+      {/* Local Navigation Tabs */}
+      <div className="mb-6">
+        <CollegeNav collegeSlug={slug} />
       </div>
 
       <motion.div

@@ -163,7 +163,7 @@ export default function MessagesClient() {
     <div className="h-screen bg-paper flex flex-col overflow-hidden">
       <Navbar />
 
-      <div className="flex-1 flex overflow-hidden pt-16 md:pt-20">
+      <div className="flex-1 flex overflow-hidden pt-24 md:pt-36">
 
         {/* SIDEBAR (Conversation List) 
             Hidden on Mobile if Chat is Open */}

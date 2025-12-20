@@ -78,7 +78,7 @@ export default function ResourcesPage() {
 
             <Navbar />
 
-            <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-20 md:pt-24">
+            <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-24 md:pt-36">
 
                 {/* Navigation */}
                 <div className="flex gap-6 pt-4">

@@ -52,7 +52,7 @@ export default async function CollegeHome({ params }: PageProps) {
   return (
     <div className="relative z-10 max-w-[1400px] mx-auto px-2 md:px-4">
       {/* Reduced padding top significantly since layout handles navbar spacing */}
-      <div className="pt-4">
+      <div className="">
         <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
       </div>
     </div>

@@ -2,26 +2,26 @@
 > server@0.0.1 test
 > jest
 
-PASS src/modules/profiles/profiles.service.spec.ts
-PASS src/modules/marketplace/marketplace.service.spec.ts (6.252 s)
-PASS src/modules/users/users.service.spec.ts (6.666 s)
-PASS src/modules/colleges/colleges.service.spec.ts (6.499 s)
-PASS src/modules/marketplace/marketplace.controller.spec.ts (6.936 s)
-PASS src/modules/events/events.service.spec.ts (6.999 s)
-PASS src/modules/events/events.controller.spec.ts (6.903 s)
-PASS src/modules/notes/notes.service.spec.ts
+PASS src/modules/marketplace/marketplace.service.spec.ts (8.573 s)
+PASS src/modules/colleges/colleges.service.spec.ts (9.171 s)
+PASS src/modules/users/users.service.spec.ts (9.214 s)
+PASS src/modules/profiles/profiles.service.spec.ts (7.491 s)
+PASS src/modules/marketplace/marketplace.controller.spec.ts (9.55 s)
+PASS src/modules/events/events.service.spec.ts (9.466 s)
+PASS src/modules/events/events.controller.spec.ts (9.822 s)
 PASS src/modules/messages/messages.controller.spec.ts
-PASS src/modules/notes/notes.controller.spec.ts
 PASS src/modules/users/users.controller.spec.ts
+PASS src/modules/clubs/clubs.service.spec.ts
+PASS src/modules/notes/notes.controller.spec.ts
 PASS src/modules/clubs/clubs.controller.spec.ts
+PASS src/modules/notes/notes.service.spec.ts
 PASS src/modules/colleges/colleges.controller.spec.ts
 PASS src/modules/messages/messages.service.spec.ts
 PASS src/app.controller.spec.ts
-PASS src/modules/clubs/clubs.service.spec.ts
 PASS src/modules/profiles/profiles.controller.spec.ts
 
 Test Suites: 17 passed, 17 total
 Tests:       17 passed, 17 total
 Snapshots:   0 total
-Time:        21.674 s
+Time:        20.895 s
 Ran all test suites.

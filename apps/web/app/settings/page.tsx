@@ -80,13 +80,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-paper relative">
       {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-          }}
-        />
+        <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
       </div>
 
       {/* Header */}
@@ -126,7 +120,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 pt-16 md:pt-20 pb-24 md:pb-8">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 pt-24 md:pt-36 pb-24 md:pb-8">
         {/* User Info Card */}
         <motion.div
           className="card-paper p-6 rounded-xl mb-8"
@@ -168,8 +162,8 @@ export default function SettingsPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg transition-all ${activeTab === tab.id
-                        ? "bg-primary border-2 border-ink shadow-neo-sm"
-                        : "hover:bg-neutral-100 border-2 border-transparent"
+                      ? "bg-primary border-2 border-ink shadow-neo-sm"
+                      : "hover:bg-neutral-100 border-2 border-transparent"
                       }`}
                   >
                     <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
@@ -257,8 +251,8 @@ export default function SettingsPage() {
                     <label
                       key={type}
                       className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${localPreferences.types[type]
-                          ? "border-ink bg-white"
-                          : "border-neutral-200 bg-neutral-50 opacity-60"
+                        ? "border-ink bg-white"
+                        : "border-neutral-200 bg-neutral-50 opacity-60"
                         }`}
                     >
                       <div className="flex items-center gap-3">

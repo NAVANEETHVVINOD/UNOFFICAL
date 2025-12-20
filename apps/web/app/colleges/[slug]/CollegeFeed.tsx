@@ -12,6 +12,7 @@ import CreatePostModal from "../../components/CreatePostModal";
 
 import FeedComposer from "../../components/feed/FeedComposer";
 import ArcMenu from "../../components/navigation/ArcMenu";
+import CollegeNav from "../../components/navigation/CollegeNav";
 import { PostCard, EventTicket } from "../../components/ui/SocialComponents";
 import { FeedSkeleton } from "../../components/ui/Skeleton";
 
@@ -469,27 +470,8 @@ export default function CollegeFeed({
                 }}
             >
                 {/* Local Navigation Tabs */}
-                {/* Local Navigation Tabs - Hidden on mobile */}
-                <div className="flex items-center gap-2 mb-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-                    {[
-                        { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
-                        { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${collegeSlug}` },
-                        { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${collegeSlug}/events` },
-                        { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${collegeSlug}/clubs` }
-                    ].map((tab) => (
-                        <Link key={tab.id} href={tab.path} className="flex-1 min-w-[100px] md:min-w-0">
-                            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all whitespace-nowrap ${(tab.id === 'feed' && !tab.path.includes('/events') && !tab.path.includes('/clubs')) || (tab.id === 'home' && false) // Logic simplified, 'feed' is active for purely /colleges/slug
-                                ? 'bg-primary border-ink shadow-neo-sm'
-                                : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
-                                }`}>
-                                <tab.icon className={`w-4 h-4 ${tab.id === 'feed' ? 'text-black' : ''}`} />
-                                <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'feed' ? 'text-black' : 'text-neutral-500'}`}>
-                                    {tab.label}
-                                </span>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                {/* Local Navigation Tabs */}
+                <CollegeNav collegeSlug={collegeSlug} />
 
                 {/* Upcoming Events Ribbon */}
                 {initialEvents.length > 0 && (

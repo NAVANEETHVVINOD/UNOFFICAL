@@ -57,9 +57,14 @@ export default function ClubsClient() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-paper">
+        {/* Background Pattern */}
+        <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+          <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
+        </div>
+
         <Navbar />
         <Container>
-          <div className="pt-16 md:pt-20 pb-24 md:pb-8">
+          <div className="pt-24 md:pt-36 pb-24 md:pb-8 relative z-10">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -79,90 +84,90 @@ export default function ClubsClient() {
               </p>
             </motion.div>
 
-          {/* Search Bar */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="max-w-xl mx-auto mb-12 relative"
-          >
-            <Tape className="absolute -top-3 left-1/2 -translate-x-1/2 z-10" />
-            <div className="bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex gap-2">
-              <input
-                type="text"
-                placeholder="Search for clubs..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="flex-grow p-2 font-mono focus:outline-none"
-              />
-              <RetroButton className="py-2 px-6">SEARCH</RetroButton>
-            </div>
-          </motion.div>
+            {/* Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="max-w-xl mx-auto mb-12 relative"
+            >
+              <Tape className="absolute -top-3 left-1/2 -translate-x-1/2 z-10" />
+              <div className="bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Search for clubs..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-grow p-2 font-mono focus:outline-none"
+                />
+                <RetroButton className="py-2 px-6">SEARCH</RetroButton>
+              </div>
+            </motion.div>
 
-          {/* Clubs Grid */}
-          {loading ? (
-            <div className="text-center py-20">
-              <Doodle
-                src="/doodles/loading.svg"
-                className="w-16 h-16 mx-auto animate-spin"
-              />
-              <p className="font-mono mt-4">Loading clubs...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-              {filteredClubs.map((club, index) => (
-                <motion.div
-                  key={club.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 * index }}
-                >
-                  <Link href={`/clubs/${club.id}`}>
-                    <NewspaperCard className="h-full hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group bg-white">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="w-12 h-12 bg-gray-100 border-2 border-black flex items-center justify-center group-hover:bg-accent-yellow transition-colors">
-                          <span className="font-display font-black text-xl">
-                            {club.name[0]}
+            {/* Clubs Grid */}
+            {loading ? (
+              <div className="text-center py-20">
+                <Doodle
+                  src="/doodles/loading.svg"
+                  className="w-16 h-16 mx-auto animate-spin"
+                />
+                <p className="font-mono mt-4">Loading clubs...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                {filteredClubs.map((club, index) => (
+                  <motion.div
+                    key={club.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * index }}
+                  >
+                    <Link href={`/clubs/${club.id}`}>
+                      <NewspaperCard className="h-full hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group bg-white">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="w-12 h-12 bg-gray-100 border-2 border-black flex items-center justify-center group-hover:bg-accent-yellow transition-colors">
+                            <span className="font-display font-black text-xl">
+                              {club.name[0]}
+                            </span>
+                          </div>
+                          <Badge className="bg-black text-white">
+                            {club._count?.members || 0} MEMBERS
+                          </Badge>
+                        </div>
+                        <h3 className="font-bold text-2xl mb-2 group-hover:underline decoration-2 decoration-accent-yellow">
+                          {club.name}
+                        </h3>
+                        <p className="text-gray-600 line-clamp-3 mb-4 font-body text-sm">
+                          {club.description || "No description available."}
+                        </p>
+                        <div className="mt-auto pt-4 border-t-2 border-dashed border-gray-200 flex justify-between items-center">
+                          <span className="font-mono text-xs text-gray-500">
+                            EST. 2024
+                          </span>
+                          <span className="font-bold text-sm group-hover:translate-x-1 transition-transform">
+                            VISIT CLUB -&gt;
                           </span>
                         </div>
-                        <Badge className="bg-black text-white">
-                          {club._count?.members || 0} MEMBERS
-                        </Badge>
-                      </div>
-                      <h3 className="font-bold text-2xl mb-2 group-hover:underline decoration-2 decoration-accent-yellow">
-                        {club.name}
-                      </h3>
-                      <p className="text-gray-600 line-clamp-3 mb-4 font-body text-sm">
-                        {club.description || "No description available."}
-                      </p>
-                      <div className="mt-auto pt-4 border-t-2 border-dashed border-gray-200 flex justify-between items-center">
-                        <span className="font-mono text-xs text-gray-500">
-                          EST. 2024
-                        </span>
-                        <span className="font-bold text-sm group-hover:translate-x-1 transition-transform">
-                          VISIT CLUB -&gt;
-                        </span>
-                      </div>
-                    </NewspaperCard>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          )}
+                      </NewspaperCard>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            )}
 
-          {!loading && filteredClubs.length === 0 && (
-            <div className="text-center py-20">
-              <Doodle
-                src="/doodles/sad-face.svg"
-                className="w-24 h-24 mx-auto mb-4 opacity-50"
-              />
-              <h3 className="font-bold text-2xl mb-2">No Clubs Found</h3>
-              <p className="text-gray-600">
-                Try searching for something else or start your own!
-              </p>
-            </div>
-          )}
+            {!loading && filteredClubs.length === 0 && (
+              <div className="text-center py-20">
+                <Doodle
+                  src="/doodles/sad-face.svg"
+                  className="w-24 h-24 mx-auto mb-4 opacity-50"
+                />
+                <h3 className="font-bold text-2xl mb-2">No Clubs Found</h3>
+                <p className="text-gray-600">
+                  Try searching for something else or start your own!
+                </p>
+              </div>
+            )}
           </div>
         </Container>
         <BottomNav />

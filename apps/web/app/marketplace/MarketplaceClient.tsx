@@ -146,12 +146,14 @@ export default function MarketplaceClient() {
         animate="animate"
       >
         {/* Background Pattern */}
-        <div className="fixed inset-0 pointer-events-none z-0 bg-halftone opacity-30" />
+        <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+          <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
+        </div>
 
         <Navbar />
 
         <Container>
-          <div className="pt-16 md:pt-20 pb-24 md:pb-8 relative z-10">
+          <div className="pt-24 md:pt-36 pb-24 md:pb-8 relative z-10">
             <CategoryRibbon className="mb-6 mt-4" />
 
             {/* Header */}
@@ -187,8 +189,8 @@ export default function MarketplaceClient() {
               <button
                 onClick={() => setActiveTab("market")}
                 className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all border-b-4 ${activeTab === "market"
-                    ? "border-primary text-black"
-                    : "border-transparent text-gray-400 hover:text-black"
+                  ? "border-primary text-black"
+                  : "border-transparent text-gray-400 hover:text-black"
                   }`}
               >
                 <Store className="w-4 h-4" />
@@ -197,8 +199,8 @@ export default function MarketplaceClient() {
               <button
                 onClick={() => setActiveTab("work")}
                 className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all border-b-4 ${activeTab === "work"
-                    ? "border-accent-blue text-black"
-                    : "border-transparent text-gray-400 hover:text-black"
+                  ? "border-accent-blue text-black"
+                  : "border-transparent text-gray-400 hover:text-black"
                   }`}
               >
                 <Briefcase className="w-4 h-4" />
