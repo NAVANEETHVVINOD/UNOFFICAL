@@ -59,47 +59,47 @@
    ============================================ */
 
 .dark {
-  /* Core Dark Colors */
-  --ink: #F5F5F5;
-  --paper: #0D0D0D;
-  --paper-light: #161616;
-  --paper-dark: #1F1F1F;
-  
+  /* Core Dark Colors - Updated for better contrast */
+  --ink: #E0E0E0;
+  --paper: #121212;
+  --paper-light: #1E1E1E;
+  --paper-dark: #0A0A0A;
+
   /* Dark Mode Surfaces */
-  --dark-bg: #0D0D0D;
-  --dark-surface: #161616;
-  --dark-elevated: #1F1F1F;
-  --dark-border: #2A2A2A;
-  --dark-border-bright: #3D3D3D;
-  
+  --dark-bg: #121212;
+  --dark-surface: #1E1E1E;
+  --dark-elevated: #2D2D2D;
+  --dark-border: #333333;
+  --dark-border-bright: #4D4D4D;
+
   /* Text Colors */
-  --dark-text: #F5F5F5;
+  --dark-text: #E0E0E0;
   --dark-text-muted: #A0A0A0;
-  --dark-text-subtle: #6B6B6B;
-  
-  /* Primary stays yellow but with glow */
+  --dark-text-subtle: #666666;
+
+  /* Primary stays yellow but adjusted for dark mode contrast */
   --primary: #FFEB3B;
   --primary-dark: #FBC02D;
   --primary-light: #FFF176;
-  
-  /* Hover Colors - brighter in dark mode */
-  --hover-primary: #FFF176;
-  --hover-muted: #FFEB3B;
-  --hover-dark: #FDD835;
-  
-  /* Grid/Pattern - Yellow tinted */
-  --grid-color: rgba(255, 235, 59, 0.05);
-  --dot-color: rgba(255, 235, 59, 0.08);
-  
-  /* Shadows - Yellow glow */
-  --shadow-neo: 4px 4px 0px 0px var(--primary);
-  --shadow-neo-lg: 6px 6px 0px 0px var(--primary);
-  --shadow-neo-yellow: 0 0 20px rgba(255, 235, 59, 0.3);
-  
+
+  /* Hover Colors */
+  --hover-primary: #FFF59D;
+  --hover-muted: #FDD835;
+  --hover-dark: #FBC02D;
+
+  /* Grid/Pattern - Smoother Grey/White Grid */
+  --grid-color: rgba(255, 255, 255, 0.03);
+  --dot-color: rgba(255, 255, 255, 0.05);
+
+  /* Shadows - Subtle yellow glow + solid blacks for depth */
+  --shadow-neo: 4px 4px 0px 0px #000000;
+  --shadow-neo-lg: 6px 6px 0px 0px #000000;
+  --shadow-neo-yellow: 0 0 15px rgba(255, 235, 59, 0.2);
+
   /* Glow effects */
-  --glow-sm: 0 0 10px rgba(255, 235, 59, 0.3);
-  --glow-md: 0 0 20px rgba(255, 235, 59, 0.4);
-  --glow-lg: 0 0 30px rgba(255, 235, 59, 0.5);
+  --glow-sm: 0 0 10px rgba(255, 235, 59, 0.15);
+  --glow-md: 0 0 20px rgba(255, 235, 59, 0.25);
+  --glow-lg: 0 0 30px rgba(255, 235, 59, 0.35);
 }
 
 /* Base Reset */
@@ -1210,7 +1210,7 @@ select:focus {
 
 /* Dark Mode Dividers */
 .dark hr,
-.dark .divide-y > * + * {
+.dark .divide-y>*+* {
   border-color: var(--dark-border);
 }
 

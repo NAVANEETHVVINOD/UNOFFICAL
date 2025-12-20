@@ -470,7 +470,7 @@ export default function CollegeFeed({
             >
                 {/* Local Navigation Tabs */}
                 {/* Local Navigation Tabs - Hidden on mobile */}
-                <div className="hidden md:flex items-center justify-between gap-2 mb-8">
+                <div className="hidden md:flex items-center justify-between gap-2 mb-4">
                     {[
                         { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
                         { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${collegeSlug}` },
@@ -479,8 +479,8 @@ export default function CollegeFeed({
                     ].map((tab) => (
                         <Link key={tab.id} href={tab.path} className="flex-1">
                             <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all ${(tab.id === 'feed' && !tab.path.includes('/events') && !tab.path.includes('/clubs')) || (tab.id === 'home' && false) // Logic simplified, 'feed' is active for purely /colleges/slug
-                                    ? 'bg-primary border-ink shadow-neo-sm'
-                                    : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
+                                ? 'bg-primary border-ink shadow-neo-sm'
+                                : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
                                 }`}>
                                 <tab.icon className="w-4 h-4" />
                                 <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'feed' ? 'text-ink' : 'text-neutral-500'}`}>
@@ -494,7 +494,7 @@ export default function CollegeFeed({
                 {/* Upcoming Events Ribbon */}
                 {initialEvents.length > 0 && (
                     <motion.div
-                        className="mt-8 mb-8 transform -rotate-1 origin-left"
+                        className="mt-4 mb-6 origin-center"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >

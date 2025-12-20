@@ -16,21 +16,21 @@ module.exports = {
         "paper-light": "#FAF3E0", // Lighter cream
         "paper-dark": "#F5ECD7",  // Slightly darker cream
         "input-bg": "#FAF8F5",    // Muted input background
-        
+
         // Dark Mode Colors - Professional Black & Yellow
         dark: {
-          bg: "#0D0D0D",          // Deep black background
-          surface: "#161616",     // Card/surface background
-          elevated: "#1F1F1F",    // Elevated elements
-          border: "#2A2A2A",      // Subtle borders
-          "border-bright": "#3D3D3D", // Brighter borders
-          text: "#F5F5F5",        // Primary text
+          bg: "#121212",          // Rich dark gray background (not pure black)
+          surface: "#1E1E1E",     // Slightly lighter surface
+          elevated: "#2D2D2D",    // Elevated elements
+          border: "#333333",      // Subtle borders
+          "border-bright": "#4D4D4D", // Brighter borders
+          text: "#E0E0E0",        // Primary text (off-white)
           "text-muted": "#A0A0A0", // Secondary text
-          "text-subtle": "#6B6B6B", // Tertiary text
-          input: "#1A1A1A",       // Input background
-          hover: "#252525",       // Hover state
+          "text-subtle": "#666666", // Tertiary text
+          input: "#1E1E1E",       // Input background
+          hover: "#2D2D2D",       // Hover state
         },
-        
+
         // Primary Yellow - The star of the show
         primary: {
           DEFAULT: "#FFEB3B",
