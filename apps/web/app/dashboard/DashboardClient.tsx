@@ -120,33 +120,21 @@ function DashboardContent() {
 
   return (
     <motion.div
-      className="min-h-screen bg-[#F2F2F2] relative" // Changed from bg-paper to a light gray for contrast
+      className="min-h-screen bg-paper dark:bg-dark-bg relative transition-colors duration-300"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Background Pattern - Smooth tilted grid */}
+      {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage: `
-              linear-gradient(45deg, #E0E0E0 25%, transparent 25%), 
-              linear-gradient(-45deg, #E0E0E0 25%, transparent 25%), 
-              linear-gradient(45deg, transparent 75%, #E0E0E0 75%), 
-              linear-gradient(-45deg, transparent 75%, #E0E0E0 75%)
-            `,
-            backgroundSize: '20px 20px',
-            backgroundPosition: '0 0, 10px 0, 10px -10px, 0px 10px'
-          }}
-        />
+        <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
       </div>
 
       {/* Fixed Header */}
       <Navbar />
 
       {/* Main Layout - with increased top padding for fixed navbar and ticker if present */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-20 md:pt-24">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-24 md:pt-36">
         <div className="flex gap-6 pt-4">
 
           {/* LEFT SIDEBAR - Desktop Only */}

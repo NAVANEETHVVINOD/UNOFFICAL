@@ -64,7 +64,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2 md:gap-3 group">
             <motion.div
-              className="w-9 h-9 md:w-10 md:h-10 bg-primary border-2 border-ink flex items-center justify-center font-display font-black text-lg md:text-xl shadow-neo-sm rounded-lg"
+              className="w-9 h-9 md:w-10 md:h-10 bg-primary border-2 border-ink flex items-center justify-center font-display font-black text-lg md:text-xl shadow-neo-sm rounded-lg text-ink group-hover:bg-ink group-hover:text-primary transition-colors duration-300"
               whileHover={{ rotate: -6, scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

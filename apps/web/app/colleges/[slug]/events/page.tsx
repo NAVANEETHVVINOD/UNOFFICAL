@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "../../../../lib/api";
 import { EventTicket } from "../../../components/ui/SocialComponents";
-import { Calendar, Sparkles, Users, Plus, History } from "lucide-react";
+import { Calendar, Sparkles, Users, Plus, History, Home } from "lucide-react";
 import { FeedSkeleton } from "../../../components/ui/Skeleton";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -72,7 +72,7 @@ export default function CollegeEventsPage({ params }: PageProps) {
 
   return (
     <motion.div
-      className="min-h-screen pb-20"
+      className="min-h-screen bg-paper dark:bg-dark-bg relative transition-colors duration-300 pb-20 pt-24 md:pt-36 px-4 lg:px-6 max-w-[1400px] mx-auto"
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.1}
@@ -86,9 +86,15 @@ export default function CollegeEventsPage({ params }: PageProps) {
         }
       }}
     >
+      {/* Background Pattern */}
+      <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+        <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
+      </div>
+
       {/* Local Navigation Tabs */}
-      <div className="flex items-center justify-between gap-2 mb-6">
+      <div className="flex items-center justify-between gap-2 mb-6 relative z-10">
         {[
+          { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
           { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${slug}` },
           { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${slug}/events` },
           { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${slug}/clubs` }
@@ -99,9 +105,10 @@ export default function CollegeEventsPage({ params }: PageProps) {
               : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
               }`}>
               <tab.icon className="w-4 h-4" />
-              <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'events' ? 'text-ink' : 'text-neutral-500'}`}>
+              <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'events' ? 'text-ink' : 'text-neutral-500'} hidden sm:inline`}>
                 {tab.label}
               </span>
+              {/* Mobile label icon only or short */}
             </div>
           </Link>
         ))}
@@ -128,8 +135,8 @@ export default function CollegeEventsPage({ params }: PageProps) {
         <button
           onClick={() => setActiveTab("upcoming")}
           className={`px-4 py-2 font-bold text-sm border-b-2 transition-colors ${activeTab === "upcoming"
-              ? "border-accent-coral text-ink"
-              : "border-transparent text-neutral-400 hover:text-ink"
+            ? "border-accent-coral text-ink"
+            : "border-transparent text-neutral-400 hover:text-ink"
             }`}
         >
           UPCOMING ({upcomingEvents.length})
@@ -137,8 +144,8 @@ export default function CollegeEventsPage({ params }: PageProps) {
         <button
           onClick={() => setActiveTab("past")}
           className={`px-4 py-2 font-bold text-sm border-b-2 transition-colors ${activeTab === "past"
-              ? "border-neutral-500 text-ink"
-              : "border-transparent text-neutral-400 hover:text-ink"
+            ? "border-neutral-500 text-ink"
+            : "border-transparent text-neutral-400 hover:text-ink"
             }`}
         >
           PAST EVENTS ({pastEvents.length})
