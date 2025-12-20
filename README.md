@@ -1,489 +1,263 @@
-# 🎓 LINKER - The Campus Collective
+<div align="center">
 
-> **Connect. Learn. Live.** - Events, Clubs, Notes & Chaos — Organized.
+  <img src="apps/web/public/icons/icon.svg" alt="LINKER Logo" width="120" height="120" />
 
-[![Deployment](https://img.shields.io/badge/Deploy-Vercel-black)](https://linker-inky.vercel.app)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7)](https://linker-g0lw.onrender.com)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/NAVANEETHVVINOD/UNOFFICAL)
+  # LINKER
+  ### The Campus Collective Super-App
+
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Next.js](https://img.shields.io/badge/Next.js-16.0-black.svg?style=flat&logo=next.js)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+  [![TailwindCSS](https://img.shields.io/badge/Tailwind-3.3-38B2AC.svg?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
+  [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green.svg?style=flat&logo=supabase)](https://supabase.com/)
+
+  <p align="center">
+    <b>Connect. Collaborate. Campus.</b><br />
+    A hyper-local, exclusive social network bridging the gap between students, events, and opportunities.
+  </p>
+
+</div>
+
+---
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
+- [About the Project](#-about-the-project)
+- [Key Features](#-key-features)
+- [Design Philosophy](#-design-philosophy)
+- [Technical Architecture](#-technical-architecture)
+  - [Tech Stack](#tech-stack)
+  - [System Diagrams](#system-diagrams)
+- [API Documentation](#-api-documentation)
+- [Getting Started](#-getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
-## 🌟 Overview
+## 🚀 About the Project
 
-**LINKER** is a comprehensive social platform designed specifically for college students. It's your one-stop hub for campus life - manage clubs, discover events, buy/sell items, share study materials, and connect with your college community.
+**LINKER** is not just another social media app. It is a gated, institution-specific platform designed to foster genuine connection within college campuses. By verifying students against their college database, LINKER ensures a safe, noise-free environment for:
 
-### **Live Demo**
-
-- 🌐 **Frontend**: [linker-inky.vercel.app](https://linker-inky.vercel.app)
-- 🔧 **Backend API**: [linker-g0lw.onrender.com](https://linker-g0lw.onrender.com)
-
-### **Why LINKER?**
-
-- 🎨 **Beautiful UI** - Unique "Newspaper/Retro" aesthetic with hand-drawn elements
-- 🚀 **Fast & Modern** - Built with Next.js 15 and NestJS
-- 📱 **Mobile-First** - Fully responsive design
-- 🔒 **Secure** - JWT authentication with bcrypt password hashing
-- 🎯 **Feature-Rich** - Everything a college student needs in one place
+1.  **Campus Life**: knowing what's happening *right now* (Events, Clubs).
+2.  **Professional Growth**: finding gigs, freelance work, and building a portfolio.
+3.  **Community**: connecting with peers in your batch, major, or district.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-### **Core Modules** ✅ (Live)
+### 🏛️ Campus Dashboard
+-   **Exclusive Access**: Secure onboarding requiring valid college credentials.
+-   **Global Feed**: Real-time ticker, polls, and media updates from the campus community.
+-   **Navigation**: Intuitive "Orbit" and "Swipe" navigation for mobile-first usability.
 
-#### 🔐 **Authentication & Profiles**
+### 📅 Events Ecosystem
+-   **Smart Ticketing**: QR Code generation for every RSVP.
+-   **Admin Scanner**: Built-in PWA QR Scanner for event organizers.
+-   **Discovery**: Advanced filtering (Trending, This Week, Past Events).
 
-- Secure registration and login
-- Customizable user profiles
-- Bio, interests, social links (GitHub, Instagram)
-- College affiliation
-- Edit profile functionality
+### 💼 Marketplace & Freelance
+-   **Peer-to-Peer Commerce**: Buy/Sell textbooks, electronics, and dorm needs.
+-   **Freelance Nexus**: Students can list services (Design, Tutor, Code) and get hired.
+-   **Job Board**: Campus-specific internships and opportunities.
 
-#### 🏛️ **Clubs**
+### 💬 Modern Messaging
+-   **Split-View UI**: Discord-inspired layout with sidebar and chat pane.
+-   **Community Groups**: Interest-based channels (Coding, Music, Sports).
+-   **Real-Time**: Built on Socket.io for instant communication.
 
-- Browse all campus clubs
-- View club details and member count
-- Join/Leave clubs instantly
-- Search clubs by name or description
+### 👤 Identity & Profile
+-   **Inverted Layout**: Unique UI prioritizing "Life Blocks" (Projects, Activity) over static stats.
+-   **Gamification**: "Link Score" and activity heatmaps (GitHub style).
 
-#### 📅 **Events**
+---
 
-- Discover upcoming campus events
-- RSVP with status (Going/Interested/Not Going)
-- **Create your own events**
-- Filter by date and venue
-- View event details (date, time, location, organizer)
+## 🎨 Design Philosophy: "Nano Banana Pro"
 
-#### 🛍️ **Marketplace**
+We adopted a custom design language specifically for Gen-Z student developers:
 
-- Buy and sell items within your college
-- **Post new listings**
-- Browse with search functionality
-- Contact sellers
-- Item status tracking (Active/Sold)
+| Element | Specification | Purpose |
+| :--- | :--- | :--- |
+| **Theme** | Neo-Brutalist | High contrast, bold borders (`2px`), hard shadows. |
+| **Colors** | Ink Black (`#121212`) & Verified Yellow (`#F4B400`) | Professional yet energetic. High readability. |
+| **Typography** | `Space Grotesk` (Headers) + `Inter` (Body) | Technical, futuristic, clean. |
+| **Motion** | Tilted Cards & Snap Transitions | Adds a playful, "tactile" feel to the digital UI. |
+| **Backgrounds** | Animated Grids & Dot Patterns | Engineering blueprint aesthetic. |
 
-#### 📚 **Study Materials (Notes)**
+---
 
-- Upload and share study materials
-- **Like/Unlike system** for popular content
-- Download/view files
-- Browse by subject and semester
-- Search functionality
+## 🏗️ Technical Architecture
 
-#### 💬 **Community Feed**
+### Tech Stack
 
-- **Create text posts** to share updates
-- Like posts
-- View community activity
-- Author information with timestamps
+-   **Frontend**: Next.js 16 (App Router), React 19 (RC), TailwindCSS, Framer Motion.
+-   **Backend**: Node.js, Express, Socket.io (Real-time).
+-   **Database**: PostgreSQL (via Supabase), Prisma ORM.
+-   **State Management**: Zustand (Client), TanStack Query (Server State).
+-   **Tools**: Turborepo (Monorepo), Vitest (Testing), Zod (Validation).
 
-#### 💬 **Realtime Chat**
-- **Instant Messaging**: Live chat with typing indicators.
-- **Socket.io Integration**: Low-latency communication.
-- **Retro Interface**: "Newspaper" styled chat bubbles.
+### System Diagrams
 
-#### 🎨 **UI/UX Excellence**
+#### User Journey Flow
 
-- **Error Boundaries** - Graceful error handling on all pages
-- **Loading States** - Smooth loading experience
-
-### **Frontend** (`apps/web`)
-
-```
-Framework:    Next.js 15 (App Router)
-Language:     TypeScript
-Styling:      Tailwind CSS
-Animations:   Framer Motion
-State:        React Context API
-HTTP Client:  Fetch API
-```
-
-### **Backend** (`apps/server`)
-
-```
-Framework:    NestJS 11
-Language:     TypeScript
-Database:     PostgreSQL (Supabase)
-ORM:          Prisma 6.18.0
-Auth:         JWT (@nestjs/jwt)
-Validation:   class-validator
-Security:     Helmet, CORS, bcrypt
+```mermaid
+graph TD
+    User((Student)) -->|Opens App| Auth{Authenticated?}
+    Auth -- No --> Login[Login / Register]
+    Auth -- Yes --> Dashboard[Global Dashboard]
+    
+    Dashboard -->|Swipe Left| Campus[College Campus]
+    Dashboard -->|Nav Bar| Market[Marketplace]
+    Dashboard -->|Nav Bar| Messages[Messages]
+    Dashboard -->|Nav Bar| Profile[Profile]
+    
+    Campus --> Events[Events Feed]
+    Campus --> Clubs[Clubs List]
+    
+    Events -->|RSVP| Ticket[QR Ticket]
+    Ticket -->|Scan| Validator((Organizer))
 ```
 
-### **Infrastructure**
+#### Data Relationship Model (ERD)
 
-```
-Monorepo:     Turborepo
-Deployment:   Vercel (Frontend) + Render (Backend)
-Database:     Supabase (Managed PostgreSQL)
-Version:      Git + GitHub
-```
-
-### **Database Models**
-
-```
-User, Profile, College, Club, ClubMember
-Event, EventParticipant, MarketplaceListing
-Note, NoteLike, Post, PostLike, Comment
+```mermaid
+erDiagram
+    USER ||--o{ POST : creates
+    USER ||--o{ EVENT : organizes
+    USER ||--o{ LISTING : sells
+    
+    COLLEGE ||--o{ USER : contains
+    COLLEGE ||--o{ EVENT : hosts
+    
+    EVENT ||--o{ RSVP : has
+    
+    CLUB ||--o{ USER : members
+    CLUB ||--o{ EVENT : hosts
+    
+    CONVERSATION ||--o{ MESSAGE : contains
+    CONVERSATION ||--o{ USER : participants
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🔌 API Documentation
 
-### **Prerequisites**
+The backend exposes a RESTful API (documented via Postman). Key endpoints include:
 
-- Node.js ≥ 18.0.0
-- npm ≥ 9.0.0
-- PostgreSQL database (or Supabase account)
+### Authentication
+-   `POST /auth/register` - Create new student account.
+-   `POST /auth/login` - Authenticate and receive JWT.
 
-### **Quick Start**
+### Events
+-   `GET /events` - List all events (supports filters).
+-   `POST /events` - Create a new event (Admin only).
+-   `POST /events/:id/rsvp` - Register for an event.
+-   `POST /events/:id/check-in` - Validate QR Code ticket.
 
-1. **Clone the repository**
+### Marketplace
+-   `GET /marketplace` - List products, services, and jobs.
+-   `POST /marketplace` - Create a listing.
 
-   ```bash
-   git clone https://github.com/NAVANEETHVVINOD/UNOFFICAL.git
-   cd UNOFFICAL
-   ```
+### Social
+-   `POST /posts` - Create a social feed post.
+-   `POST /messages` - Send a private message.
 
-2. **Install dependencies**
-
-   ```bash
-   npm install --legacy-peer-deps
-   ```
-
-3. **Set up environment variables**
-
-   **Frontend** (`apps/web/.env.local`):
-
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:4000
-   ```
-
-   **Backend** (`apps/server/.env`):
-
-   ```env
-   DATABASE_URL="postgresql://user:password@host:5432/database"
-   JWT_ACCESS_SECRET="your-secret-key-here"
-   JWT_REFRESH_SECRET="your-refresh-secret-here"
-   JWT_ACCESS_EXPIRES="15m"
-   JWT_REFRESH_EXPIRES="7d"
-   PORT=4000
-   CORS_ORIGIN="http://localhost:3000"
-   ```
-
-4. **Set up the database**
-
-   ```bash
-   cd apps/server
-   npx prisma generate
-   npx prisma migrate deploy
-   # Or for development:
-   npx prisma db push
-   ```
-
-5. **Start development servers**
-
-   ```bash
-   # From root directory:
-   npm run dev
-
-   # Or individually:
-   # Terminal 1 - Backend
-   cd apps/server && npm run start:dev
-
-   # Terminal 2 - Frontend
-   cd apps/web && npm run dev
-   ```
-
-6. **Access the app**
-   - Frontend: http://localhost:3000
-   - Backend: http://localhost:4000
-   - Prisma Studio: `npx prisma studio` (Database GUI)
+*(Full API documentation available in `/docs/api` or Swagger UI)*
 
 ---
 
-## 💻 Development
+## 🏁 Getting Started
 
-### **Available Scripts**
+### Prerequisites
+-   Node.js v20+
+-   npm or pnpm
+-   PostgreSQL Database URL (Supabase recommended)
 
-**Root:**
+### Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/NAVANEETHVVINOD/UNOFFICAL.git
+    cd UNOFFICAL
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Generate Prisma Client**
+    ```bash
+    npx prisma generate
+    ```
+
+### Environment Variables
+
+Create a `.env` file in `apps/server` and `apps/web`:
+
+**`apps/server/.env`**
+```env
+port=4000
+DATABASE_URL="postgresql://user:pass@host:5432/db"
+JWT_SECRET="your-super-secret-key"
+CLIENT_URL="http://localhost:3000"
+```
+
+**`apps/web/.env.local`**
+```env
+NEXT_PUBLIC_API_URL="http://localhost:4000"
+```
+
+### Running Locally
+
+Start the development server (runs both Frontend and Backend via Turbo):
 
 ```bash
-npm run dev          # Start all apps
-npm run build        # Build all apps
-npm run lint         # Lint all apps
+npm run dev
 ```
-
-**Frontend (`apps/web`):**
-
-```bash
-npm run dev          # Dev server (localhost:3000)
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # ESLint
-```
-
-**Backend (`apps/server`):**
-
-```bash
-npm run start:dev    # NestJS dev mode with hot reload
-npm run build        # Build for production
-npm run start:prod   # Production server
-npm run test         # Run tests
-```
-
-**Database:**
-
-```bash
-npx prisma generate            # Generate Prisma Client
-npx prisma migrate dev         # Create & apply migration
-npx prisma migrate deploy      # Deploy migrations (production)
-npx prisma studio              # Open database GUI
-npx prisma db push             # Push schema changes (dev only)
-```
+-   Frontend: `http://localhost:3000`
+-   Backend: `http://localhost:4000`
 
 ---
 
-## 🌐 Deployment
+## 📂 Project Structure
 
-### **Production URLs**
-- **Frontend**: https://linker-inky.vercel.app
-- **Backend**: https://linker-g0lw.onrender.com
-
-### **Configuration (Action Required)** ⚠️
-
-**Please refer to [DEPLOYMENT.md](DEPLOYMENT.md) for the critical "Missing Supabase Environment Variables" and "P1001" connection fixes.**
-
-Deployment requires specific configuration:
-1.  **Vercel (Frontend)**: Needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-2.  **Render (Backend)**: **MUST** use port `6543` (Connection Pooler) for `DATABASE_URL`.
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the exact values and step-by-step guide.
-
----
-
-## 📁 Project Structure
-
-```
-UNOFFICAL/
-├── apps/
-│   ├── web/                      # Next.js Frontend
-│   │   ├── app/
-│   │   │   ├── (auth)/          # Login, Register
-│   │   │   ├── dashboard/       # Main dashboard
-│   │   │   ├── profile/         # User profile & edit
-│   │   │   ├── clubs/           # Clubs directory & details
-│   │   │   ├── events/          # Events directory, details & create
-│   │   │   ├── marketplace/     # Marketplace listings & create
-│   │   │   ├── notes/           # Notes directory, details & upload
-│   │   │   ├── feed/            # Community feed & create post
-│   │   │   ├── components/      # UI components
-│   │   │   ├── context/         # AuthContext
-│   │   │   └── lib/             # API client
-│   │   └── public/              # Static assets
-│   │
-│   └── server/                   # NestJS Backend
+```bash
+.
+├── apps
+│   ├── web/                 # Next.js Frontend
+│   │   ├── app/             # App Router Pages
+│   │   ├── components/      # Reusable UI Components
+│   │   └── lib/             # Utilities & API Clients
+│   └── server/              # Node.js Backend
 │       ├── src/
-│       │   ├── modules/
-│       │   │   ├── auth/        # Authentication
-│       │   │   ├── users/       # User management
-│       │   │   ├── profiles/    # Profile management
-│       │   │   ├── colleges/    # College data
-│       │   │   ├── clubs/       # Club CRUD
-│       │   │   ├── events/      # Event CRUD
-│       │   │   ├── marketplace/ # Marketplace CRUD
-│       │   │   ├── notes/       # Notes CRUD
-│       │   │   └── posts/       # Community feed
-│       │   ├── prisma/          # Prisma service
-│       │   └── main.ts          # Entry point
-│       └── prisma/
-│           └── schema.prisma    # Database schema
-│
-├── packages/
-│   └── config/                   # Shared TypeScript config
-│
-└── turbo.json                    # Turborepo config
+│       │   ├── controllers/ # Route Logic
+│       │   ├── services/    # Business Logic
+│       │   └── routes/      # API Definitions
+│       └── prisma/          # Database Schema
+├── packages/                # Shared UI/Config (Monorepo)
+└── README.md                # You are here
 ```
-
----
-
-## 📚 API Documentation
-
-### **Base URL**
-
-- Local: `http://localhost:4000`
-- Production: `https://linker-g0lw.onrender.com`
-
-### **Authentication**
-
-**Register**
-
-```http
-POST /auth/register
-Content-Type: application/json
-
-{
-  "email": "student@example.com",
-  "password": "SecurePass123",
-  "fullName": "John Doe",
-  "collegeId": "optional-college-id"
-}
-```
-
-**Login**
-
-```http
-POST /auth/login
-Content-Type: application/json
-
-{
-  "email": "student@example.com",
-  "password": "SecurePass123"
-}
-
-Response:
-{
-  "accessToken": "jwt-token",
-  "user": { ... }
-}
-```
-
-### **Protected Endpoints** (Require `Authorization: Bearer <token>`)
-
-| Method | Endpoint           | Description            |
-| ------ | ------------------ | ---------------------- |
-| GET    | `/users/me`        | Get current user       |
-| GET    | `/profiles/:id`    | Get profile by ID      |
-| PATCH  | `/profiles/:id`    | Update profile         |
-| GET    | `/clubs`           | List all clubs         |
-| GET    | `/clubs/:id`       | Get club details       |
-| POST   | `/clubs/:id/join`  | Join club              |
-| DELETE | `/clubs/:id/leave` | Leave club             |
-| GET    | `/events`          | List all events        |
-| POST   | `/events`          | Create event           |
-| POST   | `/events/:id/rsvp` | RSVP to event          |
-| GET    | `/marketplace`     | List marketplace items |
-| POST   | `/marketplace`     | Create listing         |
-| GET    | `/notes`           | List study notes       |
-| POST   | `/notes`           | Upload note            |
-| POST   | `/notes/:id/like`  | Like note              |
-| GET    | `/posts`           | List community posts   |
-| POST   | `/posts`           | Create post            |
-| POST   | `/posts/:id/like`  | Like post              |
-
----
-
-## 🗺️ Roadmap
-
-### **Phase 1: MVP** ✅ (Complete - Nov 2024)
-
-- [x] Authentication & User Management
-- [x] Clubs, Events, Marketplace, Notes modules
-- [x] Community Feed
-- [x] Profile Management
-- [x] Responsive UI with Error Handling
-
-### **Phase 2: Production Launch** 🚀 (In Progress)
-
-- [ ] Deploy to production
-- [ ] Collect user feedback (50+ students)
-- [ ] Bug fixes & iterations
-
-### **Phase 3: AI Assistant** 🤖 (Dec 2024)
-
-- [ ] Gemini API integration
-- [ ] Personalized academic assistant
-- [ ] Resume & LinkedIn generator
-- [ ] RAG for college-specific data
-
-### **Phase 4: Advanced Features** (Q4 2024 - In Progress)
-- [x] Real-time messaging (Socket.io)
-- [x] Retro Mode (CRT Effects)
-- [ ] Push notifications
-- [ ] Admin dashboard
-- [ ] Mobile app (React Native)
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how:
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/AmazingFeature`
-3. Commit changes: `git commit -m 'Add AmazingFeature'`
-4. Push to branch: `git push origin feature/AmazingFeature`
-5. Open a Pull Request
-
-**Development Guidelines:**
-
-- Follow TypeScript best practices
-- Maintain the "Newspaper" UI theme
-- Write descriptive commit messages
-- Test locally before submitting PR
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ---
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Distributed under the MIT License. See `LICENSE` for more information.
 
----
-
-## 👥 Team
-
-**Navaneeth V** - Creator & Lead Developer
-
-- GitHub: [@NAVANEETHVVINOD](https://github.com/NAVANEETHVVINOD)
-- Email: navaneethvvinod@gmail.com
-
----
-
-## 🙏 Acknowledgments
-
-- **NestJS** - Powerful backend framework
-- **Next.js** - Amazing React framework
-- **Vercel** - Seamless frontend hosting
-- **Render** - Reliable backend hosting
-- **Supabase** - Managed PostgreSQL
-- **Prisma** - Excellent database ORM
-- **Open Source Community** - For inspiration and tools
-
----
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/NAVANEETHVVINOD/UNOFFICAL/issues)
-- **Email**: navaneethvvinod@gmail.com
-- **Discussions**: [GitHub Discussions](https://github.com/NAVANEETHVVINOD/UNOFFICAL/discussions)
-
----
-
-## 🌟 Star History
-
-If you find this project useful, please consider giving it a ⭐ on GitHub!
-
----
-
-<div align="center">
-
-**Built with ❤️ for students, by students**
-
-[🌐 Visit Live Site](https://linker-inky.vercel.app) • [📖 Documentation](https://github.com/NAVANEETHVVINOD/UNOFFICAL/wiki) • [🐛 Report Bug](https://github.com/NAVANEETHVVINOD/UNOFFICAL/issues)
-
-</div>
+<p align="center">Made with 💛 by the LINKER Team</p>
