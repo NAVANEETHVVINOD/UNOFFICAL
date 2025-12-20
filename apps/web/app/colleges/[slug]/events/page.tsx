@@ -72,7 +72,7 @@ export default function CollegeEventsPage({ params }: PageProps) {
 
   return (
     <motion.div
-      className="min-h-screen bg-paper dark:bg-dark-bg relative transition-colors duration-300 pb-20 pt-24 md:pt-36 px-4 lg:px-6 max-w-[1400px] mx-auto"
+      className="min-h-screen bg-paper dark:bg-dark-bg relative transition-colors duration-300 pb-20 pt-24 md:pt-36 px-4 lg:px-6 max-w-[1400px] mx-auto overflow-x-hidden"
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.1}
@@ -101,11 +101,11 @@ export default function CollegeEventsPage({ params }: PageProps) {
         ].map((tab) => (
           <Link key={tab.id} href={tab.path} className="flex-1">
             <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all ${tab.id === 'events'
-              ? 'bg-accent-coral text-ink border-ink shadow-neo-sm'
+              ? 'bg-accent-coral text-black border-ink shadow-neo-sm'
               : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
               }`}>
-              <tab.icon className="w-4 h-4" />
-              <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'events' ? 'text-ink' : 'text-neutral-500'} hidden sm:inline`}>
+              <tab.icon className={`w-4 h-4 ${tab.id === 'events' ? 'text-black' : ''}`} />
+              <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'events' ? 'text-black' : 'text-neutral-500'} hidden sm:inline`}>
                 {tab.label}
               </span>
               {/* Mobile label icon only or short */}

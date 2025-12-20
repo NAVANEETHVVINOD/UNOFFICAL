@@ -70,22 +70,10 @@ export default function ResourcesPage() {
     });
 
     return (
-        <div className="min-h-screen bg-[#F2F2F2] relative">
-            {/* Background Pattern - Smooth tilted grid */}
+        <div className="min-h-screen bg-paper dark:bg-dark-bg relative transition-colors duration-300">
+            {/* Background Pattern */}
             <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
-                <div
-                    className="absolute inset-0 opacity-40"
-                    style={{
-                        backgroundImage: `
-              linear-gradient(45deg, #E0E0E0 25%, transparent 25%), 
-              linear-gradient(-45deg, #E0E0E0 25%, transparent 25%), 
-              linear-gradient(45deg, transparent 75%, #E0E0E0 75%), 
-              linear-gradient(-45deg, transparent 75%, #E0E0E0 75%)
-            `,
-                        backgroundSize: '20px 20px',
-                        backgroundPosition: '0 0, 10px 0, 10px -10px, 0px 10px'
-                    }}
-                />
+                <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
             </div>
 
             <Navbar />
@@ -145,8 +133,8 @@ export default function ResourcesPage() {
                                         key={cat}
                                         onClick={() => setActiveCategory(cat)}
                                         className={`px-4 py-1.5 rounded-full text-sm font-bold border-2 transition-all whitespace-nowrap ${activeCategory === cat
-                                                ? 'bg-accent-purple text-white border-ink shadow-neo-sm'
-                                                : 'bg-white border-neutral-200 text-neutral-600 hover:border-ink'
+                                            ? 'bg-accent-purple text-white border-ink shadow-neo-sm'
+                                            : 'bg-white border-neutral-200 text-neutral-600 hover:border-ink'
                                             }`}
                                     >
                                         {cat}
@@ -167,8 +155,8 @@ export default function ResourcesPage() {
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div className={`w-10 h-10 rounded-lg border-2 border-ink flex items-center justify-center ${res.type === 'pdf' ? 'bg-accent-coral/20 text-accent-coral' :
-                                                res.type === 'video' ? 'bg-accent-blue/20 text-accent-blue' :
-                                                    'bg-accent-mint/20 text-accent-mint'
+                                            res.type === 'video' ? 'bg-accent-blue/20 text-accent-blue' :
+                                                'bg-accent-mint/20 text-accent-mint'
                                             }`}>
                                             {res.type === 'pdf' && <FileText className="w-5 h-5" />}
                                             {res.type === 'video' && <Video className="w-5 h-5" />}

@@ -11,6 +11,7 @@ import Doodle from "../../../components/ui/Doodle";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { api } from "../../../../lib/api";
+import { Home, Sparkles, Calendar, Users } from "lucide-react";
 
 interface MarketplaceItem {
   id: string;
@@ -55,11 +56,30 @@ export default function CollegeMarketplacePage({ params }: PageProps) {
   return (
     <div className="min-h-screen">
       {/* Header */}
+      {/* Local Navigation Tabs */}
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
+        {[
+          { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
+          { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${slug}` },
+          { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${slug}/events` },
+          { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${slug}/clubs` }
+        ].map((tab) => (
+          <Link key={tab.id} href={tab.path} className="flex-1 min-w-[100px] md:min-w-0">
+            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all whitespace-nowrap bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50`}>
+              <tab.icon className="w-4 h-4 text-neutral-500" />
+              <span className="font-display font-bold text-sm uppercase tracking-wide text-neutral-500">
+                {tab.label}
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mb-12 flex justify-between items-end"
+        className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-4"
       >
         <div>
           <h1 className="font-display text-4xl md:text-6xl font-black mb-2">

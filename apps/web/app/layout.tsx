@@ -11,6 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 
 import { Metadata, Viewport } from "next";
+import ClientLoader from "./components/ClientLoader";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
@@ -62,6 +63,7 @@ export default function RootLayout({
               <SocketProvider>
                 <NotificationProvider>
                   <RetroToastProvider>
+                    <ClientLoader />
                     <ScrollRestoration />
                     <div className="min-h-screen pb-16 md:pb-0">
                       {children}

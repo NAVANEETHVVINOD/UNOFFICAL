@@ -482,8 +482,8 @@ export default function CollegeFeed({
                                 ? 'bg-primary border-ink shadow-neo-sm'
                                 : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
                                 }`}>
-                                <tab.icon className="w-4 h-4" />
-                                <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'feed' ? 'text-ink' : 'text-neutral-500'}`}>
+                                <tab.icon className={`w-4 h-4 ${tab.id === 'feed' ? 'text-black' : ''}`} />
+                                <span className={`font-display font-bold text-sm uppercase tracking-wide ${tab.id === 'feed' ? 'text-black' : 'text-neutral-500'}`}>
                                     {tab.label}
                                 </span>
                             </div>
@@ -494,7 +494,7 @@ export default function CollegeFeed({
                 {/* Upcoming Events Ribbon */}
                 {initialEvents.length > 0 && (
                     <motion.div
-                        className="mt-2 mb-6 transform -rotate-1 origin-center"
+                        className="mt-6 mb-8 transform -rotate-1 origin-center"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >

@@ -5,9 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Bell, Shield, Eye, Moon, Smartphone, LogOut, Check, UserX, Trash2, Mail, ArrowLeft, User, Settings } from "lucide-react";
-import { 
-  NotificationType, 
-  NOTIFICATION_CATEGORIES, 
+import {
+  NotificationType,
+  NOTIFICATION_CATEGORIES,
   useNotifications,
   NotificationPreferences,
   NOTIFICATION_ICONS
@@ -27,7 +27,7 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const { blockedUsers, unblockUser, isLoading: isLoadingBlocked } = useBlocking();
-  
+
   const { preferences, updatePreferences } = useNotifications();
   const [localPreferences, setLocalPreferences] = useState<NotificationPreferences>(preferences);
 
@@ -80,7 +80,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-paper relative">
       {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div 
+        <div
           className="absolute inset-0 opacity-30"
           style={{
             backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)',
@@ -167,19 +167,18 @@ export default function SettingsPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg transition-all ${
-                      activeTab === tab.id
+                    className={`flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg transition-all ${activeTab === tab.id
                         ? "bg-primary border-2 border-ink shadow-neo-sm"
                         : "hover:bg-neutral-100 border-2 border-transparent"
-                    }`}
+                      }`}
                   >
                     <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
                     <span className="font-bold text-xs md:text-sm whitespace-nowrap">{tab.label}</span>
                   </button>
                 ))}
-                
+
                 <hr className="hidden md:block my-4 border-neutral-200" />
-                
+
                 <button
                   onClick={handleLogout}
                   className="flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
@@ -196,11 +195,11 @@ export default function SettingsPage() {
             {activeTab === "notifications" && (
               <div className="card-paper p-6 rounded-xl">
                 <h2 className="font-display text-2xl font-bold mb-6">Notification Preferences</h2>
-                
+
                 {/* Delivery Methods */}
                 <div className="space-y-4 mb-8">
                   <h3 className="font-bold text-sm uppercase text-neutral-500 mb-3">Delivery Methods</h3>
-                  
+
                   <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
                     <div className="flex items-center gap-3">
                       <Mail className="w-5 h-5 text-neutral-600" />
@@ -216,7 +215,7 @@ export default function SettingsPage() {
                       className="w-5 h-5 accent-primary"
                     />
                   </label>
-                  
+
                   <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl cursor-pointer hover:bg-neutral-100 transition-colors">
                     <div className="flex items-center gap-3">
                       <Smartphone className="w-5 h-5 text-neutral-600" />
@@ -253,15 +252,14 @@ export default function SettingsPage() {
                 {/* Notification Types */}
                 <div className="space-y-3">
                   <h3 className="font-bold text-sm uppercase text-neutral-500 mb-3">Notification Types</h3>
-                  
+
                   {(Object.keys(localPreferences.types) as NotificationType[]).map((type) => (
                     <label
                       key={type}
-                      className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                        localPreferences.types[type]
+                      className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${localPreferences.types[type]
                           ? "border-ink bg-white"
                           : "border-neutral-200 bg-neutral-50 opacity-60"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{getNotificationIcon(type)}</span>
@@ -319,6 +317,14 @@ export default function SettingsPage() {
                       <input type="checkbox" defaultChecked className="w-5 h-5 accent-primary" />
                     </label>
                   </div>
+
+                  <div className="mt-6 pt-6 border-t border-neutral-200">
+                    <h3 className="font-bold text-sm uppercase text-neutral-500 mb-3">Legal</h3>
+                    <div className="flex gap-4">
+                      <Link href="/legal/privacy" className="text-sm text-ink underline hover:text-primary font-bold">Privacy Policy</Link>
+                      <Link href="/legal/terms" className="text-sm text-ink underline hover:text-primary font-bold">Terms of Service</Link>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Blocked Users */}
@@ -327,7 +333,7 @@ export default function SettingsPage() {
                     <UserX className="w-6 h-6" />
                     Blocked Users
                   </h2>
-                  
+
                   {isLoadingBlocked ? (
                     <div className="text-center py-8 text-neutral-500">Loading...</div>
                   ) : blockedUsers.length === 0 ? (
