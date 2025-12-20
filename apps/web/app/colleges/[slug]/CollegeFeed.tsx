@@ -470,15 +470,15 @@ export default function CollegeFeed({
             >
                 {/* Local Navigation Tabs */}
                 {/* Local Navigation Tabs - Hidden on mobile */}
-                <div className="hidden md:flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
                     {[
                         { id: 'home', label: 'Home', icon: Home, path: '/dashboard' },
                         { id: 'feed', label: 'Feed', icon: Sparkles, path: `/colleges/${collegeSlug}` },
                         { id: 'events', label: 'Events', icon: Calendar, path: `/colleges/${collegeSlug}/events` },
                         { id: 'clubs', label: 'Clubs', icon: Users, path: `/colleges/${collegeSlug}/clubs` }
                     ].map((tab) => (
-                        <Link key={tab.id} href={tab.path} className="flex-1">
-                            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all ${(tab.id === 'feed' && !tab.path.includes('/events') && !tab.path.includes('/clubs')) || (tab.id === 'home' && false) // Logic simplified, 'feed' is active for purely /colleges/slug
+                        <Link key={tab.id} href={tab.path} className="flex-1 min-w-[100px] md:min-w-0">
+                            <div className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all whitespace-nowrap ${(tab.id === 'feed' && !tab.path.includes('/events') && !tab.path.includes('/clubs')) || (tab.id === 'home' && false) // Logic simplified, 'feed' is active for purely /colleges/slug
                                 ? 'bg-primary border-ink shadow-neo-sm'
                                 : 'bg-paper border-ink/10 hover:border-ink/30 hover:bg-neutral-50'
                                 }`}>
@@ -494,7 +494,7 @@ export default function CollegeFeed({
                 {/* Upcoming Events Ribbon */}
                 {initialEvents.length > 0 && (
                     <motion.div
-                        className="mt-4 mb-6 origin-center"
+                        className="mt-2 mb-6 transform -rotate-1 origin-center"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >

@@ -55,7 +55,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="LINKER" />
         <link rel="apple-touch-icon" href="/icons/icon.svg" />
       </head>
-      <body>
+      <body className="bg-paper dark:bg-dark-bg text-ink dark:text-dark-text transition-colors duration-300">
         <AuthProvider>
           <ThemeProvider>
             <RBACProvider>
@@ -63,7 +63,7 @@ export default function RootLayout({
                 <NotificationProvider>
                   <RetroToastProvider>
                     <ScrollRestoration />
-                    <div className="min-h-screen pb-16 md:pb-0 bg-paper dark:bg-dark-bg text-ink dark:text-dark-text transition-colors duration-300">
+                    <div className="min-h-screen pb-16 md:pb-0">
                       {children}
                       <SpeedInsights />
                     </div>

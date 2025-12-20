@@ -27,7 +27,7 @@ export default function BottomNav() {
     },
     {
       href: collegeHref,
-      label: "My College",
+      label: "Campus",
       svg: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6"><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /><line x1="4" y1="18" x2="20" y2="18" /></svg>
       )
