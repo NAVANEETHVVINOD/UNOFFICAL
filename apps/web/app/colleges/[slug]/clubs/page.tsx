@@ -37,7 +37,7 @@ export default function CollegeClubsPage({ params }: PageProps) {
   useEffect(() => {
     const fetchClubs = async () => {
       try {
-        const data = await api.getClubs(slug);
+        const data = await api.getClubs({ collegeSlug: slug });
         setClubs(data);
       } catch (error) {
         console.error("Failed to fetch clubs:", error);

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useOnboardingGuard } from "../hooks/useOnboardingGuard";
@@ -9,7 +11,7 @@ import {
 } from "../components/ui/NewspaperUI";
 import CategoryRibbon from "../components/CategoryRibbon";
 import { motion, AnimatePresence } from "framer-motion";
-import { api } from "../../lib/api";
+import { api } from "@/lib/api";
 import Link from "next/link";
 import { Search, Plus, Filter, Calendar, MapPin, Clock, Users, ArrowRight } from "lucide-react";
 import { containerVariants, itemVariants, pageVariants } from "../../lib/animations";

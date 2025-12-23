@@ -92,7 +92,7 @@ export default function ProfileSectionModal({ isOpen, onClose, onSubmit, type }:
                             <Input name="startDate" label="Start Date" type="date" onChange={handleChange} />
                             <Input name="endDate" label="End Date" type="date" onChange={handleChange} />
                         </div>
-                        <Input name="tags" label="Tags (comma separated)" placeholder="React, Node.js, AI" onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(',').map((t: string) => t.trim()) })} />
+                        <Input name="tags" label="Tags (comma separated)" placeholder="React, Node.js, AI" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, tags: e.target.value.split(',').map((t: string) => t.trim()) })} />
                         <Textarea name="description" label="Description" onChange={handleChange} />
                     </>
                 );

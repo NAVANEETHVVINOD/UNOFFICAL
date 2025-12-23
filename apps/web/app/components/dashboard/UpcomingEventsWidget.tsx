@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { TrendingUp, AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { api } from "../../lib/api";
+import { api } from "@/lib/api";
 
 type Event = {
     id: string;

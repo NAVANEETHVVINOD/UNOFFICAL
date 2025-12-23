@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "../../lib/api";
+import { api } from "@/lib/api";
 import { UserPlus, UserMinus, UserCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -72,8 +72,8 @@ export default function FollowButton({ userId, initialIsFollowing = false, onTog
             whileTap={{ scale: 0.95 }}
             disabled={loading}
             className={`relative overflow-hidden font-bold text-sm px-4 py-2 border-2 border-black transition-all ${isFollowing
-                    ? "bg-white text-black hover:bg-red-50 hover:border-red-500 hover:text-red-500"
-                    : "bg-accent-blue text-white hover:bg-blue-600"
+                ? "bg-white text-black hover:bg-red-50 hover:border-red-500 hover:text-red-500"
+                : "bg-accent-blue text-white hover:bg-blue-600"
                 } ${className}`}
         >
             <span className="flex items-center gap-2 relative z-10">

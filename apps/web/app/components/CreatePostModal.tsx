@@ -16,6 +16,7 @@ interface CreatePostModalProps {
     onClose: () => void;
     onPostCreated?: () => void;
     initialTab?: string;
+    collegeSlug?: string;
 }
 
 const postSchema = z.object({
@@ -25,7 +26,7 @@ const postSchema = z.object({
 type PostFormValues = z.infer<typeof postSchema>;
 type FeatureType = 'poll' | 'event' | 'collab' | 'report';
 
-export default function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostModalProps) {
+export default function CreatePostModal({ isOpen, onClose, onPostCreated, collegeSlug }: CreatePostModalProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,21 +40,21 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [showAnonWarning, setShowAnonWarning] = useState(false);
     const [activeFeatures, setActiveFeatures] = useState<Set<FeatureType>>(new Set());
-    
+
     // Poll state
     const [pollQuestion, setPollQuestion] = useState("");
     const [pollOptions, setPollOptions] = useState(["", ""]);
-    
+
     // Event state
     const [eventTitle, setEventTitle] = useState("");
     const [eventDate, setEventDate] = useState("");
     const [eventTime, setEventTime] = useState("");
     const [eventLocation, setEventLocation] = useState("");
-    
+
     // Collab state
     const [collabTitle, setCollabTitle] = useState("");
     const [collabDescription, setCollabDescription] = useState("");
-    
+
     // Report state
     const [reportCategory, setReportCategory] = useState("");
 
@@ -93,7 +94,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                 content: data.content,
                 image: imageUrl,
                 type: activeFeatures.has('poll') ? 'poll' : 'post',
-                collegeSlug: user?.profile?.college?.slug,
+                collegeSlug: collegeSlug || user?.profile?.college?.slug,
                 isAnonymous,
             };
 
@@ -187,9 +188,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }: Crea
                                     <button
                                         key={f.id}
                                         onClick={() => toggleFeature(f.id)}
-                                        className={`flex items-center gap-2 px-3 py-2 rounded-card border-2 transition-all ${
-                                            isActive ? `${f.color} border-ink shadow-neo-sm` : 'border-neutral-200 hover:border-neutral-400 bg-paper'
-                                        }`}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded-card border-2 transition-all ${isActive ? `${f.color} border-ink shadow-neo-sm` : 'border-neutral-200 hover:border-neutral-400 bg-paper'
+                                            }`}
                                     >
                                         <Icon className="w-4 h-4" />
                                         <span className="text-sm font-medium">{f.label}</span>
