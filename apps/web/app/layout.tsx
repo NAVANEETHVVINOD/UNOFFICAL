@@ -61,8 +61,8 @@ export default function RootLayout({
           <ThemeProvider>
             <RBACProvider>
               <SocketProvider>
-                <NotificationProvider>
-                  <RetroToastProvider>
+                <RetroToastProvider>
+                  <NotificationProvider>
                     <ClientLoader />
                     <ScrollRestoration />
                     <div className="min-h-screen pb-16 md:pb-0">
@@ -70,8 +70,8 @@ export default function RootLayout({
                       <SpeedInsights />
                     </div>
                     <BottomNav />
-                  </RetroToastProvider>
-                </NotificationProvider>
+                  </NotificationProvider>
+                </RetroToastProvider>
               </SocketProvider>
             </RBACProvider>
           </ThemeProvider>
