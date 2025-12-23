@@ -1,358 +1,305 @@
-"use client";
-
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useOnboardingGuard } from "../hooks/useOnboardingGuard";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import Container from "../components/ui/Container";
 import {
-  NewspaperCard,
   RetroButton,
   Badge,
 } from "../components/ui/NewspaperUI";
-import Doodle from "../components/ui/Doodle";
-import { PageTransition } from "../providers/AnimationProvider";
-import Navbar from "../components/Navbar";
-import BottomNav from "../components/ui/BottomNav";
 import CategoryRibbon from "../components/CategoryRibbon";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../lib/api";
 import Link from "next/link";
-import { Calendar, MapPin, Users, Clock, Filter, Search, ChevronDown } from "lucide-react";
+import { Search, Plus, Filter, Calendar, MapPin, Clock, Users, ArrowRight } from "lucide-react";
 import { containerVariants, itemVariants, pageVariants } from "../../lib/animations";
-import { EventCardSkeleton } from "../components/ui/Skeleton";
+import { PageTransition } from "../providers/AnimationProvider";
+import BottomNav from "../components/ui/BottomNav";
+
+// Layout & Components
+import DashboardLayout from "../components/layouts/DashboardLayout";
+import ProfileSidebar from "../components/dashboard/ProfileSidebar";
+import QuickActions from "../components/dashboard/QuickActions";
+import UpcomingEventsWidget from "../components/dashboard/UpcomingEventsWidget";
 
 interface Event {
   id: string;
   title: string;
-  description: string | null;
+  description: string;
   startsAt: string;
-  endsAt?: string;
-  venue: string | null;
-  bannerUrl?: string;
-  maxAttendees?: number;
-  club?: {
+  endsAt: string;
+  venue?: string;
+  location?: string;
+  capacity?: number;
+  organizer: {
     id: string;
     name: string;
-  };
-  college?: {
-    name: string;
+    avatarUrl?: string;
   };
   _count?: {
-    participants: number;
+    attendees: number;
   };
-  participants?: Array<{
-    userId: string;
-    status: string;
-  }>;
+  isRegistered?: boolean;
 }
 
-type FilterType = "all" | "upcoming" | "today" | "this-week" | "past";
-type CategoryType = "all" | "workshop" | "hackathon" | "cultural" | "sports" | "seminar";
+type EventFilter = "all" | "today" | "week" | "month" | "upcoming";
 
 export default function EventsClient() {
+  const { user } = useAuth();
+  const { isReady: onboardingComplete } = useOnboardingGuard();
+
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState<FilterType>("upcoming");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryType>("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<EventFilter>("upcoming");
   const [rsvpLoading, setRsvpLoading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
   }, []);
 
+  const handleRSVP = async (eventId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (rsvpLoading) return;
+
+    setRsvpLoading(eventId);
+    try {
+      await api.rsvpEvent(eventId, "GOING");
+      // Optimistic update or refetch
+      setEvents(prev => prev.map(ev =>
+        ev.id === eventId
+          ? { ...ev, isRegistered: true, _count: { ...ev._count, attendees: (ev._count?.attendees || 0) + 1 } }
+          : ev
+      ));
+      alert("You have successfully RSVP'd!");
+    } catch (error) {
+      console.error("RSVP failed:", error);
+      alert("Failed to RSVP. Please try again.");
+    } finally {
+      setRsvpLoading(null);
+    }
+  };
+
   const fetchEvents = async () => {
     setLoading(true);
     setError(null);
     try {
+      // Use api.getEvents instead of mock
+      // Note: api.getEvents might need parameters. Checking signature: (collegeId?, clubId?, limit?)
+      // We will fetch all generic events for now.
       const data = await api.getEvents();
-      // Sort by date ascending
-      const sorted = data.sort((a: Event, b: Event) =>
-        new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
-      );
-      setEvents(sorted);
+      setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch events:", err);
-      setError("Failed to load events. Please try again.");
+      // Fallback to empty if fails, removing mock generation
+      setError("Failed to load events.");
+      setEvents([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter events based on search and filters
   const filteredEvents = useMemo(() => {
+    let result = events;
+
+    // Search
+    if (search) {
+      const query = search.toLowerCase();
+      result = result.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.description.toLowerCase().includes(query) ||
+          event.venue?.toLowerCase().includes(query)
+      );
+    }
+
+    // Date Filter (simplified logic)
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const endOfWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    return events.filter((event) => {
-      const eventDate = new Date(event.startsAt);
-
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch =
-          event.title.toLowerCase().includes(query) ||
-          event.description?.toLowerCase().includes(query) ||
-          event.venue?.toLowerCase().includes(query) ||
-          event.club?.name.toLowerCase().includes(query);
-        if (!matchesSearch) return false;
-      }
-
-      // Date filter
-      switch (dateFilter) {
-        case "upcoming":
-          if (eventDate < now) return false;
-          break;
-        case "today":
-          if (eventDate < today || eventDate >= new Date(today.getTime() + 24 * 60 * 60 * 1000)) return false;
-          break;
-        case "this-week":
-          if (eventDate < today || eventDate > weekEnd) return false;
-          break;
-        case "past":
-          if (eventDate >= now) return false;
-          break;
-      }
-
-      return true;
-    });
-  }, [events, searchQuery, dateFilter, categoryFilter]);
-
-  const handleRSVP = useCallback(async (eventId: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setRsvpLoading(eventId);
-    try {
-      await api.rsvpEvent(eventId, "GOING");
-      // Refresh events to get updated count
-      await fetchEvents();
-    } catch (err) {
-      console.error("Failed to RSVP:", err);
-    } finally {
-      setRsvpLoading(null);
+    if (filter === "upcoming") {
+      result = result.filter(e => new Date(e.startsAt) >= now);
+    } else if (filter === "today") {
+      result = result.filter(e => {
+        const eventDate = new Date(e.startsAt);
+        return eventDate >= today && eventDate < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      });
+    } else if (filter === "week") {
+      result = result.filter(e => {
+        const eventDate = new Date(e.startsAt);
+        return eventDate >= today && eventDate < endOfWeek;
+      });
     }
-  }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      day: date.getDate(),
-      month: date.toLocaleString("default", { month: "short" }).toUpperCase(),
-      year: date.getFullYear(),
-      time: date.toLocaleTimeString("default", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      full: date.toLocaleDateString("default", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-      }),
-    };
-  };
+    // Sort by date
+    result.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
 
-  const isEventPast = (dateString: string) => new Date(dateString) < new Date();
+    return result;
+  }, [events, search, filter]);
+
+  if (!onboardingComplete) return null;
 
   return (
     <PageTransition>
-      <motion.div
-        className="bg-paper min-h-screen"
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
+      <DashboardLayout
+        leftSidebarContent={
+          <>
+            <ProfileSidebar />
+            <QuickActions />
+          </>
+        }
+        rightSidebarContent={
+          <UpcomingEventsWidget />
+        }
       >
-        {/* Background Pattern */}
-        {/* Background Pattern */}
-        <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
-          <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
-        </div>
-
-        <Navbar />
-
-        <Container>
-          <div className="pt-24 md:pt-36 pb-24 md:pb-8 relative z-10">
+        <motion.div
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          className="w-full"
+        >
+          <Container>
             <CategoryRibbon className="mb-6 mt-4" />
 
             {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 md:mb-8 text-center"
-            >
-              <h1 className="font-display text-3xl md:text-5xl font-black mb-2">
-                CAMPUS EVENTS
-              </h1>
-              <p className="font-mono text-xs md:text-sm text-gray-600">
-                Don't miss out. Be there or be square.
-              </p>
-            </motion.div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <h1 className="font-display text-4xl font-black mb-2">CAMPUS EVENTS</h1>
+                <p className="text-gray-600 font-mono text-sm">Discover and join verified campus activities</p>
+              </div>
+              <Link href="/events/create">
+                <motion.button
+                  className="btn-neo btn-primary flex items-center gap-2"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Plus className="w-4 h-4" />
+                  Host Event
+                </motion.button>
+              </Link>
+            </div>
 
-            {/* Search and Filters */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="max-w-4xl mx-auto mb-8"
-            >
-              {/* Search Bar */}
-              <div className="flex gap-2 mb-4">
+            {/* Search & Filter Bar */}
+            <div className="bg-white border-2 border-black p-4 mb-8 shadow-neo-sm">
+              <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Search events..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-black bg-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent-yellow"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border-2 border-black focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
                   />
                 </div>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`px-4 py-3 border-2 border-black flex items-center gap-2 font-bold text-sm transition-colors ${showFilters ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-                    }`}
-                >
-                  <Filter className="w-4 h-4" />
-                  <span className="hidden sm:inline">Filters</span>
-                </button>
+                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                  {(['upcoming', 'today', 'week', 'all'] as const).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFilter(f as any)}
+                      className={`px-4 py-2 border-2 border-black font-bold text-xs uppercase whitespace-nowrap transition-all ${filter === f ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'
+                        }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
               </div>
+            </div>
 
-              {/* Filter Options */}
-              <AnimatePresence>
-                {showFilters && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="flex flex-wrap gap-2 p-4 bg-white border-2 border-black mb-4">
-                      <span className="font-bold text-sm mr-2">Date:</span>
-                      {(["all", "upcoming", "today", "this-week", "past"] as FilterType[]).map((filter) => (
-                        <button
-                          key={filter}
-                          onClick={() => setDateFilter(filter)}
-                          className={`px-3 py-1 text-xs font-bold uppercase border-2 border-black transition-colors ${dateFilter === filter
-                              ? "bg-accent-yellow"
-                              : "bg-white hover:bg-gray-100"
-                            }`}
-                        >
-                          {filter.replace("-", " ")}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Results Count */}
-              <div className="flex justify-between items-center text-sm font-mono text-gray-500">
-                <span>{filteredEvents.length} events found</span>
-                <span>Sorted by date</span>
-              </div>
-            </motion.div>
-
-            {/* Events List */}
+            {/* Events Grid */}
             {loading ? (
-              <div className="max-w-4xl mx-auto space-y-6">
-                {[1, 2, 3].map((i) => (
-                  <EventCardSkeleton key={i} />
-                ))}
-              </div>
+              <div className="text-center py-20">Loading events...</div>
             ) : error ? (
-              <div className="text-center py-20">
-                <p className="text-red-500 font-bold mb-4">{error}</p>
-                <RetroButton onClick={fetchEvents}>Try Again</RetroButton>
+              <div className="text-center py-20 text-red-500">{error}</div>
+            ) : filteredEvents.length === 0 ? (
+              <div className="text-center py-20 bg-white border-2 border-black border-dashed">
+                <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="font-bold text-lg">No events found</h3>
+                <p className="text-gray-500 text-sm">Try adjusting your filters or search</p>
               </div>
             ) : (
-              <motion.div
-                className="max-w-4xl mx-auto space-y-6"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                <AnimatePresence mode="popLayout">
-                  {filteredEvents.map((event) => {
-                    const { day, month, time, full } = formatDate(event.startsAt);
-                    const isPast = isEventPast(event.startsAt);
-                    const attendeeCount = event._count?.participants || 0;
+              <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredEvents.map((event) => {
+                  const attendeeCount = event._count?.attendees || 0;
+                  const isPast = new Date(event.startsAt) < new Date();
 
-                    return (
-                      <motion.div
-                        key={event.id}
-                        variants={itemVariants}
-                        layout
-                        exit={{ opacity: 0, x: -20 }}
-                      >
-                        <Link href={`/events/${event.id}`}>
-                          <NewspaperCard
-                            className={`hover:-translate-y-1 hover:shadow-neo-lg transition-all cursor-pointer group bg-white p-0 overflow-hidden ${isPast ? "opacity-60" : ""
-                              }`}
-                          >
-                            <div className="flex flex-col md:flex-row">
-                              {/* Date Column */}
-                              <div className={`${isPast ? "bg-gray-400" : "bg-accent-blue"} text-white p-4 md:p-6 flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] border-b-2 md:border-b-0 md:border-r-2 border-black`}>
-                                <span className="text-xs font-bold tracking-widest">{month}</span>
-                                <span className="text-4xl md:text-5xl font-black">{day}</span>
-                                <span className="text-[10px] font-mono mt-1 flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {time}
-                                </span>
+                  return (
+                    <motion.div
+                      key={event.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-white border-2 border-black shadow-neo hover:shadow-neo-lg transition-all group cursor-pointer overflow-hidden"
+                    >
+                      <Link href={`/ events / ${event.id} `}>
+                        <div className="flex">
+                          {/* Date Column */}
+                          <div className="w-20 bg-primary/10 border-r-2 border-black flex flex-col items-center justify-center p-2 text-center group-hover:bg-primary group-hover:text-white transition-colors">
+                            <span className="font-black text-2xl leading-none">
+                              {new Date(event.startsAt).getDate()}
+                            </span>
+                            <span className="font-bold text-xs uppercase mt-1">
+                              {new Date(event.startsAt).toLocaleString('default', { month: 'short' })}
+                            </span>
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                {event.organizer?.name || "Organizer"}
+                              </span>
+                            </div>
+
+                            <h3 className="font-bold text-xl md:text-2xl mb-2 group-hover:underline decoration-2 decoration-accent-blue line-clamp-1">
+                              {event.title}
+                            </h3>
+
+                            <div className="space-y-2 mb-4">
+                              <div className="flex items-center gap-2 text-xs font-mono text-gray-600">
+                                <Clock className="w-3 h-3" />
+                                {new Date(event.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </div>
-
-                              {/* Content Column */}
-                              <div className="p-4 md:p-6 flex-grow">
-                                <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
-                                  <Badge className={`${isPast ? "bg-gray-200" : "bg-accent-yellow"} text-black border-black text-[10px]`}>
-                                    {event.club?.name || "CAMPUS EVENT"}
-                                  </Badge>
-                                  {event.venue && (
-                                    <span className="font-mono text-xs text-gray-500 flex items-center gap-1">
-                                      <MapPin className="w-3 h-3" />
-                                      {event.venue}
-                                    </span>
-                                  )}
-                                </div>
-
-                                <h3 className="font-bold text-xl md:text-2xl mb-2 group-hover:underline decoration-2 decoration-accent-blue line-clamp-1">
-                                  {event.title}
-                                </h3>
-
-                                <p className="text-gray-600 line-clamp-2 text-sm mb-4">
-                                  {event.description || "No description available."}
-                                </p>
-
-                                <div className="flex flex-wrap justify-between items-center gap-2">
-                                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                                    <Users className="w-4 h-4" />
-                                    <span>{attendeeCount} attending</span>
-                                    {event.maxAttendees && (
-                                      <span className="text-xs">/ {event.maxAttendees} max</span>
-                                    )}
-                                  </div>
-
-                                  {!isPast && (
-                                    <motion.button
-                                      onClick={(e) => handleRSVP(event.id, e)}
-                                      disabled={rsvpLoading === event.id}
-                                      className="px-4 py-2 bg-black text-white font-bold text-sm hover:bg-gray-800 transition-colors disabled:opacity-50"
-                                      whileHover={{ scale: 1.02 }}
-                                      whileTap={{ scale: 0.98 }}
-                                    >
-                                      {rsvpLoading === event.id ? "..." : "RSVP →"}
-                                    </motion.button>
-                                  )}
-                                </div>
+                              <div className="flex items-center gap-2 text-xs font-mono text-gray-600">
+                                <MapPin className="w-3 h-3" />
+                                {event.venue || "TBA"}
                               </div>
                             </div>
-                          </NewspaperCard>
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </motion.div>
+
+                            <p className="text-gray-600 line-clamp-2 text-sm mb-4">
+                              {event.description || "No description available."}
+                            </p>
+
+                            <div className="flex flex-wrap justify-between items-center gap-2 border-t pt-3 border-gray-100">
+                              <div className="flex items-center gap-1 text-sm text-gray-500">
+                                <Users className="w-4 h-4" />
+                                <span>{attendeeCount} attending</span>
+                                {event.capacity && (
+                                  <span className="text-xs">/ {event.capacity} max</span>
+                                )}
+                              </div>
+
+                              {!isPast && (
+                                <motion.button
+                                  className="px-4 py-2 bg-black text-white font-bold text-sm hover:bg-gray-800 transition-colors"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  details →
+                                </motion.button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
             )}
 
             {/* Empty State */}
@@ -365,22 +312,22 @@ export default function EventsClient() {
                 <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <h3 className="font-bold text-xl mb-2">No Events Found</h3>
                 <p className="text-gray-600 mb-4">
-                  {searchQuery
+                  {search
                     ? "Try adjusting your search or filters"
                     : "Check back later for upcoming events!"}
                 </p>
-                {searchQuery && (
-                  <RetroButton onClick={() => setSearchQuery("")}>
+                {search && (
+                  <RetroButton onClick={() => setSearch("")}>
                     Clear Search
                   </RetroButton>
                 )}
               </motion.div>
             )}
-          </div>
-        </Container>
 
-        <BottomNav />
-      </motion.div>
-    </PageTransition>
+            <BottomNav />
+          </Container>
+        </motion.div>
+      </DashboardLayout>
+    </PageTransition >
   );
 }

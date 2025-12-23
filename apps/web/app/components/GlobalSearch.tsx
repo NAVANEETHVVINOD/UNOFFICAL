@@ -108,8 +108,8 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     const allResults = [
       ...results.users,
       ...results.events,
-      ...results.listings,
       ...results.clubs,
+      ...results.listings,
       ...results.posts,
     ];
     return allResults[index] || null;
@@ -138,98 +138,59 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     searchTimeout.current = setTimeout(async () => {
       setLoading(true);
       try {
-        // Parallel search across different endpoints
-        const [eventsData, listingsData, clubsData, usersData] = await Promise.allSettled([
-          api.getEvents(),
-          api.getMarketplaceListings(searchQuery),
-          api.getClubs(),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/users/search?q=${encodeURIComponent(searchQuery)}`)
-            .then(r => r.ok ? r.json() : [])
-            .catch(() => []),
-        ]);
+        const data = await api.search(searchQuery);
 
         const q = searchQuery.toLowerCase();
 
-        // Filter events
-        const events: SearchResult[] = [];
-        if (eventsData.status === "fulfilled") {
-          eventsData.value
-            .filter((e: any) => e.title?.toLowerCase().includes(q))
-            .slice(0, 5)
-            .forEach((e: any) => {
-              events.push({
-                id: e.id,
-                type: "event",
-                title: e.title,
-                subtitle: new Date(e.startsAt).toLocaleDateString(),
-                url: `/events/${e.id}`,
-              });
-            });
-        }
+        // Map Results
+        const users: SearchResult[] = (data.users || []).map((u: any) => ({
+          id: u.id,
+          type: "user",
+          title: u.profile?.fullName || u.email || "Unknown User",
+          subtitle: u.profile?.college?.name || "Member",
+          imageUrl: u.profile?.avatarUrl,
+          url: `/profile/${u.profile?.userId}`, // Assuming u.profile.userId is the slug, or u.id
+        }));
 
-        // Filter listings
-        const listings: SearchResult[] = [];
-        if (listingsData.status === "fulfilled") {
-          listingsData.value
-            .slice(0, 5)
-            .forEach((l: any) => {
-              listings.push({
-                id: l.id,
-                type: "listing",
-                title: l.title,
-                subtitle: `₹${l.price}`,
-                imageUrl: l.imageUrl,
-                url: `/marketplace/${l.id}`,
-              });
-            });
-        }
+        const events: SearchResult[] = (data.events || []).map((e: any) => ({
+          id: e.id,
+          type: "event",
+          title: e.title,
+          subtitle: new Date(e.startsAt).toLocaleDateString(),
+          url: `/events/${e.id}`,
+        }));
 
-        // Filter clubs
-        const clubs: SearchResult[] = [];
-        if (clubsData.status === "fulfilled") {
-          clubsData.value
-            .filter((c: any) => c.name?.toLowerCase().includes(q))
-            .slice(0, 5)
-            .forEach((c: any) => {
-              clubs.push({
-                id: c.id,
-                type: "club",
-                title: c.name,
-                subtitle: c.description?.slice(0, 50),
-                url: `/clubs/${c.id}`,
-              });
-            });
-        }
+        const listings: SearchResult[] = (data.listings || []).map((l: any) => ({
+          id: l.id,
+          type: "listing",
+          title: l.title,
+          subtitle: `₹${l.price}`,
+          imageUrl: l.imageUrl,
+          url: `/marketplace/${l.id}`,
+        }));
 
-        // Filter users - show name, college, and mutual connections
-        const users: SearchResult[] = [];
-        if (usersData.status === "fulfilled" && Array.isArray(usersData.value)) {
-          usersData.value
-            .slice(0, 5)
-            .forEach((u: any) => {
-              const collegeName = u.profile?.college?.name || u.college?.name || "";
-              const mutualCount = u.mutualConnections || 0;
-              let subtitle = collegeName;
-              if (mutualCount > 0) {
-                subtitle += subtitle ? ` • ${mutualCount} mutual` : `${mutualCount} mutual connections`;
-              }
-              users.push({
-                id: u.id,
-                type: "user",
-                title: u.profile?.fullName || u.fullName || u.email || "Unknown User",
-                subtitle: subtitle || undefined,
-                imageUrl: u.profile?.avatarUrl || u.avatarUrl,
-                url: `/profile/${u.id}`,
-              });
-            });
-        }
+        const clubs: SearchResult[] = (data.clubs || []).map((c: any) => ({
+          id: c.id,
+          type: "club",
+          title: c.name,
+          subtitle: c.description?.slice(0, 50),
+          url: `/clubs/${c.id}`, // Or slug
+        }));
+
+        const posts: SearchResult[] = (data.posts || []).map((p: any) => ({
+          id: p.id,
+          type: "post",
+          title: p.title || p.content.slice(0, 30),
+          subtitle: `By ${p.author?.profile?.fullName || 'User'}`,
+          url: `/posts/${p.id}`, // Post detail modal or page
+        }));
 
         setResults({
           users,
           events,
           listings,
           clubs,
-          posts: [],
+          posts,
         });
       } catch (error) {
         console.error("Search failed:", error);
@@ -350,6 +311,17 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 onSelect={navigateToResult}
               />
             )}
+
+            {/* Posts */}
+            {results.posts.length > 0 && (
+              <ResultSection
+                title="Posts"
+                results={results.posts}
+                startIndex={results.users.length + results.events.length + results.clubs.length + results.listings.length}
+                selectedIndex={selectedIndex}
+                onSelect={navigateToResult}
+              />
+            )}
           </div>
         </motion.div>
       </motion.div>
@@ -380,9 +352,8 @@ function ResultSection({ title, results, startIndex, selectedIndex, onSelect }: 
           <motion.button
             key={result.id}
             onClick={() => onSelect(result)}
-            className={`w-full flex items-center gap-3 p-3 text-left transition-colors ${
-              isSelected ? "bg-accent-yellow/20" : "hover:bg-gray-50"
-            }`}
+            className={`w-full flex items-center gap-3 p-3 text-left transition-colors ${isSelected ? "bg-accent-yellow/20" : "hover:bg-gray-50"
+              }`}
             whileHover={{ x: 4 }}
           >
             {/* Show avatar for users, icon for others */}

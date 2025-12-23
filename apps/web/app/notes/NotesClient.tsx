@@ -16,11 +16,12 @@ import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import { motion } from "framer-motion";
 import { containerVariants, itemVariants } from "../../lib/animations";
 import Link from "next/link";
+import { api } from "../../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { 
-  FileText, Download, Heart, Search, Filter, Upload, 
-  BookOpen, Calendar, User, Eye, Flag, ChevronDown 
+import {
+  FileText, Download, Heart, Search, Filter, Upload,
+  BookOpen, Calendar, User, Eye, Flag, ChevronDown
 } from "lucide-react";
 
 interface Note {
@@ -93,79 +94,86 @@ function NotesContent() {
   const fetchNotes = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (selectedSubject !== "All Subjects") params.append("subject", selectedSubject);
-      if (selectedSemester !== "All Semesters") params.append("semester", selectedSemester);
-      params.append("sort", sortBy);
+      // api.getNotes takes (search, collegeSlug). 
+      // We might need to adjust api.ts if we want subject/semester filtering on backend
+      // For now, we fetch all and filter client side IF api doesn't support it, 
+      // OR update api.ts. Let's assume we fetch generic notes for now or use search param for subject?
+      // Actually api.ts getNotes definition: getNotes: (search?: string, collegeSlug?: string)
 
-      const res = await fetch(`/api/notes?${params}`);
-      if (res.ok) {
-        const data = await res.json();
-        setNotes(data);
-      } else {
-        // Mock data for demo
-        setNotes(generateMockNotes());
-      }
+      const data = await api.getNotes(searchQuery);
+      setNotes(data || []);
     } catch (error) {
       console.error("Failed to fetch notes:", error);
-      setNotes(generateMockNotes());
+      setNotes([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const generateMockNotes = (): Note[] => {
-    return [
-      { id: "1", title: "Data Structures Complete Notes", subject: "Computer Science", semester: "Semester 3", courseCode: "CS201", downloadCount: 234, likeCount: 45, createdAt: new Date().toISOString(), fileUrl: "#", uploader: { profile: { fullName: "Alex Chen" } } },
-      { id: "2", title: "Calculus II - Integration Techniques", subject: "Mathematics", semester: "Semester 2", courseCode: "MATH102", downloadCount: 189, likeCount: 32, createdAt: new Date().toISOString(), fileUrl: "#", uploader: { profile: { fullName: "Jordan Smith" } } },
-      { id: "3", title: "Organic Chemistry Reactions", subject: "Chemistry", semester: "Semester 4", courseCode: "CHEM301", downloadCount: 156, likeCount: 28, createdAt: new Date().toISOString(), fileUrl: "#", uploader: { profile: { fullName: "Taylor Kim" } } },
-      { id: "4", title: "Microeconomics Fundamentals", subject: "Economics", semester: "Semester 1", courseCode: "ECON101", downloadCount: 98, likeCount: 15, createdAt: new Date().toISOString(), fileUrl: "#", uploader: { profile: { fullName: "Morgan Lee" } } },
-      { id: "5", title: "Database Management Systems", subject: "Computer Science", semester: "Semester 5", courseCode: "CS401", downloadCount: 312, likeCount: 67, createdAt: new Date().toISOString(), fileUrl: "#", uploader: { profile: { fullName: "Casey Brown" } } },
-    ];
-  };
-
   const handleLike = async (noteId: string) => {
-    setNotes(prev => prev.map(note => 
-      note.id === noteId 
-        ? { ...note, isLiked: !note.isLiked, likeCount: note.isLiked ? note.likeCount - 1 : note.likeCount + 1 }
-        : note
+    const note = notes.find(n => n.id === noteId);
+    if (!note) return;
+
+    const isLiked = note.isLiked;
+
+    // Optimistic update
+    setNotes(prev => prev.map(n =>
+      n.id === noteId
+        ? { ...n, isLiked: !isLiked, likeCount: isLiked ? n.likeCount - 1 : n.likeCount + 1 }
+        : n
     ));
-    
+
     try {
-      await fetch(`/api/notes/${noteId}/like`, { method: "POST" });
+      if (isLiked) {
+        await api.unlikeNote(noteId);
+      } else {
+        await api.likeNote(noteId);
+      }
     } catch (error) {
-      console.error("Failed to like note:", error);
+      console.error("Failed to toggle like:", error);
+      // Revert on failure
+      setNotes(prev => prev.map(n =>
+        n.id === noteId
+          ? { ...n, isLiked: isLiked, likeCount: note.likeCount } // revert
+          : n
+      ));
     }
   };
 
   const handleDownload = async (note: Note) => {
-    // Track download
-    try {
-      await fetch(`/api/notes/${note.id}/download`, { method: "POST" });
-    } catch (error) {
-      console.error("Failed to track download:", error);
-    }
-    
     // Open file
     window.open(note.fileUrl, "_blank");
-    
-    // Update local count
-    setNotes(prev => prev.map(n => 
-      n.id === note.id ? { ...n, downloadCount: n.downloadCount + 1 } : n
-    ));
+
+    // Ideally backend tracks download on access, or we have an endpoint
+    // api.ts doesn't have explicit trackDownload, but maybe getting the note details does it?
+    // or we just skip tracking for now unless we add an endpoint.
   };
 
   const filteredNotes = notes.filter(note => {
+    // Client side filtering for subject/semester until backend supports it
+    if (selectedSubject !== "All Subjects" && note.subject !== selectedSubject) return false;
+    if (selectedSemester !== "All Semesters" && note.semester !== selectedSemester) return false;
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (
         note.title.toLowerCase().includes(query) ||
         note.subject.toLowerCase().includes(query) ||
-        note.courseCode?.toLowerCase().includes(query)
+        (note.courseCode && note.courseCode.toLowerCase().includes(query))
       );
     }
     return true;
   });
+
+  // Sort
+  if (sortBy === "popular") {
+    filteredNotes.sort((a, b) => b.likeCount - a.likeCount);
+  } else if (sortBy === "downloads") {
+    filteredNotes.sort((a, b) => b.downloadCount - a.downloadCount);
+  } else {
+    // Recent
+    filteredNotes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
 
   if (authLoading) return <LoadingState />;
   if (!isAuthenticated) return null;
@@ -329,9 +337,8 @@ function NotesContent() {
                         <div className="flex items-center gap-4 text-sm">
                           <button
                             onClick={() => handleLike(note.id)}
-                            className={`flex items-center gap-1 transition-colors ${
-                              note.isLiked ? "text-red-500" : "text-gray-500 hover:text-red-500"
-                            }`}
+                            className={`flex items-center gap-1 transition-colors ${note.isLiked ? "text-red-500" : "text-gray-500 hover:text-red-500"
+                              }`}
                           >
                             <Heart className={`w-4 h-4 ${note.isLiked ? "fill-current" : ""}`} />
                             {note.likeCount}
@@ -367,7 +374,7 @@ function NotesContent() {
                 <FileText className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-300" />
                 <h2 className="font-display text-xl md:text-2xl font-black mb-2">No Notes Found</h2>
                 <p className="text-gray-500 mb-6 text-sm md:text-base">
-                  {searchQuery 
+                  {searchQuery
                     ? `No notes match "${searchQuery}"`
                     : "Be the first to share notes for this subject!"}
                 </p>

@@ -39,7 +39,7 @@ export default function ClubsClient() {
 
   const fetchClubs = async () => {
     try {
-      const data = await api.getClubs();
+      const data = await api.getClubs({ type: "CLUB" });
       setClubs(data);
     } catch (error) {
       console.error("Failed to fetch clubs:", error);

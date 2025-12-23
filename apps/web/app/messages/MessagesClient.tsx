@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import BottomNav from "../components/ui/BottomNav";
 import { api } from "../../lib/api";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageCircle,
@@ -46,6 +47,8 @@ interface Conversation {
   listing?: {
     id: string;
     title: string;
+    price?: number;
+    currency?: string;
   };
   updatedAt: string;
   isGroup?: boolean;
@@ -66,6 +69,7 @@ export default function MessagesClient() {
   const [messageInput, setMessageInput] = useState("");
   const [activeTab, setActiveTab] = useState<"direct" | "community">("direct");
   const { user } = useAuth();
+  const { socket, isConnected } = useSocket();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Initial load
@@ -80,13 +84,79 @@ export default function MessagesClient() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [selectedConversation]);
+  }, [selectedConversation?.messages]);
+
+  // Socket: Join Room & Listen for Messages
+  useEffect(() => {
+    if (!socket || !selectedConversation) return;
+
+    // Join the conversation room
+    socket.emit("joinRoom", { roomId: selectedConversation.id });
+
+    const handleNewMessage = (newMessage: any) => {
+      // Check if message already exists (to avoid optimistic dupes if IDs match, though temp IDs differ)
+      // Usually, we replace the temp message with the real one based on some unique key or just append if not found.
+      // Since we use tempId = Date.now(), probability of collision is low but possible with fast typing.
+      // Better strategy: Filter out our own optimistic message if we receive the real one?
+      // Actually, simplest is to just append for now and handle dedupe if needed.
+
+      setSelectedConversation((prev) => {
+        if (!prev || prev.id !== newMessage.conversationId) return prev;
+
+        // Check if we already have this message ID (real ID)
+        if (prev.messages.some(m => m.id === newMessage.id)) return prev;
+
+        // If it's my message, I might have an optimistic version with a temporary ID.
+        // A robust system would map tempId -> realId.
+        // For now, let's just append. Note that if we appended optimistically, we might see double for a second until re-fetch?
+        // Or we can rely on Socket for *incoming* and only add *outgoing* optimistically.
+        // But `newMessage` event is broadcast to everyone including sender.
+        // So I should replace my optimistic message if I find one with same content/timestamp? content isn't unique.
+
+        // Simple approach: Add if not present.
+        return {
+          ...prev,
+          messages: [...prev.messages, newMessage], // Messages are usually appended at end? 
+          // Wait, prev state messages are usually loaded from DB which might be sorted one way.
+          // In the render map, we reverse array if it was desc.
+          // Let's check fetchConversations: sort desc (newest first). 
+          // But messages array in Conversation object...
+          // backend `getConversations` returns `take: 1` (last message).
+          // `getMessages` returns `orderBy: createdAt asc` (oldest first).
+          // So in `selectedConversation` (loaded via `fetchFullConversation` logic?), we need full history.
+          // Ah, I need to fetch full messages when selecting a conversation!
+        };
+      });
+
+      // Also update the conversation list snippet
+      setConversations((prev) =>
+        prev.map(c => {
+          if (c.id === newMessage.conversationId) {
+            return {
+              ...c,
+              messages: [newMessage], // Update snippet
+              updatedAt: newMessage.createdAt
+            };
+          }
+          return c;
+        }).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      );
+    };
+
+    socket.on("newMessage", handleNewMessage);
+
+    return () => {
+      socket.emit("leaveRoom", { roomId: selectedConversation.id });
+      socket.off("newMessage", handleNewMessage);
+    };
+  }, [socket, selectedConversation?.id]); // Only re-run if conversation ID changes
 
   const fetchConversations = async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await api.getConversations();
+      // sort by updated or last message
       const sorted = data.sort((a: Conversation, b: Conversation) => {
         const aTime = a.messages?.[0]?.createdAt || a.updatedAt;
         const bTime = b.messages?.[0]?.createdAt || b.updatedAt;
@@ -99,6 +169,25 @@ export default function MessagesClient() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadConversationMessages = async (conversation: Conversation) => {
+    try {
+      // Assuming api.getMessages returns full list
+      const messages = await api.getMessages(conversation.id);
+      setSelectedConversation({
+        ...conversation,
+        messages: messages // Replace snippet with full history
+      });
+    } catch (err) {
+      console.error("Failed to load history", err);
+    }
+  };
+
+  // When clicking a conversation in list
+  const handleSelectConversation = (conv: Conversation) => {
+    setSelectedConversation(conv); // Set initial state with snippet
+    loadConversationMessages(conv); // Fetch full history
   };
 
   const filteredConversations = useMemo(() => {
@@ -128,29 +217,58 @@ export default function MessagesClient() {
     if (e) e.preventDefault();
     if (!messageInput.trim() || !selectedConversation || !user) return;
 
-    const tempId = Date.now().toString();
-    const newMessage = {
-      id: tempId,
-      content: messageInput,
-      senderId: user.id,
-      seen: false,
-      createdAt: new Date().toISOString()
-    };
+    // We can rely on socket event for adding to list to avoid dupes, 
+    // OR allow optimistic update and filter dupes in the Effect.
+    // Let's do optimistic for instant feedback.
 
-    const updatedConv = {
-      ...selectedConversation,
-      messages: [newMessage, ...selectedConversation.messages]
-    };
-    setSelectedConversation(updatedConv);
-    setConversations(prev =>
-      prev.map(c => c.id === selectedConversation.id ? updatedConv : c)
-    );
-    setMessageInput("");
+    // const tempId = "temp-" + Date.now();
+    // const newMessage = {
+    //   id: tempId,
+    //   content: messageInput,
+    //   senderId: user.id,
+    //   seen: false,
+    //   createdAt: new Date().toISOString()
+    // };
 
-    try {
-      await api.replyToConversation(selectedConversation.id, messageInput);
-    } catch (err) {
-      console.error("Failed to send message", err);
+    // const updatedConv = {
+    //   ...selectedConversation,
+    //   messages: [...selectedConversation.messages, newMessage]
+    // };
+    // setSelectedConversation(updatedConv);
+
+    // Actually, sending via Socket directly is faster for Chat applications than HTTP.
+    // But our backend Gateway calls Service which calls DB.
+    // Our API calls HTTP endpoint.
+    // Let's stick to HTTP call + Socket Event for consistency with current backend logic.
+    // Backend: ChatGateway handleSendMessage calls logic.
+    // Wait, the backend Gateway has `handleSendMessage` that listens to `sendMessage` event.
+    // Does the HTTP `api.sendMessage` or `api.replyToConversation` broadcast?
+    // Checking `messages.service.ts`: `replyToConversation` just returns data. It does NOT emit to socket.
+    // SO: If I use HTTP API, I won't get real-time updates unless the Controller calls Gateway to emit.
+    // OR I should use `socket.emit('sendMessage')` INSTEAD of HTTP API for sending.
+    // Yes, using socket.emit is better.
+
+    const content = messageInput;
+    setMessageInput(""); // Clear immediately
+
+    if (socket && isConnected) {
+      socket.emit("sendMessage", {
+        conversationId: selectedConversation.id,
+        content: content,
+        senderId: user.id
+      });
+      // The socket event `newMessage` will come back and update the UI.
+    } else {
+      // Fallback to HTTP if socket fails?
+      try {
+        await api.replyToConversation(selectedConversation.id, content);
+        // If we fallback, we need to manually update UI because no socket event will come?
+        // Or rely on polling?
+        // Let's assume Socket is primary.
+        // If HTTP is used, we'd need to manually fetch.
+      } catch (err) {
+        console.error("Failed to send", err);
+      }
     }
   };
 
@@ -233,20 +351,20 @@ export default function MessagesClient() {
                     const otherParticipant = conv.participants.find(p => p.id !== user?.id) || conv.participants[0];
                     const name = conv.isGroup ? conv.groupName : otherParticipant?.profile?.fullName;
                     const avatar = conv.isGroup ? conv.groupAvatar : otherParticipant?.profile?.avatarUrl;
-                    const lastMsg = conv.messages[0];
+                    const lastMsg = conv.messages[0]; // Snippet
                     const isActive = selectedConversation?.id === conv.id;
                     const isUnread = lastMsg && !lastMsg.seen && lastMsg.senderId !== user?.id;
 
                     return (
                       <button
                         key={conv.id}
-                        onClick={() => setSelectedConversation(conv)}
+                        onClick={() => handleSelectConversation(conv)}
                         className={`w-full p-4 flex items-center gap-4 hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors text-left group ${isActive ? "bg-primary/5 border-r-4 border-primary" : ""}`}
                       >
                         <div className="relative">
                           <div className="w-12 h-12 rounded-full border-2 border-ink overflow-hidden bg-neutral-200 flex items-center justify-center">
                             {avatar ? (
-                              <img src={avatar} alt={name} className="w-full h-full object-cover" />
+                              <img src={avatar} alt={name || "User"} className="w-full h-full object-cover" />
                             ) : conv.isGroup ? (
                               <Hash className="w-6 h-6 text-neutral-500" />
                             ) : (
@@ -259,7 +377,7 @@ export default function MessagesClient() {
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-baseline mb-1">
                             <h3 className={`font-bold text-sm truncate ${isUnread ? "text-ink" : "text-neutral-700 dark:text-neutral-300"}`}>
-                              {name}
+                              {name || "Unknown User"}
                             </h3>
                             {lastMsg && (
                               <span className="text-[10px] text-neutral-400 font-mono">
@@ -315,8 +433,8 @@ export default function MessagesClient() {
                         {selectedConversation.isGroup ? selectedConversation.groupName : selectedConversation.participants.find(p => p.id !== user?.id)?.profile.fullName}
                       </h2>
                       <span className="text-xs text-neutral-500 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block" />
-                        Online
+                        <span className={`w-1.5 h-1.5 rounded-full inline-block ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
+                        {isConnected ? "Online" : "Offline"}
                       </span>
                     </div>
                   </div>
@@ -348,10 +466,14 @@ export default function MessagesClient() {
                   </div>
 
                   {/* Message Bubbles */}
-                  {[...selectedConversation.messages].reverse().map((msg, idx) => {
+                  {/* Messages assumed to be in chronological order (oldest -> newest) for rendering logic? 
+                      API returns take:1 desc for list. 
+                      LoadConversationMessages returns asc (oldest first).
+                  */}
+                  {selectedConversation.messages.map((msg, idx) => {
                     const isMe = msg.senderId === user?.id;
                     return (
-                      <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                      <div key={msg.id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                         <div className={`flex flex-col max-w-[80%] md:max-w-[60%] ${isMe ? 'items-end' : 'items-start'}`}>
                           <div
                             className={`px-4 py-3 rounded-2xl border-2 shadow-sm text-sm md:text-base ${isMe

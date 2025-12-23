@@ -16,6 +16,8 @@ import {
   VolunteeringTab,
   GitHubContributions,
 } from "../components/profile";
+import ProfileSectionModal from "../components/profile/ProfileSectionModal";
+import FollowButton from "../components/ui/FollowButton";
 
 interface UserActivity {
   posts: Array<{ id: string; content: string; createdAt: string; _count?: { likes: number; comments: number } }>;
@@ -38,11 +40,62 @@ function ProfileContent() {
     }
   }, [isAuthenticated, router, loading]);
 
+  const [profile, setProfile] = useState<any>(user?.profile || null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"education" | "experience" | "project" | "volunteering">("education");
+
+  const openModal = (type: "education" | "experience" | "project" | "volunteering") => {
+    setModalType(type);
+    setModalOpen(true);
+  };
+
+  const handleAddItem = async (type: string, data: any) => {
+    try {
+      if (type === "education") await api.addProfileEducation(data);
+      else if (type === "experience") await api.addProfileExperience(data);
+      else if (type === "project") await api.addProfileProject(data);
+      else if (type === "volunteering") await api.addProfileVolunteering(data);
+
+      await fetchFullProfile();
+    } catch (error) {
+      console.error("Failed to add profile item:", error);
+      alert("Failed to add " + type);
+    }
+  };
+
+  const handleRemoveItem = async (type: string, id: string) => {
+    if (!confirm("Are you sure you want to delete this?")) return;
+    try {
+      if (type === "education") await api.removeProfileEducation(id);
+      else if (type === "experience") await api.removeProfileExperience(id);
+      else if (type === "project") await api.removeProfileProject(id);
+      else if (type === "volunteering") await api.removeProfileVolunteering(id);
+
+      await fetchFullProfile();
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    }
+  };
+
   useEffect(() => {
     if (user?.id) {
       fetchUserActivity();
+      fetchFullProfile();
     }
   }, [user?.id]);
+
+  const fetchFullProfile = async () => {
+    setProfileLoading(true);
+    try {
+      const data = await api.getProfile();
+      setProfile(data);
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const fetchUserActivity = async () => {
     setActivityLoading(true);
@@ -68,12 +121,14 @@ function ProfileContent() {
   if (loading) return <LoadingState />;
   if (!isAuthenticated || !user) return null;
 
-  const collegeName = user.profile?.college?.name || "No Campus Selected";
+  // Fallbacks using possibly incomplete user.profile or fetched profile
+  const displayProfile = profile || user.profile;
+  const collegeName = displayProfile?.college?.name || "No Campus Selected";
   const username = user.email?.split("@")[0] || "user";
-  const fullName = user.profile?.fullName || "Anonymous User";
-  const avatarUrl = user.profile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${fullName}`;
+  const fullName = displayProfile?.fullName || "Anonymous User";
+  const avatarUrl = displayProfile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${fullName}`;
 
-  // Data Selectors
+  // Data
   const activitiesData = activity?.eventsAttended?.map((item) => ({
     id: item.id,
     eventName: item.event.title,
@@ -82,18 +137,10 @@ function ProfileContent() {
     eventId: item.event.id,
   })) || [];
 
-  const projectsData: any[] = []; // Mock
-  const educationData = user.profile?.college ? [{
-    id: "1",
-    yearStart: "2023",
-    yearEnd: "Present",
-    degree: "Bachelor of Technology",
-    field: "Computer Science",
-    institution: user.profile.college.name,
-    location: "",
-  }] : [];
-  const experienceData: any[] = []; // Mock
-  const volunteeringData: any[] = []; // Mock
+  const projectsData = displayProfile?.projects || [];
+  const educationData = displayProfile?.education || [];
+  const experienceData = displayProfile?.experience || [];
+  const volunteeringData = displayProfile?.volunteering || [];
 
   const tabs = [
     { id: "activities", label: "Activities", icon: Calendar },
@@ -153,12 +200,17 @@ function ProfileContent() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col gap-2 w-full md:w-auto">
-              <Link href="/profile/edit" className="w-full md:w-auto">
-                <button className="w-full px-6 py-2 bg-ink text-white font-bold rounded-lg hover:bg-neutral-800 transition-colors shadow-neo-sm">
-                  Edit Profile
-                </button>
-              </Link>
+            <div className="flex flex-col gap-2 w-full md:w-auto min-w-[140px]">
+              {user.id === profile?.userId ? (
+                <Link href="/profile/edit" className="w-full">
+                  <button className="w-full px-6 py-2 bg-ink text-white font-bold rounded-lg hover:bg-neutral-800 transition-colors shadow-neo-sm text-sm">
+                    Edit Profile
+                  </button>
+                </Link>
+              ) : (
+                <FollowButton userId={profile?.userId} className="w-full justify-center" />
+              )}
+
               <div className="flex gap-2 justify-center">
                 {user.profile?.githubUrl && (
                   <a href={user.profile.githubUrl} target="_blank" rel="noreferrer" className="p-2 bg-neutral-100 dark:bg-white/10 rounded-lg hover:bg-neutral-200 transition-colors">
@@ -222,10 +274,38 @@ function ProfileContent() {
           className="min-h-[300px] touch-pan-y"
         >
           {activeTab === "activities" && <ActivitiesTab activities={activitiesData} isLoading={activityLoading} />}
-          {activeTab === "projects" && <ProjectsTab projects={projectsData} isOwnProfile={true} />}
-          {activeTab === "experience" && <ExperienceTab experience={experienceData} isOwnProfile={true} />}
-          {activeTab === "education" && <EducationTab education={educationData} isOwnProfile={true} />}
-          {activeTab === "volunteering" && <VolunteeringTab volunteering={volunteeringData} isOwnProfile={true} />}
+          {activeTab === "projects" && (
+            <ProjectsTab
+              projects={projectsData}
+              isOwnProfile={true}
+              onAddProject={() => openModal("project")}
+              onRemoveProject={(id) => handleRemoveItem("project", id)}
+            />
+          )}
+          {activeTab === "experience" && (
+            <ExperienceTab
+              experience={experienceData}
+              isOwnProfile={true}
+              onAddExperience={() => openModal("experience")}
+              onRemoveExperience={(id) => handleRemoveItem("experience", id)}
+            />
+          )}
+          {activeTab === "education" && (
+            <EducationTab
+              education={educationData}
+              isOwnProfile={true}
+              onAddEducation={() => openModal("education")}
+              onRemoveEducation={(id) => handleRemoveItem("education", id)}
+            />
+          )}
+          {activeTab === "volunteering" && (
+            <VolunteeringTab
+              volunteering={volunteeringData}
+              isOwnProfile={true}
+              onAddVolunteering={() => openModal("volunteering")}
+              onRemoveVolunteering={(id) => handleRemoveItem("volunteering", id)}
+            />
+          )}
         </motion.div>
 
         {/* GitHub Graph at bottom of content if exists */}
@@ -238,6 +318,13 @@ function ProfileContent() {
           </div>
         )}
       </main>
+
+      <ProfileSectionModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleAddItem}
+        type={modalType}
+      />
     </div>
   );
 }

@@ -8,11 +8,28 @@ import { redirect } from "next/navigation";
 import { getServerProfile } from "../../../lib/server-utils";
 import { api } from "../../../lib/api";
 import CollegeFeed from "./CollegeFeed";
+import { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const college = await api.getCollegeBySlug(slug);
+    return {
+      title: `${college.name} | LINKER`,
+      description: `Join the student community at ${college.name}. Events, clubs, notes, and more.`,
+    };
+  } catch (e) {
+    return {
+      title: `${slug.toUpperCase()} | LINKER`,
+      description: "Join the student community on LINKER.",
+    };
+  }
 }
 
 export default async function CollegeHome({ params }: PageProps) {

@@ -139,6 +139,24 @@ export default function CollegeFeed({
         { id: 3, title: "Library hours extended", date: "Dec 18", type: "success" },
     ]);
 
+    const getAnnouncementBg = (type: string) => {
+        switch (type) {
+            case "warning": return "bg-accent-orange/20 text-accent-orange";
+            case "success": return "bg-green-500/20 text-green-600";
+            case "info": return "bg-blue-500/20 text-blue-600";
+            default: return "bg-gray-100 text-gray-600";
+        }
+    };
+
+    const getAnnouncementIcon = (type: string) => {
+        switch (type) {
+            case "warning": return <AlertCircle className="w-5 h-5" />;
+            case "success": return <CheckCircle className="w-5 h-5" />;
+            case "info": return <Info className="w-5 h-5" />;
+            default: return <Megaphone className="w-5 h-5" />;
+        }
+    };
+
     // Listen for create modal events
     useEffect(() => {
         const handleOpenModal = (e: any) => {
@@ -168,7 +186,7 @@ export default function CollegeFeed({
                 ? api.getCollegeStats(collegeSlug)
                 : Promise.resolve(null);
             const clubsPromise = reset
-                ? api.getClubs(collegeSlug)
+                ? api.getClubs({ collegeSlug })
                 : Promise.resolve([]);
 
             const [postsRes, events, statsData, clubsData] = await Promise.all([
@@ -205,238 +223,45 @@ export default function CollegeFeed({
                 const unique = Array.from(
                     new Map(combined.map((item) => [item.id, item])).values()
                 );
-                return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                return unique.sort(
+                    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
             });
-
-            if (postsRes.meta) {
-                setHasMore(currentPage < postsRes.meta.lastPage);
-                setPage(currentPage + 1);
-            } else {
-                setHasMore(false);
-            }
-        } catch (e) {
-            console.error("Feed error", e);
-            setError("Failed to load feed. Please try again.");
+        } catch (error) {
+            console.error("Failed to load feed:", error);
         } finally {
             setLoading(false);
             setIsLoadingMore(false);
         }
     };
-
-    useEffect(() => {
-        loadFeed(true);
-    }, [collegeSlug]);
-
-    const getAnnouncementIcon = (type: string) => {
-        switch (type) {
-            case "warning":
-                return <AlertCircle className="w-4 h-4 text-accent-coral" />;
-            case "success":
-                return <CheckCircle className="w-4 h-4 text-accent-mint" />;
-            default:
-                return <Info className="w-4 h-4 text-accent-blue" />;
-        }
-    };
-
-    const getAnnouncementBg = (type: string) => {
-        switch (type) {
-            case "warning":
-                return "bg-accent-coral/10 border-accent-coral/20";
-            case "success":
-                return "bg-accent-mint/10 border-accent-mint/20";
-            default:
-                return "bg-accent-blue/10 border-accent-blue/20";
-        }
-    };
-
     return (
-        <motion.div
-            className="flex gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-        >
+        <div className="flex flex-col lg:flex-row gap-6">
             {/* LEFT SIDEBAR - Desktop Only */}
             <motion.aside
-                className="hidden lg:block w-[280px] flex-shrink-0"
-                variants={itemVariants}
+                className="hidden lg:block w-80 shrink-0"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
             >
-                <div className="sticky top-24 space-y-4">
-                    {/* Profile Sidebar */}
-                    <ProfileSidebar />
-
-                    {/* Campus Stats Card */}
-                    {stats && (
-                        <motion.div
-                            className="bg-paper border-2 border-ink shadow-neo p-4 rounded-card-lg"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                        >
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center">
-                                    <TrendingUp className="w-3.5 h-3.5 text-ink" />
-                                </div>
-                                <h3 className="font-display text-sm uppercase tracking-wide">
-                                    Campus Stats
-                                </h3>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <motion.div
-                                    className="bg-primary/20 border border-ink/10 p-3 rounded-lg text-center cursor-pointer hover:border-ink hover:shadow-neo-sm transition-all"
-                                    whileHover={{ scale: 1.02 }}
-                                >
-                                    <div className="flex items-center justify-center gap-1.5 mb-1">
-                                        <Users className="w-4 h-4 text-primary" />
-                                        <span className="font-display text-lg">
-                                            {stats.totalMembers}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-neutral-600 uppercase tracking-wide">
-                                        Students
-                                    </span>
-                                </motion.div>
-                                <motion.div
-                                    className="bg-accent-blue/20 border border-ink/10 p-3 rounded-lg text-center cursor-pointer hover:border-ink hover:shadow-neo-sm transition-all"
-                                    whileHover={{ scale: 1.02 }}
-                                >
-                                    <div className="flex items-center justify-center gap-1.5 mb-1">
-                                        <Users className="w-4 h-4 text-accent-blue" />
-                                        <span className="font-display text-lg">
-                                            {stats.totalClubs}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-neutral-600 uppercase tracking-wide">
-                                        Clubs
-                                    </span>
-                                </motion.div>
-                                <motion.div
-                                    className="bg-accent-coral/20 border border-ink/10 p-3 rounded-lg text-center cursor-pointer hover:border-ink hover:shadow-neo-sm transition-all"
-                                    whileHover={{ scale: 1.02 }}
-                                >
-                                    <div className="flex items-center justify-center gap-1.5 mb-1">
-                                        <Calendar className="w-4 h-4 text-accent-coral" />
-                                        <span className="font-display text-lg">
-                                            {stats.totalEvents}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-neutral-600 uppercase tracking-wide">
-                                        Events
-                                    </span>
-                                </motion.div>
-                                <motion.div
-                                    className="bg-accent-mint/20 border border-ink/10 p-3 rounded-lg text-center cursor-pointer hover:border-ink hover:shadow-neo-sm transition-all"
-                                    whileHover={{ scale: 1.02 }}
-                                >
-                                    <div className="flex items-center justify-center gap-1.5 mb-1">
-                                        <BookOpen className="w-4 h-4 text-accent-mint" />
-                                        <span className="font-display text-lg">
-                                            {stats.totalNotes}
-                                        </span>
-                                    </div>
-                                    <span className="text-xs text-neutral-600 uppercase tracking-wide">
-                                        Notes
-                                    </span>
-                                </motion.div>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* Quick Actions */}
-                    <motion.div
-                        className="bg-paper border-2 border-ink shadow-neo p-4 rounded-card-lg"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
-                    >
-                        <h3 className="font-display text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-primary rounded-full" />
-                            Quick Actions
-                        </h3>
-                        <div className="grid grid-cols-3 gap-2">
-                            {quickActions.map((item, index) => {
-                                const Icon = item.icon;
-                                const href = item.href?.startsWith("/")
-                                    ? item.href
-                                    : `/colleges/${collegeSlug}/${item.href}`;
-
-                                const content = (
-                                    <motion.div
-                                        className={`flex flex-col items-center justify-center p-3 rounded-lg border border-ink/10 cursor-pointer hover:border-ink hover:shadow-neo-sm transition-all ${item.action === "post" ? "bg-primary/10" : "bg-neutral-50"}`}
-                                        whileHover={{ scale: 1.05, y: -2 }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        <div
-                                            className={`w-8 h-8 ${item.color} rounded-lg flex items-center justify-center mb-1.5`}
-                                        >
-                                            <Icon className="w-4 h-4 text-ink" />
-                                        </div>
-                                        <span className="text-[10px] font-medium text-neutral-700 text-center">
-                                            {item.label}
-                                        </span>
-                                    </motion.div>
-                                );
-
-                                if (item.action === "post") {
-                                    return (
-                                        <button
-                                            key={index}
-                                            onClick={() => {
-                                                setPostModalTab("TEXT");
-                                                setIsPostModalOpen(true);
-                                            }}
-                                            className="text-left"
-                                        >
-                                            {content}
-                                        </button>
-                                    );
-                                }
-                                return (
-                                    <Link key={index} href={href}>
-                                        {content}
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </motion.div>
-
-                    {/* Active Clubs */}
+                <div className="sticky top-24 space-y-6">
+                    {/* Clubs Widget */}
                     {clubs.length > 0 && (
-                        <motion.div
-                            className="bg-paper border-2 border-ink shadow-neo overflow-hidden rounded-card-lg"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                        >
-                            <div className="px-4 py-3 bg-accent-orange/10 border-b border-ink/10 flex items-center gap-2">
-                                <Users className="w-4 h-4" />
-                                <h3 className="font-display text-sm uppercase tracking-wide">
+                        <motion.div className="bg-white border-2 border-black shadow-neo rounded-xl overflow-hidden">
+                            <div className="p-4 border-b-2 border-black bg-accent-orange/10">
+                                <h3 className="font-bold flex items-center gap-2">
+                                    <Users className="w-4 h-4" />
                                     Active Clubs
                                 </h3>
                             </div>
-                            <div className="divide-y divide-neutral-100">
-                                {clubs.map((club, index) => (
-                                    <Link
-                                        key={club.id}
-                                        href={`/clubs/${club.id}`}
-                                        className="block"
-                                    >
-                                        <motion.div
-                                            className="px-4 py-3 hover:bg-neutral-50 transition-colors cursor-pointer group"
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.05 * index }}
-                                        >
+                            <div className="divide-y-2 divide-black/5">
+                                {clubs.map((club) => (
+                                    <Link key={club.id} href={`/clubs/${club.id}`}>
+                                        <div className="px-4 py-3 hover:bg-neutral-50 transition-colors cursor-pointer group">
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-2 h-2 bg-accent-orange rounded-full" />
-                                                    <span className="font-medium text-sm group-hover:text-primary transition-colors truncate max-w-[160px]">
-                                                        {club.name}
-                                                    </span>
-                                                </div>
-                                                <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-primary transition-colors" />
+                                                <span className="font-medium text-sm">{club.name}</span>
+                                                <ChevronRight className="w-4 h-4 text-neutral-300" />
                                             </div>
-                                        </motion.div>
+                                        </div>
                                     </Link>
                                 ))}
                             </div>
@@ -461,7 +286,7 @@ export default function CollegeFeed({
             </motion.aside>
 
             {/* CENTER FEED */}
-            <motion.main
+            < motion.main
                 className="flex-1 min-w-0 pb-32 lg:pb-8"
                 variants={itemVariants}
                 drag="x"
@@ -479,83 +304,85 @@ export default function CollegeFeed({
                 <CollegeNav collegeSlug={collegeSlug} />
 
                 {/* Upcoming Events Ribbon */}
-                {initialEvents.length > 0 && (
-                    <motion.div
-                        className="mt-6 mb-8 transform -rotate-1 origin-center"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-accent-coral border-2 border-ink rounded-lg flex items-center justify-center shadow-neo-sm">
-                                    <Calendar className="w-4 h-4 text-ink" />
+                {
+                    initialEvents.length > 0 && (
+                        <motion.div
+                            className="mt-6 mb-8 transform -rotate-1 origin-center"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-accent-coral border-2 border-ink rounded-lg flex items-center justify-center shadow-neo-sm">
+                                        <Calendar className="w-4 h-4 text-ink" />
+                                    </div>
+                                    <h3 className="font-display text-sm uppercase tracking-wide">
+                                        Upcoming Events
+                                    </h3>
                                 </div>
-                                <h3 className="font-display text-sm uppercase tracking-wide">
-                                    Upcoming Events
-                                </h3>
-                            </div>
-                            <Link
-                                href={`/colleges/${collegeSlug}/events`}
-                                className="text-sm font-medium text-neutral-500 hover:text-ink transition-colors flex items-center gap-1"
-                            >
-                                View All <ArrowUpRight className="w-3 h-3" />
-                            </Link>
-                        </div>
-                        <div className="overflow-x-auto pb-4 -mx-4 px-4 flex gap-4 scrollbar-hide">
-                            {initialEvents.map((event: any, index: number) => (
                                 <Link
-                                    key={event.id}
-                                    href={`/events/${event.id}`}
-                                    className="min-w-[240px] shrink-0"
+                                    href={`/colleges/${collegeSlug}/events`}
+                                    className="text-sm font-medium text-neutral-500 hover:text-ink transition-colors flex items-center gap-1"
                                 >
-                                    <motion.div
-                                        className="bg-paper border-2 border-ink rounded-card-lg overflow-hidden shadow-neo hover:shadow-neo-lg transition-all h-full"
-                                        whileHover={{ scale: 1.02, rotate: -1, y: -4 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.1 }}
-                                    >
-                                        <div className="h-2 bg-gradient-to-r from-accent-coral to-accent-pink" />
-                                        <div className="p-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className="px-2 py-1 bg-primary/20 rounded text-[10px] font-bold uppercase">
-                                                    {new Date(event.startsAt).toLocaleDateString(
-                                                        "en-US",
-                                                        {
-                                                            weekday: "short",
-                                                            month: "short",
-                                                            day: "numeric",
-                                                        }
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-1 text-xs text-neutral-500">
-                                                    <Clock className="w-3 h-3" />
-                                                    {new Date(event.startsAt).toLocaleTimeString(
-                                                        "en-US",
-                                                        {
-                                                            hour: "numeric",
-                                                            minute: "2-digit",
-                                                        }
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <h4 className="font-display text-base leading-tight mb-2 line-clamp-2">
-                                                {event.title}
-                                            </h4>
-                                            {event.venue && (
-                                                <div className="flex items-center gap-1 text-xs text-neutral-500">
-                                                    <MapPin className="w-3 h-3" />
-                                                    <span className="truncate">{event.venue}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </motion.div>
+                                    View All <ArrowUpRight className="w-3 h-3" />
                                 </Link>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
+                            </div>
+                            <div className="overflow-x-auto pb-4 -mx-4 px-4 flex gap-4 scrollbar-hide">
+                                {initialEvents.map((event: any, index: number) => (
+                                    <Link
+                                        key={event.id}
+                                        href={`/events/${event.id}`}
+                                        className="min-w-[240px] shrink-0"
+                                    >
+                                        <motion.div
+                                            className="bg-paper border-2 border-ink rounded-card-lg overflow-hidden shadow-neo hover:shadow-neo-lg transition-all h-full"
+                                            whileHover={{ scale: 1.02, rotate: -1, y: -4 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.1 }}
+                                        >
+                                            <div className="h-2 bg-gradient-to-r from-accent-coral to-accent-pink" />
+                                            <div className="p-4">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="px-2 py-1 bg-primary/20 rounded text-[10px] font-bold uppercase">
+                                                        {new Date(event.startsAt).toLocaleDateString(
+                                                            "en-US",
+                                                            {
+                                                                weekday: "short",
+                                                                month: "short",
+                                                                day: "numeric",
+                                                            }
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-xs text-neutral-500">
+                                                        <Clock className="w-3 h-3" />
+                                                        {new Date(event.startsAt).toLocaleTimeString(
+                                                            "en-US",
+                                                            {
+                                                                hour: "numeric",
+                                                                minute: "2-digit",
+                                                            }
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <h4 className="font-display text-base leading-tight mb-2 line-clamp-2">
+                                                    {event.title}
+                                                </h4>
+                                                {event.venue && (
+                                                    <div className="flex items-center gap-1 text-xs text-neutral-500">
+                                                        <MapPin className="w-3 h-3" />
+                                                        <span className="truncate">{event.venue}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )
+                }
 
                 {/* Feed Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -584,11 +411,13 @@ export default function CollegeFeed({
                 <FeedComposer />
 
                 {/* Loading State */}
-                {loading && (
-                    <div className="mt-6">
-                        <FeedSkeleton count={3} />
-                    </div>
-                )}
+                {
+                    loading && (
+                        <div className="mt-6">
+                            <FeedSkeleton count={3} />
+                        </div>
+                    )
+                }
 
                 {/* Feed Items */}
                 <AnimatePresence mode="popLayout">
@@ -607,73 +436,81 @@ export default function CollegeFeed({
                 </AnimatePresence>
 
                 {/* Loading More */}
-                {isLoadingMore && (
-                    <div className="mt-6">
-                        <FeedSkeleton count={2} />
-                    </div>
-                )}
+                {
+                    isLoadingMore && (
+                        <div className="mt-6">
+                            <FeedSkeleton count={2} />
+                        </div>
+                    )
+                }
 
                 {/* Load More Button */}
-                {!loading && feedItems.length > 0 && hasMore && !isLoadingMore && (
-                    <motion.div
-                        className="flex justify-center py-8"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                    >
-                        <button
-                            onClick={() => loadFeed(false)}
-                            className="btn-neo btn-primary px-6 py-3 text-sm rounded-card"
+                {
+                    !loading && feedItems.length > 0 && hasMore && !isLoadingMore && (
+                        <motion.div
+                            className="flex justify-center py-8"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                         >
-                            Load More Posts
-                        </button>
-                    </motion.div>
-                )}
+                            <button
+                                onClick={() => loadFeed(false)}
+                                className="btn-neo btn-primary px-6 py-3 text-sm rounded-card"
+                            >
+                                Load More Posts
+                            </button>
+                        </motion.div>
+                    )
+                }
 
                 {/* End of Feed */}
-                {!hasMore && feedItems.length > 0 && (
-                    <motion.div
-                        className="text-center py-12"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-full">
-                            <span className="text-2xl">🎉</span>
-                            <span className="font-mono text-sm text-neutral-600">
-                                You're all caught up!
-                            </span>
-                        </div>
-                    </motion.div>
-                )}
+                {
+                    !hasMore && feedItems.length > 0 && (
+                        <motion.div
+                            className="text-center py-12"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-full">
+                                <span className="text-2xl">🎉</span>
+                                <span className="font-mono text-sm text-neutral-600">
+                                    You're all caught up!
+                                </span>
+                            </div>
+                        </motion.div>
+                    )
+                }
 
                 {/* Empty State */}
-                {feedItems.length === 0 && !loading && (
-                    <motion.div
-                        className="text-center py-16"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                    >
-                        <div className="w-20 h-20 mx-auto mb-6 bg-primary/20 border-2 border-dashed border-primary rounded-2xl flex items-center justify-center">
-                            <Sparkles className="w-10 h-10 text-primary" />
-                        </div>
-                        <h3 className="font-display text-xl text-ink mb-2">No posts yet</h3>
-                        <p className="text-neutral-500 mb-6">
-                            Be the first to share something with your campus!
-                        </p>
-                        <button
-                            onClick={() => {
-                                setPostModalTab("TEXT");
-                                setIsPostModalOpen(true);
-                            }}
-                            className="btn-neo btn-primary rounded-card"
+                {
+                    feedItems.length === 0 && !loading && (
+                        <motion.div
+                            className="text-center py-16"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
                         >
-                            Create First Post
-                        </button>
-                    </motion.div>
-                )}
-            </motion.main>
+                            <div className="w-20 h-20 mx-auto mb-6 bg-primary/20 border-2 border-dashed border-primary rounded-2xl flex items-center justify-center">
+                                <Sparkles className="w-10 h-10 text-primary" />
+                            </div>
+                            <h3 className="font-display text-xl text-ink mb-2">No posts yet</h3>
+                            <p className="text-neutral-500 mb-6">
+                                Be the first to share something with your campus!
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setPostModalTab("TEXT");
+                                    setIsPostModalOpen(true);
+                                }}
+                                className="btn-neo btn-primary rounded-card"
+                            >
+                                Create First Post
+                            </button>
+                        </motion.div>
+                    )
+                }
+            </motion.main >
 
             {/* RIGHT SIDEBAR - Desktop Only */}
-            <motion.aside
+            < motion.aside
                 className="hidden xl:block w-[280px] flex-shrink-0"
                 variants={itemVariants}
             >
@@ -796,21 +633,20 @@ export default function CollegeFeed({
                         </Link>
                     </motion.div>
                 </div>
-            </motion.aside>
+            </motion.aside >
 
             {/* Create Post Modal */}
-            <CreatePostModal
+            < CreatePostModal
                 isOpen={isPostModalOpen}
                 onClose={() => setIsPostModalOpen(false)}
                 initialTab={postModalTab}
                 onPostCreated={() => loadFeed(true)}
             />
 
-            {/* Mobile Bottom Navigation */}
-            <ArcMenu onCompose={() => {
+            < ArcMenu onCompose={() => {
                 setPostModalTab('TEXT');
                 setIsPostModalOpen(true);
             }} />
-        </motion.div>
+        </div >
     );
 }

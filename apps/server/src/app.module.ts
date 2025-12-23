@@ -27,9 +27,12 @@ import {
 } from 'nest-winston';
 import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { SavedModule } from './modules/saved/saved.module';
 import * as winston from 'winston';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { FollowsModule } from './modules/follows/follows.module';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -72,11 +75,15 @@ import { join } from 'path';
     FeedbackModule,
     PostsModule,
     MessagesModule,
+    MessagesModule,
     NotificationsModule,
+    SavedModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    FollowsModule,
+    SearchModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
@@ -87,4 +94,4 @@ import { join } from 'path';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

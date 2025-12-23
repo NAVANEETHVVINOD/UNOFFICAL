@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('clubs')
 export class ClubsController {
-  constructor(private readonly clubsService: ClubsService) {}
+  constructor(private readonly clubsService: ClubsService) { }
 
   @Get()
   async findAll(
@@ -25,17 +25,19 @@ export class ClubsController {
     @Query('search') search?: string,
     @Query('cursor') cursor?: string,
     @Query('limit') limit?: string,
+    @Query('type') type?: string,
   ) {
     const take = limit ? parseInt(limit) : 10;
     const where: Prisma.ClubWhereInput = {
       ...(collegeSlug ? { college: { slug: collegeSlug } } : {}),
+      ...(type ? { type: type as any } : {}),
       ...(search
         ? {
-            OR: [
-              { name: { contains: search, mode: 'insensitive' } },
-              { description: { contains: search, mode: 'insensitive' } },
-            ],
-          }
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        }
         : {}),
     };
 

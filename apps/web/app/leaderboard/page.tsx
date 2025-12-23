@@ -14,21 +14,22 @@ import { calculateLevel, formatKarma, BADGES } from "../../lib/karma";
 import { Trophy, Medal, Award, Crown, Zap, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 
-interface LeaderboardUser {
+import { api } from "../../lib/api";
+
+interface LeaderboardProfile {
   id: string;
-  profile: {
-    fullName: string;
-    avatarUrl?: string;
-    karma: number;
-    level: number;
-    college?: { name: string };
-  };
+  userId: string;
+  fullName: string;
+  avatarUrl?: string;
+  points: number; // mapped to karma
+  college?: { name: string };
+  user?: { role: string };
 }
 
 function LeaderboardContent() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [leaders, setLeaders] = useState<LeaderboardUser[]>([]);
+  const [leaders, setLeaders] = useState<LeaderboardProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "college">("all");
 
@@ -45,38 +46,20 @@ function LeaderboardContent() {
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ limit: "50" });
-      if (filter === "college" && user?.profile?.collegeId) {
-        params.append("collegeId", user.profile.collegeId);
-      }
-      
-      const res = await fetch(`/api/leaderboard?${params}`);
-      if (res.ok) {
-        const data = await res.json();
-        setLeaders(data);
-      } else {
-        // Mock data for demo
-        setLeaders(generateMockLeaders());
-      }
+      // api.getLeaderboard currently doesn't support filtering by college in backend yet?
+      // We added getLeaderboard(limit) in service.
+      // For now, let's fetch global leaderboard. 
+      // Todo: Add college filter to backend getLeaderboard.
+
+      const data = await api.getLeaderboard();
+      // data is Profile[]
+      setLeaders(data || []);
     } catch (error) {
       console.error("Failed to fetch leaderboard:", error);
-      setLeaders(generateMockLeaders());
+      setLeaders([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateMockLeaders = (): LeaderboardUser[] => {
-    const names = ["Alex Chen", "Jordan Smith", "Taylor Kim", "Morgan Lee", "Casey Brown", "Riley Davis", "Quinn Wilson", "Avery Johnson", "Drew Martinez", "Jamie Garcia"];
-    return names.map((name, i) => ({
-      id: `mock-${i}`,
-      profile: {
-        fullName: name,
-        karma: Math.max(100, 2500 - i * 200 + Math.floor(Math.random() * 100)),
-        level: Math.max(1, 10 - Math.floor(i / 2)),
-        college: { name: "Demo University" },
-      },
-    }));
   };
 
   const getRankIcon = (rank: number) => {
@@ -146,7 +129,7 @@ function LeaderboardContent() {
                       <p className="font-mono text-sm text-gray-500">{levelInfo.title}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex-1 grid grid-cols-3 gap-4 text-center">
                     <div>
                       <div className="flex items-center justify-center gap-1 text-2xl font-bold">
@@ -199,18 +182,16 @@ function LeaderboardContent() {
             <div className="flex gap-2">
               <button
                 onClick={() => setFilter("all")}
-                className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-black transition-all ${
-                  filter === "all" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-black transition-all ${filter === "all" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+                  }`}
               >
                 <Users className="w-4 h-4" />
                 All Students
               </button>
               <button
                 onClick={() => setFilter("college")}
-                className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-black transition-all ${
-                  filter === "college" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-black transition-all ${filter === "college" ? "bg-black text-white" : "bg-white hover:bg-gray-50"
+                  }`}
               >
                 <Trophy className="w-4 h-4" />
                 My College
@@ -239,34 +220,33 @@ function LeaderboardContent() {
                 >
                   {leaders.map((leader, index) => {
                     const rank = index + 1;
-                    const leaderLevel = calculateLevel(leader.profile.karma);
-                    const isCurrentUser = leader.id === user?.id;
-                    
+                    const leaderLevel = calculateLevel(leader.points); // points instead of karma
+                    const isCurrentUser = leader.userId === user?.id; // check userId
+
                     return (
                       <motion.div
                         key={leader.id}
                         variants={itemVariants}
-                        className={`p-4 border-2 border-black ${getRankBg(rank)} ${
-                          isCurrentUser ? "ring-2 ring-accent-blue ring-offset-2" : ""
-                        } hover:shadow-neo transition-shadow`}
+                        className={`p-4 border-2 border-black ${getRankBg(rank)} ${isCurrentUser ? "ring-2 ring-accent-blue ring-offset-2" : ""
+                          } hover:shadow-neo transition-shadow`}
                       >
-                        <Link href={isCurrentUser ? "/profile" : `/users/${leader.id}`} className="flex items-center gap-4">
+                        <Link href={isCurrentUser ? "/profile" : `/users/${leader.userId}`} className="flex items-center gap-4">
                           <div className="w-10 flex justify-center">
                             {getRankIcon(rank)}
                           </div>
-                          
+
                           <div className="w-12 h-12 border-2 border-black overflow-hidden bg-white flex-shrink-0">
                             <img
-                              src={leader.profile.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${leader.profile.fullName}`}
-                              alt={leader.profile.fullName}
+                              src={leader.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${leader.fullName}`}
+                              alt={leader.fullName}
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <h3 className="font-bold truncate">
-                                {leader.profile.fullName}
+                                {leader.fullName}
                                 {isCurrentUser && <span className="text-accent-blue ml-1">(You)</span>}
                               </h3>
                               <Badge className="bg-accent-purple/20 text-xs">
@@ -274,14 +254,14 @@ function LeaderboardContent() {
                               </Badge>
                             </div>
                             <p className="text-xs font-mono text-gray-500 truncate">
-                              {leaderLevel.title} • {leader.profile.college?.name || "Unknown College"}
+                              {leaderLevel.title} • {leader.college?.name || "Unknown College"}
                             </p>
                           </div>
-                          
+
                           <div className="text-right">
                             <div className="font-display font-bold text-lg flex items-center gap-1">
                               <Award className="w-4 h-4 text-accent-purple" />
-                              {formatKarma(leader.profile.karma)}
+                              {formatKarma(leader.points)}
                             </div>
                             <p className="text-xs font-mono text-gray-500">karma</p>
                           </div>

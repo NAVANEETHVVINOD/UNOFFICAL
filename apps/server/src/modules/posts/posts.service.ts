@@ -7,11 +7,15 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import sanitizeHtml from 'sanitize-html';
-import { PostType, Poll, PollOption } from '@prisma/client';
+import { PostType, Poll, PollOption, NotificationType } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService
+  ) { }
 
   async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -28,12 +32,12 @@ export class PostsService {
 
     const sanitizedContent = createPostDto.content
       ? sanitizeHtml(createPostDto.content, {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-          allowedAttributes: {
-            ...sanitizeHtml.defaults.allowedAttributes,
-            img: ['src', 'alt'],
-          },
-        })
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+        allowedAttributes: {
+          ...sanitizeHtml.defaults.allowedAttributes,
+          img: ['src', 'alt'],
+        },
+      })
       : '';
 
     // Data object for Prisma
@@ -164,12 +168,30 @@ export class PostsService {
 
   async like(id: string, userId: string) {
     try {
-      return await this.prisma.postLike.create({
+      const like = await this.prisma.postLike.create({
         data: {
           postId: id,
           userId,
         },
+        include: {
+          post: true,
+          user: { include: { profile: true } },
+        },
       });
+
+      // Send Notification
+      if (like.post.authorId && like.post.authorId !== userId) {
+        await this.notificationsService.createNotification({
+          userId: like.post.authorId,
+          type: NotificationType.LIKE,
+          title: 'New Like',
+          message: `${like.user.profile?.fullName || 'Someone'} liked your post`,
+          actionUrl: `/feed?post=${id}`,
+          actorId: userId,
+        });
+      }
+
+      return like;
     } catch (error) {
       // If already liked, ignore (or could toggle)
       return { message: 'Already liked' };

@@ -7,7 +7,125 @@ import {
   IsNotEmpty,
   IsUrl,
   Matches,
+  IsDateString,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class CreateEducationDto {
+  @IsString()
+  school: string;
+
+  @IsString()
+  degree: string;
+
+  @IsOptional()
+  @IsString()
+  field?: string;
+
+  @IsDateString()
+  startDate: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  current?: boolean;
+
+  @IsOptional()
+  @IsString()
+  grade?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
+
+export class CreateExperienceDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  company: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsDateString()
+  startDate: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  current?: boolean;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
+
+export class CreateProjectDto {
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  link?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags?: string[];
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+}
+
+export class CreateVolunteeringDto {
+  @IsString()
+  role: string;
+
+  @IsString()
+  organization: string;
+
+  @IsDateString()
+  startDate: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  current?: boolean;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  link?: string;
+}
 
 export class UpdateProfileDto {
   @IsString()

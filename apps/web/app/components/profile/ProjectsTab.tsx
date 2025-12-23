@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FolderOpen, ExternalLink, Plus } from "lucide-react";
+import { FolderOpen, ExternalLink, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface ProjectEntry {
@@ -18,9 +18,10 @@ interface ProjectsTabProps {
   isLoading?: boolean;
   isOwnProfile?: boolean;
   onAddProject?: () => void;
+  onRemoveProject?: (id: string) => void;
 }
 
-export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddProject }: ProjectsTabProps) {
+export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddProject, onRemoveProject }: ProjectsTabProps) {
   if (isLoading) {
     return (
       <div className="p-6">
@@ -34,7 +35,7 @@ export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddPr
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl">Projects</h2>
         {isOwnProfile && (
-          <button 
+          <button
             onClick={onAddProject}
             className="flex items-center gap-2 px-4 py-2 border-2 border-ink rounded-full text-sm font-bold hover:bg-ink hover:text-white transition-colors"
           >
@@ -53,7 +54,7 @@ export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddPr
             Showcase your work and side projects
           </p>
           {isOwnProfile && (
-            <button 
+            <button
               onClick={onAddProject}
               className="btn-neo btn-primary text-sm"
             >
@@ -69,19 +70,19 @@ export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddPr
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-paper-light rounded-xl border border-ink/10 overflow-hidden hover:shadow-neo transition-shadow"
+              className="bg-paper-light rounded-xl border border-ink/10 overflow-hidden hover:shadow-neo transition-shadow group"
             >
               {/* Project Image */}
               {project.imageUrl && (
                 <div className="aspect-video bg-neutral-100 overflow-hidden">
-                  <img 
-                    src={project.imageUrl} 
+                  <img
+                    src={project.imageUrl}
                     alt={project.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
               )}
-              
+
               {/* Project Details */}
               <div className="p-5">
                 <div className="flex items-start justify-between gap-4">
@@ -91,23 +92,34 @@ export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddPr
                       {project.description}
                     </p>
                   </div>
-                  {project.link && (
-                    <a 
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-shrink-0 p-2 hover:bg-neutral-100 rounded-lg transition-colors"
-                    >
-                      <ExternalLink className="w-5 h-5 text-neutral-500" />
-                    </a>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {project.link && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+                      >
+                        <ExternalLink className="w-5 h-5 text-neutral-500" />
+                      </a>
+                    )}
+                    {isOwnProfile && onRemoveProject && (
+                      <button
+                        onClick={() => onRemoveProject(project.id)}
+                        className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-                
+
                 {/* Tags */}
                 {project.tags && project.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4">
                     {project.tags.map((tag) => (
-                      <span 
+                      <span
                         key={tag}
                         className="px-3 py-1 bg-paper border border-ink/10 rounded-full text-xs font-medium"
                       >
@@ -124,3 +136,5 @@ export default function ProjectsTab({ projects, isLoading, isOwnProfile, onAddPr
     </div>
   );
 }
+
+

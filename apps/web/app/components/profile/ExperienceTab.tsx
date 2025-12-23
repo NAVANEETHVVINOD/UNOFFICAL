@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Briefcase, Plus } from "lucide-react";
+import { Briefcase, Plus, Trash2 } from "lucide-react";
 
 interface ExperienceEntry {
   id: string;
@@ -18,9 +18,10 @@ interface ExperienceTabProps {
   isLoading?: boolean;
   isOwnProfile?: boolean;
   onAddExperience?: () => void;
+  onRemoveExperience?: (id: string) => void;
 }
 
-export default function ExperienceTab({ experience, isLoading, isOwnProfile, onAddExperience }: ExperienceTabProps) {
+export default function ExperienceTab({ experience, isLoading, isOwnProfile, onAddExperience, onRemoveExperience }: ExperienceTabProps) {
   if (isLoading) {
     return (
       <div className="p-6 space-y-4">
@@ -36,7 +37,7 @@ export default function ExperienceTab({ experience, isLoading, isOwnProfile, onA
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl">Experience</h2>
         {isOwnProfile && (
-          <button 
+          <button
             onClick={onAddExperience}
             className="flex items-center gap-2 px-4 py-2 border-2 border-ink rounded-full text-sm font-bold hover:bg-ink hover:text-white transition-colors"
           >
@@ -54,7 +55,7 @@ export default function ExperienceTab({ experience, isLoading, isOwnProfile, onA
             Build your professional story. Add your work history
           </p>
           {isOwnProfile && (
-            <button 
+            <button
               onClick={onAddExperience}
               className="flex items-center gap-2 px-6 py-3 border-2 border-ink rounded-full font-bold hover:bg-ink hover:text-white transition-colors mx-auto"
             >
@@ -70,19 +71,32 @@ export default function ExperienceTab({ experience, isLoading, isOwnProfile, onA
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="p-5 bg-paper-light rounded-xl border border-ink/10"
+              className="p-5 bg-paper-light rounded-xl border border-ink/10 group"
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Briefcase className="w-6 h-6 text-neutral-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-ink">{entry.title}</h3>
-                  <p className="text-neutral-600">{entry.company}</p>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    {entry.startDate} - {entry.endDate || "Present"}
-                    {entry.location && ` · ${entry.location}`}
-                  </p>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-ink">{entry.title}</h3>
+                      <p className="text-neutral-600">{entry.company}</p>
+                      <p className="text-sm text-neutral-500 mt-1">
+                        {new Date(entry.startDate).getFullYear()} - {entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'}
+                        {entry.location && ` · ${entry.location}`}
+                      </p>
+                    </div>
+                    {isOwnProfile && onRemoveExperience && (
+                      <button
+                        onClick={() => onRemoveExperience(entry.id)}
+                        className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                   {entry.description && (
                     <p className="text-sm text-neutral-600 mt-3">{entry.description}</p>
                   )}
@@ -95,3 +109,5 @@ export default function ExperienceTab({ experience, isLoading, isOwnProfile, onA
     </div>
   );
 }
+
+

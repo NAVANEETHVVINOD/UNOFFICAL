@@ -40,52 +40,60 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed' }: UseInf
         const currentPage = reset ? 1 : page;
 
         try {
-            // Simulate API delay for "feel"
-            // await new Promise(r => setTimeout(r, 800));
-
-            // Construct API call based on category
-            // In a real scenario, this would likely be a unified /feed endpoint
-            // For now, we simulate mixing posts and events
-
-            let newBatch: FeedItemData[] = [];
+            let newItems: FeedItemData[] = [];
 
             // 1. Fetch Posts
-            // const postsPromise = api.getPosts(undefined, currentPage);
+            const postsPromise = api.getPosts(undefined, currentPage);
 
-            // 2. Fetch Events (only on first page or interleaved)
-            // const eventsPromise = reset ? api.getEvents(undefined, undefined, 5) : Promise.resolve([]);
+            // 2. Fetch Events (only on first page for now to interleave)
+            const eventsPromise = reset ? api.getEvents(undefined, undefined, 5) : Promise.resolve({ data: [] });
 
-            // Mocking Response for consistent Dev Experience until Backend is 100%
-            // Replace this block with actual API calls
-            const mockPosts = Array.from({ length: 5 }).map((_, i) => ({
-                id: `post-${currentPage}-${i}-${Math.random()}`,
-                type: (Math.random() > 0.7 ? 'poll' : 'post') as FeedItemType,
-                createdAt: new Date().toISOString(),
-                data: {
-                    id: `post-${currentPage}-${i}`,
-                    content: `This is a retro post #${i + 1} from page ${currentPage}. #campus #vibes`,
-                    author: { name: 'Campus Chaos', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=chaos' },
-                    likes: Math.floor(Math.random() * 100),
-                    comments: Math.floor(Math.random() * 20),
-                    image: Math.random() > 0.5 ? 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853' : undefined,
-                }
+            const [postsRes, eventsRes] = await Promise.all([
+                postsPromise.catch(e => { console.error("Posts fetch error", e); return { data: [], meta: { lastPage: 0 } } }),
+                eventsPromise.catch(e => { console.error("Events fetch error", e); return { data: [] } })
+            ]);
+
+            const postsData = postsRes.data || [];
+            const eventsData = (eventsRes as any).data || [];
+
+            // Map Posts
+            const mappedPosts: FeedItemData[] = postsData.map((p: any) => ({
+                id: `post-${p.id}`,
+                type: 'post' as const,
+                data: p,
+                createdAt: p.createdAt
             }));
 
-            newBatch = [...mockPosts];
+            // Map Events
+            const mappedEvents: FeedItemData[] = eventsData.map((e: any) => ({
+                id: `event-${e.id}`,
+                type: 'event' as const,
+                data: e,
+                createdAt: e.createdAt
+            }));
 
+            // Combine
+            newItems = [...mappedPosts, ...mappedEvents];
+
+            // Sort by createdAt desc
+            newItems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            // Update State
             setItems(prev => {
-                if (reset) return newBatch;
-
-                // Dedup logic
-                const existingIds = new Set(prev.map(i => i.id));
-                const filterednew = newBatch.filter(i => !existingIds.has(i.id));
-                return [...prev, ...filterednew];
+                const combined = reset ? newItems : [...prev, ...newItems];
+                // Dedup
+                const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+                // Re-sort to be safe
+                return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             });
 
-            setPage(prev => reset ? 2 : prev + 1);
-
-            // Stop after 5 pages for demo
-            if (currentPage >= 5) setHasMore(false);
+            // Pagination Logic
+            if (postsRes.meta) {
+                setHasMore(currentPage < postsRes.meta.lastPage);
+                setPage(currentPage + 1);
+            } else {
+                setHasMore(false);
+            }
 
         } catch (err) {
             console.error("Feed Error:", err);

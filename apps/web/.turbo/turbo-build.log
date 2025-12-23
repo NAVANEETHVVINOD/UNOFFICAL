@@ -9,63 +9,135 @@
 
  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
    Creating an optimized production build ...
- ✓ Compiled successfully in 30.7s
-   Running TypeScript ...
-   Collecting page data using 7 workers ...
-   Generating static pages using 7 workers (0/1) ...
- ✓ Generating static pages using 7 workers (1/1) in 4.2s
-   Finalizing page optimization ...
 
-Route (app)
-┌ ƒ /
-├ ƒ /_not-found
-├ ƒ /admin/college
-├ ƒ /admin/platform
-├ ƒ /auth/callback
-├ ƒ /clubs
-├ ƒ /clubs/[id]
-├ ƒ /clubs/[id]/manage
-├ ƒ /colleges/[slug]
-├ ƒ /colleges/[slug]/clubs
-├ ƒ /colleges/[slug]/clubs/create
-├ ƒ /colleges/[slug]/events
-├ ƒ /colleges/[slug]/events/create
-├ ƒ /colleges/[slug]/marketplace
-├ ƒ /colleges/[slug]/marketplace/create
-├ ƒ /communities
-├ ƒ /dashboard
-├ ƒ /events
-├ ƒ /events/[id]
-├ ƒ /events/[id]/certificates
-├ ƒ /events/[id]/checkin
-├ ƒ /events/create
-├ ƒ /feed
-├ ƒ /feed/create
-├ ƒ /leaderboard
-├ ƒ /legal/privacy
-├ ƒ /legal/terms
-├ ƒ /login
-├ ƒ /marketplace
-├ ƒ /marketplace/[id]
-├ ƒ /marketplace/create
-├ ƒ /messages
-├ ƒ /messages/[id]
-├ ƒ /my-college
-├ ƒ /notes
-├ ƒ /notes/[id]
-├ ƒ /notes/upload
-├ ƒ /offline
-├ ƒ /onboarding
-├ ƒ /profile
-├ ƒ /profile/[id]
-├ ƒ /profile/edit
-├ ƒ /register
-├ ƒ /resources
-├ ƒ /saved
-└ ƒ /settings
+> Build error occurred
+Error: Turbopack build failed with 5 errors:
+./apps/web/app/events/EventsClient.tsx:1:20
+Ecmascript file had an error
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { useState[33m,[39m useEffect[33m,[39m useMemo } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m   |[39m                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 2 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m"../context/AuthContext"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m { useOnboardingGuard } [36mfrom[39m [32m"../hooks/useOnboardingGuard"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { [33mErrorBoundary[39m } [36mfrom[39m [32m"../components/ErrorBoundary"[39m[33m;[39m[0m
+
+You're importing a component that needs `useEffect`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
+
+ Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
 
 
-ƒ Proxy (Middleware)
 
-ƒ  (Dynamic)  server-rendered on demand
+Import trace:
+  Server Component:
+    ./apps/web/app/events/EventsClient.tsx
+    ./apps/web/app/events/page.tsx
 
+
+./apps/web/app/events/EventsClient.tsx:1:10
+Ecmascript file had an error
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { useState[33m,[39m useEffect[33m,[39m useMemo } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 2 |[39m [36mimport[39m { useAuth } [36mfrom[39m [32m"../context/AuthContext"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m { useOnboardingGuard } [36mfrom[39m [32m"../hooks/useOnboardingGuard"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { [33mErrorBoundary[39m } [36mfrom[39m [32m"../components/ErrorBoundary"[39m[33m;[39m[0m
+
+You're importing a component that needs `useState`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
+
+ Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+
+
+
+Import trace:
+  Server Component:
+    ./apps/web/app/events/EventsClient.tsx
+    ./apps/web/app/events/page.tsx
+
+
+./apps/web/app/components/dashboard/UpcomingEventsWidget.tsx:7:1
+Module not found: Can't resolve '../../lib/api'
+[0m [90m  5 |[39m [36mimport[39m { [33mTrendingUp[39m[33m,[39m [33mAlertCircle[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m { useEffect[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m { api } [36mfrom[39m [32m"../../lib/api"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  8 |[39m
+ [90m  9 |[39m type [33mEvent[39m [33m=[39m {
+ [90m 10 |[39m     id[33m:[39m string[33m;[39m[0m
+
+
+
+Import traces:
+  Server Component:
+    ./apps/web/app/components/dashboard/UpcomingEventsWidget.tsx
+    ./apps/web/app/events/EventsClient.tsx
+    ./apps/web/app/events/page.tsx
+
+  Client Component Browser:
+    ./apps/web/app/components/dashboard/UpcomingEventsWidget.tsx [Client Component Browser]
+    ./apps/web/app/dashboard/DashboardClient.tsx [Client Component Browser]
+    ./apps/web/app/dashboard/DashboardClient.tsx [Server Component]
+    ./apps/web/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/web/app/components/dashboard/UpcomingEventsWidget.tsx [Client Component SSR]
+    ./apps/web/app/dashboard/DashboardClient.tsx [Client Component SSR]
+    ./apps/web/app/dashboard/DashboardClient.tsx [Server Component]
+    ./apps/web/app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./apps/web/app/components/ui/FollowButton.tsx:4:1
+Module not found: Can't resolve '../../lib/api'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { useState[33m,[39m useEffect } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { api } [36mfrom[39m [32m"../../lib/api"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m [36mimport[39m { [33mUserPlus[39m[33m,[39m [33mUserMinus[39m[33m,[39m [33mUserCheck[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 6 |[39m [36mimport[39m { motion } [36mfrom[39m [32m"framer-motion"[39m[33m;[39m
+ [90m 7 |[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./apps/web/app/components/ui/FollowButton.tsx [Client Component Browser]
+    ./apps/web/app/profile/ProfileClient.tsx [Client Component Browser]
+    ./apps/web/app/profile/ProfileClient.tsx [Server Component]
+    ./apps/web/app/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/web/app/components/ui/FollowButton.tsx [Client Component SSR]
+    ./apps/web/app/profile/ProfileClient.tsx [Client Component SSR]
+    ./apps/web/app/profile/ProfileClient.tsx [Server Component]
+    ./apps/web/app/profile/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./apps/web/app/events/page.tsx:2:1
+Export default doesn't exist in target module
+[0m [90m 1 |[39m [36mimport[39m { [33mMetadata[39m } [36mfrom[39m [32m"next"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m [33mEventsClient[39m [36mfrom[39m [32m"./EventsClient"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 3 |[39m
+ [90m 4 |[39m [36mexport[39m [36mconst[39m metadata[33m:[39m [33mMetadata[39m [33m=[39m {
+ [90m 5 |[39m   title[33m:[39m [32m"Campus Events | LINKER"[39m[33m,[39m[0m
+
+The export default was not found in module [project]/apps/web/app/events/EventsClient.tsx [app-rsc] (ecmascript).
+The module has no exports at all.
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+
+    at <unknown> (./apps/web/app/events/EventsClient.tsx:1:20)
+    at <unknown> (./apps/web/app/events/EventsClient.tsx:1:10)
+    at <unknown> (./apps/web/app/components/dashboard/UpcomingEventsWidget.tsx:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./apps/web/app/components/ui/FollowButton.tsx:4:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./apps/web/app/events/page.tsx:2:1)
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path F:\kannan\projects\unoffical\apps\web
+npm error workspace @college-connect/web@0.1.0
+npm error location F:\kannan\projects\unoffical\apps\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

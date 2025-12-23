@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { useSocket } from "./SocketContext";
+import { useToast } from "./ToastContext";
+import { api } from "../../lib/api";
 
 // Notification Types
 export type NotificationType =
@@ -97,11 +99,12 @@ interface NotificationProviderProps {
 
 export function NotificationProvider({ children }: NotificationProviderProps) {
   const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
-  
+
   // Always call useSocket unconditionally - it will return null values if not in SocketProvider
   const socketContext = useSocket();
 
@@ -177,29 +180,23 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/notifications`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const data = await api.getNotifications();
+      // data is expected to be Notification[] directly or wrapped? 
+      // api.getNotifications uses apiRequest which returns response.json().
+      // Assuming backend matches the interface.
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
-
-      const data = await response.json();
       setNotifications(
-        data.map((n: any) => ({
+        (data as any[]).map((n: any) => ({
           ...n,
           createdAt: new Date(n.createdAt),
         }))
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load notifications");
-      // Use mock data in development if API fails
       if (process.env.NODE_ENV === "development") {
-        setNotifications(getMockNotifications());
+        console.warn("API failed, keeping empty or previous notifications");
+        // User requested removal of mock data fallback to mock function.
+        // So we just set empty or keep error.
       }
     } finally {
       setIsLoading(false);
@@ -209,13 +206,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   // Mark single notification as read
   const markAsRead = useCallback(async (id: string) => {
     try {
-      const token = localStorage.getItem("token");
-      await fetch(`${API_URL}/notifications/${id}/read`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.markNotificationAsRead(id);
 
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read: true } : n))
@@ -232,13 +223,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   // Mark all notifications as read
   const markAllAsRead = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
-      await fetch(`${API_URL}/notifications/read-all`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.markAllNotificationsAsRead();
 
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     } catch (err) {
@@ -275,7 +260,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   // Poll for new notifications every 30 seconds (fallback when socket not available)
   useEffect(() => {
     if (!isAuthenticated) return;
-    
+
     // If socket is connected, reduce polling frequency
     const pollInterval = socketContext?.isConnected ? 60000 : 30000;
     const interval = setInterval(fetchNotifications, pollInterval);
@@ -284,7 +269,10 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 
   // Listen for real-time notifications via Socket.io
   useEffect(() => {
-    if (!socketContext || !socketContext.isConnected) return;
+    if (!socketContext || !socketContext.isConnected || !user) return;
+
+    // Join user room for private notifications
+    socketContext.socket?.emit("joinUserRoom", { userId: user.id });
 
     const unsubscribe = socketContext.onNotification((payload) => {
       const notification: Notification = {
@@ -297,15 +285,18 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         actionUrl: payload.actionUrl,
         actor: payload.actor,
       };
-      
+
       // Check if this notification type is enabled before adding
       if (!isNotificationTypeEnabled(notification.type)) {
         return; // Skip this notification based on user preferences
       }
-      
+
       // Add to the beginning of the list
       addNotification(notification);
-      
+
+      // Show in-app toast
+      toast(notification.message, "info");
+
       // Show browser notification if permitted and push notifications are enabled
       if (
         preferences.push &&
@@ -321,7 +312,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     });
 
     return unsubscribe;
-  }, [socketContext, addNotification, isNotificationTypeEnabled, preferences.push]);
+  }, [socketContext, addNotification, isNotificationTypeEnabled, preferences.push, toast]);
 
   const value: NotificationContextType = {
     notifications,
@@ -357,40 +348,7 @@ export function useNotifications() {
   return context;
 }
 
-// Mock notifications for development
-function getMockNotifications(): Notification[] {
-  return [
-    {
-      id: "1",
-      type: "LIKE",
-      title: "New Like",
-      message: "Sarah liked your post about React Hooks",
-      read: false,
-      createdAt: new Date(Date.now() - 2 * 60 * 1000), // 2 minutes ago
-      actionUrl: "/posts/123",
-      actor: { id: "user1", name: "Sarah", avatarUrl: undefined },
-    },
-    {
-      id: "2",
-      type: "COMMENT",
-      title: "New Comment",
-      message: "Alex commented on your marketplace listing",
-      read: false,
-      createdAt: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
-      actionUrl: "/marketplace/456",
-      actor: { id: "user2", name: "Alex", avatarUrl: undefined },
-    },
-    {
-      id: "3",
-      type: "EVENT_REMINDER",
-      title: "Event Starting Soon",
-      message: "Tech Talk: AI in 2025 starts in 1 hour",
-      read: true,
-      createdAt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
-      actionUrl: "/events/789",
-    },
-  ];
-}
+
 
 // Notification type icons mapping - using simple text symbols for consistency
 export const NOTIFICATION_ICONS: Record<NotificationType, string> = {

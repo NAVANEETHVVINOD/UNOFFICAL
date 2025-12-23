@@ -149,6 +149,54 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  addProfileEducation: (data: any) =>
+    apiRequest("/profiles/me/education", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  removeProfileEducation: (id: string) =>
+    apiRequest(`/profiles/me/education/${id}`, { method: "DELETE" }),
+
+  addProfileExperience: (data: any) =>
+    apiRequest("/profiles/me/experience", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  removeProfileExperience: (id: string) =>
+    apiRequest(`/profiles/me/experience/${id}`, { method: "DELETE" }),
+
+  addProfileProject: (data: any) =>
+    apiRequest("/profiles/me/projects", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  removeProfileProject: (id: string) =>
+    apiRequest(`/profiles/me/projects/${id}`, { method: "DELETE" }),
+
+  addProfileVolunteering: (data: any) =>
+    apiRequest("/profiles/me/volunteering", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  removeProfileVolunteering: (id: string) =>
+    apiRequest(`/profiles/me/volunteering/${id}`, { method: "DELETE" }),
+
+  getLeaderboard: () => apiRequest("/profiles/leaderboard"),
+
+  // Follows
+  followUser: (userId: string) => apiRequest(`/follows/${userId}`, { method: "POST" }),
+  unfollowUser: (userId: string) => apiRequest(`/follows/${userId}`, { method: "DELETE" }),
+  getFollowStatus: (userId: string) => apiRequest(`/follows/${userId}/status`),
+  getFollowers: (userId: string) => apiRequest(`/follows/${userId}/followers`),
+  getFollowing: (userId: string) => apiRequest(`/follows/${userId}/following`),
+
+  // Search
+  search: (query: string) => apiRequest(`/search?q=${encodeURIComponent(query)}`),
+
   // Colleges
   getColleges: () => apiRequest("/colleges"),
 
@@ -165,9 +213,12 @@ export const api = {
     }),
 
   // Clubs
-  getClubs: (collegeSlug?: string) => {
-    const query = collegeSlug ? `?collegeSlug=${collegeSlug}` : "";
-    return apiRequest(`/clubs${query}`);
+  getClubs: (params?: { collegeSlug?: string; type?: "CLUB" | "COMMUNITY" }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.collegeSlug) queryParams.append("collegeSlug", params.collegeSlug);
+    if (params?.type) queryParams.append("type", params.type);
+    const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
+    return apiRequest(`/clubs${queryString}`);
   },
 
   getClub: (id: string) => apiRequest(`/clubs/${id}`),
@@ -455,4 +506,16 @@ export const api = {
 
     return response.json();
   },
+
+  // Saved Items
+  getSavedItems: () => apiRequest("/saved"),
+
+  saveItem: (data: { type: "POST" | "EVENT" | "LISTING" | "NOTE"; postId?: string; eventId?: string; listingId?: string; noteId?: string }) =>
+    apiRequest("/saved", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  removeItem: (id: string) =>
+    apiRequest(`/saved/${id}`, { method: "DELETE" }),
 };

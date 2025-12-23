@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { containerVariants, itemVariants } from "../../lib/animations";
 import { Bookmark, FileText, Calendar, ShoppingBag, BookOpen, Trash2, ExternalLink, Filter } from "lucide-react";
 import Link from "next/link";
+import { api } from "../../lib/api";
 
 type SavedItemType = "post" | "event" | "listing" | "note";
 
@@ -44,29 +45,15 @@ function SavedContent() {
   }, [isAuthenticated, router, authLoading]);
 
   useEffect(() => {
-    const generateMockSaved = (): SavedItem[] => {
-      return [
-        { id: "s1", type: "post", savedAt: new Date().toISOString(), item: { id: "p1", content: "Just finished my final project! So relieved 😅 #campuslife", imageUrl: undefined } },
-        { id: "s2", type: "event", savedAt: new Date(Date.now() - 86400000).toISOString(), item: { id: "e1", title: "Tech Talk: AI in 2025", startsAt: new Date(Date.now() + 86400000 * 3).toISOString() } },
-        { id: "s3", type: "listing", savedAt: new Date(Date.now() - 86400000 * 2).toISOString(), item: { id: "l1", title: "MacBook Pro 2023", price: 45000, imageUrl: undefined } },
-        { id: "s4", type: "note", savedAt: new Date(Date.now() - 86400000 * 3).toISOString(), item: { id: "n1", title: "Data Structures Complete Notes" } },
-        { id: "s5", type: "post", savedAt: new Date(Date.now() - 86400000 * 5).toISOString(), item: { id: "p2", content: "This content is no longer available", isDeleted: true } },
-      ];
-    };
 
     const fetchSavedItems = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/api/saved");
-        if (res.ok) {
-          const data = await res.json();
-          setSavedItems(data);
-        } else {
-          setSavedItems(generateMockSaved());
-        }
+        const data = await api.getSavedItems();
+        setSavedItems(data);
       } catch (error) {
         console.error("Failed to fetch saved items:", error);
-        setSavedItems(generateMockSaved());
+        setSavedItems([]);
       } finally {
         setLoading(false);
       }
@@ -77,7 +64,7 @@ function SavedContent() {
 
   const handleRemove = async (savedId: string) => {
     try {
-      await fetch(`/api/saved/${savedId}`, { method: "DELETE" });
+      await api.removeItem(savedId);
     } catch (error) {
       console.error("Failed to remove:", error);
     }
