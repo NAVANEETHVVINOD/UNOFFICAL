@@ -108,7 +108,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper flex flex-col">
+    <div className="h-screen overflow-hidden bg-paper flex flex-col">
       <header className="px-4 py-3 flex justify-between items-center border-b border-neutral-200">
         <Link href="/" className="font-display text-xl font-black">LINKER</Link>
         <Link href="/login" className="text-sm font-bold text-primary hover:underline">Sign In</Link>

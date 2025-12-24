@@ -615,27 +615,27 @@ export default function OnboardingPage() {
 
   return (
     <Container>
-      <div className="min-h-screen flex items-center justify-center py-12">
-        <div className="w-full max-w-xl relative">
-          <Doodle src="/doodles/sparkle.svg" className="absolute -top-12 -right-12 w-24 h-24 text-accent-pink animate-spin-slow" />
-          <NewspaperCard className="p-8 md:p-12 relative bg-white min-h-[600px] flex flex-col">
-            <Tape className="absolute -top-4 left-1/2 -translate-x-1/2" />
-            <div className="w-full h-2 bg-gray-100 mb-8 rounded-full overflow-hidden border border-black">
+      <div className="h-screen w-full flex items-center justify-center overflow-hidden p-4">
+        <div className="w-full max-w-xl relative flex flex-col max-h-full">
+          <Doodle src="/doodles/sparkle.svg" className="absolute -top-12 -right-12 w-24 h-24 text-accent-pink animate-spin-slow z-10" />
+          <NewspaperCard className="p-6 md:p-10 relative bg-white flex flex-col h-full max-h-[85vh] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-black">
+            <Tape className="absolute -top-4 left-1/2 -translate-x-1/2 z-20" />
+            <div className="w-full h-2 bg-gray-100 mb-6 rounded-full overflow-hidden border border-black flex-shrink-0">
               <motion.div className="h-full bg-accent-blue" initial={{ width: 0 }} animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }} transition={{ duration: 0.5, ease: "easeInOut" }} />
             </div>
-            <div className="mb-8 text-center">
-              <Badge className="mb-4 bg-black text-white border-black">STEP {currentStep + 1} / {STEPS.length}</Badge>
-              <h1 className="font-display text-4xl font-black mb-2">{STEPS[currentStep].title}</h1>
-              <p className="text-gray-600 font-serif italic">{STEPS[currentStep].subtitle}</p>
+            <div className="mb-6 text-center flex-shrink-0">
+              <Badge className="mb-3 bg-black text-white border-black">STEP {currentStep + 1} / {STEPS.length}</Badge>
+              <h1 className="font-display text-3xl md:text-4xl font-black mb-1">{STEPS[currentStep].title}</h1>
+              <p className="text-gray-600 font-serif italic text-sm">{STEPS[currentStep].subtitle}</p>
             </div>
-            <div className="flex-grow">
+            <div className="flex-grow overflow-y-auto px-1 custom-scrollbar">
               <AnimatePresence mode="wait">
-                <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
+                <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }} className="py-2">
                   {renderStepContent()}
                 </motion.div>
               </AnimatePresence>
             </div>
-            <div className="mt-8">
+            <div className="mt-6 flex-shrink-0 pt-2 bg-white sticky bottom-0 z-10">
               <div className="flex gap-4">
                 {currentStep > 0 && <RetroButton onClick={handleBack} variant="outline" className="flex-1" disabled={loading}>BACK</RetroButton>}
                 <RetroButton onClick={handleNext} className="flex-1 bg-black text-white hover:bg-neutral-800" disabled={loading}>
