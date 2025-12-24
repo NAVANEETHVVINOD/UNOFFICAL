@@ -451,14 +451,20 @@ export default function OnboardingPage() {
       case 4: // Campus
         const filteredColleges = colleges.filter(c => {
           // 1. Filter by Location (if selected)
-          if (formData.state && c.state && c.state !== formData.state) return false;
-          if (formData.district && c.district && c.district !== formData.district) return false;
+          // Use Case-Insensitive comparison and handle trimming
+          if (formData.state && c.state && c.state.trim().toLowerCase() !== formData.state.trim().toLowerCase()) return false;
+
+          // Note: Backend doesn't currently support district on College model, so skipping strict district filter
+          // if (formData.district && c.district && c.district !== formData.district) return false;
 
           // 2. Filter by Search Query
           if (!searchQuery) return true; // Show all (filtered by location) if no search
-          const q = searchQuery.toLowerCase();
+          const q = searchQuery.toLowerCase().trim();
           return c.name.toLowerCase().includes(q) || c.city?.toLowerCase().includes(q);
-        }).slice(0, 5); // Limit to 5 to fit UI
+        }).slice(0, 50); // Increased limit to 50 to ensure results aren't hidden prematurely
+
+        // Debugging for user feedback
+        console.log(`[Campus] Filtering: State=${formData.state}, Query="${searchQuery}". Found ${filteredColleges.length} matches.`);
 
         return (
           <div className="space-y-6">
