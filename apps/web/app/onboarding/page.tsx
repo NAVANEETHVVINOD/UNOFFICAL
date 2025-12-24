@@ -365,12 +365,15 @@ export default function OnboardingPage() {
                   )}
                 </div>
                 <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarChange}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-2 file:border-black file:text-sm file:font-semibold file:bg-white hover:file:bg-gray-100"
-                  />
+                  <label className="cursor-pointer bg-black text-white px-4 py-2 rounded-lg font-bold text-sm hover:-translate-y-0.5 transition-transform flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]">
+                    <span>Upload Photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </label>
                   <p className="text-xs text-gray-500 mt-1">Max 2MB. JPG, PNG, GIF.</p>
                 </div>
               </div>
@@ -584,7 +587,7 @@ export default function OnboardingPage() {
             <div className="mt-8">
               <div className="flex gap-4">
                 {currentStep > 0 && <RetroButton onClick={handleBack} variant="outline" className="flex-1" disabled={loading}>BACK</RetroButton>}
-                <RetroButton onClick={handleNext} className="flex-1 bg-accent-blue text-white" disabled={loading}>
+                <RetroButton onClick={handleNext} className="flex-1 bg-black text-white hover:bg-neutral-800" disabled={loading}>
                   {loading ? "SAVING..." : currentStep === STEPS.length - 1 ? "FINISH ->" : "NEXT ->"}
                 </RetroButton>
               </div>
