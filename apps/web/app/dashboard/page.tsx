@@ -16,9 +16,9 @@ export default async function DashboardPage() {
       redirect("/login");
     }
 
-    if (!user.profile?.isOnboarded) {
-      redirect("/onboarding");
-    }
+    // if (!user.profile?.isOnboarded) {
+    //   redirect("/onboarding");
+    // }
 
     return <DashboardClient />;
   } catch (error) {

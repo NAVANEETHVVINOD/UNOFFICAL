@@ -18,16 +18,18 @@ export function checkOnboardingStatus(user: any): OnboardingCheckResult {
 
   const fullName = user?.profile?.fullName;
   const hasFullName = typeof fullName === 'string' && fullName.trim().length > 0;
-  
+
   if (!hasFullName) {
     missingFields.push("fullName");
   }
-  
+
   // Check both collegeId and college.id since the API might return either
+  // Check collegeId, college.id, OR tempCollegeId in socials (fallback mode)
   const collegeId = user?.profile?.collegeId;
   const collegeObjId = user?.profile?.college?.id;
-  const hasCollege = !!(collegeId || collegeObjId);
-  
+  const tempCollegeId = (user?.profile?.socials as any)?.tempCollegeId;
+  const hasCollege = !!(collegeId || collegeObjId || tempCollegeId);
+
   if (!hasCollege) {
     missingFields.push("collegeId");
   }
@@ -55,7 +57,7 @@ export function useOnboardingGuard() {
     if (loading) {
       return;
     }
-    
+
     // If no user, don't redirect here - let the page handle it or show loading
     // The AuthContext will handle showing loading state
     if (!user) {
@@ -83,7 +85,7 @@ export function useOnboardingGuard() {
           JSON.stringify(missingFields)
         );
       }
-      
+
       // Redirect to specific step if only college is missing
       if (missingFields.includes("collegeId") && !missingFields.includes("fullName")) {
         router.replace("/onboarding?step=college");
