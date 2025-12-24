@@ -137,36 +137,53 @@ export default function OnboardingPage() {
     }
   };
 
+  // Fetch colleges only once on mount
+  useEffect(() => {
+    fetchColleges();
+  }, []);
+
+  // Sync profile data when user is loaded
   useEffect(() => {
     const profile = user?.profile;
+    // Only update if we have a profile and haven't initialized (or user changed)
+    // We used to dep on [user], which caused loops if user obj ref changed.
     if (profile) {
+      // Check if we actually need to update to avoid overwriting user edits during re-renders
+      // Logic: If formData is empty defaults, fill it. If user has typed, trust them? 
+      // For now, simpler fix: Just rely on user.id changing less often.
+      // Even better: Check if values differ significantly? 
+      // Let's just set it safe by checking user.id.
+
       setFormData((prev) => ({
         ...prev,
-        fullName: profile.fullName || "",
-        avatarUrl: profile.avatarUrl || "",
-        bio: profile.bio || "",
-        githubUrl: profile.githubUrl || "",
-        instagram: profile.instagram || "",
-        interests: profile.interests || [],
-        collegeId: profile.collegeId || "",
-        state: (profile.socials as any)?.state || "",
-        district: (profile.socials as any)?.district || "",
+        fullName: prev.fullName || profile.fullName || "",
+        // Don't overwrite if user selected a file!
+        avatarUrl: prev.avatarUrl || profile.avatarUrl || "",
+        bio: prev.bio || profile.bio || "",
+        githubUrl: prev.githubUrl || profile.githubUrl || "",
+        instagram: prev.instagram || profile.instagram || "",
+        interests: (prev.interests.length > 0 ? prev.interests : profile.interests) || [],
+        // Crucial: Only overwrite collegeId if we don't have one selected yet!
+        collegeId: prev.collegeId || profile.collegeId || "",
+        state: prev.state || (profile.socials as any)?.state || "",
+        district: prev.district || (profile.socials as any)?.district || "",
       }));
 
-      if (profile.avatarUrl) {
+      if (profile.avatarUrl && !avatarPreview) {
         setAvatarPreview(profile.avatarUrl);
       }
 
       if (
         profile.onboardingStep !== undefined &&
-        profile.onboardingStep !== null
+        profile.onboardingStep !== null &&
+        currentStep === 0 // Only jump step if we are at start (prevent jumping loops)
       ) {
         const safeStep = Math.min(profile.onboardingStep, STEPS.length - 1);
         setCurrentStep(safeStep);
       }
     }
-    fetchColleges();
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.profile?.updatedAt]); // Depend on ID and profile update time, not the whole object
 
   // Analytics hooks...
   useEffect(() => {
