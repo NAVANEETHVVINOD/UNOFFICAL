@@ -72,7 +72,20 @@ export default function OnboardingPage() {
   const [colleges, setColleges] = useState<any[]>([]);
 
   // Form State
-  const [formData, setFormData] = useState({
+  interface OnboardingFormData {
+    fullName: string;
+    avatarUrl: string;
+    bio: string;
+    githubUrl: string;
+    instagram: string;
+    interests: string[];
+    collegeId: string;
+    state: string;
+    district: string;
+    socials?: any; // Add optional socials for temp data bypass
+  }
+
+  const [formData, setFormData] = useState<OnboardingFormData>({
     fullName: "",
     avatarUrl: "",
     bio: "",
@@ -82,6 +95,7 @@ export default function OnboardingPage() {
     collegeId: "",
     state: "",      // New
     district: "",   // New
+    socials: {}
   });
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -680,15 +694,22 @@ export default function OnboardingPage() {
               <p className="font-bold text-xs uppercase text-gray-500">Name</p>
               <p className="font-bold text-lg">{formData.fullName}</p>
             </div>
-            <div className="p-4 bg-gray-50 border-2 border-black">
-              <p className="font-bold text-xs uppercase text-gray-500">College</p>
-              <p className="font-bold text-lg">
-                {isCustomCollege ? `${customCollegeData.name} (Custom)` : colleges.find((c) => c.id === formData.collegeId)?.name || "Not Selected"}
+            {/* IMPROVED VISIBILITY: Changed background to white and text to intense black */}
+            <div className="p-4 bg-white border-2 border-black rounded-lg shadow-sm">
+              <p className="font-bold text-xs uppercase text-gray-500 mb-1">Name</p>
+              <p className="font-bold text-xl text-black">{formData.fullName}</p>
+            </div>
+            <div className="p-4 bg-white border-2 border-black rounded-lg shadow-sm">
+              <p className="font-bold text-xs uppercase text-gray-500 mb-1">College</p>
+              <p className="font-bold text-xl text-black">
+                {isCustomCollege
+                  ? `${customCollegeData.name} (Custom)`
+                  : (colleges.find((c) => c.id === formData.collegeId)?.name || (formData.socials as any)?.tempCollegeName || "Not Selected")}
               </p>
             </div>
-            <div className="p-4 bg-gray-50 border-2 border-black">
-              <p className="font-bold text-xs uppercase text-gray-500">Location</p>
-              <p className="font-bold text-lg">{formData.district ? `${formData.district}, ${formData.state}` : "Not Specified"}</p>
+            <div className="p-4 bg-white border-2 border-black rounded-lg shadow-sm">
+              <p className="font-bold text-xs uppercase text-gray-500 mb-1">Location</p>
+              <p className="font-bold text-xl text-black">{formData.district ? `${formData.district}, ${formData.state}` : "Not Specified"}</p>
             </div>
           </div>
         );
