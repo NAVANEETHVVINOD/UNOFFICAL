@@ -37,46 +37,8 @@ const STEPS = [
   { id: "review", title: "LAST CHANCE", subtitle: "Ready to enter the void?" },
 ];
 
-const KERALA_DISTRICTS = [
-  "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha", "Kottayam",
-  "Idukki", "Ernakulam", "Thrissur", "Palakkad", "Malappuram",
-  "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
-];
-
 export default function OnboardingPage() {
   const router = useRouter();
-
-  const DISTRICT_MAPPING: Record<string, string[]> = {
-    "Thiruvananthapuram": ["trivandrum", "thiruvananthapuram", "attingal", "muttathara", "kariavattom", "parassala", "nedumangad", "neyyattinkara", "varkala"],
-    "Kollam": ["kollam", "quilon", "karunagappally", "kottarakkara", "pathanapuram", "perumon", "sasthamcotta", "chadayamangalam", "chathannoor"],
-    "Pathanamthitta": ["pathanamthitta", "kallooppara", "aranmula", "adoor", "thiruvalla", "mallappally", "ranni", "konni"],
-    "Alappuzha": ["alappuzha", "alleppey", "chengannur", "cherthala", "punnapra", "kuttanad", "kayamkulam", "mavelikkara", "haripad"],
-    "Kottayam": ["kottayam", "poonjar", "kidangoor", "pala", "kanjirapally", "changanassery", "vaikom", "ettumanoor"],
-    "Idukki": ["idukki", "munnar", "thodupuzha", "painavu", "kattappana", "adimpy", "nedumkandam"],
-    "Ernakulam": ["ernakulam", "kochi", "cochin", "kothamangalam", "aluva", "angamaly", "perumbavoor", "muvattupuzha", "kalamassery", "kakkanad", "north paravur"],
-    "Thrissur": ["thrissur", "trichur", "chalakudy", "kunnamkulam", "kodungallur", "chavakkad", "irinjalakuda", "guruvayur"],
-    "Palakkad": ["palakkad", "palghat", "sreekrishnapuram", "ottapalam", "shornur", "mannarkkad", "chittur", "pattambi"],
-    "Malappuram": ["malappuram", "tenhipalam", "tavanur", "manjeri", "tirur", "ponnani", "perinthalmanna", "nilambur"],
-    "Kozhikode": ["kozhikode", "calicut", "vatakara", "vadakara", "koyilandy", "thamarassery", "mukkam"],
-    "Wayanad": ["wayanad", "kalpetta", "sulthan bathery", "mananthavady"],
-    "Kannur": ["kannur", "cannanore", "thalassery", "payyanur", "taliparamba", "uthuparamba", "mattannur"],
-    "Kasaragod": ["kasaragod", "kasargod", "trikaripur", "kanhangad", "uppala", "manjeshwar"]
-  };
-
-  // Helper to check location match
-  const isLocationMatch = (collegeCity: string | null | undefined, selectedDistrict: string) => {
-    if (!collegeCity || !selectedDistrict) return false;
-
-    const cityLower = collegeCity.toLowerCase().trim();
-    const districtLower = selectedDistrict.toLowerCase().trim();
-
-    // 1. Direct match (Case insensitive)
-    if (cityLower === districtLower) return true;
-
-    // 2. Check mapping
-    const mappedCities = DISTRICT_MAPPING[selectedDistrict] || [];
-    return mappedCities.some(mapped => cityLower.includes(mapped.toLowerCase()));
-  };
   const { user, refreshUser, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [initialStepSet, setInitialStepSet] = useState(false);
@@ -481,21 +443,25 @@ export default function OnboardingPage() {
           </div>
         );
       case 4: // Campus
+        // Dynamic City Extraction
+        const availableCities = formData.state
+          ? Array.from(new Set(
+            colleges
+              .filter(c => c.state && c.state.toLowerCase() === formData.state.toLowerCase())
+              .map(c => c.city)
+              .filter(Boolean)
+          )).sort()
+          : [];
+
         const filteredColleges = colleges.filter(c => {
-          // 1. Filter by Location (if selected)
-          // Use Case-Insensitive comparison and handle trimming
-          if (formData.state && c.state && c.state.trim().toLowerCase() !== formData.state.trim().toLowerCase()) return false;
+          if (formData.state && c.state && c.state.toLowerCase() !== formData.state.toLowerCase()) return false;
+          // Strict City Match
+          if (formData.district && c.city !== formData.district) return false;
 
-          if (formData.district && formData.state === 'Kerala') {
-            // Use our new mapping helper since backend city might be a specific town
-            if (!isLocationMatch(c.city, formData.district)) return false;
-          }
-
-          // 2. Filter by Search Query
-          if (!searchQuery) return true; // Show all (filtered by location) if no search
+          if (!searchQuery) return true;
           const q = searchQuery.toLowerCase().trim();
-          return c.name.toLowerCase().includes(q) || c.city?.toLowerCase().includes(q);
-        }).slice(0, 5); // Limit to 5 as requested
+          return c.name.toLowerCase().includes(q) || (c.city && c.city.toLowerCase().includes(q));
+        }).slice(0, 5);
 
         // Debugging for user feedback
         console.log(`[Campus] Filtering: State=${formData.state}, Query="${searchQuery}". Found ${filteredColleges.length} matches.`);
@@ -524,20 +490,18 @@ export default function OnboardingPage() {
                 </div>
               </div>
               <div>
-                <label className="block font-bold mb-2 uppercase text-xs tracking-wider text-gray-500">District</label>
+                <label className="block font-bold mb-2 uppercase text-xs tracking-wider text-gray-500">City / Location</label>
                 <div className="relative">
                   <select
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value, collegeId: "" })}
-                    disabled={!formData.state || formData.state === 'Other'}
+                    disabled={!formData.state}
                     className="w-full p-3 pr-10 border-2 border-gray-200 rounded-lg bg-white focus:border-black focus:ring-0 focus:outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400 appearance-none font-medium"
                   >
-                    <option value="">Select District</option>
-                    {formData.state === 'Kerala' ? KERALA_DISTRICTS.map(d => (
-                      <option key={d} value={d}>{d}</option>
-                    )) : (
-                      <option value="Other">Other</option>
-                    )}
+                    <option value="">{availableCities.length > 0 ? "Select City" : (formData.state ? "No Cities Found" : "Select State First")}</option>
+                    {availableCities.map((city: any) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
                   </select>
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
@@ -569,7 +533,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {formData.state && (
-                  <div className="space-y-2 max-h-[250px] overflow-y-auto px-1">
+                  <div className="space-y-3">
                     {filteredColleges.length > 0 ? (
                       filteredColleges.map((college) => (
                         <div
