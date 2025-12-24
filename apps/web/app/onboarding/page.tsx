@@ -499,7 +499,13 @@ export default function OnboardingPage() {
                     disabled={!formData.state}
                     className="w-full p-3 pr-10 border-2 border-gray-200 rounded-lg bg-white focus:border-black focus:ring-0 focus:outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400 appearance-none font-medium"
                   >
-                    <option value="">{availableCities.length > 0 ? "Select City" : (formData.state ? "No Cities Found" : "Select State First")}</option>
+                    <option value="">{
+                      availableCities.length > 0
+                        ? "Select City"
+                        : (formData.state
+                          ? `No Cities Found (Loaded ${colleges.length} colleges)`
+                          : "Select State First")
+                    }</option>
                     {availableCities.map((city: any) => (
                       <option key={city} value={city}>{city}</option>
                     ))}
