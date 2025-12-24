@@ -657,10 +657,10 @@ export default function OnboardingPage() {
 
   return (
     <Container>
-      <div className="h-screen w-full flex items-center justify-center overflow-hidden p-4">
-        <div className="w-full max-w-xl relative flex flex-col max-h-full">
+      <div className="min-h-screen w-full flex items-center justify-center py-10 px-4">
+        <div className="w-full max-w-xl relative flex flex-col">
           <Doodle src="/doodles/sparkle.svg" className="absolute -top-12 -right-12 w-24 h-24 text-accent-pink animate-spin-slow z-10" />
-          <NewspaperCard className="p-6 md:p-10 relative bg-white flex flex-col h-full max-h-[85vh] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-black">
+          <NewspaperCard className="p-6 md:p-10 relative bg-white flex flex-col min-h-0 w-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-black">
             <Tape className="absolute -top-4 left-1/2 -translate-x-1/2 z-20" />
             <div className="w-full h-2 bg-gray-100 mb-6 rounded-full overflow-hidden border border-black flex-shrink-0">
               <motion.div className="h-full bg-accent-blue" initial={{ width: 0 }} animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }} transition={{ duration: 0.5, ease: "easeInOut" }} />
@@ -670,7 +670,7 @@ export default function OnboardingPage() {
               <h1 className="font-display text-3xl md:text-4xl font-black mb-1">{STEPS[currentStep].title}</h1>
               <p className="text-gray-600 font-serif italic text-sm">{STEPS[currentStep].subtitle}</p>
             </div>
-            <div className="flex-grow overflow-y-auto px-1 scrollbar-hide">
+            <div className="mt-4">
               <style jsx global>{`
                 .scrollbar-hide::-webkit-scrollbar {
                   display: none;
