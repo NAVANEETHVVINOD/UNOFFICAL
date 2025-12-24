@@ -120,6 +120,7 @@ export default function OnboardingPage() {
   const fetchColleges = async () => {
     try {
       const data = await api.getColleges();
+      console.log('DEBUG: Fetched colleges:', data?.length, data?.[0]);
       setColleges(data);
     } catch (error) {
       console.error("Failed to fetch colleges", error);
@@ -447,16 +448,16 @@ export default function OnboardingPage() {
         const availableCities = formData.state
           ? Array.from(new Set(
             colleges
-              .filter(c => c.state && c.state.toLowerCase() === formData.state.toLowerCase())
-              .map(c => c.city)
+              .filter(c => c.state && c.state.trim().toLowerCase() === formData.state.trim().toLowerCase())
+              .map(c => c.city?.trim()) // Normalize city names
               .filter(Boolean)
           )).sort()
           : [];
 
         const filteredColleges = colleges.filter(c => {
-          if (formData.state && c.state && c.state.toLowerCase() !== formData.state.toLowerCase()) return false;
-          // Strict City Match
-          if (formData.district && c.city !== formData.district) return false;
+          if (formData.state && c.state && c.state.trim().toLowerCase() !== formData.state.trim().toLowerCase()) return false;
+          // Robust City Match
+          if (formData.district && c.city?.trim() !== formData.district.trim()) return false;
 
           if (!searchQuery) return true;
           const q = searchQuery.toLowerCase().trim();
