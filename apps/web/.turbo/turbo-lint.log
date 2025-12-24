@@ -3,82 +3,57 @@
 > eslint .
 
 
-F:\kannan\projects\unoffical\apps\web\app\admin\college\page.tsx
+/app/apps/web/app/admin/college/page.tsx
   66:6  warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\ClubDetailsClient.tsx
+/app/apps/web/app/clubs/[id]/ClubDetailsClient.tsx
   47:6  warning  React Hook useEffect has a missing dependency: 'fetchClubDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\manage\page.tsx
+/app/apps/web/app/clubs/[id]/manage/page.tsx
   76:6  warning  React Hook useEffect has a missing dependency: 'fetchClub'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\CollegeFeed.tsx
-  223:8  warning  React Hook useEffect has a missing dependency: 'loadFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\layout.tsx
-  20:10  error  Parsing error: ')' expected
-
-F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\marketplace\page.tsx
+/app/apps/web/app/colleges/[slug]/marketplace/page.tsx
   44:6  warning  React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\components\GlobalSearch.tsx
+/app/apps/web/app/components/GlobalSearch.tsx
   95:6  warning  React Hook useEffect has missing dependencies: 'getResultAtIndex', 'getTotalResults', 'navigateToResult', and 'onClose'. Either include them or remove the dependency array. If 'onClose' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\components\feed\CommentDrawer.tsx
-  68:37  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+/app/apps/web/app/context/NotificationContext.tsx
+  315:6  warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\components\feed\InlineCommentSection.tsx
-  45:41  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
-  61:50  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+/app/apps/web/app/context/SocketContext.tsx
+  61:6  warning  React Hook useEffect has a missing dependency: 'socket'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\context\SocketContext.tsx
-  115:6  warning  React Hook useEffect has a missing dependency: 'socket'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\events\EventsClient.tsx
-  120:6  warning  React Hook useMemo has an unnecessary dependency: 'categoryFilter'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\events\[id]\EventDetailsClient.tsx
+/app/apps/web/app/events/[id]/EventDetailsClient.tsx
   64:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\events\[id]\certificates\page.tsx
-   76:6   warning  React Hook useEffect has a missing dependency: 'fetchEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  282:19  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images    jsx-a11y/alt-text
-  325:27  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images    jsx-a11y/alt-text
+/app/apps/web/app/events/[id]/certificates/page.tsx
+  76:6  warning  React Hook useEffect has a missing dependency: 'fetchEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\events\[id]\checkin\page.tsx
+/app/apps/web/app/events/[id]/checkin/page.tsx
   68:6  warning  React Hook useEffect has a missing dependency: 'fetchEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\hooks\useInfiniteFeed.ts
-  97:8  warning  React Hook useCallback has an unnecessary dependency: 'category'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+/app/apps/web/app/hooks/useInfiniteFeed.ts
+  105:8  warning  React Hook useCallback has an unnecessary dependency: 'category'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\layout.tsx
-  47:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
-
-F:\kannan\projects\unoffical\apps\web\app\leaderboard\page.tsx
-  43:6  warning  React Hook useEffect has a missing dependency: 'fetchLeaderboard'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-F:\kannan\projects\unoffical\apps\web\app\marketplace\[id]\ItemDetailsClient.tsx
+/app/apps/web/app/marketplace/[id]/ItemDetailsClient.tsx
   50:6  warning  React Hook useEffect has a missing dependency: 'fetchItemDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\messages\[id]\ChatClient.tsx
+/app/apps/web/app/messages/MessagesClient.tsx
+  152:6  warning  React Hook useEffect has a missing dependency: 'selectedConversation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/apps/web/app/messages/[id]/ChatClient.tsx
   61:6  warning  React Hook useEffect has missing dependencies: 'fetchMessages' and 'markAsSeen'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
   90:6  warning  React Hook useEffect has a missing dependency: 'markAsSeen'. Either include it or remove the dependency array                        react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\notes\NotesClient.tsx
-  91:6  warning  React Hook useEffect has a missing dependency: 'fetchNotes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+/app/apps/web/app/notes/NotesClient.tsx
+  92:6  warning  React Hook useEffect has a missing dependency: 'fetchNotes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\profile\ProfileClient.tsx
-  45:6  warning  React Hook useEffect has a missing dependency: 'fetchUserActivity'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+/app/apps/web/app/profile/ProfileClient.tsx
+  86:6  warning  React Hook useEffect has a missing dependency: 'fetchUserActivity'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
-F:\kannan\projects\unoffical\apps\web\app\profile\[id]\page.tsx
+/app/apps/web/app/profile/[id]/page.tsx
   60:6  warning  React Hook useEffect has missing dependencies: 'fetchUserProfile' and 'router'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
-✖ 26 problems (1 error, 25 warnings)
+✖ 18 problems (0 errors, 18 warnings)
 
-npm error Lifecycle script `lint` failed with error:
-npm error code 1
-npm error path F:\kannan\projects\unoffical\apps\web
-npm error workspace @college-connect/web@0.1.0
-npm error location F:\kannan\projects\unoffical\apps\web
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c eslint .

@@ -23,7 +23,8 @@ describe('AppController (e2e)', () => {
       await app.init();
     } catch (error) {
       console.error('App creation failed:', error);
-      require('fs').writeFileSync(
+      const fs = await import('fs');
+      fs.writeFileSync(
         'e2e-error.log',
         JSON.stringify(error, Object.getOwnPropertyNames(error)),
       );

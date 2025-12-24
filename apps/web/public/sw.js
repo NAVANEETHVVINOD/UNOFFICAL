@@ -1,3 +1,5 @@
+/* eslint-env serviceworker */
+
 // LINKER Service Worker
 const CACHE_NAME = 'linker-cache-v1';
 const OFFLINE_URL = '/offline';

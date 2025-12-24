@@ -39,7 +39,7 @@ async function refreshTokenFlow(): Promise<string | null> {
 }
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
-  let token =
+  const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const getHeaders = (t: string | null) => {

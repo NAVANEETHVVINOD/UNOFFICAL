@@ -36,7 +36,7 @@ export class MarketplaceController {
     }
 
     if (scope) {
-      // @ts-ignore: Scope is valid in DB but types might be lagging
+      // @ts-expect-error: Scope is valid in DB but types might be lagging
       andConditions.push({ scope: scope });
     }
 

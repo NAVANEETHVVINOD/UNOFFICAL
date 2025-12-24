@@ -53,14 +53,14 @@ async function bootstrap() {
   const port = process.env.PORT || 4000;
 
   // Logger
-  const { WINSTON_MODULE_NEST_PROVIDER } = require('nest-winston');
+  const { WINSTON_MODULE_NEST_PROVIDER } = await import('nest-winston');
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // Global Filter
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // Ensure Prisma connects before starting
-  const { PrismaService } = require('./prisma/prisma.service');
+  const { PrismaService } = await import('./prisma/prisma.service');
   const prismaService = app.get(PrismaService);
   await prismaService.$connect();
   console.log('Prisma connected successfully.');

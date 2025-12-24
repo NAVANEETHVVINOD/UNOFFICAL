@@ -252,7 +252,7 @@ export default function OnboardingPage() {
         // Socials
         const normalizeUrl = (url?: string) => {
           if (!url?.trim()) return undefined;
-          let cleaned = url.trim();
+          const cleaned = url.trim();
           if (!/^https?:\/\//i.test(cleaned)) return `https://${cleaned}`;
           return cleaned;
         };
@@ -422,7 +422,7 @@ export default function OnboardingPage() {
             </div>
           </div>
         );
-      case 3: // Interests
+      case 3: { // Interests
         const INTERESTS = ["Coding", "Design", "Music", "Sports", "Gaming", "Reading", "Travel", "Food", "Art", "Tech"];
         return (
           <div className="grid grid-cols-2 gap-4">
@@ -445,7 +445,8 @@ export default function OnboardingPage() {
             ))}
           </div>
         );
-      case 4: // Campus
+      }
+      case 4: { // Campus
         const filteredColleges = colleges.filter(c =>
           c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           c.city?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -534,6 +535,7 @@ export default function OnboardingPage() {
             </div>
           </div>
         );
+      }
       case 5: // Review
         return (
           <div className="space-y-4 text-left">
