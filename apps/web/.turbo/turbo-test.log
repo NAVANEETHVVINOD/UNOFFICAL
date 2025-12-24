@@ -5,19 +5,18 @@
 
 [1m[46m RUN [49m[22m [36mv4.0.16 [39m[90mF:/kannan/projects/unoffical/apps/web[39m
 
- [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 27[2mms[22m[39m
- [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 41[2mms[22m[39m
- [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 361[2mms[22m[39m
- [32m✓[39m __tests__/properties/ui-design-refresh.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 539[2mms[22m[39m
- [32m✓[39m __tests__/properties/social-url-validation.property.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 2177[2mms[22m[39m
-     [33m[2m✓[22m[39m Property 33: Valid website URLs are accepted [33m 1976[2mms[22m[39m
- [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 787[2mms[22m[39m
-     [33m[2m✓[22m[39m Property 31: Badge count equals number of unread notifications [33m 308[2mms[22m[39m
- [32m✓[39m __tests__/properties/user-api.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1122[2mms[22m[39m
-     [33m[2m✓[22m[39m Property 50: User clubs API response contains required fields [33m 304[2mms[22m[39m
+ [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 63[2mms[22m[39m
+ [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 368[2mms[22m[39m
+ [32m✓[39m __tests__/properties/ui-design-refresh.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 796[2mms[22m[39m
+ [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1016[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 31: Badge count equals number of unread notifications [33m 416[2mms[22m[39m
+ [32m✓[39m __tests__/properties/social-url-validation.property.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 2788[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 33: Valid website URLs are accepted [33m 2501[2mms[22m[39m
+ [32m✓[39m __tests__/properties/user-api.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1414[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
 [2m      Tests [22m [1m[32m74 passed[39m[22m[90m (74)[39m
-[2m   Start at [22m 16:19:33
-[2m   Duration [22m 14.48s[2m (transform 2.47s, setup 4.19s, import 14.20s, tests 5.05s, environment 35.63s)[22m
+[2m   Start at [22m 16:35:05
+[2m   Duration [22m 17.49s[2m (transform 3.97s, setup 6.00s, import 16.52s, tests 6.49s, environment 47.22s)[22m
 

@@ -45,6 +45,38 @@ const KERALA_DISTRICTS = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+
+  const DISTRICT_MAPPING: Record<string, string[]> = {
+    "Thiruvananthapuram": ["trivandrum", "thiruvananthapuram", "attingal", "muttathara", "kariavattom", "parassala", "nedumangad", "neyyattinkara", "varkala"],
+    "Kollam": ["kollam", "quilon", "karunagappally", "kottarakkara", "pathanapuram", "perumon", "sasthamcotta", "chadayamangalam", "chathannoor"],
+    "Pathanamthitta": ["pathanamthitta", "kallooppara", "aranmula", "adoor", "thiruvalla", "mallappally", "ranni", "konni"],
+    "Alappuzha": ["alappuzha", "alleppey", "chengannur", "cherthala", "punnapra", "kuttanad", "kayamkulam", "mavelikkara", "haripad"],
+    "Kottayam": ["kottayam", "poonjar", "kidangoor", "pala", "kanjirapally", "changanassery", "vaikom", "ettumanoor"],
+    "Idukki": ["idukki", "munnar", "thodupuzha", "painavu", "kattappana", "adimpy", "nedumkandam"],
+    "Ernakulam": ["ernakulam", "kochi", "cochin", "kothamangalam", "aluva", "angamaly", "perumbavoor", "muvattupuzha", "kalamassery", "kakkanad", "north paravur"],
+    "Thrissur": ["thrissur", "trichur", "chalakudy", "kunnamkulam", "kodungallur", "chavakkad", "irinjalakuda", "guruvayur"],
+    "Palakkad": ["palakkad", "palghat", "sreekrishnapuram", "ottapalam", "shornur", "mannarkkad", "chittur", "pattambi"],
+    "Malappuram": ["malappuram", "tenhipalam", "tavanur", "manjeri", "tirur", "ponnani", "perinthalmanna", "nilambur"],
+    "Kozhikode": ["kozhikode", "calicut", "vatakara", "vadakara", "koyilandy", "thamarassery", "mukkam"],
+    "Wayanad": ["wayanad", "kalpetta", "sulthan bathery", "mananthavady"],
+    "Kannur": ["kannur", "cannanore", "thalassery", "payyanur", "taliparamba", "uthuparamba", "mattannur"],
+    "Kasaragod": ["kasaragod", "kasargod", "trikaripur", "kanhangad", "uppala", "manjeshwar"]
+  };
+
+  // Helper to check location match
+  const isLocationMatch = (collegeCity: string | null | undefined, selectedDistrict: string) => {
+    if (!collegeCity || !selectedDistrict) return false;
+
+    const cityLower = collegeCity.toLowerCase().trim();
+    const districtLower = selectedDistrict.toLowerCase().trim();
+
+    // 1. Direct match (Case insensitive)
+    if (cityLower === districtLower) return true;
+
+    // 2. Check mapping
+    const mappedCities = DISTRICT_MAPPING[selectedDistrict] || [];
+    return mappedCities.some(mapped => cityLower.includes(mapped.toLowerCase()));
+  };
   const { user, refreshUser, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [initialStepSet, setInitialStepSet] = useState(false);
@@ -454,14 +486,16 @@ export default function OnboardingPage() {
           // Use Case-Insensitive comparison and handle trimming
           if (formData.state && c.state && c.state.trim().toLowerCase() !== formData.state.trim().toLowerCase()) return false;
 
-          // Note: Backend doesn't currently support district on College model, so skipping strict district filter
-          // if (formData.district && c.district && c.district !== formData.district) return false;
+          if (formData.district && formData.state === 'Kerala') {
+            // Use our new mapping helper since backend city might be a specific town
+            if (!isLocationMatch(c.city, formData.district)) return false;
+          }
 
           // 2. Filter by Search Query
           if (!searchQuery) return true; // Show all (filtered by location) if no search
           const q = searchQuery.toLowerCase().trim();
           return c.name.toLowerCase().includes(q) || c.city?.toLowerCase().includes(q);
-        }).slice(0, 50); // Increased limit to 50 to ensure results aren't hidden prematurely
+        }).slice(0, 5); // Limit to 5 as requested
 
         // Debugging for user feedback
         console.log(`[Campus] Filtering: State=${formData.state}, Query="${searchQuery}". Found ${filteredColleges.length} matches.`);
@@ -628,7 +662,16 @@ export default function OnboardingPage() {
               <h1 className="font-display text-3xl md:text-4xl font-black mb-1">{STEPS[currentStep].title}</h1>
               <p className="text-gray-600 font-serif italic text-sm">{STEPS[currentStep].subtitle}</p>
             </div>
-            <div className="flex-grow overflow-y-auto px-1 custom-scrollbar">
+            <div className="flex-grow overflow-y-auto px-1 scrollbar-hide">
+              <style jsx global>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                  display: none;
+                }
+                .scrollbar-hide {
+                  -ms-overflow-style: none;
+                  scrollbar-width: none;
+                }
+              `}</style>
               <AnimatePresence mode="wait">
                 <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }} className="py-2">
                   {renderStepContent()}
