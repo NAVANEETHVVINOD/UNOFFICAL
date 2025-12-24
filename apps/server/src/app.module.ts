@@ -94,4 +94,4 @@ import { SearchModule } from './modules/search/search.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -14,8 +14,8 @@ import { NotificationsService } from '../notifications/notifications.service';
 export class PostsService {
   constructor(
     private prisma: PrismaService,
-    private notificationsService: NotificationsService
-  ) { }
+    private notificationsService: NotificationsService,
+  ) {}
 
   async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -32,12 +32,12 @@ export class PostsService {
 
     const sanitizedContent = createPostDto.content
       ? sanitizeHtml(createPostDto.content, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-        allowedAttributes: {
-          ...sanitizeHtml.defaults.allowedAttributes,
-          img: ['src', 'alt'],
-        },
-      })
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ['src', 'alt'],
+          },
+        })
       : '';
 
     // Data object for Prisma

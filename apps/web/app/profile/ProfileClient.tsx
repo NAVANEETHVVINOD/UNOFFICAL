@@ -2,7 +2,7 @@
 
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import Link from "next/link";
@@ -78,14 +78,9 @@ function ProfileContent() {
     }
   };
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchUserActivity();
-      fetchFullProfile();
-    }
-  }, [user?.id]);
 
-  const fetchFullProfile = async () => {
+
+  const fetchFullProfile = useCallback(async () => {
     setProfileLoading(true);
     try {
       const data = await api.getProfile();
@@ -95,15 +90,16 @@ function ProfileContent() {
     } finally {
       setProfileLoading(false);
     }
-  };
+  }, []);
 
-  const fetchUserActivity = async () => {
+  const fetchUserActivity = useCallback(async () => {
+    if (!user?.id) return;
     setActivityLoading(true);
     try {
       const [postsRes, eventsRes, clubsRes] = await Promise.allSettled([
-        api.getUserPosts?.(user!.id) || Promise.resolve([]),
-        api.getUserEvents?.(user!.id) || Promise.resolve([]),
-        api.getUserClubs?.(user!.id) || Promise.resolve([]),
+        api.getUserPosts?.(user.id) || Promise.resolve([]),
+        api.getUserEvents?.(user.id) || Promise.resolve([]),
+        api.getUserClubs?.(user.id) || Promise.resolve([]),
       ]);
 
       setActivity({
@@ -116,7 +112,17 @@ function ProfileContent() {
     } finally {
       setActivityLoading(false);
     }
-  };
+
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserActivity();
+      fetchFullProfile();
+    }
+  }, [user?.id, fetchUserActivity, fetchFullProfile]);
+
+
 
   if (loading) return <LoadingState />;
   if (!isAuthenticated || !user) return null;

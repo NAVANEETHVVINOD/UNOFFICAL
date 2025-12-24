@@ -10,8 +10,8 @@ export class NotificationsService {
 
   constructor(
     private prisma: PrismaService,
-    private notificationsGateway: NotificationsGateway
-  ) { }
+    private notificationsGateway: NotificationsGateway,
+  ) {}
 
   async createNotification(data: {
     userId: string;
@@ -33,7 +33,9 @@ export class NotificationsService {
     });
 
     // Emit socket event
-    this.notificationsGateway.server.to(`user_${data.userId}`).emit('notification', notification);
+    this.notificationsGateway.server
+      .to(`user_${data.userId}`)
+      .emit('notification', notification);
 
     return notification;
   }

@@ -10,4 +10,4 @@ import { NotificationsModule } from '../notifications/notifications.module';
   controllers: [PostsController],
   providers: [PostsService],
 })
-export class PostsModule { }
+export class PostsModule {}

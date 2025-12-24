@@ -237,7 +237,7 @@ export default function EventsClient() {
                       animate={{ opacity: 1, scale: 1 }}
                       className="bg-white border-2 border-black shadow-neo hover:shadow-neo-lg transition-all group cursor-pointer overflow-hidden"
                     >
-                      <Link href={`/ events / ${event.id} `}>
+                      <Link href={`/events/${event.id}`}>
                         <div className="flex">
                           {/* Date Column */}
                           <div className="w-20 bg-primary/10 border-r-2 border-black flex flex-col items-center justify-center p-2 text-center group-hover:bg-primary group-hover:text-white transition-colors">

@@ -1,11 +1,16 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Profile, Prisma } from '@prisma/client';
-import { CreateEducationDto, CreateExperienceDto, CreateProjectDto, CreateVolunteeringDto } from './dto/update-profile.dto';
+import {
+  CreateEducationDto,
+  CreateExperienceDto,
+  CreateProjectDto,
+  CreateVolunteeringDto,
+} from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfilesService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async findOne(
     profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput,
@@ -99,8 +104,11 @@ export class ProfilesService {
     if (!profile) throw new BadRequestException('Profile not found');
 
     // Check ownership
-    const edu = await this.prisma.education.findUnique({ where: { id: educationId } });
-    if (!edu || edu.profileId !== profile.id) throw new BadRequestException('Item not found');
+    const edu = await this.prisma.education.findUnique({
+      where: { id: educationId },
+    });
+    if (!edu || edu.profileId !== profile.id)
+      throw new BadRequestException('Item not found');
 
     return this.prisma.education.delete({ where: { id: educationId } });
   }
@@ -121,8 +129,11 @@ export class ProfilesService {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
     if (!profile) throw new BadRequestException('Profile not found');
 
-    const exp = await this.prisma.experience.findUnique({ where: { id: experienceId } });
-    if (!exp || exp.profileId !== profile.id) throw new BadRequestException('Item not found');
+    const exp = await this.prisma.experience.findUnique({
+      where: { id: experienceId },
+    });
+    if (!exp || exp.profileId !== profile.id)
+      throw new BadRequestException('Item not found');
 
     return this.prisma.experience.delete({ where: { id: experienceId } });
   }
@@ -143,8 +154,11 @@ export class ProfilesService {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
     if (!profile) throw new BadRequestException('Profile not found');
 
-    const proj = await this.prisma.project.findUnique({ where: { id: projectId } });
-    if (!proj || proj.profileId !== profile.id) throw new BadRequestException('Item not found');
+    const proj = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
+    if (!proj || proj.profileId !== profile.id)
+      throw new BadRequestException('Item not found');
 
     return this.prisma.project.delete({ where: { id: projectId } });
   }
@@ -165,8 +179,11 @@ export class ProfilesService {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
     if (!profile) throw new BadRequestException('Profile not found');
 
-    const vol = await this.prisma.volunteering.findUnique({ where: { id: volunteeringId } });
-    if (!vol || vol.profileId !== profile.id) throw new BadRequestException('Item not found');
+    const vol = await this.prisma.volunteering.findUnique({
+      where: { id: volunteeringId },
+    });
+    if (!vol || vol.profileId !== profile.id)
+      throw new BadRequestException('Item not found');
 
     return this.prisma.volunteering.delete({ where: { id: volunteeringId } });
   }
@@ -180,9 +197,9 @@ export class ProfilesService {
           select: {
             id: true,
             role: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
   }
 }

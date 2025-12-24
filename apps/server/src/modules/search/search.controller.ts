@@ -3,10 +3,10 @@ import { SearchService } from './search.service';
 
 @Controller('search')
 export class SearchController {
-    constructor(private readonly searchService: SearchService) { }
+  constructor(private readonly searchService: SearchService) {}
 
-    @Get()
-    async search(@Query('q') query: string) {
-        return this.searchService.search(query);
-    }
+  @Get()
+  async search(@Query('q') query: string) {
+    return this.searchService.search(query);
+  }
 }

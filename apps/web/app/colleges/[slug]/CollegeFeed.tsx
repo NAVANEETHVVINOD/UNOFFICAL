@@ -149,12 +149,13 @@ export default function CollegeFeed({
     };
 
     const getAnnouncementIcon = (type: string) => {
-        switch (type) {
-            case "warning": return <AlertCircle className="w-5 h-5" />;
-            case "success": return <CheckCircle className="w-5 h-5" />;
-            case "info": return <Info className="w-5 h-5" />;
-            default: return <Megaphone className="w-5 h-5" />;
-        }
+        const iconMap: Record<string, any> = {
+            warning: AlertCircle,
+            success: CheckCircle,
+            info: Info,
+        };
+        const Icon = iconMap[type] || Megaphone;
+        return <Icon className="w-5 h-5" />;
     };
 
     // Listen for create modal events

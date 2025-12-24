@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('clubs')
 export class ClubsController {
-  constructor(private readonly clubsService: ClubsService) { }
+  constructor(private readonly clubsService: ClubsService) {}
 
   @Get()
   async findAll(
@@ -33,11 +33,11 @@ export class ClubsController {
       ...(type ? { type: type as any } : {}),
       ...(search
         ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-          ],
-        }
+            OR: [
+              { name: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+            ],
+          }
         : {}),
     };
 

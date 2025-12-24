@@ -11,11 +11,17 @@ import {
 } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UpdateProfileDto, CreateEducationDto, CreateExperienceDto, CreateProjectDto, CreateVolunteeringDto } from './dto/update-profile.dto';
+import {
+  UpdateProfileDto,
+  CreateEducationDto,
+  CreateExperienceDto,
+  CreateProjectDto,
+  CreateVolunteeringDto,
+} from './dto/update-profile.dto';
 
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) { }
+  constructor(private readonly profilesService: ProfilesService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
