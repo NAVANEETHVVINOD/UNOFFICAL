@@ -449,67 +449,27 @@ export default function OnboardingPage() {
           </div>
         );
       case 4: // Campus
-        const filteredColleges = colleges.filter(c =>
-          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          c.city?.toLowerCase().includes(searchQuery.toLowerCase())
-        ).slice(0, 5);
+        const filteredColleges = colleges.filter(c => {
+          // 1. Filter by Location (if selected)
+          if (formData.state && c.state && c.state !== formData.state) return false;
+          if (formData.district && c.district && c.district !== formData.district) return false;
+
+          // 2. Filter by Search Query
+          if (!searchQuery) return true; // Show all (filtered by location) if no search
+          const q = searchQuery.toLowerCase();
+          return c.name.toLowerCase().includes(q) || c.city?.toLowerCase().includes(q);
+        }).slice(0, 5); // Limit to 5 to fit UI
 
         return (
           <div className="space-y-6">
-            {!isCustomCollege ? (
-              <div className="space-y-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full p-3 pl-10 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all"
-                    placeholder="Search your college..."
-                    autoFocus
-                  />
-                  {/* Search Icon */}
-                </div>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                  {filteredColleges.map((college) => (
-                    <div
-                      key={college.id}
-                      onClick={() => setFormData({ ...formData, collegeId: college.id })}
-                      className={`p-4 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${formData.collegeId === college.id ? "bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "bg-white hover:bg-gray-50"}`}
-                    >
-                      <div>
-                        <h3 className="font-bold text-sm">{college.name}</h3>
-                        <p className="text-xs text-gray-600">{college.city}</p>
-                      </div>
-                      {formData.collegeId === college.id && (
-                        <span className="text-green-800 font-bold">✓</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => { setIsCustomCollege(true); setFormData({ ...formData, collegeId: "" }); }}
-                  className="w-full py-2 text-xs font-bold text-gray-500 hover:text-black underline"
-                >
-                  My college is not listed
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Custom College Fields */}
-                {/* ... (Existing code for custom college) ... */}
-                <button onClick={() => setIsCustomCollege(false)} className="text-xs underline">Back to Search</button>
-              </div>
-            )}
-
-            <hr className="border-black/10 my-4" />
-
+            {/* 1. Location Selection (State & District) */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block font-bold mb-2 uppercase text-sm tracking-wider">State</label>
                 <select
                   value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value, district: "" })}
-                  className="w-full p-3 border-2 border-black bg-white focus:outline-none"
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value, district: "", collegeId: "" })}
+                  className="w-full p-3 border-2 border-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
                 >
                   <option value="">Select State</option>
                   <option value="Kerala">Kerala</option>
@@ -522,9 +482,9 @@ export default function OnboardingPage() {
                 <label className="block font-bold mb-2 uppercase text-sm tracking-wider">District</label>
                 <select
                   value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  disabled={!formData.state}
-                  className="w-full p-3 border-2 border-black bg-white focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                  onChange={(e) => setFormData({ ...formData, district: e.target.value, collegeId: "" })}
+                  disabled={!formData.state || formData.state === 'Other'}
+                  className="w-full p-3 border-2 border-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all disabled:bg-gray-100 disabled:text-gray-400"
                 >
                   <option value="">Select District</option>
                   {formData.state === 'Kerala' ? KERALA_DISTRICTS.map(d => (
@@ -535,6 +495,91 @@ export default function OnboardingPage() {
                 </select>
               </div>
             </div>
+
+            <hr className="border-black/10 my-4" />
+
+            {/* 2. College Search & List */}
+            {!isCustomCollege ? (
+              <div className="space-y-4">
+                <div className="relative">
+                  <label className="block font-bold mb-2 uppercase text-sm tracking-wider">College</label>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    disabled={!formData.state} // Encourage picking state first
+                    className="w-full p-3 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    placeholder={!formData.state ? "Select State first..." : "Search your college..."}
+                  />
+                </div>
+
+                {formData.state && (
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                    {filteredColleges.length > 0 ? (
+                      filteredColleges.map((college) => (
+                        <div
+                          key={college.id}
+                          onClick={() => setFormData({ ...formData, collegeId: college.id })}
+                          className={`p-3 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${formData.collegeId === college.id ? "bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "bg-white hover:bg-gray-50"}`}
+                        >
+                          <div className="truncate pr-2">
+                            <h3 className="font-bold text-sm truncate">{college.name}</h3>
+                            <p className="text-xs text-gray-600 truncate">{college.city}</p>
+                          </div>
+                          {formData.collegeId === college.id && (
+                            <span className="text-green-800 font-bold flex-shrink-0">✓</span>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4 text-gray-400 text-sm">
+                        No colleges found in this location.{searchQuery && " Try a different search."}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {formData.state && (
+                  <button
+                    onClick={() => { setIsCustomCollege(true); setFormData({ ...formData, collegeId: "" }); }}
+                    className="w-full py-2 text-xs font-bold text-gray-500 hover:text-black underline"
+                  >
+                    My college is not listed
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg text-sm text-yellow-800 mb-4">
+                  Top Tip: Adding a new college takes a while to verify. Check the search one more time?
+                </div>
+
+                <div>
+                  <label className="block font-bold mb-2 uppercase text-sm tracking-wider">College Name</label>
+                  <input
+                    type="text"
+                    value={customCollegeData.name}
+                    onChange={e => setCustomCollegeData({ ...customCollegeData, name: e.target.value })}
+                    className="w-full p-3 border-2 border-black"
+                    placeholder="e.g. St. Thomas Institute"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold mb-2 uppercase text-sm tracking-wider">City</label>
+                  <input
+                    type="text"
+                    value={customCollegeData.city}
+                    onChange={e => setCustomCollegeData({ ...customCollegeData, city: e.target.value })}
+                    className="w-full p-3 border-2 border-black"
+                    placeholder="e.g. Trivandrum"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center mt-4">
+                  <button onClick={() => setIsCustomCollege(false)} className="text-xs underline font-bold text-gray-500">Back to Search</button>
+                </div>
+              </div>
+            )}
           </div>
         );
       case 5: // Review
