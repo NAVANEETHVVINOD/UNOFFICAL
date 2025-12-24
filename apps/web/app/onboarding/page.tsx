@@ -504,76 +504,103 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             {/* 1. Location Selection (State & District) */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold mb-2 uppercase text-sm tracking-wider">State</label>
-                <select
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value, district: "", collegeId: "" })}
-                  className="w-full p-3 border-2 border-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-                >
-                  <option value="">Select State</option>
-                  <option value="Kerala">Kerala</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Other">Other</option>
-                </select>
+              <div className="relative">
+                <label className="block font-bold mb-2 uppercase text-xs tracking-wider text-gray-500">State</label>
+                <div className="relative">
+                  <select
+                    value={formData.state}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value, district: "", collegeId: "" })}
+                    className="w-full p-3 pr-10 border-2 border-gray-200 rounded-lg bg-white focus:border-black focus:ring-0 focus:outline-none transition-all appearance-none font-medium"
+                  >
+                    <option value="">Select State</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+                  </div>
+                </div>
               </div>
               <div>
-                <label className="block font-bold mb-2 uppercase text-sm tracking-wider">District</label>
-                <select
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value, collegeId: "" })}
-                  disabled={!formData.state || formData.state === 'Other'}
-                  className="w-full p-3 border-2 border-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all disabled:bg-gray-100 disabled:text-gray-400"
-                >
-                  <option value="">Select District</option>
-                  {formData.state === 'Kerala' ? KERALA_DISTRICTS.map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  )) : (
-                    <option value="Other">Other</option>
-                  )}
-                </select>
+                <label className="block font-bold mb-2 uppercase text-xs tracking-wider text-gray-500">District</label>
+                <div className="relative">
+                  <select
+                    value={formData.district}
+                    onChange={(e) => setFormData({ ...formData, district: e.target.value, collegeId: "" })}
+                    disabled={!formData.state || formData.state === 'Other'}
+                    className="w-full p-3 pr-10 border-2 border-gray-200 rounded-lg bg-white focus:border-black focus:ring-0 focus:outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400 appearance-none font-medium"
+                  >
+                    <option value="">Select District</option>
+                    {formData.state === 'Kerala' ? KERALA_DISTRICTS.map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    )) : (
+                      <option value="Other">Other</option>
+                    )}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <hr className="border-black/10 my-4" />
+            <hr className="border-gray-100 my-2" />
 
             {/* 2. College Search & List */}
             {!isCustomCollege ? (
               <div className="space-y-4">
                 <div className="relative">
-                  <label className="block font-bold mb-2 uppercase text-sm tracking-wider">College</label>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    disabled={!formData.state} // Encourage picking state first
-                    className="w-full p-3 border-2 border-black bg-gray-50 focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={!formData.state ? "Select State first..." : "Search your college..."}
-                  />
+                  <label className="block font-bold mb-2 uppercase text-xs tracking-wider text-gray-500">College</label>
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      disabled={!formData.state}
+                      className="w-full p-3 pl-10 border-2 border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-black focus:outline-none transition-all disabled:opacity-50"
+                      placeholder={!formData.state ? "Select State first..." : "Search college name..."}
+                    />
+                  </div>
                 </div>
 
                 {formData.state && (
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                  <div className="space-y-2 max-h-[250px] overflow-y-auto px-1">
                     {filteredColleges.length > 0 ? (
                       filteredColleges.map((college) => (
                         <div
                           key={college.id}
                           onClick={() => setFormData({ ...formData, collegeId: college.id })}
-                          className={`p-3 border-2 border-black cursor-pointer transition-all flex justify-between items-center ${formData.collegeId === college.id ? "bg-accent-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "bg-white hover:bg-gray-50"}`}
+                          className={`p-3 border-2 rounded-xl cursor-pointer transition-all flex items-center gap-3 group ${formData.collegeId === college.id
+                            ? "border-black bg-black text-white shadow-lg"
+                            : "border-gray-100 bg-white hover:border-black hover:shadow-md"
+                            }`}
                         >
-                          <div className="truncate pr-2">
-                            <h3 className="font-bold text-sm truncate">{college.name}</h3>
-                            <p className="text-xs text-gray-600 truncate">{college.city}</p>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${formData.collegeId === college.id ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600 group-hover:bg-black group-hover:text-white transition-colors"
+                            }`}>
+                            <span className="font-bold text-xs">{college.name.substring(0, 2).toUpperCase()}</span>
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <h3 className={`font-bold text-sm truncate ${formData.collegeId === college.id ? "text-white" : "text-black"}`}>{college.name}</h3>
+                            <p className={`text-xs truncate ${formData.collegeId === college.id ? "text-white/70" : "text-gray-500 ml-0"}`}>{college.city}</p>
                           </div>
                           {formData.collegeId === college.id && (
-                            <span className="text-green-800 font-bold flex-shrink-0">✓</span>
+                            <div className="bg-white text-black rounded-full p-1">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
                           )}
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-4 text-gray-400 text-sm">
-                        No colleges found in this location.{searchQuery && " Try a different search."}
+                      <div className="text-center py-8 text-gray-400 flex flex-col items-center">
+                        <p className="text-sm font-medium">No colleges found.</p>
+                        <p className="text-xs mt-1 text-gray-300">
+                          {colleges.length === 0 ? "Loading data or DB empty..." : `Checked ${colleges.length} colleges.`}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -582,9 +609,9 @@ export default function OnboardingPage() {
                 {formData.state && (
                   <button
                     onClick={() => { setIsCustomCollege(true); setFormData({ ...formData, collegeId: "" }); }}
-                    className="w-full py-2 text-xs font-bold text-gray-500 hover:text-black underline"
+                    className="w-full py-2 text-xs font-bold text-gray-400 hover:text-black underline transition-colors"
                   >
-                    My college is not listed
+                    Can't find your college? Add it manually
                   </button>
                 )}
               </div>
