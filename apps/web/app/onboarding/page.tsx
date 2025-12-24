@@ -44,10 +44,14 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [initialStepSet, setInitialStepSet] = useState(false);
 
-  // Auth Check
+  // Auth Check & Onboarding Redirect
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace("/auth/login");
+    if (!authLoading) {
+      if (!user) {
+        router.replace("/auth/login");
+      } else if (user.profile?.isOnboarded && !new URLSearchParams(window.location.search).get("edit")) {
+        router.replace("/dashboard");
+      }
     }
   }, [user, authLoading, router]);
 
