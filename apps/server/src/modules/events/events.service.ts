@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Event, Prisma } from '@prisma/client';
+import { Event, Prisma, EventApprovalStatus } from '@prisma/client';
 import { QrService } from './qr.service';
 
 @Injectable()
@@ -8,7 +8,7 @@ export class EventsService {
   constructor(
     private prisma: PrismaService,
     private qrService: QrService,
-  ) {}
+  ) { }
 
   async findAll(params: {
     skip?: number;
@@ -37,13 +37,26 @@ export class EventsService {
     });
   }
 
-  async create(data: Prisma.EventCreateInput, userId: string): Promise<Event> {
+  async create(
+    data: Prisma.EventCreateInput,
+    user: { id: string; role: string; collegeId?: string | null },
+  ): Promise<Event> {
+    const status =
+      user.role === 'STUDENT'
+        ? EventApprovalStatus.PENDING
+        : EventApprovalStatus.APPROVED;
+
     return this.prisma.event.create({
       data: {
         ...data,
+        status,
         createdBy: {
-          connect: { id: userId },
+          connect: { id: user.id },
         },
+        // Auto-connect college if not provided and user has one
+        ...(user.collegeId && !data.college
+          ? { college: { connect: { id: user.collegeId } } }
+          : {}),
       },
     });
   }

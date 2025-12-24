@@ -15,7 +15,7 @@ export class PostsService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
-  ) {}
+  ) { }
 
   async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -32,12 +32,12 @@ export class PostsService {
 
     const sanitizedContent = createPostDto.content
       ? sanitizeHtml(createPostDto.content, {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-          allowedAttributes: {
-            ...sanitizeHtml.defaults.allowedAttributes,
-            img: ['src', 'alt'],
-          },
-        })
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+        allowedAttributes: {
+          ...sanitizeHtml.defaults.allowedAttributes,
+          img: ['src', 'alt'],
+        },
+      })
       : '';
 
     // Data object for Prisma
@@ -49,6 +49,7 @@ export class PostsService {
       title: createPostDto.title, // For Collabs
       isAnonymous: createPostDto.isAnonymous || false,
       imageUrl: createPostDto.imageUrl,
+      visibility: createPostDto.visibility || 'PUBLIC',
     };
 
     // If Poll, create nested Poll + Options
@@ -82,16 +83,70 @@ export class PostsService {
     });
   }
 
-  async findAll(collegeSlug?: string, page: number = 1, limit: number = 10) {
+  async findAll(
+    currentUser: { id: string; role: string; collegeId: string | null },
+    collegeSlug?: string,
+    page: number = 1,
+    limit: number = 10,
+    filter: 'all' | 'college' = 'college',
+    isOfficial: boolean = false,
+  ) {
     const skip = (page - 1) * limit;
-    const whereClause: any = {};
+
+    // 1. Base Logic: Start with empty AND array
+    const andConditions: any[] = [];
+
+    // Filter by specific college feed (e.g. visiting a college profile? No, Feed is global now)
+    // If 'collegeSlug' is passed, we filter posts from that college ONLY.
+    // If no collegeSlug, global feed.
     if (collegeSlug) {
-      whereClause.college = { slug: collegeSlug };
+      andConditions.push({ college: { slug: collegeSlug } });
     }
 
-    // V1.5 Implementation: Just fetch everything for now and let Frontend filter or simple sort.
-    // In strict smart feed, we would do complex SQL here.
-    // We will ensure we fetch the "type" and "poll" data.
+    // New Filter: "My College" vs "All"
+    if (filter === 'college' && currentUser.collegeId) {
+      andConditions.push({ collegeId: currentUser.collegeId });
+    }
+
+    // 2. Role-Based Restrictions
+    if (currentUser.role === 'FACULTY') {
+      andConditions.push({ isAnonymous: false });
+    }
+
+    // Official Filter
+    if (isOfficial) {
+      andConditions.push({ author: { role: 'COLLEGE_ADMIN' } });
+    }
+
+    // 3. Visibility Logic (Complex OR)
+    // User sees: 
+    // - PUBLIC posts
+    // - COLLEGE posts (IF user's collegeId matches post's collegeId)
+    // - PRIVATE posts (IF authorId matches userId)
+
+    const visibilityConditions: any[] = [
+      { visibility: 'PUBLIC' },
+    ];
+
+    if (currentUser.collegeId) {
+      visibilityConditions.push({
+        visibility: 'COLLEGE',
+        collegeId: currentUser.collegeId,
+      });
+    }
+
+    visibilityConditions.push({
+      visibility: 'PRIVATE',
+      authorId: currentUser.id,
+    });
+
+    // Combine
+    const whereClause: any = {
+      AND: [
+        ...andConditions,
+        { OR: visibilityConditions },
+      ],
+    };
 
     const [total, posts] = await this.prisma.$transaction([
       this.prisma.post.count({ where: whereClause }),

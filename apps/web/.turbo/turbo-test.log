@@ -5,17 +5,18 @@
 
 [1m[46m RUN [49m[22m [36mv4.0.16 [39m[90mF:/kannan/projects/unoffical/apps/web[39m
 
- [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 32[2mms[22m[39m
- [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 63[2mms[22m[39m
- [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 495[2mms[22m[39m
- [32m✓[39m __tests__/properties/ui-design-refresh.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1484[2mms[22m[39m
- [32m✓[39m __tests__/properties/social-url-validation.property.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 3490[2mms[22m[39m
-     [33m[2m✓[22m[39m Property 33: Valid website URLs are accepted [33m 3162[2mms[22m[39m
- [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 989[2mms[22m[39m
- [32m✓[39m __tests__/properties/user-api.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1540[2mms[22m[39m
+ [32m✓[39m __tests__/properties/rbac.property.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m __tests__/properties/mobile-sidebar.property.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m __tests__/properties/message-socket.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 383[2mms[22m[39m
+ [32m✓[39m __tests__/properties/ui-design-refresh.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 737[2mms[22m[39m
+ [32m✓[39m __tests__/properties/social-url-validation.property.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 2610[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 33: Valid website URLs are accepted [33m 2330[2mms[22m[39m
+ [32m✓[39m __tests__/properties/notification.property.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1230[2mms[22m[39m
+     [33m[2m✓[22m[39m Property 31: Badge count equals number of unread notifications [33m 381[2mms[22m[39m
+ [32m✓[39m __tests__/properties/user-api.property.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1652[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
 [2m      Tests [22m [1m[32m74 passed[39m[22m[90m (74)[39m
-[2m   Start at [22m 22:28:06
-[2m   Duration [22m 18.18s[2m (transform 8.81s, setup 9.56s, import 23.59s, tests 8.09s, environment 42.80s)[22m
+[2m   Start at [22m 14:50:50
+[2m   Duration [22m 15.81s[2m (transform 2.58s, setup 6.39s, import 13.71s, tests 6.71s, environment 48.00s)[22m
 

@@ -29,6 +29,7 @@ interface Event {
   endsAt: string;
   venue: string | null;
   createdById: string;
+  status: "PENDING" | "APPROVED" | "REJECTED"; // Added status
   club?: {
     name: string;
   };
@@ -143,6 +144,8 @@ export default function EventDetailsClient() {
     });
   };
 
+  const isOrganizerOrFaculty = user && (user.id === event?.createdById || user.role === "ADMIN" || user.role === "FACULTY");
+
   if (loading) {
     return (
       <Container>
@@ -176,186 +179,208 @@ export default function EventDetailsClient() {
         <Container>
           <div className="pt-16 md:pt-20 pb-24 md:pb-8">
             <div className="max-w-4xl mx-auto mt-4 md:mt-8">
-            <RetroButton
-              onClick={() => router.push("/events")}
-              variant="outline"
-              className="mb-8 text-sm"
-            >
-              &lt;- BACK TO EVENTS
-            </RetroButton>
+              <RetroButton
+                onClick={() => router.push("/events")}
+                variant="outline"
+                className="mb-8 text-sm"
+              >
+                &lt;- BACK TO EVENTS
+              </RetroButton>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative"
-            >
-              <Tape className="absolute -top-4 left-1/2 -translate-x-1/2 z-10" />
-              <NewspaperCard className="p-0 overflow-hidden border-4">
-                {/* Event Header */}
-                <div className="bg-accent-blue p-8 text-white border-b-4 border-black relative overflow-hidden">
-                  <Doodle
-                    src="/doodles/sparkle.svg"
-                    className="absolute top-4 right-4 w-12 h-12 opacity-50"
-                  />
-                  <Badge className="bg-white text-black border-black mb-4">
-                    {event.club?.name || "CAMPUS EVENT"}
-                  </Badge>
-                  <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-black mb-4 leading-tight">
-                    {event.title}
-                  </h1>
-                  <div className="flex flex-col md:flex-row gap-4 md:gap-8 font-mono text-sm">
-                    <div className="flex items-center gap-2">
-                      <span>🕒</span>
-                      <span>{formatDate(event.startsAt)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span>📍</span>
-                      <span>{event.venue || "TBA"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-8 grid md:grid-cols-3 gap-8">
-                  {/* Description */}
-                  <div className="md:col-span-2">
-                    <h3 className="font-bold text-xl uppercase mb-4 border-b-2 border-black pb-2">
-                      About Event
-                    </h3>
-                    <div className="prose font-body text-lg leading-relaxed text-gray-800">
-                      <p>{event.description || "No description provided."}</p>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative"
+              >
+                <Tape className="absolute -top-4 left-1/2 -translate-x-1/2 z-10" />
+                <NewspaperCard className="p-0 overflow-hidden border-4">
+                  {/* Event Header */}
+                  <div className="bg-accent-blue p-8 text-white border-b-4 border-black relative overflow-hidden">
+                    <Doodle
+                      src="/doodles/sparkle.svg"
+                      className="absolute top-4 right-4 w-12 h-12 opacity-50"
+                    />
+                    <div className="flex gap-2 mb-4">
+                      <Badge className="bg-white text-black border-black">
+                        {event.club?.name || "CAMPUS EVENT"}
+                      </Badge>
+                      {event.status === 'PENDING' && (
+                        <Badge className="bg-accent-yellow text-black border-black animate-pulse">
+                          ⏳ PENDING REVIEW
+                        </Badge>
+                      )}
+                      {event.status === 'REJECTED' && (
+                        <Badge className="bg-accent-coral text-white border-black">
+                          ❌ REJECTED
+                        </Badge>
+                      )}
                     </div>
 
-                    {/* Attendance Section */}
-                    <div className="mt-8 p-6 bg-yellow-50 border-2 border-black border-dashed">
-                      <h3 className="font-bold text-lg uppercase mb-4">
-                        Attendance
-                      </h3>
-                      <div className="flex flex-wrap gap-4">
-                        <RetroButton
-                          onClick={() => setShowScanner(true)}
-                          className="bg-black text-white"
-                        >
-                          📷 SCAN QR TO CHECK-IN
-                        </RetroButton>
-
-                        {/* Show only if creator or admin (simplified check) */}
-                        {user &&
-                          (user.id === event.createdById ||
-                            user.role === "ADMIN") && (
-                            <>
-                              <RetroButton
-                                onClick={handleShowQR}
-                                variant="outline"
-                              >
-                                🎟️ SHOW EVENT QR
-                              </RetroButton>
-                              <RetroButton
-                                onClick={() => setShowCertPreview(true)}
-                                variant="outline"
-                              >
-                                🎓 PREVIEW CERT
-                              </RetroButton>
-                            </>
-                          )}
+                    <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-black mb-4 leading-tight">
+                      {event.title}
+                    </h1>
+                    <div className="flex flex-col md:flex-row gap-4 md:gap-8 font-mono text-sm">
+                      <div className="flex items-center gap-2">
+                        <span>🕒</span>
+                        <span>{formatDate(event.startsAt)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>📍</span>
+                        <span>{event.venue || "TBA"}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* RSVP Section */}
-                  <div className="bg-gray-50 p-6 border-2 border-black h-fit">
-                    <h3 className="font-bold text-lg uppercase mb-4 text-center">
-                      Will you be there?
-                    </h3>
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => handleRSVP("GOING")}
-                        disabled={updating}
-                        className={`w-full py-3 border-2 border-black font-bold transition-all ${
-                          rsvpStatus === "GOING"
-                            ? "bg-green-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]"
-                            : "bg-white hover:bg-green-100"
-                        }`}
-                      >
-                        GOING {rsvpStatus === "GOING" && "✓"}
-                      </button>
-                      <button
-                        onClick={() => handleRSVP("INTERESTED")}
-                        disabled={updating}
-                        className={`w-full py-3 border-2 border-black font-bold transition-all ${
-                          rsvpStatus === "INTERESTED"
-                            ? "bg-yellow-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]"
-                            : "bg-white hover:bg-yellow-100"
-                        }`}
-                      >
-                        INTERESTED {rsvpStatus === "INTERESTED" && "✓"}
-                      </button>
-                      <button
-                        onClick={() => handleRSVP("NOT_GOING")}
-                        disabled={updating}
-                        className={`w-full py-3 border-2 border-black font-bold transition-all ${
-                          rsvpStatus === "NOT_GOING"
-                            ? "bg-red-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]"
-                            : "bg-white hover:bg-red-100"
-                        }`}
-                      >
-                        NOT GOING {rsvpStatus === "NOT_GOING" && "✓"}
-                      </button>
+                  <div className="p-8 grid md:grid-cols-3 gap-8">
+                    {/* Description */}
+                    <div className="md:col-span-2">
+                      <h3 className="font-bold text-xl uppercase mb-4 border-b-2 border-black pb-2">
+                        About Event
+                      </h3>
+                      <div className="prose font-body text-lg leading-relaxed text-gray-800">
+                        <p>{event.description || "No description provided."}</p>
+                      </div>
+
+                      {/* Faculty / Organizer Tools Section */}
+                      {isOrganizerOrFaculty && (
+                        <div className="mt-8 p-6 bg-paper-light border-2 border-dashed border-ink rounded-lg relative overflow-hidden">
+                          <div className="absolute top-0 right-0 bg-ink text-white px-3 py-1 text-xs font-bold font-mono">
+                            {user?.role === 'FACULTY' ? 'FACULTY TOOLS' : 'ORGANIZER TOOLS'}
+                          </div>
+                          <h3 className="font-bold text-lg uppercase mb-4 flex items-center gap-2">
+                            🛠️ Event Management
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <RetroButton onClick={handleShowQR} variant="outline" className="text-sm">
+                              🎟️ Show QR Code
+                            </RetroButton>
+                            <RetroButton onClick={() => setShowCertPreview(true)} variant="outline" className="text-sm">
+                              🎓 Preview Cert
+                            </RetroButton>
+                            <RetroButton onClick={() => alert("Feature coming soon: Export list")} variant="outline" className="text-sm opacity-50 cursor-not-allowed">
+                              📥 Export List
+                            </RetroButton>
+                            <RetroButton onClick={() => alert("Feature coming soon: Mark Attendance")} variant="outline" className="text-sm opacity-50 cursor-not-allowed">
+                              ✅ Mark Attendance
+                            </RetroButton>
+                          </div>
+
+                          {/* Stats Mini View */}
+                          <div className="mt-4 flex gap-4 text-sm font-bold text-neutral-600 border-t border-dashed border-ink/30 pt-4">
+                            <span>👥 {event.participants?.filter(p => p.status === 'GOING').length || 0} Going</span>
+                            <span>⭐ {event.participants?.filter(p => p.status === 'INTERESTED').length || 0} Interested</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Public Actions Section */}
+                      <div className="mt-8 p-6 bg-yellow-50 border-2 border-black border-dashed">
+                        <h3 className="font-bold text-lg uppercase mb-4">
+                          Action Center
+                        </h3>
+                        <div className="flex flex-wrap gap-4">
+                          <RetroButton
+                            onClick={() => setShowScanner(true)}
+                            className="bg-black text-white"
+                          >
+                            📷 SCAN QR TO CHECK-IN
+                          </RetroButton>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* RSVP Section */}
+                    <div className="bg-gray-50 p-6 border-2 border-black h-fit">
+                      <h3 className="font-bold text-lg uppercase mb-4 text-center">
+                        Will you be there?
+                      </h3>
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => handleRSVP("GOING")}
+                          disabled={updating}
+                          className={`w-full py-3 border-2 border-black font-bold transition-all ${rsvpStatus === "GOING"
+                              ? "bg-green-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]"
+                              : "bg-white hover:bg-green-100"
+                            }`}
+                        >
+                          GOING {rsvpStatus === "GOING" && "✓"}
+                        </button>
+                        <button
+                          onClick={() => handleRSVP("INTERESTED")}
+                          disabled={updating}
+                          className={`w-full py-3 border-2 border-black font-bold transition-all ${rsvpStatus === "INTERESTED"
+                              ? "bg-yellow-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]"
+                              : "bg-white hover:bg-yellow-100"
+                            }`}
+                        >
+                          INTERESTED {rsvpStatus === "INTERESTED" && "✓"}
+                        </button>
+                        <button
+                          onClick={() => handleRSVP("NOT_GOING")}
+                          disabled={updating}
+                          className={`w-full py-3 border-2 border-black font-bold transition-all ${rsvpStatus === "NOT_GOING"
+                              ? "bg-red-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]"
+                              : "bg-white hover:bg-red-100"
+                            }`}
+                        >
+                          NOT GOING {rsvpStatus === "NOT_GOING" && "✓"}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </NewspaperCard>
-            </motion.div>
-          </div>
+                </NewspaperCard>
+              </motion.div>
+            </div>
 
-          {/* Modals */}
-          {showScanner && (
-            <QRScanner
-              onScan={handleScan}
-              onClose={() => setShowScanner(false)}
-            />
-          )}
+            {/* Modals */}
+            {showScanner && (
+              <QRScanner
+                onScan={handleScan}
+                onClose={() => setShowScanner(false)}
+              />
+            )}
 
-          {showQR && qrCodeUrl && (
-            <QRDisplay qrCodeUrl={qrCodeUrl} onClose={() => setShowQR(false)} />
-          )}
+            {showQR && qrCodeUrl && (
+              <QRDisplay qrCodeUrl={qrCodeUrl} onClose={() => setShowQR(false)} />
+            )}
 
-          {showCertPreview && event && (
-            <CertificatePreview
-              templateUrl="https://placehold.co/800x600/png?text=Certificate+Template"
-              data={{
-                name: "John Doe",
-                date: new Date().toLocaleDateString(),
-                event: event.title,
-              }}
-              layout={[
-                {
-                  field: "name",
-                  x: 400,
-                  y: 300,
-                  fontSize: 40,
-                  color: "#000000",
-                  align: "center",
-                },
-                {
-                  field: "event",
-                  x: 400,
-                  y: 380,
-                  fontSize: 30,
-                  color: "#333333",
-                  align: "center",
-                },
-                {
-                  field: "date",
-                  x: 400,
-                  y: 450,
-                  fontSize: 20,
-                  color: "#666666",
-                  align: "center",
-                },
-              ]}
-              onClose={() => setShowCertPreview(false)}
-            />
-          )}
+            {showCertPreview && event && (
+              <CertificatePreview
+                templateUrl="https://placehold.co/800x600/png?text=Certificate+Template"
+                data={{
+                  name: "John Doe",
+                  date: new Date().toLocaleDateString(),
+                  event: event.title,
+                }}
+                layout={[
+                  {
+                    field: "name",
+                    x: 400,
+                    y: 300,
+                    fontSize: 40,
+                    color: "#000000",
+                    align: "center",
+                  },
+                  {
+                    field: "event",
+                    x: 400,
+                    y: 380,
+                    fontSize: 30,
+                    color: "#333333",
+                    align: "center",
+                  },
+                  {
+                    field: "date",
+                    x: 400,
+                    y: 450,
+                    fontSize: 20,
+                    color: "#666666",
+                    align: "center",
+                  },
+                ]}
+                onClose={() => setShowCertPreview(false)}
+              />
+            )}
           </div>
         </Container>
         <BottomNav />

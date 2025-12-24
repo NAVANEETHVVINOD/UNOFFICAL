@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -25,13 +25,24 @@ export class PostsController {
     return this.postsService.create(createPostDto, req.user.userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
+    @Request() req,
     @Query('collegeSlug') collegeSlug?: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('filter') filter: 'all' | 'college' = 'college',
+    @Query('isOfficial') isOfficial?: string,
   ) {
-    return this.postsService.findAll(collegeSlug, Number(page), Number(limit));
+    // req.user is populated by JwtStrategy. Ideally it has userId, role, collegeId.
+    // We map it to the service's expected format.
+    const currentUser = {
+      id: req.user.userId,
+      role: req.user.role,
+      collegeId: req.user.collegeId || null,
+    };
+    return this.postsService.findAll(currentUser, collegeSlug, Number(page), Number(limit), filter, isOfficial === 'true');
   }
 
   @Get(':id')

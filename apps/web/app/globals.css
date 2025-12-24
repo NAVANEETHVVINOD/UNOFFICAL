@@ -180,8 +180,8 @@ body.dark {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
   background-size: 32px 32px;
   pointer-events: none;
   z-index: 0;
@@ -191,7 +191,7 @@ body.dark {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255, 235, 59, 0.08) 2px, transparent 2px);
+  background-image: radial-gradient(circle, var(--dot-color) 2px, transparent 2px);
   background-size: 32px 32px;
   background-position: 16px 16px;
   pointer-events: none;

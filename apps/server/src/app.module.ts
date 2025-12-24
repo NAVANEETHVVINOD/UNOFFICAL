@@ -33,6 +33,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FollowsModule } from './modules/follows/follows.module';
 import { SearchModule } from './modules/search/search.module';
+import { ClassroomsModule } from './modules/classrooms/classrooms.module';
 
 @Module({
   imports: [
@@ -75,7 +76,6 @@ import { SearchModule } from './modules/search/search.module';
     FeedbackModule,
     PostsModule,
     MessagesModule,
-    MessagesModule,
     NotificationsModule,
     SavedModule,
     ServeStaticModule.forRoot({
@@ -84,6 +84,7 @@ import { SearchModule } from './modules/search/search.module';
     }),
     FollowsModule,
     SearchModule,
+    ClassroomsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
@@ -94,4 +95,4 @@ import { SearchModule } from './modules/search/search.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

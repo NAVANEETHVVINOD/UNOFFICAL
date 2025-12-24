@@ -50,7 +50,8 @@ const itemVariants: Variants = {
 function DashboardContent() {
   const { user, loading } = useAuth();
   const { isReady: onboardingComplete } = useOnboardingGuard();
-  const { items, isLoading, loadMore, hasMore } = useInfiniteFeed({ category: 'feed' });
+  const [filter, setFilter] = useState<'all' | 'college' | 'events' | 'market'>('college');
+  const { items, isLoading, loadMore, hasMore } = useInfiniteFeed({ category: 'feed', filter });
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [postModalTab, setPostModalTab] = useState<'TEXT' | 'POLL' | 'MARKET' | 'EVENT'>('TEXT');
@@ -101,7 +102,6 @@ function DashboardContent() {
         <>
           <ProfileSidebar />
           <QuickActions />
-          {/* Trending Widget - Optional: Add back if API exists, removed mock as requested */}
         </>
       }
       rightSidebarContent={
@@ -125,26 +125,38 @@ function DashboardContent() {
         {/* Category Navigation */}
         <CategoryRibbon />
 
-        {/* Feed Header */}
-        <div className="flex items-center justify-between mt-6 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary border-2 border-ink rounded-lg flex items-center justify-center shadow-neo-sm">
-              <Sparkles className="w-5 h-5 text-ink" />
-            </div>
-            <div>
-              <h1 className="font-display text-2xl text-ink leading-tight">
-                Campus Feed
-              </h1>
-              <p className="text-sm text-neutral-500">
-                What's happening on campus
-              </p>
-            </div>
-          </div>
+        {/* Sticky Feed Header & Filters */}
+        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md pt-4 pb-2 mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <h1 className="font-display text-xl text-ink hidden sm:block">Feed</h1>
 
-          {/* Live indicator */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-paper border-2 border-ink rounded-full shadow-neo-sm">
-            <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
-            <span className="font-mono text-xs uppercase">Live</span>
+            <div className="flex bg-paper p-1 rounded-full border-2 border-ink shadow-neo-sm overflow-x-auto max-w-full">
+              <button
+                onClick={() => setFilter('college')}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'college' ? 'bg-primary text-ink shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
+              >
+                My College
+              </button>
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-accent-blue text-white shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
+              >
+                Everything
+              </button>
+              <div className="w-[1px] h-4 bg-neutral-300 mx-1 self-center" />
+              <button
+                onClick={() => setFilter('events')}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'events' ? 'bg-accent-coral text-white shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
+              >
+                Events
+              </button>
+              <button
+                onClick={() => setFilter('market')}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'market' ? 'bg-accent-mint text-ink shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
+              >
+                Market
+              </button>
+            </div>
           </div>
         </div>
 

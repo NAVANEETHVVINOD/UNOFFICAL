@@ -25,7 +25,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     // Hash password
@@ -66,7 +66,7 @@ export class AuthService {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    const tokens = await this.generateTokens(user.id, user.email, user.role, user.profile?.collegeId);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -105,7 +105,7 @@ export class AuthService {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    const tokens = await this.generateTokens(user.id, user.email, user.role, user.profile?.collegeId);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -115,7 +115,7 @@ export class AuthService {
   }
 
   async loginWithUser(user: any) {
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    const tokens = await this.generateTokens(user.id, user.email, user.role, user.profile?.collegeId);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -141,6 +141,7 @@ export class AuthService {
 
       const user = await this.prisma.user.findUnique({
         where: { id: decoded.sub },
+        include: { profile: true },
       });
 
       if (!user || !user.hashedRefreshToken) {
@@ -160,6 +161,7 @@ export class AuthService {
         decoded.sub,
         decoded.email,
         decoded.role,
+        user.profile?.collegeId,
       );
       await this.updateRefreshToken(decoded.sub, tokens.refreshToken);
 
@@ -181,11 +183,13 @@ export class AuthService {
     userId: string,
     email: string | null,
     role: string,
+    collegeId?: string | null,
   ) {
     const payload = {
       sub: userId,
       email,
       role,
+      collegeId: collegeId || null,
     };
 
     const [accessToken, refreshToken] = await Promise.all([

@@ -34,7 +34,19 @@ export default function EventTicket({ event }: { event: any }) {
 
                 <div>
                     <div className="flex items-start justify-between">
-                        <span className="bg-black text-white px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider mb-2 inline-block">Event Ticket</span>
+                        {evt.status === 'PENDING' ? (
+                            <span className="bg-accent-yellow text-black border-2 border-black px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider mb-2 inline-block animate-pulse">
+                                ⏳ Pending Review
+                            </span>
+                        ) : evt.status === 'REJECTED' ? (
+                            <span className="bg-accent-coral text-white border-2 border-black px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider mb-2 inline-block">
+                                ❌ Rejected
+                            </span>
+                        ) : (
+                            <span className="bg-black text-white px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider mb-2 inline-block">
+                                Event Ticket
+                            </span>
+                        )}
                         <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <h3 className="font-display font-black text-2xl mb-2 leading-none uppercase">{evt.title}</h3>

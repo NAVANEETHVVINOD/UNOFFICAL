@@ -7,13 +7,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 // Components
-import ProfileSidebar from "../../components/dashboard/ProfileSidebar";
 import CreatePostModal from "../../components/CreatePostModal";
 
 import FeedComposer from "../../components/feed/FeedComposer";
 import ArcMenu from "../../components/navigation/ArcMenu";
-import CollegeNav from "../../components/navigation/CollegeNav";
-import { PostCard, EventTicket } from "../../components/ui/SocialComponents";
+import CollegeNav from "../../components/navigation/CollegeNav"; // Kept for local tabs logic if needed, but we implemented custom tabs
 import { FeedSkeleton } from "../../components/ui/Skeleton";
 import FeedItemFactory from "../../components/FeedItemFactory";
 import type { FeedItemData } from "../../hooks/useInfiniteFeed";
@@ -41,6 +39,7 @@ import {
     AlertCircle,
     Info,
     CheckCircle,
+    Info as InfoIcon
 } from "lucide-react";
 
 // Animation variants
@@ -106,11 +105,14 @@ const trendingTopics = [
 export default function CollegeFeed({
     collegeSlug,
     initialEvents,
+    college,
 }: {
     collegeSlug: string;
     initialEvents: any[];
+    college: any;
 }) {
     const router = useRouter();
+    const [activeTab, setActiveTab] = useState<'feed' | 'official' | 'about'>('feed');
     const [feedItems, setFeedItems] = useState<FeedItemData[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -169,23 +171,37 @@ export default function CollegeFeed({
             document.removeEventListener("open-create-modal", handleOpenModal);
     }, []);
 
+    // Effect to reload feed when tab changes
+    useEffect(() => {
+        if (activeTab === 'feed' || activeTab === 'official') {
+            loadFeed(true);
+        }
+    }, [activeTab]);
+
     const loadFeed = async (reset = false) => {
         const currentPage = reset ? 1 : page;
         if (reset) {
             setLoading(true);
             setError(null);
+            setPage(1); // Ensure page is reset
         } else {
             setIsLoadingMore(true);
         }
 
         try {
-            const postsPromise = api.getPosts(collegeSlug, currentPage);
-            const eventsPromise = reset
+            // Determine if fetching official only
+            const isOfficial = activeTab === 'official';
+
+            const postsPromise = api.getPosts(collegeSlug, currentPage, 10, 'college', isOfficial);
+
+            const eventsPromise = reset && activeTab === 'feed' // Only show events in main feed for now
                 ? api.getEvents(collegeSlug)
                 : Promise.resolve([]);
+
             const statsPromise = reset
                 ? api.getCollegeStats(collegeSlug)
                 : Promise.resolve(null);
+
             const clubsPromise = reset
                 ? api.getClubs({ collegeSlug })
                 : Promise.resolve([]);
@@ -203,21 +219,22 @@ export default function CollegeFeed({
             const postsData = postsRes.data || [];
 
             // Combine and sort
-            // Combine and sort
-            const newItems: FeedItemData[] = [
-                ...postsData.map((p: any) => ({
-                    id: `post-${p.id}`,
-                    type: "post" as const,
-                    data: p,
-                    createdAt: p.createdAt,
-                })),
-                ...(Array.isArray(events) ? events : []).map((e: any) => ({
+            let newItems: FeedItemData[] = postsData.map((p: any) => ({
+                id: `post-${p.id}`,
+                type: "post" as const,
+                data: p,
+                createdAt: p.createdAt,
+            }));
+
+            if (activeTab === 'feed') {
+                const eventItems = (Array.isArray(events) ? events : []).map((e: any) => ({
                     id: `event-${e.id}`,
                     type: "event" as const,
                     data: e,
                     createdAt: e.createdAt,
-                })),
-            ];
+                }));
+                newItems = [...newItems, ...eventItems];
+            }
 
             setFeedItems((prev) => {
                 const combined = reset ? newItems : [...prev, ...newItems];
@@ -228,6 +245,14 @@ export default function CollegeFeed({
                     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
             });
+
+            setHasMore(postsData.length === 10);
+            if (!reset && postsData.length > 0) {
+                setPage(prev => prev + 1);
+            } else if (reset && postsData.length > 0) {
+                setPage(2);
+            }
+
         } catch (error) {
             console.error("Failed to load feed:", error);
         } finally {
@@ -235,6 +260,7 @@ export default function CollegeFeed({
             setIsLoadingMore(false);
         }
     };
+
     return (
         <div className="flex flex-col lg:flex-row gap-6">
             {/* LEFT SIDEBAR - Desktop Only */}
@@ -245,6 +271,15 @@ export default function CollegeFeed({
                 transition={{ delay: 0.2 }}
             >
                 <div className="sticky top-24 space-y-6">
+                    {/* College Info Card */}
+                    <div className="bg-white border-2 border-black shadow-neo rounded-xl overflow-hidden p-4 text-center">
+                        <div className="w-20 h-20 mx-auto bg-primary border-2 border-black rounded-full mb-3 flex items-center justify-center">
+                            <Home className="w-10 h-10 text-white" />
+                        </div>
+                        <h2 className="font-display text-xl font-bold mb-1">{college?.name || collegeSlug}</h2>
+                        {college?.city && <p className="text-sm text-neutral-500">{college.city}, {college.state}</p>}
+                    </div>
+
                     {/* Clubs Widget */}
                     {clubs.length > 0 && (
                         <motion.div className="bg-white border-2 border-black shadow-neo rounded-xl overflow-hidden">
@@ -287,276 +322,196 @@ export default function CollegeFeed({
             </motion.aside>
 
             {/* CENTER FEED */}
-            < motion.main
+            <motion.main
                 className="flex-1 min-w-0 pb-32 lg:pb-8"
                 variants={itemVariants}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.1}
-                onDragEnd={(_, info) => {
-                    // Swipe Left (dragged content left) -> Go to Events
-                    if (info.offset.x < -100) {
-                        router.push(`/colleges/${collegeSlug}/events`);
-                    }
-                }}
             >
-                {/* Local Navigation Tabs */}
-                {/* Local Navigation Tabs */}
-                <CollegeNav collegeSlug={collegeSlug} />
-
-                {/* Upcoming Events Ribbon */}
-                {
-                    initialEvents.length > 0 && (
-                        <motion.div
-                            className="mt-6 mb-8 transform -rotate-1 origin-center"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-accent-coral border-2 border-ink rounded-lg flex items-center justify-center shadow-neo-sm">
-                                        <Calendar className="w-4 h-4 text-ink" />
-                                    </div>
-                                    <h3 className="font-display text-sm uppercase tracking-wide">
-                                        Upcoming Events
-                                    </h3>
-                                </div>
-                                <Link
-                                    href={`/colleges/${collegeSlug}/events`}
-                                    className="text-sm font-medium text-neutral-500 hover:text-ink transition-colors flex items-center gap-1"
-                                >
-                                    View All <ArrowUpRight className="w-3 h-3" />
-                                </Link>
-                            </div>
-                            <div className="overflow-x-auto pb-4 -mx-4 px-4 flex gap-4 scrollbar-hide">
-                                {initialEvents.map((event: any, index: number) => (
-                                    <Link
-                                        key={event.id}
-                                        href={`/events/${event.id}`}
-                                        className="min-w-[240px] shrink-0"
-                                    >
-                                        <motion.div
-                                            className="bg-paper border-2 border-ink rounded-card-lg overflow-hidden shadow-neo hover:shadow-neo-lg transition-all h-full"
-                                            whileHover={{ scale: 1.02, rotate: -1, y: -4 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                        >
-                                            <div className="h-2 bg-gradient-to-r from-accent-coral to-accent-pink" />
-                                            <div className="p-4">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <div className="px-2 py-1 bg-primary/20 rounded text-[10px] font-bold uppercase">
-                                                        {new Date(event.startsAt).toLocaleDateString(
-                                                            "en-US",
-                                                            {
-                                                                weekday: "short",
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            }
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-1 text-xs text-neutral-500">
-                                                        <Clock className="w-3 h-3" />
-                                                        {new Date(event.startsAt).toLocaleTimeString(
-                                                            "en-US",
-                                                            {
-                                                                hour: "numeric",
-                                                                minute: "2-digit",
-                                                            }
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <h4 className="font-display text-base leading-tight mb-2 line-clamp-2">
-                                                    {event.title}
-                                                </h4>
-                                                {event.venue && (
-                                                    <div className="flex items-center gap-1 text-xs text-neutral-500">
-                                                        <MapPin className="w-3 h-3" />
-                                                        <span className="truncate">{event.venue}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </motion.div>
-                    )
-                }
-
-                {/* Feed Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary border-2 border-ink rounded-lg flex items-center justify-center shadow-neo-sm">
-                            <Sparkles className="w-5 h-5 text-ink" />
-                        </div>
-                        <div>
-                            <h1 className="font-display text-2xl text-ink leading-tight">
-                                Campus Feed
-                            </h1>
-                            <p className="text-sm text-neutral-500">
-                                What's happening on campus
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Live indicator */}
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-paper border-2 border-ink rounded-full shadow-neo-sm">
-                        <span className="w-2 h-2 bg-accent-coral rounded-full animate-pulse" />
-                        <span className="font-mono text-xs uppercase">Live</span>
-                    </div>
+                {/* Local Navigation Tabs - Replaced CollegeNav with Custom Tabs */}
+                <div className="flex overflow-x-auto gap-2 pb-2 mb-4 scrollbar-hide border-b-2 border-neutral-100">
+                    <button
+                        onClick={() => setActiveTab('feed')}
+                        className={`px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'feed'
+                            ? 'bg-primary text-ink shadow-neo-sm border-2 border-ink'
+                            : 'bg-white text-neutral-500 border-2 border-transparent hover:bg-neutral-100'
+                            }`}
+                    >
+                        🏠 Feed
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('official')}
+                        className={`px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'official'
+                            ? 'bg-accent-blue text-white shadow-neo-sm border-2 border-ink'
+                            : 'bg-white text-neutral-500 border-2 border-transparent hover:bg-neutral-100'
+                            }`}
+                    >
+                        📢 Official Updates
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('about')}
+                        className={`px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'about'
+                            ? 'bg-ink text-white shadow-neo-sm border-2 border-ink'
+                            : 'bg-white text-neutral-500 border-2 border-transparent hover:bg-neutral-100'
+                            }`}
+                    >
+                        ℹ️ About
+                    </button>
                 </div>
 
-                {/* Feed Composer */}
-                <FeedComposer />
+                {/* Tab Content */}
+                {activeTab === 'about' ? (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-paper border-2 border-ink rounded-xl p-6 shadow-neo"
+                    >
+                        <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2">
+                            <InfoIcon className="w-6 h-6" /> About {college?.name}
+                        </h2>
+                        {college?.description ? (
+                            <div className="prose prose-sm max-w-none font-medium leading-relaxed"
+                                dangerouslySetInnerHTML={{ __html: college.description.replace(/\n/g, '<br/>') }}
+                            />
+                        ) : (
+                            <div className="text-center py-8 text-neutral-500 italic">
+                                No description available for this campus yet.
+                            </div>
+                        )}
 
-                {/* Loading State */}
-                {
-                    loading && (
-                        <div className="mt-6">
-                            <FeedSkeleton count={3} />
+                        <div className="mt-8 pt-6 border-t-2 border-dashed border-neutral-200 grid grid-cols-2 gap-4">
+                            <div className="p-4 bg-neutral-50 rounded-lg">
+                                <h4 className="font-bold text-neutral-400 text-xs uppercase mb-1">City</h4>
+                                <p className="font-medium text-lg">{college?.city || 'Unknown'}</p>
+                            </div>
+                            <div className="p-4 bg-neutral-50 rounded-lg">
+                                <h4 className="font-bold text-neutral-400 text-xs uppercase mb-1">State</h4>
+                                <p className="font-medium text-lg">{college?.state || 'Unknown'}</p>
+                            </div>
                         </div>
-                    )
-                }
-
-                {/* Feed Items */}
-                <AnimatePresence mode="popLayout">
-                    <motion.div className="space-y-4 mt-6" variants={containerVariants}>
-                        {feedItems.map((item) => (
-                            <motion.div
-                                key={item.id}
-                                variants={itemVariants}
-                                layout
-                                className="transform-gpu"
-                            >
-                                <FeedItemFactory item={item} />
-                            </motion.div>
-                        ))}
                     </motion.div>
-                </AnimatePresence>
-
-                {/* Loading More */}
-                {
-                    isLoadingMore && (
-                        <div className="mt-6">
-                            <FeedSkeleton count={2} />
+                ) : (
+                    <>
+                        {/* Feed Header */}
+                        <div className="flex items-center justify-between mb-4 mt-2">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 border-2 border-ink rounded-lg flex items-center justify-center shadow-neo-sm ${activeTab === 'official' ? 'bg-accent-blue' : 'bg-primary'}`}>
+                                    {activeTab === 'official' ? <Megaphone className="w-5 h-5 text-white" /> : <Sparkles className="w-5 h-5 text-ink" />}
+                                </div>
+                                <div>
+                                    <h1 className="font-display text-2xl text-ink leading-tight">
+                                        {activeTab === 'official' ? 'Official Updates' : 'Campus Feed'}
+                                    </h1>
+                                    <p className="text-sm text-neutral-500">
+                                        {activeTab === 'official' ? 'Important announcements from admin' : "What's happening on campus"}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    )
-                }
 
-                {/* Load More Button */}
-                {
-                    !loading && feedItems.length > 0 && hasMore && !isLoadingMore && (
-                        <motion.div
-                            className="flex justify-center py-8"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                        >
-                            <button
-                                onClick={() => loadFeed(false)}
-                                className="btn-neo btn-primary px-6 py-3 text-sm rounded-card"
-                            >
-                                Load More Posts
-                            </button>
-                        </motion.div>
-                    )
-                }
+                        {/* Feed Composer - Only on regular feed or if admin? For now simplify */}
+                        {activeTab === 'feed' && <FeedComposer />}
 
-                {/* End of Feed */}
-                {
-                    !hasMore && feedItems.length > 0 && (
-                        <motion.div
-                            className="text-center py-12"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-full">
-                                <span className="text-2xl">🎉</span>
-                                <span className="font-mono text-sm text-neutral-600">
-                                    You're all caught up!
-                                </span>
+                        {/* Loading State */}
+                        {loading && (
+                            <div className="mt-6">
+                                <FeedSkeleton count={3} />
                             </div>
-                        </motion.div>
-                    )
-                }
+                        )}
 
-                {/* Empty State */}
-                {
-                    feedItems.length === 0 && !loading && (
-                        <motion.div
-                            className="text-center py-16"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                        >
-                            <div className="w-20 h-20 mx-auto mb-6 bg-primary/20 border-2 border-dashed border-primary rounded-2xl flex items-center justify-center">
-                                <Sparkles className="w-10 h-10 text-primary" />
+                        {/* Feed Items */}
+                        <AnimatePresence mode="popLayout">
+                            <motion.div className="space-y-4 mt-6" variants={containerVariants}>
+                                {feedItems.map((item) => (
+                                    <motion.div
+                                        key={item.id}
+                                        variants={itemVariants}
+                                        layout
+                                        className="transform-gpu"
+                                    >
+                                        <FeedItemFactory item={item} />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        </AnimatePresence>
+
+                        {/* Loading More */}
+                        {isLoadingMore && (
+                            <div className="mt-6">
+                                <FeedSkeleton count={2} />
                             </div>
-                            <h3 className="font-display text-xl text-ink mb-2">No posts yet</h3>
-                            <p className="text-neutral-500 mb-6">
-                                Be the first to share something with your campus!
-                            </p>
-                            <button
-                                onClick={() => {
-                                    setPostModalTab("TEXT");
-                                    setIsPostModalOpen(true);
-                                }}
-                                className="btn-neo btn-primary rounded-card"
+                        )}
+
+                        {/* Load More Button */}
+                        {!loading && feedItems.length > 0 && hasMore && !isLoadingMore && (
+                            <motion.div
+                                className="flex justify-center py-8"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
                             >
-                                Create First Post
-                            </button>
-                        </motion.div>
-                    )
-                }
-            </motion.main >
+                                <button
+                                    onClick={() => loadFeed(false)}
+                                    className="btn-neo btn-primary px-6 py-3 text-sm rounded-card"
+                                >
+                                    Load More Posts
+                                </button>
+                            </motion.div>
+                        )}
+
+                        {/* Empty State */}
+                        {feedItems.length === 0 && !loading && (
+                            <motion.div
+                                className="text-center py-16"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                            >
+                                <div className="w-20 h-20 mx-auto mb-6 bg-primary/20 border-2 border-dashed border-primary rounded-2xl flex items-center justify-center">
+                                    <Sparkles className="w-10 h-10 text-primary" />
+                                </div>
+                                <h3 className="font-display text-xl text-ink mb-2">No posts yet</h3>
+                                <p className="text-neutral-500 mb-6">
+                                    {activeTab === 'official' ? 'No official announcements yet.' : 'Be the first to share something!'}
+                                </p>
+                            </motion.div>
+                        )}
+                    </>
+                )}
+            </motion.main>
 
             {/* RIGHT SIDEBAR - Desktop Only */}
-            < motion.aside
+            <motion.aside
                 className="hidden xl:block w-[280px] flex-shrink-0"
                 variants={itemVariants}
             >
                 <div className="sticky top-24 space-y-4">
-                    {/* Announcements */}
-                    <motion.div
-                        className="bg-paper border-2 border-ink shadow-neo overflow-hidden rounded-card-lg"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 }}
-                    >
-                        <div className="px-4 py-3 bg-primary/10 border-b border-ink/10 flex items-center gap-2">
-                            <Megaphone className="w-4 h-4" />
-                            <h3 className="font-display text-sm uppercase tracking-wide">
-                                Announcements
-                            </h3>
-                        </div>
-                        <div className="divide-y divide-neutral-100">
-                            {announcements.map((ann, index) => (
-                                <motion.div
-                                    key={ann.id}
-                                    className="px-4 py-3 hover:bg-neutral-50 transition-colors cursor-pointer group"
-                                    initial={{ opacity: 0, x: 10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.05 * index }}
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <div
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${getAnnouncementBg(ann.type)}`}
-                                        >
-                                            {getAnnouncementIcon(ann.type)}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-sm font-medium text-ink leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                                                {ann.title}
+                    {/* Upcoming Events Ribbon (Moved to sidebar for cleaner feed) */}
+                    {initialEvents.length > 0 && (
+                        <motion.div
+                            className="bg-paper border-2 border-ink shadow-neo overflow-hidden rounded-card-lg mb-4"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                        >
+                            <div className="px-4 py-3 bg-accent-coral/10 border-b border-ink/10 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    <h3 className="font-display text-sm uppercase tracking-wide">
+                                        Upcoming
+                                    </h3>
+                                </div>
+                                <Link href={`/colleges/${collegeSlug}/events`} className="text-xs font-bold hover:underline">View All</Link>
+                            </div>
+                            <div className="p-2 space-y-2">
+                                {initialEvents.slice(0, 3).map((event: any) => (
+                                    <Link key={event.id} href={`/events/${event.id}`}>
+                                        <div className="p-2 hover:bg-neutral-50 rounded-lg transition-colors border border-transparent hover:border-black/5">
+                                            <p className="font-bold text-sm leading-tight line-clamp-1">{event.title}</p>
+                                            <p className="text-xs text-neutral-500">
+                                                {new Date(event.startsAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                             </p>
-                                            <span className="text-xs text-neutral-500 mt-1 block">
-                                                {ann.date}
-                                            </span>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
 
                     {/* Trending Topics */}
                     <motion.div
@@ -600,11 +555,6 @@ export default function CollegeFeed({
                                 </motion.div>
                             ))}
                         </div>
-                        <div className="px-4 py-3 bg-neutral-50 text-center hover:bg-neutral-100 transition-colors cursor-pointer">
-                            <span className="text-sm font-medium text-ink">
-                                Explore More →
-                            </span>
-                        </div>
                     </motion.div>
 
                     {/* Study Notes Promo */}
@@ -623,8 +573,7 @@ export default function CollegeFeed({
                             </h3>
                         </div>
                         <p className="text-xs text-neutral-600 mb-4">
-                            {stats?.totalNotes || 0} notes shared by students. Access study
-                            materials and previous year papers.
+                            {stats?.totalNotes || 0} notes shared by students.
                         </p>
                         <Link
                             href="/notes"
@@ -634,20 +583,20 @@ export default function CollegeFeed({
                         </Link>
                     </motion.div>
                 </div>
-            </motion.aside >
+            </motion.aside>
 
             {/* Create Post Modal */}
-            < CreatePostModal
+            <CreatePostModal
                 isOpen={isPostModalOpen}
                 onClose={() => setIsPostModalOpen(false)}
                 initialTab={postModalTab}
                 onPostCreated={() => loadFeed(true)}
             />
 
-            < ArcMenu onCompose={() => {
+            <ArcMenu onCompose={() => {
                 setPostModalTab('TEXT');
                 setIsPostModalOpen(true);
             }} />
-        </div >
+        </div>
     );
 }

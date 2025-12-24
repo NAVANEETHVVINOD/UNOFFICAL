@@ -53,13 +53,16 @@ export default async function CollegeHome({ params }: PageProps) {
 
   // Fetch data in parallel with proper error handling
   let events: any[] = [];
+  let college: any = null;
 
   try {
     const results = await Promise.allSettled([
       api.getEvents(slug),
+      api.getCollegeBySlug(slug),
     ]);
 
     events = results[0].status === 'fulfilled' ? results[0].value : [];
+    college = results[1].status === 'fulfilled' ? results[1].value : null;
   } catch (error) {
     console.error("Failed to fetch college data:", error);
   }
@@ -70,7 +73,7 @@ export default async function CollegeHome({ params }: PageProps) {
     <div className="relative z-10 max-w-[1400px] mx-auto px-2 md:px-4">
       {/* Reduced padding top significantly since layout handles navbar spacing */}
       <div className="">
-        <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} />
+        <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} college={college} />
       </div>
     </div>
   );

@@ -336,11 +336,13 @@ export const api = {
     apiRequest(`/notes/${id}/like`, { method: "DELETE" }),
 
   // Posts (Community Feed)
-  getPosts: (collegeSlug?: string, page: number = 1, limit: number = 20) => {
+  getPosts: (collegeSlug?: string, page: number = 1, limit: number = 20, filter?: 'all' | 'college', isOfficial?: boolean) => {
     const query = new URLSearchParams();
     if (collegeSlug) query.append("collegeSlug", collegeSlug);
     query.append("page", page.toString());
     query.append("limit", limit.toString());
+    if (filter) query.append("filter", filter);
+    if (isOfficial) query.append("isOfficial", "true");
     return apiRequest(`/posts?${query.toString()}`);
   },
 
@@ -518,4 +520,45 @@ export const api = {
 
   removeItem: (id: string) =>
     apiRequest(`/saved/${id}`, { method: "DELETE" }),
+
+  // Classrooms (LMS)
+  getClassrooms: () => apiRequest("/classrooms"),
+
+  getClassroom: (id: string) => apiRequest(`/classrooms/${id}`),
+
+  createClassroom: (data: { name: string; description?: string; subject?: string; collegeId: string }) =>
+    apiRequest("/classrooms", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  joinClassroom: (code: string) =>
+    apiRequest("/classrooms/join", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    }),
+
+  createAssignment: (classroomId: string, data: any) =>
+    apiRequest(`/classrooms/${classroomId}/assignments`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  getAssignments: (classroomId: string) =>
+    apiRequest(`/classrooms/${classroomId}/assignments`),
+
+  submitAssignment: (assignmentId: string, fileUrl: string) =>
+    apiRequest(`/classrooms/assignments/${assignmentId}/submit`, {
+      method: "POST",
+      body: JSON.stringify({ fileUrl }),
+    }),
+
+  getSubmissions: (assignmentId: string) =>
+    apiRequest(`/classrooms/assignments/${assignmentId}/submissions`),
+
+  gradeSubmission: (submissionId: string, grade: number, feedback?: string) =>
+    apiRequest(`/classrooms/submissions/${submissionId}/grade`, {
+      method: "POST",
+      body: JSON.stringify({ grade, feedback }),
+    }),
 };

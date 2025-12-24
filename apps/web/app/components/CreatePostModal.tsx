@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { X, Image as ImageIcon, Paperclip, Loader2, EyeOff, AlertTriangle, BarChart2, Calendar, Users, Flag, MapPin, Clock, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { X, Image as ImageIcon, Paperclip, Loader2, EyeOff, AlertTriangle, BarChart2, Calendar, Users, Flag, MapPin, Clock, ChevronDown, ChevronUp, Plus, Trash2, Globe, Lock, Building } from "lucide-react";
 import { RetroButton } from "./ui/NewspaperUI";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -40,6 +40,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [showAnonWarning, setShowAnonWarning] = useState(false);
     const [activeFeatures, setActiveFeatures] = useState<Set<FeatureType>>(new Set());
+    const [visibility, setVisibility] = useState<'PUBLIC' | 'COLLEGE' | 'PRIVATE'>('PUBLIC');
 
     // Poll state
     const [pollQuestion, setPollQuestion] = useState("");
@@ -96,6 +97,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
                 type: activeFeatures.has('poll') ? 'poll' : 'post',
                 collegeSlug: collegeSlug || user?.profile?.college?.slug,
                 isAnonymous,
+                visibility,
             };
 
             if (activeFeatures.has('poll') && pollQuestion) {
@@ -121,6 +123,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
             reset();
             setFile(null);
             setActiveFeatures(new Set());
+            setVisibility('PUBLIC');
             onClose();
         } catch (e: any) {
             toast(e.message || "Failed to post.", "error");
@@ -294,12 +297,43 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
                         )}
                     </AnimatePresence>
 
-                    {/* Anonymous Toggle */}
-                    <div className="mt-4">
+                    {/* Visibility & Anonymous Controls */}
+                    <div className="mt-4 flex flex-wrap gap-3 items-center">
+                        {/* Visibility Selector */}
+                        <div className="relative group">
+                            <button className="flex items-center gap-2 px-3 py-2 rounded-card border-2 border-neutral-200 hover:border-neutral-400 bg-paper transition-all">
+                                {visibility === 'PUBLIC' && <Globe className="w-4 h-4 text-accent-blue" />}
+                                {visibility === 'COLLEGE' && <Building className="w-4 h-4 text-accent-coral" />}
+                                {visibility === 'PRIVATE' && <Lock className="w-4 h-4 text-accent-purple" />}
+                                <span className="font-medium text-sm">
+                                    {visibility === 'PUBLIC' ? 'Everyone' : visibility === 'COLLEGE' ? 'My College' : 'Only Me'}
+                                </span>
+                                <ChevronDown className="w-3 h-3 text-neutral-400" />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            <div className="absolute top-full left-0 mt-2 w-48 bg-white border-2 border-ink rounded-lg shadow-neo-sm overflow-hidden hidden group-hover:block z-20">
+                                <button onClick={() => setVisibility('PUBLIC')} className="w-full text-left px-4 py-2 hover:bg-neutral-100 flex items-center gap-2">
+                                    <Globe className="w-4 h-4" /> Everyone
+                                </button>
+                                <button onClick={() => setVisibility('COLLEGE')} className="w-full text-left px-4 py-2 hover:bg-neutral-100 flex items-center gap-2">
+                                    <Building className="w-4 h-4" /> My College
+                                </button>
+                                <button onClick={() => setVisibility('PRIVATE')} className="w-full text-left px-4 py-2 hover:bg-neutral-100 flex items-center gap-2">
+                                    <Lock className="w-4 h-4" /> Only Me
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Anonymous Toggle */}
                         <button
                             type="button"
+                            disabled={user?.role === 'FACULTY'}
                             onClick={() => !isAnonymous ? setShowAnonWarning(true) : setIsAnonymous(false)}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-card border-2 transition-all ${isAnonymous ? "border-accent-purple bg-accent-purple/10" : "border-neutral-200 hover:border-neutral-400"}`}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-card border-2 transition-all ${isAnonymous
+                                    ? "border-accent-purple bg-accent-purple/10"
+                                    : "border-neutral-200 hover:border-neutral-400"
+                                } ${user?.role === 'FACULTY' ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <EyeOff className="w-4 h-4" />
                             <span className="font-medium text-sm">Post Anonymously</span>

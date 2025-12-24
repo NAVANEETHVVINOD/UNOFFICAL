@@ -40,6 +40,11 @@ model User {
   followers Follows[] @relation("following")
   following Follows[] @relation("follower")
 
+  // LMS Relations
+  teachingClassrooms Classroom[]       @relation("TeacherClassrooms")
+  joinedClassrooms   ClassroomMember[]
+  submissions        Submission[]
+
   @@index([supabaseId])
 }
 
@@ -138,6 +143,7 @@ model College {
   slug      String               @unique
   city      String?
   state     String?
+  description String?  @db.Text
   createdAt DateTime             @default(now())
   clubs     Club[]
   events    Event[]
@@ -145,6 +151,7 @@ model College {
   notes     Note[]
   posts     Post[]
   profiles  Profile[]
+  classrooms Classroom[]
 }
 
 model Club {
@@ -190,6 +197,11 @@ model Event {
   collegeId    String?
   createdById  String
   scope        EventScope         @default(COLLEGE)
+  
+  // Approval
+  status          EventApprovalStatus @default(PENDING)
+  rejectionReason String?
+
   qrToken      String?
   certificates CertificateIssue[]
   club         Club?              @relation(fields: [clubId], references: [id])
@@ -265,12 +277,19 @@ enum PostType {
   COLLAB
 }
 
+enum PostVisibility {
+  PUBLIC
+  PRIVATE
+  COLLEGE
+}
+
 model Post {
-  id          String    @id @default(cuid())
-  type        PostType  @default(TEXT)
+  id          String          @id @default(cuid())
+  type        PostType        @default(TEXT)
+  visibility  PostVisibility  @default(PUBLIC)
   title       String?   // for collab posts
   content     String
-  imageUrl    String?   // Keeping original singular for now to match verified code, or should I change to array? usage shows singular. spec said array. checking usage: `imageUrl` string. Keeping singular for now to avoid breaking existing code, will add `imageUrls` if needed later or strictly follow spec if critical. Spec said `imageUrls String[]`. I will add `imageUrls` as a new field to be safe and keep `imageUrl` for backward compat if needed, or just replace if I'm confident. The spec said "Modify... imageUrls String[]". Let's stick to the spec but being careful. Actually, looking at the previous file content, it was `imageUrl String?`. I will add `imageUrls String[]` and `pollId`.
+  imageUrl    String?   
 
   pollId      String?
   isAnonymous Boolean   @default(false)
@@ -397,6 +416,7 @@ model Message {
 
 enum Role {
   STUDENT
+  FACULTY
   CLUB_ADMIN
   COLLEGE_ADMIN
   PLATFORM_ADMIN
@@ -412,6 +432,12 @@ enum EventStatus {
   GOING
   INTERESTED
   NOT_GOING
+}
+
+enum EventApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum ListingStatus {
@@ -497,4 +523,102 @@ enum NotificationType {
   MESSAGE
   SYSTEM
   FOLLOW
+  CLASSROOM
+}
+
+// -------------------- LMS (Learning Management System) --------------------
+
+model Classroom {
+  id          String   @id @default(cuid())
+  name        String
+  subject     String?
+  description String?  @db.Text
+  code        String   @unique // Unique join code
+  bannerUrl   String?
+  
+  teacherId   String
+  collegeId   String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  teacher     User     @relation("TeacherClassrooms", fields: [teacherId], references: [id])
+  college     College  @relation(fields: [collegeId], references: [id])
+  
+  members     ClassroomMember[]
+  assignments Assignment[]
+  attendance  AttendanceRecord[]
+}
+
+model ClassroomMember {
+  id          String        @id @default(cuid())
+  classroomId String
+  userId      String
+  role        ClassroomRole @default(STUDENT)
+  joinedAt    DateTime      @default(now())
+
+  classroom   Classroom     @relation(fields: [classroomId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+
+  @@unique([classroomId, userId])
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  dueDate     DateTime?
+  points      Int      @default(100)
+  
+  classroomId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  classroom   Classroom     @relation(fields: [classroomId], references: [id])
+  submissions Submission[]
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  assignmentId String
+  studentId    String
+  
+  status       SubmissionStatus @default(PENDING)
+  fileUrl      String?
+  grade        Int?
+  feedback     String?          @db.Text
+  submittedAt  DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id])
+  student      User             @relation(fields: [studentId], references: [id])
+
+  @@unique([assignmentId, studentId])
+}
+
+model AttendanceRecord {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now()) // Can be just date part
+  classroomId String
+  
+  // JSON structure: { "userId": "status", "userId2": "status" }
+  // Status: PRESENT, ABSENT, LATE, EXCUSED
+  records     Json 
+
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+
+  @@unique([classroomId, date])
+}
+
+enum ClassroomRole {
+  TEACHER
+  STUDENT
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  LATE
+  GRADED
+  MISSING
 }

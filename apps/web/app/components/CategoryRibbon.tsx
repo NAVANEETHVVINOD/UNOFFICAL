@@ -4,19 +4,13 @@ import { motion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Home,
-  School,
-  Calendar,
-  ShoppingBag,
+  Compass, // Explore icon
   MessageCircle,
-  BookOpen, // Added icon
 } from "lucide-react";
 
 const CATEGORIES = [
   { id: 'feed', label: 'Home', icon: Home, color: 'bg-primary', path: '/dashboard' },
-  { id: 'campus', label: 'Campus', icon: School, color: 'bg-accent-blue', path: '/my-college' },
-  { id: 'events', label: 'Events', icon: Calendar, color: 'bg-accent-coral', path: '/events' },
-  { id: 'resources', label: 'Resources', icon: BookOpen, color: 'bg-accent-purple', path: '/resources' },
-  { id: 'market', label: 'Market', icon: ShoppingBag, color: 'bg-accent-mint', path: '/marketplace' },
+  { id: 'explore', label: 'Explore', icon: Compass, color: 'bg-accent-blue', path: '/explore' },
   { id: 'messages', label: 'Chat', icon: MessageCircle, color: 'bg-accent-orange', path: '/messages' },
 ];
 
@@ -30,10 +24,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
 
   const getActiveCategory = () => {
     if (pathname === '/dashboard' || pathname === '/') return 'feed';
-    if (pathname.startsWith('/my-college') || pathname.startsWith('/colleges')) return 'campus';
-    if (pathname.startsWith('/events')) return 'events';
-    if (pathname.startsWith('/resources')) return 'resources';
-    if (pathname.startsWith('/marketplace')) return 'market';
+    if (pathname.startsWith('/explore') || pathname.startsWith('/events') || pathname.startsWith('/clubs') || pathname.startsWith('/resources') || pathname.startsWith('/marketplace')) return 'explore';
     if (pathname.startsWith('/messages')) return 'messages';
     return 'feed';
   };

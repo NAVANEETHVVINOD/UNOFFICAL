@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
 
   @Get()
   async findAll(
@@ -44,24 +44,28 @@ export class EventsController {
     return this.eventsService.findOne({ id });
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    'CLUB_ADMIN' as Role,
-    'COLLEGE_ADMIN' as Role,
-    'PLATFORM_ADMIN' as Role,
-  )
+  @UseGuards(JwtAuthGuard)
+  // Removed strict @Roles to allow Students/Faculty to create events (will be PENDING)
   @Post()
   async create(
     @Request() req,
     @Body() createEventDto: Prisma.EventCreateInput & { collegeSlug?: string },
   ) {
     const { collegeSlug, ...rest } = createEventDto;
+    // Map req.user to service expected format
+    const user = {
+      id: req.user.userId,
+      role: req.user.role,
+      collegeId: req.user.collegeId || null
+    };
+
     return this.eventsService.create(
       {
         ...rest,
+        // If explicit slug provided, connect to it
         ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
       },
-      req.user.userId,
+      user,
     );
   }
 
