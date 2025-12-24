@@ -182,7 +182,7 @@ export default function OnboardingPage() {
         instagram: prev.instagram || profile.instagram || "",
         interests: (prev.interests.length > 0 ? prev.interests : profile.interests) || [],
         // Crucial: Only overwrite collegeId if we don't have one selected yet!
-        collegeId: prev.collegeId || profile.collegeId || "",
+        collegeId: prev.collegeId || profile.collegeId || (profile.socials as any)?.tempCollegeId || "",
         state: prev.state || (profile.socials as any)?.state || "",
         district: prev.district || (profile.socials as any)?.district || "",
       }));
