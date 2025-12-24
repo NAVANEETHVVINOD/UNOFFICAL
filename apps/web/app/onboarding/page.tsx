@@ -183,7 +183,7 @@ export default function OnboardingPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, user?.profile?.updatedAt]); // Depend on ID and profile update time, not the whole object
+  }, [user?.id, (user?.profile as any)?.updatedAt]); // Depend on ID and profile update time, not the whole object
 
   // Analytics hooks...
   useEffect(() => {
