@@ -15,6 +15,7 @@ import {
 } from "../components/ui/NewspaperUI";
 import Doodle from "../components/ui/Doodle";
 import { logEvent } from "../../lib/analytics";
+import { FALLBACK_COLLEGES } from "../../lib/college-data";
 
 // Steps
 // 1. Identity (Avatar + Name)
@@ -119,11 +120,20 @@ export default function OnboardingPage() {
 
   const fetchColleges = async () => {
     try {
-      const data = await api.getColleges();
+      let data = await api.getColleges();
+
+      // Fallback for empty backend (render deployment fix)
+      if (!data || data.length === 0) {
+        console.warn("API returned 0 colleges. Using fallback seed data.");
+        data = FALLBACK_COLLEGES;
+      }
+
       console.log('DEBUG: Fetched colleges:', data?.length, data?.[0]);
       setColleges(data);
     } catch (error) {
       console.error("Failed to fetch colleges", error);
+      // Fallback on error too
+      setColleges(FALLBACK_COLLEGES);
     }
   };
 
