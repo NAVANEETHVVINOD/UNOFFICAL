@@ -125,7 +125,8 @@ export default function CollegeAdminPage() {
 
   const handleSaveCollegeInfo = async () => {
     try {
-      await api.updateCollege(user?.profile?.collegeId!, collegeInfo);
+      if (!user?.profile?.collegeId) return;
+      await api.updateCollege(user.profile.collegeId, collegeInfo);
       alert("College info updated!");
     } catch (error) {
       console.error("Failed to update college:", error);

@@ -30,10 +30,10 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
         <div className="border-4 border-black rounded-lg overflow-hidden bg-black">
           <QrReaderAny
             onResult={(result: any, error: any) => {
-              if (!!result) {
+              if (result) {
                 onScan(result?.getText());
               }
-              if (!!error) {
+              if (error) {
                 // console.info(error);
               }
             }}

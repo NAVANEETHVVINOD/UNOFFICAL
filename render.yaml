@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: LINKER
+    name: LINKER-server
     env: node
     plan: free
 
@@ -47,3 +47,19 @@ services:
 
       - key: CORS_ORIGIN
         sync: false
+  - type: web
+    name: LINKER-web
+    env: node
+    plan: free
+
+    rootDir: apps/web
+
+    buildCommand: |
+      npm install
+      npm run build
+
+    startCommand: npm run start
+
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: 'https://linker-server.onrender.com'
