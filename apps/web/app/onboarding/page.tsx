@@ -304,54 +304,39 @@ export default function OnboardingPage() {
         stepData.interests = formData.interests;
       } else if (currentStep === 4) {
         // Campus + Location
-
-        // CRITICAL FIX: The backend DB is empty, so these IDs don't exist there.
-        // If we send a non-existent collegeId, the backend throws 400.
-        // We must check if we are in "fallback mode" (real API returned 0 results).
-
-        // How to detect fallback mode? We can check if `colleges` came from API or fallback.
-        // Or simpler: Try to find the college in the *real* list? 
-        // We know checking `colleges` state relies on what was set.
-
-        // SAFE APPROACH: If `collegeId` is set, pass it ONLY if we believe it exists.
-        // Since we are using fallback data now because backend is empty, we should NOT pass collegeId.
-        // Instead, we verify if the selected ID is in the fallback list and save it to `socials`.
-
-        const isFallbackMode = colleges.length === 145; // 145 is the fallback list length (approx) - or just robustly:
-        // Better: We only pass collegeId if we are sure. For this specific "No Cities" fix phase:
-
-        // If we are using fallback data, send NULL collegeId and save selection in socials.
-        // This prevents the 400 error while saving the user's choice.
-
+        // BYPASS: Backend has no colleges, so we set collegeId to null to avoid FK error.
+        // We persist the selection in 'socials' instead.
         const selectedCollege = colleges.find(c => c.id === formData.collegeId);
 
-        // If the backend has 0 colleges, we forced fallback. So these fail validation.
-        // We will send collegeId = NULL and put the details in socials.
-
-        stepData.collegeId = null; // FORCE NULL to bypass relation check
-
+        stepData.collegeId = null;
         stepData.socials = {
           ...(user?.profile?.socials as object || {}),
           state: formData.state,
           district: formData.district,
-          // Save the "Soft Linked" college here
           tempCollegeId: formData.collegeId,
           tempCollegeName: selectedCollege?.name || customCollegeData.name
         };
-
       } else if (currentStep === 5) {
         // Review
         if (!formData.fullName?.trim()) {
           alert("Full name is required."); return;
         }
-        // Validation: We allow proceeding if we have a college selected in state, 
-        // even if we are not sending it as a formal relation ID.
         if (!formData.collegeId && !isCustomCollege) {
           alert("Please select a college."); return;
         }
         stepData.isOnboarded = true;
-        // Ensure we don't send validation-failing IDs in the final step either
-        stepData.collegeId = null;
+        stepData.collegeId = null; // Maintain bypass
+        // Also ensure socials (with name) are sent again if needed, or rely on step 4.
+        // Better to send what we have to be safe against step-skipping or partial updates.
+        const selectedCollege = colleges.find(c => c.id === formData.collegeId);
+        stepData.socials = {
+          ...(user?.profile?.socials as object || {}),
+          state: formData.state,
+          district: formData.district,
+          tempCollegeId: formData.collegeId,
+          tempCollegeName: selectedCollege?.name || customCollegeData.name
+        };
+
       }
 
       await api.updateProfile(stepData);
@@ -501,8 +486,8 @@ export default function OnboardingPage() {
                   setFormData({ ...formData, interests: newInterests });
                 }}
                 className={`p-3 border-2 border-black font-bold transition-all ${formData.interests.includes(interest)
-                  ? "bg-accent-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white hover:bg-gray-50"
+                  ? "bg-accent-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-black"
+                  : "bg-white hover:bg-black hover:text-white transition-colors"
                   }`}
               >
                 {interest}
@@ -627,8 +612,8 @@ export default function OnboardingPage() {
                             <p className={`text-xs truncate ${formData.collegeId === college.id ? "text-white/70" : "text-gray-500 ml-0"}`}>{college.city}</p>
                           </div>
                           {formData.collegeId === college.id && (
-                            <div className="bg-white text-black rounded-full p-1">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div className="bg-green-500 text-white rounded-full p-1 shadow-md">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                           )}
                         </div>
@@ -690,26 +675,23 @@ export default function OnboardingPage() {
       case 5: // Review
         return (
           <div className="space-y-4 text-left">
-            <div className="p-4 bg-gray-50 border-2 border-black">
-              <p className="font-bold text-xs uppercase text-gray-500">Name</p>
-              <p className="font-bold text-lg">{formData.fullName}</p>
+
+            {/* IMPROVED VISIBILITY: Black background with White text for maximum contrast */}
+            <div className="p-4 bg-black border-2 border-black rounded-lg shadow-sm">
+              <p className="font-bold text-xs uppercase text-gray-400 mb-1">Name</p>
+              <p className="font-bold text-xl text-white">{formData.fullName}</p>
             </div>
-            {/* IMPROVED VISIBILITY: Changed background to white and text to intense black */}
-            <div className="p-4 bg-white border-2 border-black rounded-lg shadow-sm">
-              <p className="font-bold text-xs uppercase text-gray-500 mb-1">Name</p>
-              <p className="font-bold text-xl text-black">{formData.fullName}</p>
-            </div>
-            <div className="p-4 bg-white border-2 border-black rounded-lg shadow-sm">
-              <p className="font-bold text-xs uppercase text-gray-500 mb-1">College</p>
-              <p className="font-bold text-xl text-black">
+            <div className="p-4 bg-black border-2 border-black rounded-lg shadow-sm">
+              <p className="font-bold text-xs uppercase text-gray-400 mb-1">College</p>
+              <p className="font-bold text-xl text-white">
                 {isCustomCollege
                   ? `${customCollegeData.name} (Custom)`
                   : (colleges.find((c) => c.id === formData.collegeId)?.name || (formData.socials as any)?.tempCollegeName || "Not Selected")}
               </p>
             </div>
-            <div className="p-4 bg-white border-2 border-black rounded-lg shadow-sm">
-              <p className="font-bold text-xs uppercase text-gray-500 mb-1">Location</p>
-              <p className="font-bold text-xl text-black">{formData.district ? `${formData.district}, ${formData.state}` : "Not Specified"}</p>
+            <div className="p-4 bg-black border-2 border-black rounded-lg shadow-sm">
+              <p className="font-bold text-xs uppercase text-gray-400 mb-1">Location</p>
+              <p className="font-bold text-xl text-white">{formData.district ? `${formData.district}, ${formData.state}` : "Not Specified"}</p>
             </div>
           </div>
         );
