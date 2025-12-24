@@ -2,117 +2,28 @@
 > server@0.0.1 test
 > jest
 
-PASS src/modules/marketplace/marketplace.service.spec.ts
-PASS src/modules/users/users.service.spec.ts
-PASS src/modules/marketplace/marketplace.controller.spec.ts
-FAIL src/modules/follows/follows.service.spec.ts
-  ● FollowsService › should be defined
-
-    Nest can't resolve dependencies of the FollowsService (?). Please make sure that the argument PrismaService at index [0] is available in the RootTestModule context.
-
-    Potential solutions:
-    - Is RootTestModule a valid NestJS module?
-    - If PrismaService is a provider, is it part of the current RootTestModule?
-    - If PrismaService is exported from a separate @Module, is that module imported within RootTestModule?
-      @Module({
-        imports: [ /* the Module containing PrismaService */ ]
-      })
-
-    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
-
-    [0m [90m  6 |[39m
-     [90m  7 |[39m   beforeEach([36masync[39m () [33m=>[39m {
-    [31m[1m>[22m[39m[90m  8 |[39m     [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
-     [90m    |[39m                                   [31m[1m^[22m[39m
-     [90m  9 |[39m       providers[33m:[39m [[33mFollowsService[39m][33m,[39m
-     [90m 10 |[39m     })[33m.[39mcompile()[33m;[39m
-     [90m 11 |[39m[0m
-
-      at TestingInjector.lookupComponentInParentModules (../../../node_modules/@nestjs/core/injector/injector.js:286:19)
-      at TestingInjector.resolveComponentWrapper (../../../node_modules/@nestjs/testing/testing-injector.js:19:45)
-      at resolveParam (../../../node_modules/@nestjs/core/injector/injector.js:140:38)
-          at async Promise.all (index 0)
-      at TestingInjector.resolveConstructorParams (../../../node_modules/@nestjs/core/injector/injector.js:169:27)
-      at TestingInjector.loadInstance (../../../node_modules/@nestjs/core/injector/injector.js:75:13)
-      at TestingInjector.loadProvider (../../../node_modules/@nestjs/core/injector/injector.js:103:9)
-      at ../../../node_modules/@nestjs/core/injector/instance-loader.js:56:13
-          at async Promise.all (index 3)
-      at TestingInstanceLoader.createInstancesOfProviders (../../../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
-      at ../../../node_modules/@nestjs/core/injector/instance-loader.js:40:13
-          at async Promise.all (index 1)
-      at TestingInstanceLoader.createInstances (../../../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
-      at TestingInstanceLoader.createInstancesOfDependencies (../../../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
-      at TestingInstanceLoader.createInstancesOfDependencies (../../../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
-      at TestingModuleBuilder.createInstancesOfDependencies (../../../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
-      at TestingModuleBuilder.compile (../../../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
-      at Object.<anonymous> (modules/follows/follows.service.spec.ts:8:35)
-
-FAIL src/modules/follows/follows.controller.spec.ts (5.003 s)
-  ● FollowsController › should be defined
-
-    Nest can't resolve dependencies of the FollowsController (?). Please make sure that the argument FollowsService at index [0] is available in the RootTestModule context.
-
-    Potential solutions:
-    - Is RootTestModule a valid NestJS module?
-    - If FollowsService is a provider, is it part of the current RootTestModule?
-    - If FollowsService is exported from a separate @Module, is that module imported within RootTestModule?
-      @Module({
-        imports: [ /* the Module containing FollowsService */ ]
-      })
-
-    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
-
-    [0m [90m  6 |[39m
-     [90m  7 |[39m   beforeEach([36masync[39m () [33m=>[39m {
-    [31m[1m>[22m[39m[90m  8 |[39m     [36mconst[39m module[33m:[39m [33mTestingModule[39m [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
-     [90m    |[39m                                   [31m[1m^[22m[39m
-     [90m  9 |[39m       controllers[33m:[39m [[33mFollowsController[39m][33m,[39m
-     [90m 10 |[39m     })[33m.[39mcompile()[33m;[39m
-     [90m 11 |[39m[0m
-
-      at TestingInjector.lookupComponentInParentModules (../../../node_modules/@nestjs/core/injector/injector.js:286:19)
-      at TestingInjector.resolveComponentWrapper (../../../node_modules/@nestjs/testing/testing-injector.js:19:45)
-      at resolveParam (../../../node_modules/@nestjs/core/injector/injector.js:140:38)
-          at async Promise.all (index 0)
-      at TestingInjector.resolveConstructorParams (../../../node_modules/@nestjs/core/injector/injector.js:169:27)
-      at TestingInjector.loadInstance (../../../node_modules/@nestjs/core/injector/injector.js:75:13)
-      at TestingInjector.loadController (../../../node_modules/@nestjs/core/injector/injector.js:94:9)
-      at ../../../node_modules/@nestjs/core/injector/instance-loader.js:68:13
-          at async Promise.all (index 0)
-      at TestingInstanceLoader.createInstancesOfControllers (../../../node_modules/@nestjs/core/injector/instance-loader.js:67:9)
-      at ../../../node_modules/@nestjs/core/injector/instance-loader.js:42:13
-          at async Promise.all (index 1)
-      at TestingInstanceLoader.createInstances (../../../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
-      at TestingInstanceLoader.createInstancesOfDependencies (../../../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
-      at TestingInstanceLoader.createInstancesOfDependencies (../../../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
-      at TestingModuleBuilder.createInstancesOfDependencies (../../../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
-      at TestingModuleBuilder.compile (../../../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
-      at Object.<anonymous> (modules/follows/follows.controller.spec.ts:8:35)
-
-PASS src/modules/events/events.service.spec.ts (5.797 s)
-PASS src/modules/events/events.controller.spec.ts (5.721 s)
-PASS src/modules/colleges/colleges.service.spec.ts
-PASS src/modules/messages/messages.controller.spec.ts
-PASS src/modules/profiles/profiles.service.spec.ts
-PASS src/modules/clubs/clubs.controller.spec.ts
-PASS src/modules/users/users.controller.spec.ts
-PASS src/modules/colleges/colleges.controller.spec.ts
+PASS src/modules/marketplace/marketplace.service.spec.ts (7.872 s)
+PASS src/modules/users/users.service.spec.ts (7.784 s)
+PASS src/modules/users/users.controller.spec.ts (6.079 s)
+PASS src/modules/marketplace/marketplace.controller.spec.ts (8.334 s)
+PASS src/modules/events/events.service.spec.ts (8.641 s)
+PASS src/modules/events/events.controller.spec.ts (8.862 s)
 PASS src/modules/notes/notes.controller.spec.ts
-PASS src/modules/notes/notes.service.spec.ts
+PASS src/modules/follows/follows.controller.spec.ts
+PASS src/modules/colleges/colleges.controller.spec.ts
+PASS src/modules/profiles/profiles.controller.spec.ts (8.775 s)
+PASS src/modules/messages/messages.controller.spec.ts
 PASS src/modules/messages/messages.service.spec.ts
+PASS src/modules/clubs/clubs.controller.spec.ts
 PASS src/modules/clubs/clubs.service.spec.ts
+PASS src/modules/profiles/profiles.service.spec.ts
 PASS src/app.controller.spec.ts
-PASS src/modules/profiles/profiles.controller.spec.ts
+PASS src/modules/notes/notes.service.spec.ts
+PASS src/modules/follows/follows.service.spec.ts
+PASS src/modules/colleges/colleges.service.spec.ts
 
-Test Suites: 2 failed, 17 passed, 19 total
-Tests:       2 failed, 17 passed, 19 total
+Test Suites: 19 passed, 19 total
+Tests:       19 passed, 19 total
 Snapshots:   0 total
-Time:        23.201 s
+Time:        23.36 s
 Ran all test suites.
-npm error Lifecycle script `test` failed with error:
-npm error code 1
-npm error path F:\kannan\projects\unoffical\apps\server
-npm error workspace server@0.0.1
-npm error location F:\kannan\projects\unoffical\apps\server
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c jest

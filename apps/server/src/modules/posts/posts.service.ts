@@ -15,7 +15,7 @@ export class PostsService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
-  ) { }
+  ) {}
 
   async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -32,12 +32,12 @@ export class PostsService {
 
     const sanitizedContent = createPostDto.content
       ? sanitizeHtml(createPostDto.content, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-        allowedAttributes: {
-          ...sanitizeHtml.defaults.allowedAttributes,
-          img: ['src', 'alt'],
-        },
-      })
+          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+          allowedAttributes: {
+            ...sanitizeHtml.defaults.allowedAttributes,
+            img: ['src', 'alt'],
+          },
+        })
       : '';
 
     // Data object for Prisma
@@ -119,14 +119,12 @@ export class PostsService {
     }
 
     // 3. Visibility Logic (Complex OR)
-    // User sees: 
+    // User sees:
     // - PUBLIC posts
     // - COLLEGE posts (IF user's collegeId matches post's collegeId)
     // - PRIVATE posts (IF authorId matches userId)
 
-    const visibilityConditions: any[] = [
-      { visibility: 'PUBLIC' },
-    ];
+    const visibilityConditions: any[] = [{ visibility: 'PUBLIC' }];
 
     if (currentUser.collegeId) {
       visibilityConditions.push({
@@ -142,10 +140,7 @@ export class PostsService {
 
     // Combine
     const whereClause: any = {
-      AND: [
-        ...andConditions,
-        { OR: visibilityConditions },
-      ],
+      AND: [...andConditions, { OR: visibilityConditions }],
     };
 
     const [total, posts] = await this.prisma.$transaction([

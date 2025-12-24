@@ -17,7 +17,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) { }
+  constructor(private readonly eventsService: EventsService) {}
 
   @Get()
   async findAll(
@@ -56,7 +56,7 @@ export class EventsController {
     const user = {
       id: req.user.userId,
       role: req.user.role,
-      collegeId: req.user.collegeId || null
+      collegeId: req.user.collegeId || null,
     };
 
     return this.eventsService.create(

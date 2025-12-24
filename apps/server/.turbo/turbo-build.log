@@ -2,12 +2,12 @@
 > server@0.0.1 build
 > npx prisma generate && npx nest build
 
-Prisma schema loaded from prisma\schema.prisma
 Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
 
 ✔ Installed the @prisma/client and prisma packages in your project
 
-✔ Generated Prisma Client (v6.19.0) to .\node_modules\@prisma\client in 1.23s
+✔ Generated Prisma Client (v6.19.0) to .\node_modules\@prisma\client in 1.37s
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 

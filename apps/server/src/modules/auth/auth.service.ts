@@ -25,7 +25,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     // Hash password
@@ -66,7 +66,12 @@ export class AuthService {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role, user.profile?.collegeId);
+    const tokens = await this.generateTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.profile?.collegeId,
+    );
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -105,7 +110,12 @@ export class AuthService {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role, user.profile?.collegeId);
+    const tokens = await this.generateTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.profile?.collegeId,
+    );
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -115,7 +125,12 @@ export class AuthService {
   }
 
   async loginWithUser(user: any) {
-    const tokens = await this.generateTokens(user.id, user.email, user.role, user.profile?.collegeId);
+    const tokens = await this.generateTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.profile?.collegeId,
+    );
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {

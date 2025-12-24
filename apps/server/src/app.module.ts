@@ -95,4 +95,4 @@ import { ClassroomsModule } from './modules/classrooms/classrooms.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

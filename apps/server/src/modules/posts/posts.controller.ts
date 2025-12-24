@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) { }
+  constructor(private readonly postsService: PostsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -42,7 +42,14 @@ export class PostsController {
       role: req.user.role,
       collegeId: req.user.collegeId || null,
     };
-    return this.postsService.findAll(currentUser, collegeSlug, Number(page), Number(limit), filter, isOfficial === 'true');
+    return this.postsService.findAll(
+      currentUser,
+      collegeSlug,
+      Number(page),
+      Number(limit),
+      filter,
+      isOfficial === 'true',
+    );
   }
 
   @Get(':id')

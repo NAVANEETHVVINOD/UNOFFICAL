@@ -6,11 +6,18 @@
 F:\kannan\projects\unoffical\apps\web\app\admin\college\page.tsx
   66:6  warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
+F:\kannan\projects\unoffical\apps\web\app\classrooms\[id]\ClassroomClient.tsx
+  212:8  warning  React Hook useEffect has a missing dependency: 'loadAssignments'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  312:8  warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array         react-hooks/exhaustive-deps
+
 F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\ClubDetailsClient.tsx
   47:6  warning  React Hook useEffect has a missing dependency: 'fetchClubDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\clubs\[id]\manage\page.tsx
   76:6  warning  React Hook useEffect has a missing dependency: 'fetchClub'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\CollegeFeed.tsx
+  179:8  warning  React Hook useEffect has a missing dependency: 'loadFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\colleges\[slug]\marketplace\page.tsx
   44:6  warning  React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
@@ -32,7 +39,7 @@ F:\kannan\projects\unoffical\apps\web\app\context\SocketContext.tsx
   61:6  warning  React Hook useEffect has a missing dependency: 'socket'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\events\[id]\EventDetailsClient.tsx
-  64:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  65:6  warning  React Hook useEffect has a missing dependency: 'fetchEventDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\events\[id]\certificates\page.tsx
    76:6   warning  React Hook useEffect has a missing dependency: 'fetchEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
@@ -43,7 +50,7 @@ F:\kannan\projects\unoffical\apps\web\app\events\[id]\checkin\page.tsx
   68:6  warning  React Hook useEffect has a missing dependency: 'fetchEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\hooks\useInfiniteFeed.ts
-  105:8  warning  React Hook useCallback has an unnecessary dependency: 'category'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  148:8  warning  React Hook useCallback has an unnecessary dependency: 'category'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
 
 F:\kannan\projects\unoffical\apps\web\app\layout.tsx
   47:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
@@ -64,5 +71,5 @@ F:\kannan\projects\unoffical\apps\web\app\notes\NotesClient.tsx
 F:\kannan\projects\unoffical\apps\web\app\profile\[id]\page.tsx
   60:6  warning  React Hook useEffect has missing dependencies: 'fetchUserProfile' and 'router'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
 
-✖ 23 problems (0 errors, 23 warnings)
+✖ 26 problems (0 errors, 26 warnings)
 

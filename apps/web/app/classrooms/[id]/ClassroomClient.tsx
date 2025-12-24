@@ -2,12 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "../../../lib/api";
-import Navbar from "../../components/Navbar";
-import Container from "../../components/ui/Container";
+import { api } from "@/lib/api";
+import Navbar from "@/components/Navbar";
+import Container from "@/components/ui/Container";
 import { Settings, Users, BookOpen, GraduationCap, ChevronLeft, MoreHorizontal, Plus, Clock, ChevronDown, Upload } from "lucide-react";
+import CreateAssignmentModal from "@/components/lms/CreateAssignmentModal";
+import UploadComponent from "@/components/ui/UploadComponent";
+import GradingModal from "@/components/lms/GradingModal";
 
-// Placeholder components (will serve as separate files later if needed)
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+    }).format(new Date(dateString));
+};
+
 function StreamTab({ classroom }: { classroom: any }) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -33,21 +45,6 @@ function StreamTab({ classroom }: { classroom: any }) {
         </div>
     );
 }
-
-import CreateAssignmentModal from "../../components/lms/CreateAssignmentModal";
-import UploadComponent from "../../components/ui/UploadComponent";
-
-const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    return new Intl.DateTimeFormat('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric'
-    }).format(new Date(dateString));
-};
-
-import GradingModal from "../../components/lms/GradingModal";
 
 function AssignmentItem({ assignment, isTeacher, classroomId }: { assignment: any; isTeacher: boolean; classroomId: string }) {
     const [expanded, setExpanded] = useState(false);
