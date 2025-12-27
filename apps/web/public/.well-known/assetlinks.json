@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "app.vercel.linker_app.twa",
+      "package_name": "app.vercel.linker_inky.twa",
       "sha256_cert_fingerprints": [
         "B7:E5:7E:06:EF:BF:37:80:A9:F5:67:AC:6E:04:39:21:B3:9B:7A:4E:BF:87:40:BE:CA:25:18:D1:74:48:03:91"
       ]

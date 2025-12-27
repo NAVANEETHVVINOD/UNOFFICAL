@@ -19,7 +19,7 @@ npm install -g @anthropic/bubblewrap-cli
 
 ```bash
 # From project root
-bubblewrap init --manifest=https://linker-app.vercel.app/manifest.json
+bubblewrap init --manifest=https://linker-inky.vercel.app/manifest.json
 ```
 
 Or use the existing twa-manifest.json:
@@ -126,8 +126,8 @@ adb install app-release-signed.apk
 - **Full Description**: [See PLAY_STORE_LISTING.md]
 - **Category**: Education > Social
 - **Content Rating**: 13+
-- **Privacy Policy**: https://linker-app.vercel.app/legal/privacy
-- **Terms of Service**: https://linker-app.vercel.app/legal/terms
+- **Privacy Policy**: https://linker-inky.vercel.app/legal/privacy
+- **Terms of Service**: https://linker-inky.vercel.app/legal/terms
 
 ### Release Tracks
 

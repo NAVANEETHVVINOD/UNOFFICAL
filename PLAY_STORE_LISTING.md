@@ -106,8 +106,8 @@ Same screens as phone, optimized for tablet layout.
 ## Contact Information
 
 **Email:** support@linker.app
-**Website:** https://linker-app.vercel.app
-**Privacy Policy:** https://linker-app.vercel.app/legal/privacy
+**Website:** https://linker-inky.vercel.app
+**Privacy Policy:** https://linker-inky.vercel.app/legal/privacy
 
 ## Content Rating Questionnaire
 
