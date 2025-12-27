@@ -23,10 +23,10 @@ export default function CollegeLayout({
       {/* Global Navbar */}
       <Navbar />
 
-      {/* Main Content Container */}
-      <div className="relative z-10 pt-24 md:pt-28">
+      {/* Main Content Container - pt-24 md:pt-36 matches Dashboard spacing */}
+      <div className="relative z-10 pt-24 md:pt-36">
         {/* NavBox - College variant with 3 items */}
-        <div className="max-w-[1400px] mx-auto px-4 mb-4">
+        <div className="max-w-[1400px] mx-auto px-4 lg:px-6 mb-6">
           <CategoryRibbon variant="college" />
         </div>
         {children}

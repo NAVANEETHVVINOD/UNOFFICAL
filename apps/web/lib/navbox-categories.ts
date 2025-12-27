@@ -20,12 +20,12 @@ export interface CategoryItem {
   pathTemplate: string; // Use template for dynamic paths
 }
 
-// Global variant: Home, Explore, Chat, College (4 items)
+// Global variant: Home, College, Explore, Chat (4 items)
 export const GLOBAL_CATEGORIES: CategoryItem[] = [
   { id: 'home', label: 'Home', icon: Home, color: 'bg-primary', pathTemplate: '/dashboard' },
+  { id: 'college', label: 'College', icon: GraduationCap, color: 'bg-accent-coral', pathTemplate: '{{collegeHref}}' },
   { id: 'explore', label: 'Explore', icon: Compass, color: 'bg-accent-blue', pathTemplate: '/explore' },
   { id: 'chat', label: 'Chat', icon: MessageCircle, color: 'bg-accent-orange', pathTemplate: '/messages' },
-  { id: 'college', label: 'College', icon: GraduationCap, color: 'bg-accent-coral', pathTemplate: '{{collegeHref}}' },
 ];
 
 // College variant: Home, College, Clubs (3 items)
