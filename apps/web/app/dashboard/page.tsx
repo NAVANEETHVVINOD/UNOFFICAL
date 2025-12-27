@@ -16,9 +16,13 @@ export default async function DashboardPage() {
       redirect("/login");
     }
 
-    // if (!user.profile?.isOnboarded) {
-    //   redirect("/onboarding");
-    // }
+    // Check if user has completed onboarding (has college selected)
+    const hasCollege = user.profile?.collegeId || user.profile?.college?.id || (user.profile?.socials as any)?.tempCollegeId;
+    const hasFullName = user.profile?.fullName && user.profile.fullName.trim().length > 0;
+    
+    if (!hasCollege || !hasFullName) {
+      redirect("/onboarding");
+    }
 
     return <DashboardClient />;
   } catch (error) {

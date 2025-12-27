@@ -15,7 +15,11 @@ export default function ProfileSidebar() {
 
   const level = user.profile?.level || 1;
   const karma = user.profile?.karma || 0;
-  const collegeName = user.profile?.college?.name || "No Campus Selected";
+  
+  // Get college name from multiple sources (direct college, or temp college from socials)
+  const collegeName = user.profile?.college?.name 
+    || (user.profile?.socials as any)?.tempCollegeName 
+    || "No Campus Selected";
 
   // Calculate level progress (example: 100 karma per level)
   const progress = Math.min((karma % 100) / 100 * 100, 100);

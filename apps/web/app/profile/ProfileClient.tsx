@@ -130,7 +130,9 @@ function ProfileContent() {
 
   // Fallbacks using possibly incomplete user.profile or fetched profile
   const displayProfile = profile || user.profile;
-  const collegeName = displayProfile?.college?.name || "No Campus Selected";
+  const collegeName = displayProfile?.college?.name 
+    || (displayProfile?.socials as any)?.tempCollegeName 
+    || "No Campus Selected";
   const username = user.email?.split("@")[0] || "user";
   const fullName = displayProfile?.fullName || "Anonymous User";
   const avatarUrl = displayProfile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${fullName}`;
