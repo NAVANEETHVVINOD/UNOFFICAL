@@ -98,7 +98,7 @@ export function useFeatureFlags() {
         setFlags(defaultFlags);
     }, []);
 
-    const userRole = user?.profile?.role;
+    const userRole = user?.role;
     const isAdmin = hasAdminAccess('eventsCreate', userRole);
 
     // Helper to check if a specific feature is enabled for current user
