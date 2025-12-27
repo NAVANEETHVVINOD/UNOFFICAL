@@ -5,47 +5,57 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import {
   Home,
-  GraduationCap, // College icon
-  Compass, // Explore icon
+  GraduationCap,
+  Compass,
   MessageCircle,
+  Users,
 } from "lucide-react";
+import { 
+  GLOBAL_CATEGORIES, 
+  COLLEGE_CATEGORIES,
+  type NavBoxVariant 
+} from "../../lib/navbox-categories";
 
 interface CategoryRibbonProps {
+  variant?: NavBoxVariant;
   className?: string;
 }
 
-export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) {
+export default function CategoryRibbon({ variant = 'global', className = "" }: CategoryRibbonProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
 
   const collegeSlug = user?.profile?.college?.slug;
-  const collegeHref = collegeSlug ? `/colleges/${collegeSlug}` : '/my-college';
+  const tempCollegeId = (user?.profile?.socials as any)?.tempCollegeId;
+  const collegeHref = collegeSlug 
+    ? `/colleges/${collegeSlug}` 
+    : tempCollegeId 
+      ? `/colleges/${tempCollegeId}`
+      : '/my-college';
 
-  // Desktop Nav Box: 4 items - Home, College, Explore, Chat
-  const CATEGORIES = [
-    { id: 'feed', label: 'Home', icon: Home, color: 'bg-primary', path: '/dashboard' },
-    { id: 'college', label: 'College', icon: GraduationCap, color: 'bg-accent-coral', path: collegeHref },
-    { id: 'explore', label: 'Explore', icon: Compass, color: 'bg-accent-blue', path: '/explore' },
-    { id: 'messages', label: 'Chat', icon: MessageCircle, color: 'bg-accent-orange', path: '/messages' },
-  ];
+  // Get categories based on variant and resolve dynamic paths
+  const baseCategories = variant === 'college' ? COLLEGE_CATEGORIES : GLOBAL_CATEGORIES;
+  const CATEGORIES = baseCategories.map(cat => ({
+    ...cat,
+    path: cat.pathTemplate.replace('{{collegeHref}}', collegeHref)
+  }));
 
   const getActiveCategory = () => {
-    if (pathname === '/dashboard' || pathname === '/') return 'feed';
+    if (pathname === '/dashboard' || pathname === '/') return 'home';
     if (pathname.startsWith('/colleges') || pathname.startsWith('/my-college')) return 'college';
-    if (pathname.startsWith('/explore') || pathname.startsWith('/events') || pathname.startsWith('/clubs') || pathname.startsWith('/resources') || pathname.startsWith('/marketplace')) return 'explore';
-    if (pathname.startsWith('/messages')) return 'messages';
-    return 'feed';
+    if (pathname.startsWith('/explore') || pathname.startsWith('/events') || pathname.startsWith('/resources') || pathname.startsWith('/marketplace') || pathname.startsWith('/collabo')) return 'explore';
+    if (pathname.startsWith('/messages')) return 'chat';
+    if (pathname.startsWith('/clubs')) return 'clubs';
+    return 'home';
   };
 
   const active = getActiveCategory();
 
   return (
     <div className={`w-full hidden md:block ${className}`}>
-      {/* Desktop View - Hidden on mobile, BottomNav handles navigation */}
-      <div
-        className="flex items-center gap-2 p-1.5 bg-paper border-2 border-ink rounded-xl shadow-neo"
-      >
+      {/* Desktop View - No rotation/tilt, consistent styling */}
+      <div className="flex items-center gap-2 p-1.5 bg-paper dark:bg-dark-surface border-2 border-ink dark:border-dark-border rounded-xl shadow-neo">
         {CATEGORIES.map((cat) => {
           const isActive = active === cat.id;
           const Icon = cat.icon;
@@ -59,7 +69,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
                 font-medium text-sm transition-all
                 ${isActive
                   ? `${cat.color} text-ink border-2 border-ink shadow-neo-sm`
-                  : 'text-neutral-600 hover:bg-neutral-100'
+                  : 'text-neutral-600 dark:text-dark-text-muted hover:bg-neutral-100 dark:hover:bg-dark-border'
                 }
               `}
               whileHover={{ scale: isActive ? 1 : 1.02 }}
@@ -71,7 +81,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
               {isActive && (
                 <motion.div
                   className="absolute -bottom-1 left-1/2 w-2 h-2 bg-ink rounded-full"
-                  layoutId="activeTab"
+                  layoutId={`activeTab-${variant}`}
                   style={{ x: '-50%' }}
                 />
               )}
@@ -79,7 +89,6 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
           );
         })}
       </div>
-
     </div>
   );
 }

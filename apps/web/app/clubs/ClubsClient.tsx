@@ -13,6 +13,7 @@ import Doodle from "../components/ui/Doodle";
 import { PageTransition } from "../providers/AnimationProvider";
 import Navbar from "../components/Navbar";
 import BottomNav from "../components/ui/BottomNav";
+import CategoryRibbon from "../components/CategoryRibbon";
 import { motion } from "framer-motion";
 import { api } from "../../lib/api";
 import Link from "next/link";
@@ -64,7 +65,12 @@ export default function ClubsClient() {
 
         <Navbar />
         <Container>
-          <div className="pt-24 md:pt-36 pb-24 md:pb-8 relative z-10">
+          <div className="pt-24 md:pt-28 pb-24 md:pb-8 relative z-10">
+            {/* NavBox - College variant with 3 items */}
+            <div className="hidden md:block mb-6">
+              <CategoryRibbon variant="college" />
+            </div>
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

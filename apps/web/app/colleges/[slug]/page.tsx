@@ -1,13 +1,14 @@
 /**
  * CollegeHome (Dynamic Route)
  *
- * The specific dashboard for a single college (/colleges/[slug]).
- * Modern redesign matching the global dashboard aesthetic.
+ * The college information page (/colleges/[slug]).
+ * Displays college details, stats, and quick links.
+ * Feed is now in the global dashboard.
  */
 import { redirect } from "next/navigation";
 import { getServerProfile } from "../../../lib/server-utils";
 import { api } from "../../../lib/api";
-import CollegeFeed from "./CollegeFeed";
+import CollegeInfo from "./CollegeInfo";
 import { Metadata } from "next";
 
 interface PageProps {
@@ -51,30 +52,25 @@ export default async function CollegeHome({ params }: PageProps) {
 
   const { slug } = await params;
 
-  // Fetch data in parallel with proper error handling
-  let events: any[] = [];
+  // Fetch college data and stats
   let college: any = null;
+  let stats: any = null;
 
   try {
     const results = await Promise.allSettled([
-      api.getEvents(slug),
       api.getCollegeBySlug(slug),
+      api.getCollegeStats(slug),
     ]);
 
-    events = results[0].status === 'fulfilled' ? results[0].value : [];
-    college = results[1].status === 'fulfilled' ? results[1].value : null;
+    college = results[0].status === 'fulfilled' ? results[0].value : null;
+    stats = results[1].status === 'fulfilled' ? results[1].value : null;
   } catch (error) {
     console.error("Failed to fetch college data:", error);
   }
 
-  const upcomingEvents = (Array.isArray(events) ? events : []).slice(0, 5);
-
   return (
-    <div className="relative z-10 max-w-[1400px] mx-auto px-2 md:px-4">
-      {/* Reduced padding top significantly since layout handles navbar spacing */}
-      <div className="">
-        <CollegeFeed collegeSlug={slug} initialEvents={upcomingEvents} college={college} />
-      </div>
+    <div className="relative z-10 max-w-[1400px] mx-auto px-4 pb-24">
+      <CollegeInfo college={college} stats={stats} collegeSlug={slug} />
     </div>
   );
 }

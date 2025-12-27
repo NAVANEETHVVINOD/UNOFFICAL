@@ -352,9 +352,9 @@ export default function MessagesClient() {
 
       <div className="flex-1 flex flex-col overflow-hidden pt-24 md:pt-36 max-w-[1600px] mx-auto w-full px-4 lg:px-6">
         
-        {/* NavBox at top - Desktop only */}
+        {/* NavBox at top - Desktop only, global variant */}
         <div className="hidden md:block mb-4">
-          <CategoryRibbon />
+          <CategoryRibbon variant="global" />
         </div>
 
         {/* MESSAGES LAYOUT CONTAINER - Wraps List and Chat */}

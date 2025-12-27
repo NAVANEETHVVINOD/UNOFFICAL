@@ -1,5 +1,6 @@
 import { ReactNode, use } from "react";
 import Navbar from "../../components/Navbar";
+import CategoryRibbon from "../../components/CategoryRibbon";
 
 interface CollegeLayoutProps {
   children: ReactNode;
@@ -12,9 +13,6 @@ export default function CollegeLayout({
   children,
   params,
 }: CollegeLayoutProps) {
-  // We don't really need slug/params here if we are just a shell, 
-  // but we keep the signature correct.
-
   return (
     <>
       {/* Background Pattern */}
@@ -25,8 +23,12 @@ export default function CollegeLayout({
       {/* Global Navbar */}
       <Navbar />
 
-      {/* Main Content Container - Removed duplicate padding */}
-      <div className="relative z-10 pt-24 md:pt-36">
+      {/* Main Content Container */}
+      <div className="relative z-10 pt-24 md:pt-28">
+        {/* NavBox - College variant with 3 items */}
+        <div className="max-w-[1400px] mx-auto px-4 mb-4">
+          <CategoryRibbon variant="college" />
+        </div>
         {children}
       </div>
     </>

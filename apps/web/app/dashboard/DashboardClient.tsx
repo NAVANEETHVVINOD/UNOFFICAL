@@ -122,8 +122,8 @@ function DashboardContent() {
         }}
       >
 
-        {/* Category Navigation */}
-        <CategoryRibbon />
+        {/* Category Navigation - Global variant with 4 items */}
+        <CategoryRibbon variant="global" />
 
         {/* Sticky Feed Header & Filters */}
         <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md pt-4 pb-2 mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
