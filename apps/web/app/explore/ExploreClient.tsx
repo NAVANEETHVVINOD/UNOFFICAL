@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Container from "../components/ui/Container";
 import Navbar from "../components/Navbar";
+import CategoryRibbon from "../components/CategoryRibbon";
 import BottomNav from "../components/ui/BottomNav";
 import { PageTransition } from "../providers/AnimationProvider";
 import {
@@ -89,6 +90,11 @@ export default function ExploreClient() {
 
                 <Container>
                     <div className="pt-20 pb-24">
+                        {/* NavBox at top - Desktop only */}
+                        <div className="hidden md:block mb-6">
+                            <CategoryRibbon />
+                        </div>
+
                         {/* Header */}
                         <div className="flex items-center gap-3 mb-8">
                             <div className="p-3 bg-white dark:bg-dark-surface border-2 border-ink rounded-xl shadow-neo-sm">

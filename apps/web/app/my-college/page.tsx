@@ -22,12 +22,19 @@ export default function MyCollegeRedirect() {
             return;
         }
 
-        // Check if user has a college
+        // Check if user has a college (check both college.slug and tempCollegeId in socials)
         const collegeSlug = user?.profile?.college?.slug;
+        const tempCollegeId = (user?.profile?.socials as any)?.tempCollegeId;
+        const tempCollegeName = (user?.profile?.socials as any)?.tempCollegeName;
 
         if (collegeSlug) {
             setRedirecting(true);
             router.replace(`/colleges/${collegeSlug}`);
+        } else if (tempCollegeId) {
+            // User has a fallback college (tempCollegeId) - redirect to dashboard
+            // since we can't navigate to a college page without a slug
+            setRedirecting(true);
+            router.replace("/dashboard");
         } else {
             // No college set - redirect to onboarding
             setError("No campus selected");

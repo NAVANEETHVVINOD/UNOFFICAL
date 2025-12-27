@@ -135,7 +135,8 @@ export default function Carousel({
 
   return (
     <div
-      className={`relative ${containerClasses} ${className}`}
+      className={`relative ${containerClasses} ${className} transform -rotate-1`}
+      style={{ transformOrigin: 'center' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       role="region"

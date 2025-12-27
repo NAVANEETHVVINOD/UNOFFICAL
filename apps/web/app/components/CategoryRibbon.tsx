@@ -44,8 +44,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
     <div className={`w-full hidden md:block ${className}`}>
       {/* Desktop View - Hidden on mobile, BottomNav handles navigation */}
       <div
-        className="flex items-center gap-2 p-1.5 bg-paper border-2 border-ink rounded-xl shadow-neo transform -rotate-1"
-        style={{ transformOrigin: 'center left' }}
+        className="flex items-center gap-2 p-1.5 bg-paper border-2 border-ink rounded-xl shadow-neo"
       >
         {CATEGORIES.map((cat) => {
           const isActive = active === cat.id;

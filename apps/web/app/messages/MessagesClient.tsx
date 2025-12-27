@@ -68,6 +68,7 @@ interface SearchUser {
 }
 
 import AppSidebar from "../components/navigation/AppSidebar";
+import CategoryRibbon from "../components/CategoryRibbon";
 
 export default function MessagesClient() {
   const router = useRouter();
@@ -349,11 +350,11 @@ export default function MessagesClient() {
     <div className="h-screen bg-paper flex flex-col overflow-hidden">
       <Navbar />
 
-      <div className="flex-1 flex overflow-hidden pt-24 md:pt-36 max-w-[1600px] mx-auto w-full px-4 lg:px-6 gap-4">
-
-        {/* APP NAVIGATION SIDEBAR - Visible only on Large Screens */}
-        <div className="hidden lg:block w-[280px] flex-shrink-0 flex flex-col gap-4 overflow-y-auto pb-4">
-          <AppSidebar />
+      <div className="flex-1 flex flex-col overflow-hidden pt-24 md:pt-36 max-w-[1600px] mx-auto w-full px-4 lg:px-6">
+        
+        {/* NavBox at top - Desktop only */}
+        <div className="hidden md:block mb-4">
+          <CategoryRibbon />
         </div>
 
         {/* MESSAGES LAYOUT CONTAINER - Wraps List and Chat */}

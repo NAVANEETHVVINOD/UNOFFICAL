@@ -18,6 +18,7 @@ import Doodle from "./components/ui/Doodle";
 import BottomNav from "./components/ui/BottomNav";
 import Carousel from "./components/ui/Carousel";
 import Navbar from "./components/Navbar";
+import LandingNavbar from "./components/LandingNavbar";
 import Loading from "./loading";
 
 import { useEffect, useState } from "react";
@@ -80,6 +81,9 @@ export default function Home() {
     return (
 
         <Container>
+            {/* Landing Navbar */}
+            <LandingNavbar />
+            
             <div className="absolute top-0 left-0 w-full h-[80vh] overflow-hidden -z-10">
                 <img
                     src="/doodles/header-vangof.jpg"
@@ -89,7 +93,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/80 to-white"></div>
             </div>
             <Container>
-                <div className="py-8 pb-24 md:pb-8">
+                <div className="py-8 pb-24 md:pb-8 pt-20">
                     {/* Navbar */}
 
                     <div>
