@@ -26,7 +26,7 @@ import CreatePostModal from "../components/CreatePostModal";
 import { FeedSkeleton } from "../components/ui/Skeleton";
 
 // Icons
-import { Sparkles } from "lucide-react";
+import { Sparkles, AlertTriangle, RefreshCw } from "lucide-react";
 
 // Animation variants
 const containerVariants: Variants = {
@@ -51,7 +51,7 @@ function DashboardContent() {
   const { user, loading } = useAuth();
   const { isReady: onboardingComplete } = useOnboardingGuard();
   const [filter, setFilter] = useState<'all' | 'college' | 'events' | 'market'>('college');
-  const { items, isLoading, loadMore, hasMore } = useInfiniteFeed({ category: 'feed', filter });
+  const { items, isLoading, loadMore, hasMore, error } = useInfiniteFeed({ category: 'feed', filter });
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [postModalTab, setPostModalTab] = useState<'TEXT' | 'POLL' | 'MARKET' | 'EVENT'>('TEXT');
@@ -220,7 +220,7 @@ function DashboardContent() {
         )}
 
         {/* Empty State */}
-        {!isLoading && items.length === 0 && (
+        {!isLoading && items.length === 0 && !error && (
           <motion.div
             className="text-center py-16"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -243,6 +243,32 @@ function DashboardContent() {
               className="btn-neo btn-primary"
             >
               Create First Post
+            </button>
+          </motion.div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="w-20 h-20 mx-auto mb-6 bg-accent-coral/20 border-2 border-dashed border-accent-coral rounded-2xl flex items-center justify-center">
+              <AlertTriangle className="w-10 h-10 text-accent-coral" />
+            </div>
+            <h3 className="font-display text-xl text-ink mb-2">
+              Connection Error
+            </h3>
+            <p className="text-neutral-500 mb-6 max-w-md mx-auto">
+              Unable to connect to the server. This might be because the server is waking up (takes ~30 seconds) or there's a network issue.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-neo btn-primary inline-flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try Again
             </button>
           </motion.div>
         )}

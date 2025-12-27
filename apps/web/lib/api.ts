@@ -104,7 +104,12 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
     }
 
     return response.json();
-  } catch (error) {
+  } catch (error: any) {
+    // Handle network errors gracefully
+    if (error.name === 'TypeError' && error.message.includes('network')) {
+      console.error(`[API] Network error for ${fullUrl}. Server may be unavailable.`);
+      throw new Error("Unable to connect to server. Please try again in a moment.");
+    }
     console.error(`[API] Request failed for ${fullUrl}:`, error);
     throw error;
   }
