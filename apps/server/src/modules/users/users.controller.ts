@@ -20,6 +20,27 @@ export class UsersController {
     return this.usersService.findOne({ id: req.user.userId });
   }
 
+  /**
+   * Get all saved items for the authenticated user.
+   * Supports filtering by type (POST, EVENT, LISTING, NOTE).
+   * 
+   * **Validates: Requirements 27.4**
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('me/saved')
+  async getSavedItems(
+    @Request() req,
+    @Query('type') type?: 'POST' | 'EVENT' | 'LISTING' | 'NOTE',
+  ) {
+    return this.usersService.getSavedItems(req.user.userId, type);
+  }
+
+  /**
+   * Search users by name or email.
+   * 
+   * **Validates: Requirements 29.1**
+   */
+  @UseGuards(JwtAuthGuard)
   @Get('search')
   async searchUsers(@Query('q') query: string, @Request() req) {
     const currentUserId = req.user?.userId;

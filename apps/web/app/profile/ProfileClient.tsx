@@ -3,10 +3,10 @@
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import Link from "next/link";
-import { Settings, Send, MapPin, Github, Briefcase, GraduationCap, Heart, Star, Calendar, ArrowLeft } from "lucide-react";
+import { Settings, MapPin, Github, Briefcase, GraduationCap, Heart, Star, Calendar, ArrowLeft } from "lucide-react";
 import { api } from "../../lib/api";
 import {
   ActivitiesTab,
@@ -18,6 +18,7 @@ import {
 } from "../components/profile";
 import ProfileSectionModal from "../components/profile/ProfileSectionModal";
 import FollowButton from "../components/ui/FollowButton";
+import NavBox from "../components/ui/NavBox";
 
 interface UserActivity {
   posts: Array<{ id: string; content: string; createdAt: string; _count?: { likes: number; comments: number } }>;
@@ -229,30 +230,15 @@ function ProfileContent() {
         </div>
       </motion.div>
 
-      {/* 2. STICKY TABS ("Nav Box") - Scrollable */}
-      <div className="sticky top-16 md:top-20 z-40 bg-neutral-100/95 dark:bg-[#121212]/95 backdrop-blur-sm border-b border-ink/10 mb-6">
-        <div className="max-w-3xl mx-auto w-full px-4 py-2">
-          <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as ProfileTabId)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all whitespace-nowrap flex-shrink-0 ${isActive
-                    ? "bg-primary border-ink text-black shadow-neo-sm"
-                    : "bg-white dark:bg-[#2D2D2D] border-transparent dark:border-white/10 text-neutral-500 hover:border-ink/20"
-                    }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm font-bold font-display">{tab.label}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </div>
+      {/* 2. STICKY TABS using NavBox Component */}
+      <NavBox
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(tabId) => setActiveTab(tabId as ProfileTabId)}
+        sticky
+        stickyOffset="top-16 md:top-20"
+        className="mb-6"
+      />
 
       {/* 3. SCROLLABLE MAIN CONTENT with Swipe */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 pb-20 overflow-hidden">

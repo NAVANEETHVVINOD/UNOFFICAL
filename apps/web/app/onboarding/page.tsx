@@ -308,16 +308,20 @@ export default function OnboardingPage() {
         stepData.interests = formData.interests;
       } else if (currentStep === 4) {
         // Campus + Location
-        // BYPASS: Backend has no colleges, so we set collegeId to null to avoid FK error.
-        // We persist the selection in 'socials' instead.
+        // Save collegeId to backend if it's a valid database ID (CUID format)
+        // Also store location info in socials for additional context
         const selectedCollege = colleges.find(c => c.id === formData.collegeId);
-
-        stepData.collegeId = null;
+        
+        // Check if collegeId looks like a valid CUID (starts with 'cl' or 'c' and is long)
+        // Fallback IDs like 'nitc' are short slugs, not valid for FK
+        const isValidDbId = formData.collegeId && formData.collegeId.length > 10;
+        
+        stepData.collegeId = isValidDbId ? formData.collegeId : null;
         stepData.socials = {
           ...(user?.profile?.socials as object || {}),
           state: formData.state,
           district: formData.district,
-          tempCollegeId: formData.collegeId,
+          tempCollegeId: formData.collegeId, // Keep for reference
           tempCollegeName: selectedCollege?.name || customCollegeData.name
         };
       } else if (currentStep === 5) {
@@ -329,10 +333,12 @@ export default function OnboardingPage() {
           alert("Please select a college."); return;
         }
         stepData.isOnboarded = true;
-        stepData.collegeId = null; // Maintain bypass
-        // Also ensure socials (with name) are sent again if needed, or rely on step 4.
-        // Better to send what we have to be safe against step-skipping or partial updates.
+        
+        // Save collegeId if it's a valid database ID
         const selectedCollege = colleges.find(c => c.id === formData.collegeId);
+        const isValidDbId = formData.collegeId && formData.collegeId.length > 10;
+        
+        stepData.collegeId = isValidDbId ? formData.collegeId : null;
         stepData.socials = {
           ...(user?.profile?.socials as object || {}),
           state: formData.state,

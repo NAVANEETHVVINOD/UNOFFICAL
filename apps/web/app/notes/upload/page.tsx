@@ -116,7 +116,7 @@ function UploadContent() {
         fileUrl = uploadData.url;
       }
       
-      // Create note entry
+      // Create note entry with original filename for naming convention
       const noteRes = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -127,6 +127,7 @@ function UploadContent() {
           courseCode: courseCode || undefined,
           description: description || undefined,
           fileUrl,
+          originalFilename: file!.name, // Send original filename for naming convention
         }),
       });
       

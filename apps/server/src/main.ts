@@ -7,10 +7,12 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import * as Sentry from '@sentry/nestjs';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { ConfigService } from '@nestjs/config';
+import { CorsConfig } from './config/cors.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const corsConfig = app.get(CorsConfig);
 
   Sentry.init({
     dsn: configService.get('SENTRY_DSN'),
@@ -32,21 +34,8 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
 
-  // CORS
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://linker-inky.vercel.app',
-    process.env.CORS_ORIGIN,
-  ].filter(Boolean);
-
-  app.enableCors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders:
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-    exposedHeaders: ['Authorization'],
-  });
+  // CORS - using centralized CorsConfig
+  app.enableCors(corsConfig.getCorsOptions());
 
   // Start server
   // Render deployment fix: Use process.env.PORT

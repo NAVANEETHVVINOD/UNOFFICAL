@@ -1,10 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Note, Prisma } from '@prisma/client';
+import { formatResourceFilename } from '../../common/utils/resource-filename';
 
 @Injectable()
 export class NotesService {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Format the filename for a resource upload according to naming convention.
+   * Format: SubjectName_Username.extension
+   * 
+   * **Validates: Requirements 3.1, 3.2, 3.4**
+   */
+  formatFilename(subject: string, username: string, originalFilename: string): string {
+    return formatResourceFilename(subject, username, originalFilename);
+  }
 
   async findAll(params: {
     skip?: number;

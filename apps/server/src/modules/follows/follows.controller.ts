@@ -41,4 +41,14 @@ export class FollowsController {
   async getFollowStatus(@Request() req, @Param('id') id: string) {
     return this.followsService.getStatus(req.user.userId, id);
   }
+
+  /**
+   * Get follower and following counts for a user.
+   * 
+   * **Validates: Requirements 28.3, 28.4**
+   */
+  @Get(':id/counts')
+  async getFollowCounts(@Param('id') id: string) {
+    return this.followsService.getCounts(id);
+  }
 }

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Bell, Shield, Eye, Moon, Smartphone, LogOut, Check, UserX, Trash2, Mail, ArrowLeft, User, Settings } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bell, Shield, Eye, Moon, Smartphone, LogOut, Check, UserX, Trash2, Mail, ArrowLeft, User, Settings, AlertTriangle } from "lucide-react";
 import {
   NotificationType,
   NOTIFICATION_CATEGORIES,
@@ -16,6 +16,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import { useBlocking } from "../hooks/useBlocking";
 import Link from "next/link";
 import BottomNav from "../components/ui/BottomNav";
+import NavBox from "../components/ui/NavBox";
 
 function getNotificationIcon(type: NotificationType): string {
   return NOTIFICATION_ICONS[type] || "🔔";
@@ -28,6 +29,9 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const { blockedUsers, unblockUser, isLoading: isLoadingBlocked } = useBlocking();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { preferences, updatePreferences } = useNotifications();
   const [localPreferences, setLocalPreferences] = useState<NotificationPreferences>(preferences);
@@ -67,6 +71,24 @@ export default function SettingsPage() {
   const handleLogout = () => {
     logout();
     router.push("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== "DELETE") return;
+    
+    setIsDeleting(true);
+    try {
+      // TODO: Add API call for account deletion when backend supports it
+      // await api.deleteAccount();
+      logout();
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      alert("Failed to delete account. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
   };
 
   const tabs = [
@@ -153,40 +175,19 @@ export default function SettingsPage() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-          {/* Sidebar */}
-          <div className="md:col-span-1">
-            <div className="card-paper p-3 md:p-4 rounded-xl">
-              <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible scrollbar-hide">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg transition-all ${activeTab === tab.id
-                      ? "bg-primary border-2 border-ink shadow-neo-sm"
-                      : "hover:bg-neutral-100 border-2 border-transparent"
-                      }`}
-                  >
-                    <tab.icon className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="font-bold text-xs md:text-sm whitespace-nowrap">{tab.label}</span>
-                  </button>
-                ))}
+        {/* NavBox for Settings Tabs */}
+        <NavBox
+          tabs={tabs.map(tab => ({ id: tab.id, label: tab.label, icon: tab.icon }))}
+          activeTab={activeTab}
+          onTabChange={(tabId) => setActiveTab(tabId as typeof activeTab)}
+          sticky
+          stickyOffset="top-16"
+          className="mb-6"
+        />
 
-                <hr className="hidden md:block my-4 border-neutral-200" />
-
-                <button
-                  onClick={handleLogout}
-                  className="flex-shrink-0 md:w-full flex items-center gap-2 md:gap-3 px-3 py-2 md:py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <LogOut className="w-4 h-4 md:w-5 md:h-5" />
-                  <span className="font-bold text-xs md:text-sm whitespace-nowrap">Log Out</span>
-                </button>
-              </nav>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 gap-4 md:gap-6">
           {/* Content */}
-          <div className="md:col-span-3">
+          <div>
             {activeTab === "notifications" && (
               <div className="card-paper p-6 rounded-xl">
                 <h2 className="font-display text-2xl font-bold mb-6">Notification Preferences</h2>
@@ -376,6 +377,35 @@ export default function SettingsPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Delete Account Section */}
+                <div className="card-paper p-6 rounded-xl border-2 border-red-200">
+                  <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-2 text-red-600">
+                    <AlertTriangle className="w-6 h-6" />
+                    Danger Zone
+                  </h2>
+                  <p className="text-neutral-600 mb-4">
+                    Once you delete your account, there is no going back. Please be certain.
+                  </p>
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Account
+                  </button>
+                </div>
+
+                {/* Logout Button */}
+                <div className="card-paper p-6 rounded-xl">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-100 text-red-600 font-bold rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Log Out
+                  </button>
+                </div>
               </div>
             )}
 
@@ -402,6 +432,73 @@ export default function SettingsPage() {
       </div>
 
       <BottomNav />
+
+      {/* Delete Account Modal */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-[#1E1E1E] rounded-2xl p-6 max-w-md w-full shadow-2xl border-2 border-ink"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-bold">Delete Account</h3>
+                  <p className="text-sm text-neutral-500">This action cannot be undone</p>
+                </div>
+              </div>
+
+              <p className="text-neutral-600 dark:text-neutral-300 mb-4">
+                All your data will be permanently deleted, including your profile, posts, and activity history.
+              </p>
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">
+                  Type <span className="text-red-600">DELETE</span> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  className="w-full px-4 py-2 border-2 border-neutral-200 rounded-lg focus:border-red-500 focus:outline-none"
+                  placeholder="DELETE"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeleteConfirmText("");
+                  }}
+                  className="flex-1 px-4 py-2 bg-neutral-100 font-bold rounded-lg hover:bg-neutral-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteConfirmText !== "DELETE" || isDeleting}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? "Deleting..." : "Delete Account"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

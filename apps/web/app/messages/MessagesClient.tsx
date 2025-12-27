@@ -25,7 +25,8 @@ import {
   Image as ImageIcon,
   Smile,
   ChevronLeft,
-  Hash
+  Hash,
+  UserPlus
 } from "lucide-react";
 
 interface Conversation {
@@ -50,10 +51,20 @@ interface Conversation {
     price?: number;
     currency?: string;
   };
+  type?: 'direct' | 'listing';
   updatedAt: string;
   isGroup?: boolean;
   groupName?: string;
   groupAvatar?: string;
+}
+
+interface SearchUser {
+  id: string;
+  email: string;
+  profile?: {
+    fullName: string;
+    avatarUrl?: string;
+  };
 }
 
 import AppSidebar from "../components/navigation/AppSidebar";
@@ -71,6 +82,13 @@ export default function MessagesClient() {
   const { user } = useAuth();
   const { socket, isConnected } = useSocket();
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // New message modal state
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
+  const [searchingUsers, setSearchingUsers] = useState(false);
+  const [creatingConversation, setCreatingConversation] = useState(false);
 
   // Initial load
   useEffect(() => {
@@ -168,6 +186,61 @@ export default function MessagesClient() {
       setError("Failed to load messages");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Search users for new direct message
+  const searchUsers = async (query: string) => {
+    if (!query.trim() || query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    
+    setSearchingUsers(true);
+    try {
+      const results = await api.searchUsers(query);
+      // Filter out current user
+      setSearchResults(results.filter((u: SearchUser) => u.id !== user?.id));
+    } catch (err) {
+      console.error("Failed to search users:", err);
+      setSearchResults([]);
+    } finally {
+      setSearchingUsers(false);
+    }
+  };
+
+  // Debounced user search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (userSearchQuery) {
+        searchUsers(userSearchQuery);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [userSearchQuery]);
+
+  // Start a new direct conversation
+  const startDirectConversation = async (participantId: string) => {
+    setCreatingConversation(true);
+    try {
+      const conversation = await api.createDirectConversation(participantId);
+      setShowNewMessageModal(false);
+      setUserSearchQuery("");
+      setSearchResults([]);
+      
+      // Add to conversations list if not already there
+      setConversations(prev => {
+        const exists = prev.find(c => c.id === conversation.id);
+        if (exists) return prev;
+        return [conversation, ...prev];
+      });
+      
+      // Select the new conversation
+      handleSelectConversation(conversation);
+    } catch (err) {
+      console.error("Failed to create conversation:", err);
+    } finally {
+      setCreatingConversation(false);
     }
   };
 
@@ -292,7 +365,16 @@ export default function MessagesClient() {
 
             {/* Sidebar Header */}
             <div className="p-4 border-b border-ink/10">
-              <h1 className="font-display text-2xl font-black mb-4">Messages</h1>
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="font-display text-2xl font-black">Messages</h1>
+                <button
+                  onClick={() => setShowNewMessageModal(true)}
+                  className="p-2 bg-primary hover:bg-primary/80 rounded-lg text-ink transition-colors border-2 border-ink shadow-neo-sm"
+                  title="New Message"
+                >
+                  <UserPlus className="w-5 h-5" />
+                </button>
+              </div>
 
               {/* Search */}
               <div className="relative mb-4">
@@ -551,6 +633,94 @@ export default function MessagesClient() {
       <div className="md:hidden">
         <BottomNav />
       </div>
+
+      {/* New Message Modal */}
+      <AnimatePresence>
+        {showNewMessageModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowNewMessageModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-paper dark:bg-[#1E1E1E] rounded-xl border-2 border-ink shadow-neo w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 border-b border-ink/10 flex items-center justify-between">
+                <h2 className="font-display text-xl font-bold">New Message</h2>
+                <button
+                  onClick={() => setShowNewMessageModal(false)}
+                  className="p-2 hover:bg-neutral-100 dark:hover:bg-white/10 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4">
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                  <input
+                    type="text"
+                    placeholder="Search users by name..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-neutral-100 dark:bg-black/20 rounded-xl text-sm border-2 border-transparent focus:border-ink focus:outline-none transition-all"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="max-h-64 overflow-y-auto">
+                  {searchingUsers ? (
+                    <div className="py-8 text-center text-neutral-500">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                      <p className="text-sm">Searching...</p>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className="space-y-1">
+                      {searchResults.map((searchUser) => (
+                        <button
+                          key={searchUser.id}
+                          onClick={() => startDirectConversation(searchUser.id)}
+                          disabled={creatingConversation}
+                          className="w-full p-3 flex items-center gap-3 hover:bg-neutral-50 dark:hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          <div className="w-10 h-10 rounded-full border-2 border-ink overflow-hidden bg-neutral-200 flex items-center justify-center">
+                            {searchUser.profile?.avatarUrl ? (
+                              <img src={searchUser.profile.avatarUrl} alt={searchUser.profile?.fullName || "User"} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="font-display font-bold">{searchUser.profile?.fullName?.[0] || searchUser.email[0].toUpperCase()}</span>
+                            )}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <p className="font-bold text-sm">{searchUser.profile?.fullName || "Unknown User"}</p>
+                            <p className="text-xs text-neutral-500">{searchUser.email}</p>
+                          </div>
+                          <MessageCircle className="w-5 h-5 text-neutral-400" />
+                        </button>
+                      ))}
+                    </div>
+                  ) : userSearchQuery.length >= 2 ? (
+                    <div className="py-8 text-center text-neutral-500">
+                      <Users className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                      <p className="text-sm">No users found</p>
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center text-neutral-500">
+                      <Search className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                      <p className="text-sm">Type at least 2 characters to search</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div >
   );
 }

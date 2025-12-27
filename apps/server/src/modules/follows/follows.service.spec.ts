@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FollowsService } from './follows.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 describe('FollowsService', () => {
   let service: FollowsService;
@@ -19,6 +20,12 @@ describe('FollowsService', () => {
               delete: jest.fn(),
               findMany: jest.fn(),
             },
+          },
+        },
+        {
+          provide: NotificationsService,
+          useValue: {
+            createNotification: jest.fn(),
           },
         },
       ],

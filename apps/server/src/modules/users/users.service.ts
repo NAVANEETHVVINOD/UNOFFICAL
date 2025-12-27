@@ -206,4 +206,131 @@ export class UsersService {
       updatedAt: post.updatedAt,
     }));
   }
+
+  /**
+   * Get all saved items for a user.
+   * Supports filtering by type (POST, EVENT, LISTING, NOTE).
+   * 
+   * **Validates: Requirements 27.4**
+   */
+  async getSavedItems(userId: string, type?: 'POST' | 'EVENT' | 'LISTING' | 'NOTE') {
+    const where: any = { userId };
+    if (type) {
+      where.type = type;
+    }
+
+    const savedItems = await this.prisma.savedItem.findMany({
+      where,
+      include: {
+        post: {
+          include: {
+            author: {
+              include: {
+                profile: true,
+              },
+            },
+            _count: {
+              select: {
+                likes: true,
+                comments: true,
+              },
+            },
+          },
+        },
+        event: {
+          include: {
+            club: true,
+            college: true,
+            _count: {
+              select: { attendees: true },
+            },
+          },
+        },
+        listing: {
+          include: {
+            owner: {
+              include: {
+                profile: true,
+              },
+            },
+            college: true,
+          },
+        },
+        note: {
+          include: {
+            author: {
+              include: {
+                profile: true,
+              },
+            },
+            college: true,
+            _count: {
+              select: { likes: true },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return savedItems.map((item) => ({
+      id: item.id,
+      type: item.type,
+      createdAt: item.createdAt,
+      post: item.post ? {
+        id: item.post.id,
+        type: item.post.type,
+        content: item.post.content,
+        imageUrl: item.post.imageUrl,
+        author: item.post.author ? {
+          id: item.post.author.id,
+          profile: item.post.author.profile,
+        } : null,
+        likeCount: item.post._count.likes,
+        commentCount: item.post._count.comments,
+        createdAt: item.post.createdAt,
+      } : null,
+      event: item.event ? {
+        id: item.event.id,
+        title: item.event.title,
+        description: item.event.description,
+        startsAt: item.event.startsAt,
+        endsAt: item.event.endsAt,
+        venue: item.event.venue,
+        club: item.event.club,
+        college: item.event.college,
+        attendeeCount: item.event._count.attendees,
+      } : null,
+      listing: item.listing ? {
+        id: item.listing.id,
+        title: item.listing.title,
+        description: item.listing.description,
+        price: item.listing.price,
+        imageUrl: item.listing.imageUrl,
+        status: item.listing.status,
+        type: item.listing.type,
+        owner: item.listing.owner ? {
+          id: item.listing.owner.id,
+          profile: item.listing.owner.profile,
+        } : null,
+        college: item.listing.college,
+      } : null,
+      note: item.note ? {
+        id: item.note.id,
+        title: item.note.title,
+        description: item.note.description,
+        subject: item.note.subject,
+        semester: item.note.semester,
+        fileUrl: item.note.fileUrl,
+        author: item.note.author ? {
+          id: item.note.author.id,
+          profile: item.note.author.profile,
+        } : null,
+        college: item.note.college,
+        likeCount: item.note._count.likes,
+      } : null,
+    }));
+  }
 }

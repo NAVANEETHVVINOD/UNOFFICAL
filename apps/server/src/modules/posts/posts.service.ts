@@ -9,6 +9,13 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import sanitizeHtml from 'sanitize-html';
 import { PostType, Poll, PollOption, NotificationType } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
+import {
+  CursorPaginationParams,
+  CursorPaginatedResponse,
+  buildPrismaCursorQuery,
+  buildPaginatedResponse,
+  normalizeLimit,
+} from '../../common/utils/pagination';
 
 @Injectable()
 export class PostsService {
@@ -181,6 +188,92 @@ export class PostsService {
     };
   }
 
+  /**
+   * Cursor-based pagination for posts feed.
+   * More efficient than offset pagination for infinite scroll.
+   * 
+   * **Validates: Requirements 26.1, 26.2, 26.3, 26.4**
+   */
+  async findAllCursor(
+    currentUser: { id: string; role: string; collegeId: string | null },
+    params: CursorPaginationParams & {
+      collegeSlug?: string;
+      filter?: 'all' | 'college';
+      isOfficial?: boolean;
+    },
+  ): Promise<CursorPaginatedResponse<any>> {
+    const { cursor, limit, collegeSlug, filter = 'college', isOfficial = false } = params;
+    const normalizedLimit = normalizeLimit(limit);
+    const { cursor: prismaCursor, take, skip } = buildPrismaCursorQuery({ cursor, limit: normalizedLimit });
+
+    // Build where clause (same logic as findAll)
+    const andConditions: any[] = [];
+
+    if (collegeSlug) {
+      andConditions.push({ college: { slug: collegeSlug } });
+    }
+
+    if (filter === 'college' && currentUser.collegeId) {
+      andConditions.push({ collegeId: currentUser.collegeId });
+    }
+
+    if (currentUser.role === 'FACULTY') {
+      andConditions.push({ isAnonymous: false });
+    }
+
+    if (isOfficial) {
+      andConditions.push({ author: { role: 'COLLEGE_ADMIN' } });
+    }
+
+    // Visibility logic
+    const visibilityConditions: any[] = [{ visibility: 'PUBLIC' }];
+
+    if (currentUser.collegeId) {
+      visibilityConditions.push({
+        visibility: 'COLLEGE',
+        collegeId: currentUser.collegeId,
+      });
+    }
+
+    visibilityConditions.push({
+      visibility: 'PRIVATE',
+      authorId: currentUser.id,
+    });
+
+    const whereClause: any = {
+      AND: [...andConditions, { OR: visibilityConditions }],
+    };
+
+    // Execute cursor-based query
+    const posts = await this.prisma.post.findMany({
+      where: whereClause,
+      cursor: prismaCursor,
+      take,
+      skip,
+      include: {
+        author: {
+          include: { profile: true },
+        },
+        poll: {
+          include: {
+            options: {
+              include: {
+                _count: { select: { votes: true } },
+              },
+            },
+            _count: { select: { votes: true } },
+          },
+        },
+        _count: {
+          select: { likes: true, comments: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return buildPaginatedResponse(posts, normalizedLimit);
+  }
+
   async findOne(id: string) {
     const post = await this.prisma.post.findUnique({
       where: { id },
@@ -282,5 +375,75 @@ export class PostsService {
         optionId,
       },
     });
+  }
+
+  /**
+   * Save a post for the user.
+   * Uses the SavedItem model with type POST.
+   * 
+   * **Validates: Requirements 27.1, 27.2**
+   */
+  async savePost(postId: string, userId: string) {
+    // Check if post exists
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    // Check if already saved
+    const existingSave = await this.prisma.savedItem.findUnique({
+      where: {
+        userId_postId: { userId, postId },
+      },
+    });
+
+    if (existingSave) {
+      return { message: 'Post already saved', isSaved: true };
+    }
+
+    await this.prisma.savedItem.create({
+      data: {
+        userId,
+        postId,
+        type: 'POST',
+      },
+    });
+
+    return { message: 'Post saved', isSaved: true };
+  }
+
+  /**
+   * Unsave a post for the user.
+   * 
+   * **Validates: Requirements 27.1, 27.2**
+   */
+  async unsavePost(postId: string, userId: string) {
+    try {
+      await this.prisma.savedItem.delete({
+        where: {
+          userId_postId: { userId, postId },
+        },
+      });
+      return { message: 'Post unsaved', isSaved: false };
+    } catch (error) {
+      return { message: 'Post was not saved', isSaved: false };
+    }
+  }
+
+  /**
+   * Check if a post is saved by the user.
+   * 
+   * **Validates: Requirements 27.3**
+   */
+  async isPostSaved(postId: string, userId: string): Promise<boolean> {
+    const savedItem = await this.prisma.savedItem.findUnique({
+      where: {
+        userId_postId: { userId, postId },
+      },
+    });
+    return !!savedItem;
   }
 }

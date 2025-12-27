@@ -16,12 +16,42 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
+  /**
+   * Send a message (either to a listing or direct to a user).
+   */
   @Post()
   async sendMessage(
     @Request() req,
-    @Body() body: { listingId?: string; content: string },
+    @Body() body: { listingId?: string; receiverId?: string; content: string },
   ) {
     return this.messagesService.sendMessage(req.user.userId, body);
+  }
+
+  /**
+   * Create or get a direct conversation with another user.
+   * 
+   * **Validates: Requirements 29.1, 29.2**
+   */
+  @Post('direct')
+  async createDirectConversation(
+    @Request() req,
+    @Body() body: { participantId: string; initialMessage?: string },
+  ) {
+    const conversation = await this.messagesService.createDirectConversation(
+      req.user.userId,
+      body.participantId,
+    );
+
+    // If initial message provided, send it
+    if (body.initialMessage) {
+      await this.messagesService.replyToConversation(
+        req.user.userId,
+        conversation.id,
+        body.initialMessage,
+      );
+    }
+
+    return conversation;
   }
 
   @Post(':id/reply')

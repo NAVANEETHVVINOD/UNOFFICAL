@@ -9,7 +9,6 @@ import { Bell, User, Search, QrCode } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import GlobalSearch from "./GlobalSearch";
 import QRCodeModal from "./QRCodeModal";
-import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const router = useRouter();

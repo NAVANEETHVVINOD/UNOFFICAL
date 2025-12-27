@@ -80,6 +80,7 @@ function NotesContent() {
   const [selectedSubject, setSelectedSubject] = useState("All Subjects");
   const [selectedSemester, setSelectedSemester] = useState("All Semesters");
   const [sortBy, setSortBy] = useState<"recent" | "popular" | "downloads">("recent");
+  const [dateFilter, setDateFilter] = useState<"all" | "week" | "month" | "year">("all");
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -89,18 +90,41 @@ function NotesContent() {
 
   useEffect(() => {
     fetchNotes();
-  }, [selectedSubject, selectedSemester, sortBy]);
+  }, [selectedSubject, selectedSemester, sortBy, dateFilter]);
+
+  const getDateRange = () => {
+    const now = new Date();
+    switch (dateFilter) {
+      case "week":
+        const weekAgo = new Date(now);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return { startDate: weekAgo.toISOString() };
+      case "month":
+        const monthAgo = new Date(now);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        return { startDate: monthAgo.toISOString() };
+      case "year":
+        const yearAgo = new Date(now);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        return { startDate: yearAgo.toISOString() };
+      default:
+        return {};
+    }
+  };
 
   const fetchNotes = async () => {
     setLoading(true);
     try {
-      // api.getNotes takes (search, collegeSlug). 
-      // We might need to adjust api.ts if we want subject/semester filtering on backend
-      // For now, we fetch all and filter client side IF api doesn't support it, 
-      // OR update api.ts. Let's assume we fetch generic notes for now or use search param for subject?
-      // Actually api.ts getNotes definition: getNotes: (search?: string, collegeSlug?: string)
-
-      const data = await api.getNotes(searchQuery);
+      const dateRange = getDateRange();
+      const subjectParam = selectedSubject !== "All Subjects" ? selectedSubject : undefined;
+      const data = await api.getNotes(
+        searchQuery || undefined,
+        undefined, // collegeSlug
+        subjectParam,
+        undefined, // uploaderId
+        dateRange.startDate,
+        undefined // endDate
+      );
       setNotes(data || []);
     } catch (error) {
       console.error("Failed to fetch notes:", error);
@@ -277,6 +301,20 @@ function NotesContent() {
                     <option value="recent">Most Recent</option>
                     <option value="popular">Most Liked</option>
                     <option value="downloads">Most Downloaded</option>
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value as any)}
+                    className="appearance-none px-4 py-2 pr-8 border-2 border-black bg-white font-bold text-sm cursor-pointer"
+                  >
+                    <option value="all">All Time</option>
+                    <option value="week">Past Week</option>
+                    <option value="month">Past Month</option>
+                    <option value="year">Past Year</option>
                   </select>
                   <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
                 </div>

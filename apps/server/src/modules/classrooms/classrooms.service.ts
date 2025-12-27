@@ -2,8 +2,15 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+
+type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
+
+interface AttendanceRecords {
+  [userId: string]: AttendanceStatus;
+}
 
 @Injectable()
 export class ClassroomsService {
@@ -196,5 +203,272 @@ export class ClassroomsService {
         status: 'GRADED',
       },
     });
+  }
+
+  // ==================== ATTENDANCE METHODS ====================
+
+  /**
+   * Mark attendance for a classroom on a specific date.
+   * Records are stored as JSON: { "userId": "PRESENT" | "ABSENT" | "LATE" | "EXCUSED" }
+   * 
+   * **Validates: Requirements 2.1, 2.2**
+   */
+  async markAttendance(
+    classroomId: string,
+    teacherId: string,
+    date: Date,
+    records: AttendanceRecords,
+  ) {
+    // Verify teacher owns this classroom
+    const classroom = await this.prisma.classroom.findUnique({
+      where: { id: classroomId },
+    });
+
+    if (!classroom) {
+      throw new NotFoundException('Classroom not found');
+    }
+
+    if (classroom.teacherId !== teacherId) {
+      throw new ForbiddenException('Only the teacher can mark attendance');
+    }
+
+    // Normalize date to start of day
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
+
+    // Upsert attendance record
+    return this.prisma.attendanceRecord.upsert({
+      where: {
+        classroomId_date: {
+          classroomId,
+          date: normalizedDate,
+        },
+      },
+      update: {
+        records: records as any,
+      },
+      create: {
+        classroomId,
+        date: normalizedDate,
+        records: records as any,
+      },
+    });
+  }
+
+  /**
+   * Get attendance records for a classroom with optional date range filter.
+   * 
+   * **Validates: Requirements 2.4**
+   */
+  async getAttendance(
+    classroomId: string,
+    startDate?: Date,
+    endDate?: Date,
+  ) {
+    const where: any = { classroomId };
+
+    if (startDate || endDate) {
+      where.date = {};
+      if (startDate) where.date.gte = startDate;
+      if (endDate) where.date.lte = endDate;
+    }
+
+    return this.prisma.attendanceRecord.findMany({
+      where,
+      orderBy: { date: 'desc' },
+    });
+  }
+
+  /**
+   * Get attendance record for a specific date.
+   */
+  async getAttendanceByDate(classroomId: string, date: Date) {
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
+
+    return this.prisma.attendanceRecord.findUnique({
+      where: {
+        classroomId_date: {
+          classroomId,
+          date: normalizedDate,
+        },
+      },
+    });
+  }
+
+  /**
+   * Calculate attendance percentage for a student in a classroom.
+   * 
+   * **Validates: Requirements 2.3, 2.5**
+   */
+  async getStudentAttendancePercentage(
+    classroomId: string,
+    studentId: string,
+  ): Promise<{ percentage: number; present: number; total: number }> {
+    const records = await this.prisma.attendanceRecord.findMany({
+      where: { classroomId },
+    });
+
+    let present = 0;
+    let total = 0;
+
+    for (const record of records) {
+      const attendanceData = record.records as AttendanceRecords;
+      if (studentId in attendanceData) {
+        total++;
+        if (
+          attendanceData[studentId] === 'PRESENT' ||
+          attendanceData[studentId] === 'LATE'
+        ) {
+          present++;
+        }
+      }
+    }
+
+    const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+
+    return { percentage, present, total };
+  }
+
+  /**
+   * Get attendance summary for all students in a classroom.
+   */
+  async getClassroomAttendanceSummary(classroomId: string) {
+    const members = await this.prisma.classroomMember.findMany({
+      where: { classroomId, role: 'STUDENT' },
+      include: { user: { include: { profile: true } } },
+    });
+
+    const summaries = await Promise.all(
+      members.map(async (member) => {
+        const stats = await this.getStudentAttendancePercentage(
+          classroomId,
+          member.userId,
+        );
+        return {
+          userId: member.userId,
+          fullName: member.user.profile?.fullName || 'Unknown',
+          avatarUrl: member.user.profile?.avatarUrl,
+          ...stats,
+        };
+      }),
+    );
+
+    return summaries;
+  }
+
+  /**
+   * Verify assignment completion and award karma points.
+   * 
+   * **Validates: Requirements 1.6, 1.7**
+   */
+  async verifyAssignmentCompletion(
+    submissionId: string,
+    teacherId: string,
+    verified: boolean,
+    karmaPoints: number = 10,
+  ) {
+    const submission = await this.prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: {
+        assignment: {
+          include: { classroom: true },
+        },
+      },
+    });
+
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    if (submission.assignment.classroom.teacherId !== teacherId) {
+      throw new ForbiddenException('Only the teacher can verify submissions');
+    }
+
+    // Update submission status
+    const updatedSubmission = await this.prisma.submission.update({
+      where: { id: submissionId },
+      data: {
+        status: verified ? 'GRADED' : 'PENDING',
+      },
+    });
+
+    // Award karma points if verified
+    if (verified && karmaPoints > 0) {
+      await this.prisma.profile.updateMany({
+        where: { userId: submission.studentId },
+        data: {
+          points: { increment: karmaPoints },
+        },
+      });
+    }
+
+    return updatedSubmission;
+  }
+
+  /**
+   * Get classroom analytics for teacher dashboard.
+   * 
+   * **Validates: Requirements 1.1**
+   */
+  async getClassroomAnalytics(classroomId: string) {
+    const classroom = await this.prisma.classroom.findUnique({
+      where: { id: classroomId },
+      include: {
+        _count: {
+          select: {
+            members: true,
+            assignments: true,
+            attendance: true,
+          },
+        },
+      },
+    });
+
+    if (!classroom) {
+      throw new NotFoundException('Classroom not found');
+    }
+
+    // Get submission stats
+    const assignments = await this.prisma.assignment.findMany({
+      where: { classroomId },
+      include: {
+        _count: {
+          select: { submissions: true },
+        },
+        submissions: {
+          where: { status: 'GRADED' },
+        },
+      },
+    });
+
+    const totalSubmissions = assignments.reduce(
+      (acc, a) => acc + a._count.submissions,
+      0,
+    );
+    const gradedSubmissions = assignments.reduce(
+      (acc, a) => acc + a.submissions.length,
+      0,
+    );
+
+    // Get average attendance
+    const attendanceSummary = await this.getClassroomAttendanceSummary(classroomId);
+    const avgAttendance =
+      attendanceSummary.length > 0
+        ? Math.round(
+            attendanceSummary.reduce((acc, s) => acc + s.percentage, 0) /
+              attendanceSummary.length,
+          )
+        : 0;
+
+    return {
+      studentCount: classroom._count.members - 1, // Exclude teacher
+      assignmentCount: classroom._count.assignments,
+      totalSubmissions,
+      gradedSubmissions,
+      pendingSubmissions: totalSubmissions - gradedSubmissions,
+      averageAttendance: avgAttendance,
+      attendanceDays: classroom._count.attendance,
+    };
   }
 }

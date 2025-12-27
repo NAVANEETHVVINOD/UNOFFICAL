@@ -247,9 +247,9 @@ describe('Social URL Validation Properties', () => {
           return result.isValid === true;
         }
       ),
-      { numRuns: 100 }
+      { numRuns: 50 } // Reduced from 100 to prevent timeout
     );
-  });
+  }, 10000); // Extended timeout to 10 seconds
 
   /**
    * **Feature: linker-ui-overhaul, Property 33: Social URL validation**

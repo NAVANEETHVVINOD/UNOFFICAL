@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { api } from '../../lib/api'; // Correct path
+import { api } from '../../lib/api';
 import { useAuth } from '../context/AuthContext';
+
+/**
+ * **Validates: Requirements 26.1, 26.2, 26.3**
+ * 
+ * Cursor-based pagination for infinite scroll feed.
+ * More efficient than offset pagination for large datasets.
+ */
 
 // Types
 export type FeedItemType = 'post' | 'event' | 'poll' | 'market';
@@ -17,7 +24,13 @@ export interface FeedItemData {
 interface UseInfiniteFeedProps {
     initialItems?: FeedItemData[];
     category?: string; // 'feed' | 'campus' | 'events' | 'market'
-    filter?: 'all' | 'college' | 'events' | 'market'; // Added events/market
+    filter?: 'all' | 'college' | 'events' | 'market';
+}
+
+interface CursorPaginatedResponse<T> {
+    data: T[];
+    nextCursor: string | null;
+    hasMore: boolean;
 }
 
 export function useInfiniteFeed({ initialItems = [], category = 'feed', filter = 'college' }: UseInfiniteFeedProps) {
@@ -25,7 +38,7 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
     const [items, setItems] = useState<FeedItemData[]>(initialItems);
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [page, setPage] = useState(1);
+    const [cursor, setCursor] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     // Ref to prevent double-fetching in React Strict Mode
@@ -38,23 +51,24 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
         setIsLoading(true);
         setError(null);
 
-        const currentPage = reset ? 1 : page;
+        const currentCursor = reset ? undefined : cursor ?? undefined;
 
         try {
             let newItems: FeedItemData[] = [];
+            let nextCursor: string | null = null;
+            let moreAvailable = false;
 
             if (filter === 'events') {
                 // --- EVENTS ONLY ---
-                const { data } = await api.getEvents(undefined, undefined, 10); // TODO: Pagination cursor support
+                const { data } = await api.getEvents(undefined, undefined, 10);
                 const mappedEvents = (data || []).map((e: any) => ({
                     id: `event-${e.id}`,
                     type: 'event' as const,
                     data: e,
-                    createdAt: e.createdAt // Events need start date sorting usually, but feed uses createdAt?
+                    createdAt: e.createdAt
                 }));
                 newItems = mappedEvents;
-                // Simple pagination hack for now as getEvents uses cursor, not page
-                setHasMore(data.length === 10);
+                moreAvailable = data.length === 10;
 
             } else if (filter === 'market') {
                 // --- MARKET ONLY ---
@@ -66,31 +80,41 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
                     createdAt: m.createdAt
                 }));
                 newItems = mappedMarket;
-                setHasMore(data.length === 10);
+                moreAvailable = data.length === 10;
 
             } else {
-                // --- MIXED FEED (ALL or COLLEGE) ---
+                // --- MIXED FEED (ALL or COLLEGE) using cursor pagination ---
 
-                // 1. Fetch Posts
-                // If filter is 'college', API handles the logic via collegeSlug or user context? 
-                // Currently api.getPosts takes filter param.
-                const postsPromise = api.getPosts(undefined, currentPage, 20, filter as 'all' | 'college');
+                // Get college slug for filtering
+                const collegeSlug = filter === 'college' && user?.profile?.college?.slug 
+                    ? user.profile.college.slug 
+                    : undefined;
 
-                // 2. Fetch Events (conditionally filtered)
-                let eventCollegeSlug = undefined;
-                if (filter === 'college' && user?.profile?.college?.slug) {
-                    eventCollegeSlug = user.profile.college.slug;
+                // Fetch posts with cursor pagination
+                const postsRes = await api.getPostsCursor({
+                    cursor: currentCursor,
+                    limit: 20,
+                    collegeSlug,
+                    filter: filter as 'all' | 'college',
+                }).catch(e => {
+                    console.error("Posts fetch error", e);
+                    return { data: [], nextCursor: null, hasMore: false };
+                });
+
+                // Fetch events only on initial load (reset)
+                let eventsData: any[] = [];
+                if (reset) {
+                    try {
+                        const eventsRes = await api.getEvents(collegeSlug, undefined, 5);
+                        eventsData = eventsRes.data || [];
+                    } catch (e) {
+                        console.error("Events fetch error", e);
+                    }
                 }
 
-                const eventsPromise = reset ? api.getEvents(eventCollegeSlug, undefined, 5) : Promise.resolve({ data: [] });
-
-                const [postsRes, eventsRes] = await Promise.all([
-                    postsPromise.catch(e => { console.error("Posts fetch error", e); return { data: [], meta: { lastPage: 0 } } }),
-                    eventsPromise.catch(e => { console.error("Events fetch error", e); return { data: [] } })
-                ]);
-
                 const postsData = postsRes.data || [];
-                const eventsData = (eventsRes as any).data || [];
+                nextCursor = postsRes.nextCursor || null;
+                moreAvailable = postsRes.hasMore ?? false;
 
                 // Map Posts
                 const mappedPosts: FeedItemData[] = postsData.map((p: any) => ({
@@ -110,49 +134,42 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
 
                 // Combine
                 newItems = [...mappedPosts, ...mappedEvents];
-
-                // Pagination Logic
-                if (postsRes.meta) {
-                    setHasMore(currentPage < postsRes.meta.lastPage);
-                    setPage(currentPage + 1);
-                } else {
-                    setHasMore(false);
-                }
             }
 
-            // Sort by createdAt desc (or custom logic)
-            // Note: Events might need sorting by eventDate, but feed is usually creation time
+            // Sort by createdAt desc
             newItems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
             // Update State
             setItems(prev => {
                 const combined = reset ? newItems : [...prev, ...newItems];
-                // Dedup
+                // Dedup by id
                 const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
                 // Re-sort
                 return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             });
 
-            if (!reset && filter !== 'events' && filter !== 'market') {
-                // Only increment page for mixed feed where we track page state
-                // Events/Market need cursor implementation later
-            }
+            // Update cursor and hasMore
+            setCursor(nextCursor);
+            setHasMore(moreAvailable);
 
         } catch (err) {
             console.error("Feed Error:", err);
-            setError("Failed to load chaos. Try again.");
+            setError("Failed to load feed. Try again.");
         } finally {
             setIsLoading(false);
             isFetching.current = false;
         }
-    }, [user, page, hasMore, category, filter]);
+    }, [user, cursor, hasMore, category, filter]);
 
 
     // Initial Load
     useEffect(() => {
+        // Reset cursor when filter changes
+        setCursor(null);
+        setHasMore(true);
         loadMore(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [category, filter]); // Reload when category or filter changes
+    }, [category, filter]);
 
     return {
         items,
@@ -160,6 +177,10 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
         hasMore,
         error,
         loadMore,
-        refresh: () => loadMore(true)
+        refresh: () => {
+            setCursor(null);
+            setHasMore(true);
+            loadMore(true);
+        }
     };
 }

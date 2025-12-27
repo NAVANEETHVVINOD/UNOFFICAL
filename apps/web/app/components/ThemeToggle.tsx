@@ -13,9 +13,9 @@ export default function ThemeToggle({ className = "", size = "md" }: ThemeToggle
   const { theme, toggleTheme, isDark } = useTheme();
 
   const sizes = {
-    sm: { button: "w-8 h-8", icon: "w-4 h-4" },
-    md: { button: "w-10 h-10", icon: "w-5 h-5" },
-    lg: { button: "w-12 h-12", icon: "w-6 h-6" },
+    sm: { button: "p-1.5", icon: "w-4 h-4" },
+    md: { button: "p-2", icon: "w-5 h-5" },
+    lg: { button: "p-3", icon: "w-6 h-6" },
   };
 
   return (
@@ -23,7 +23,6 @@ export default function ThemeToggle({ className = "", size = "md" }: ThemeToggle
       onClick={toggleTheme}
       className={`
         ${sizes[size].button}
-        relative flex items-center justify-center
         rounded-xl border-2 
         transition-all duration-300
         ${isDark 
@@ -57,7 +56,6 @@ export default function ThemeToggle({ className = "", size = "md" }: ThemeToggle
           className="absolute inset-0 rounded-xl bg-primary/20 blur-md -z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
         />
       )}
     </motion.button>

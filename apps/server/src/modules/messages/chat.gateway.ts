@@ -9,28 +9,45 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
+import { WsAuthService } from '../../common/services/ws-auth.service';
+import { ConfigService } from '@nestjs/config';
+import { getWebSocketCorsConfig } from '../../config/cors.config';
 
 @WebSocketGateway({
-  cors: {
-    origin: '*', // Allow all origins for now (dev mode)
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
+  cors: getWebSocketCorsConfig(),
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly wsAuthService: WsAuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  handleConnection(client: Socket) {
-    const token = client.handshake.auth.token || client.handshake.query.token;
-    // TODO: Verify token later
-    console.log(`WS Client connected: ${client.id}`);
+  async handleConnection(client: Socket) {
+    // Verify JWT token
+    const payload = await this.wsAuthService.verifyToken(client);
+    
+    if (!payload) {
+      console.log(`WS Client rejected (invalid auth): ${client.id}`);
+      client.emit('error', { message: 'Authentication required' });
+      client.disconnect(true);
+      return;
+    }
+
+    // Attach user data to socket
+    this.wsAuthService.attachUserToSocket(client, payload);
+    console.log(`WS Client connected: ${client.id} (user: ${payload.sub})`);
+    
+    // Auto-join user's personal room for direct messages
+    client.join(`user:${payload.sub}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`WS Client disconnected: ${client.id}`);
+    const userId = this.wsAuthService.getUserId(client);
+    console.log(`WS Client disconnected: ${client.id} (user: ${userId || 'unknown'})`);
   }
 
   @SubscribeMessage('joinRoom')
@@ -38,6 +55,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() payload: { roomId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    const userId = this.wsAuthService.getUserId(client);
+    if (!userId) {
+      client.emit('error', { message: 'Not authenticated' });
+      return;
+    }
+
     if (payload.roomId) {
       client.join(payload.roomId);
       console.log(`Client ${client.id} joined room ${payload.roomId}`);
@@ -58,26 +81,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @MessageBody()
-    payload: { conversationId: string; content: string; senderId: string },
+    payload: { conversationId: string; content: string },
     @ConnectedSocket() client: Socket,
   ) {
+    const userId = this.wsAuthService.getUserId(client);
+    if (!userId) {
+      client.emit('error', { message: 'Not authenticated' });
+      return;
+    }
+
     try {
-      // 1. Save to DB
+      // Use authenticated user's ID instead of trusting client payload
       const newMessage = await this.messagesService.replyToConversation(
-        payload.senderId,
+        userId,
         payload.conversationId,
         payload.content,
       );
 
-      // 2. Broadcast to room (including sender)
-      // client.to(...) broadcasts to everyone BUT sender.
-      // this.server.to(...) broadcasts to EVERYONE.
+      // Broadcast to room (including sender)
       this.server.to(payload.conversationId).emit('newMessage', newMessage);
 
       return newMessage;
     } catch (error) {
       console.error('SendMessage Error:', error);
-      // Determine if we should emit an error back to client
       client.emit('error', { message: 'Failed to send message' });
     }
   }
@@ -87,12 +113,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody()
     payload: {
       conversationId: string;
-      userId: string;
       isTyping: boolean;
     },
+    @ConnectedSocket() client: Socket,
   ) {
-    // Broadcast to room except sender? Or just everyone.
-    // Ideally everyone so the sender knows their query went through? No, sender knows they are typing.
-    this.server.to(payload.conversationId).emit('userTyping', payload);
+    const userId = this.wsAuthService.getUserId(client);
+    if (!userId) return;
+
+    // Broadcast typing status with authenticated user ID
+    this.server.to(payload.conversationId).emit('userTyping', {
+      conversationId: payload.conversationId,
+      userId,
+      isTyping: payload.isTyping,
+    });
   }
 }

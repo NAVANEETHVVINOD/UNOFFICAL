@@ -1,9 +1,14 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class FollowsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async follow(followerId: string, followingId: string) {
     if (followerId === followingId) {
@@ -28,12 +33,30 @@ export class FollowsService {
 
     if (existing) return existing;
 
-    return this.prisma.follows.create({
+    const follow = await this.prisma.follows.create({
       data: {
         followerId,
         followingId,
       },
+      include: {
+        follower: {
+          include: { profile: true },
+        },
+      },
     });
+
+    // Send follow notification
+    const followerName = follow.follower.profile?.fullName || 'Someone';
+    await this.notificationsService.createNotification({
+      userId: followingId,
+      type: NotificationType.FOLLOW,
+      title: 'New Follower',
+      message: `${followerName} started following you`,
+      actionUrl: `/profile/${followerId}`,
+      actorId: followerId,
+    });
+
+    return follow;
   }
 
   async unfollow(followerId: string, followingId: string) {
@@ -91,5 +114,18 @@ export class FollowsService {
       },
     });
     return { isFollowing: !!follow };
+  }
+
+  /**
+   * Get follower and following counts for a user.
+   * 
+   * **Validates: Requirements 28.3, 28.4**
+   */
+  async getCounts(userId: string) {
+    const [followerCount, followingCount] = await Promise.all([
+      this.prisma.follows.count({ where: { followingId: userId } }),
+      this.prisma.follows.count({ where: { followerId: userId } }),
+    ]);
+    return { followerCount, followingCount };
   }
 }

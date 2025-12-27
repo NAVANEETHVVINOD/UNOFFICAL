@@ -76,7 +76,7 @@ export default function RootLayout({
             </RBACProvider>
           </ThemeProvider>
         </AuthProvider>
-        {/* Service Worker Registration */}
+        {/* Service Worker Registration with Update Handling */}
         <Script id="sw-register" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
@@ -84,11 +84,44 @@ export default function RootLayout({
                 navigator.serviceWorker.register('/sw.js').then(
                   function(registration) {
                     console.log('ServiceWorker registration successful');
+                    
+                    // Check for updates periodically
+                    setInterval(() => {
+                      registration.update();
+                    }, 60 * 60 * 1000); // Check every hour
+                    
+                    // Handle updates
+                    registration.addEventListener('updatefound', () => {
+                      const newWorker = registration.installing;
+                      if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New content available, show update prompt
+                            if (confirm('New version available! Reload to update?')) {
+                              newWorker.postMessage({ type: 'SKIP_WAITING' });
+                              window.location.reload();
+                            }
+                          }
+                        });
+                      }
+                    });
                   },
                   function(err) {
                     console.log('ServiceWorker registration failed: ', err);
                   }
                 );
+                
+                // Listen for SW messages
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                  if (event.data && event.data.type === 'SW_UPDATED') {
+                    console.log('Service Worker updated to version:', event.data.version);
+                  }
+                });
+                
+                // Handle controller change (new SW activated)
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                  console.log('New service worker activated');
+                });
               });
             }
           `}

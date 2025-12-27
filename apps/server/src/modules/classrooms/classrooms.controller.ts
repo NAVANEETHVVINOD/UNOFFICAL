@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { ClassroomsService } from './classrooms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -83,5 +84,115 @@ export class ClassroomsController {
       body.grade,
       body.feedback,
     );
+  }
+
+  // ==================== ATTENDANCE ENDPOINTS ====================
+
+  /**
+   * Mark attendance for a classroom.
+   * 
+   * **Validates: Requirements 2.1, 2.2**
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/attendance')
+  markAttendance(
+    @Request() req,
+    @Param('id') classroomId: string,
+    @Body() body: { date: string; records: Record<string, string> },
+  ) {
+    return this.classroomsService.markAttendance(
+      classroomId,
+      req.user.userId,
+      new Date(body.date),
+      body.records as any,
+    );
+  }
+
+  /**
+   * Get attendance records for a classroom with optional date range.
+   * 
+   * **Validates: Requirements 2.4**
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/attendance')
+  getAttendance(
+    @Param('id') classroomId: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.classroomsService.getAttendance(
+      classroomId,
+      startDate ? new Date(startDate) : undefined,
+      endDate ? new Date(endDate) : undefined,
+    );
+  }
+
+  /**
+   * Get attendance for a specific date.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/attendance/:date')
+  getAttendanceByDate(
+    @Param('id') classroomId: string,
+    @Param('date') date: string,
+  ) {
+    return this.classroomsService.getAttendanceByDate(classroomId, new Date(date));
+  }
+
+  /**
+   * Get attendance summary for all students in a classroom.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/attendance-summary')
+  getAttendanceSummary(@Param('id') classroomId: string) {
+    return this.classroomsService.getClassroomAttendanceSummary(classroomId);
+  }
+
+  /**
+   * Get attendance percentage for a specific student.
+   * 
+   * **Validates: Requirements 2.3**
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/attendance/student/:studentId')
+  getStudentAttendance(
+    @Param('id') classroomId: string,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.classroomsService.getStudentAttendancePercentage(
+      classroomId,
+      studentId,
+    );
+  }
+
+  /**
+   * Verify assignment completion and award karma.
+   * 
+   * **Validates: Requirements 1.6, 1.7**
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('submissions/:submissionId/verify')
+  verifySubmission(
+    @Request() req,
+    @Param('submissionId') submissionId: string,
+    @Body() body: { verified: boolean; karmaPoints?: number },
+  ) {
+    return this.classroomsService.verifyAssignmentCompletion(
+      submissionId,
+      req.user.userId,
+      body.verified,
+      body.karmaPoints,
+    );
+  }
+
+  /**
+   * Get classroom analytics for teacher dashboard.
+   * 
+   * **Validates: Requirements 1.1**
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/analytics')
+  getAnalytics(@Param('id') classroomId: string) {
+    return this.classroomsService.getClassroomAnalytics(classroomId);
   }
 }

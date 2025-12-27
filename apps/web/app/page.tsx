@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import Container from "./components/ui/Container";
 import {
     NewspaperCard,
@@ -15,6 +16,7 @@ import {
 } from "./components/ui/NewspaperUI";
 import Doodle from "./components/ui/Doodle";
 import BottomNav from "./components/ui/BottomNav";
+import Carousel from "./components/ui/Carousel";
 import Navbar from "./components/Navbar";
 import Loading from "./loading";
 
@@ -27,6 +29,24 @@ export default function Home() {
     const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
     const [showLanding, setShowLanding] = useState(false);
+
+    // Force light mode on landing page only
+    useEffect(() => {
+        const root = document.documentElement;
+        // Store current theme to restore later
+        const hadDarkClass = root.classList.contains("dark");
+        
+        // Force light mode for landing page
+        root.classList.remove("dark");
+        
+        // Cleanup: restore dark mode when leaving landing page if it was enabled
+        return () => {
+            const storedTheme = localStorage.getItem("linker-theme");
+            if (storedTheme === "dark" || hadDarkClass) {
+                root.classList.add("dark");
+            }
+        };
+    }, []);
 
     useEffect(() => {
         // Wait for auth to finish loading
@@ -73,27 +93,44 @@ export default function Home() {
                     {/* Navbar */}
 
                     <div>
-                        <h1 className="text-center mb-6">
+                        {/* Enhanced Hero with Pixel Font */}
+                        <motion.h1 
+                            className="text-center mb-6"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                        >
                             <span
-                                className="block uppercase moo-lah-lah-regular transform -rotate-2 hover:rotate-0 transition-transform duration-500 text-hero-moo"
+                                className="block uppercase font-pixel transform -rotate-2 hover:rotate-0 transition-transform duration-500 text-hero-moo tracking-wider"
                                 style={{
-                                    fontSize: "clamp(2.5rem, 8vw, 5rem)",
-                                    letterSpacing: "3px",
-                                    lineHeight: 1.2,
+                                    fontSize: "clamp(2rem, 6vw, 4rem)",
+                                    letterSpacing: "4px",
+                                    lineHeight: 1.3,
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.1)",
                                 }}
                             >
                                 Academic Chaos as a Service.™
                             </span>
-                        </h1>
+                        </motion.h1>
 
-                        <p className="text-lg md:text-2xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed font-serif italic px-4">
+                        <motion.p 
+                            className="text-lg md:text-2xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed font-hand italic px-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                        >
                             Finally, a place where chaos meets structure.
                             <span className="bg-accent-yellow/30 px-2 rounded-md mx-1 not-italic font-bold">
                                 (Barely.)
                             </span>
-                        </p>
+                        </motion.p>
 
-                        <div className="flex flex-col md:flex-row justify-center gap-4">
+                        <motion.div 
+                            className="flex flex-col md:flex-row justify-center gap-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                        >
                             <Link href="/register">
                                 <RetroButton
                                     variant="secondary"
@@ -110,7 +147,7 @@ export default function Home() {
                                     Show me around.
                                 </RetroButton>
                             </Link>
-                        </div>
+                        </motion.div>
                     </div>
 
                     {/* Left Card - Retro TV Style */}
@@ -176,29 +213,90 @@ export default function Home() {
                     </div>
 
                     {/* Marquee Section */}
-                    <div className="mb-24 -mx-4 md:-mx-8 transform -rotate-1">
+                    <div className="mb-16 -mx-4 md:-mx-8 transform -rotate-1">
                         <div className="bg-black py-4 border-y-4 border-accent-yellow shadow-xl">
                             <Marquee speed={30}>
                                 <span className="text-white font-pixel text-3xl mx-8">
                                     {"/// BREAKING_NEWS: HACKATHON REGISTRATIONS OPEN ///"}
                                 </span>
-                                <span className="text-accent-yellow font-serif italic text-3xl mx-8">
+                                <span className="text-accent-yellow font-hand italic text-3xl mx-8">
                                     Don&apos;t miss out!
                                 </span>
                                 <span className="text-white font-pixel text-3xl mx-8">
                                     {"/// NEW_CLUB_ALERT: ROBOTICS ///"}
                                 </span>
-                                <span className="text-accent-blue font-serif italic text-3xl mx-8">
+                                <span className="text-accent-blue font-hand italic text-3xl mx-8">
                                     Join the revolution
                                 </span>
                                 <span className="text-white font-pixel text-3xl mx-8">
                                     {"/// EXAM_SCHEDULE_RELEASED ///"}
                                 </span>
-                                <span className="text-accent-pink font-serif italic text-3xl mx-8">
+                                <span className="text-accent-pink font-hand italic text-3xl mx-8">
                                     Panic mode: ON
                                 </span>
                             </Marquee>
                         </div>
+                    </div>
+
+                    {/* Featured Content Carousel */}
+                    <div className="mb-24 -mx-4 md:-mx-8">
+                        <div className="text-center mb-8">
+                            <Badge className="mb-4 bg-accent-coral text-white border-black">
+                                FEATURED
+                            </Badge>
+                            <h2 className="font-display text-3xl md:text-4xl font-black">
+                                WHAT&apos;S HAPPENING
+                            </h2>
+                        </div>
+                        <Carousel
+                            items={[
+                                <div key="slide1" className="px-4 md:px-8">
+                                    <NewspaperCard variant="curved" className="bg-gradient-to-br from-accent-blue to-accent-purple p-8 text-white">
+                                        <div className="flex flex-col md:flex-row items-center gap-6">
+                                            <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+                                                <span className="text-4xl">🎉</span>
+                                            </div>
+                                            <div className="text-center md:text-left">
+                                                <h3 className="font-display text-2xl md:text-3xl font-black mb-2">Freshers&apos; Week 2024</h3>
+                                                <p className="text-white/80 font-body">Join us for a week of fun, games, and making new friends!</p>
+                                            </div>
+                                        </div>
+                                    </NewspaperCard>
+                                </div>,
+                                <div key="slide2" className="px-4 md:px-8">
+                                    <NewspaperCard variant="curved" className="bg-gradient-to-br from-accent-pink to-accent-coral p-8 text-white">
+                                        <div className="flex flex-col md:flex-row items-center gap-6">
+                                            <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+                                                <span className="text-4xl">💻</span>
+                                            </div>
+                                            <div className="text-center md:text-left">
+                                                <h3 className="font-display text-2xl md:text-3xl font-black mb-2">Code Chaos Hackathon</h3>
+                                                <p className="text-white/80 font-body">24 hours of coding, pizza, and innovation!</p>
+                                            </div>
+                                        </div>
+                                    </NewspaperCard>
+                                </div>,
+                                <div key="slide3" className="px-4 md:px-8">
+                                    <NewspaperCard variant="curved" className="bg-gradient-to-br from-accent-yellow to-accent-green p-8 text-black">
+                                        <div className="flex flex-col md:flex-row items-center gap-6">
+                                            <div className="w-24 h-24 bg-black/10 rounded-full flex items-center justify-center">
+                                                <span className="text-4xl">🤖</span>
+                                            </div>
+                                            <div className="text-center md:text-left">
+                                                <h3 className="font-display text-2xl md:text-3xl font-black mb-2">Robotics Club Launch</h3>
+                                                <p className="text-black/70 font-body">Build the future, one bot at a time!</p>
+                                            </div>
+                                        </div>
+                                    </NewspaperCard>
+                                </div>,
+                            ]}
+                            autoPlay
+                            autoPlayInterval={5000}
+                            showDots
+                            showArrows
+                            fullWidth
+                            className="py-4"
+                        />
                     </div>
 
                     {/* About Section */}
@@ -649,6 +747,74 @@ export default function Home() {
                         </div>
                     </div>
 
+                    {/* Statistics Section */}
+                    <div className="mb-24">
+                        <div className="bg-gradient-to-r from-accent-yellow via-accent-pink to-accent-blue rounded-3xl p-8 md:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-black relative overflow-hidden">
+                            {/* Decorative doodles */}
+                            <div className="absolute top-4 right-4 text-6xl opacity-20">📚</div>
+                            <div className="absolute bottom-4 left-4 text-6xl opacity-20">🎉</div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+                                <motion.div 
+                                    className="text-center"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0 }}
+                                >
+                                    <div className="text-4xl md:text-5xl font-hand font-black text-gray-900 mb-2">
+                                        500+
+                                    </div>
+                                    <div className="text-sm md:text-base font-bold text-gray-800 font-body">
+                                        Active Students
+                                    </div>
+                                </motion.div>
+                                <motion.div 
+                                    className="text-center"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.1 }}
+                                >
+                                    <div className="text-4xl md:text-5xl font-hand font-black text-gray-900 mb-2">
+                                        50+
+                                    </div>
+                                    <div className="text-sm md:text-base font-bold text-gray-800 font-body">
+                                        Campus Clubs
+                                    </div>
+                                </motion.div>
+                                <motion.div 
+                                    className="text-center"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.2 }}
+                                >
+                                    <div className="text-4xl md:text-5xl font-hand font-black text-gray-900 mb-2">
+                                        100+
+                                    </div>
+                                    <div className="text-sm md:text-base font-bold text-gray-800 font-body">
+                                        Events/Month
+                                    </div>
+                                </motion.div>
+                                <motion.div 
+                                    className="text-center"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    <div className="text-4xl md:text-5xl font-hand font-black text-gray-900 mb-2">
+                                        1000+
+                                    </div>
+                                    <div className="text-sm md:text-base font-bold text-gray-800 font-body">
+                                        Notes Shared
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Bottom Motivation Marquee */}
                     <div className="mb-24 -mx-4 md:-mx-8 transform rotate-1">
                         <div className="bg-white py-4 border-y-4 border-black shadow-xl">
@@ -656,25 +822,25 @@ export default function Home() {
                                 <span className="text-black font-pixel text-4xl mx-8 uppercase">
                                     Link. Learn. Live.
                                 </span>
-                                <span className="text-gray-400 font-serif italic text-3xl mx-8">
+                                <span className="text-gray-400 font-hand italic text-3xl mx-8">
                                     &quot;Sleep is for the weak (and the graduated)&quot;
                                 </span>
                                 <span className="text-black font-pixel text-4xl mx-8 uppercase">
                                     Link. Learn. Live.
                                 </span>
-                                <span className="text-gray-400 font-serif italic text-3xl mx-8">
+                                <span className="text-gray-400 font-hand italic text-3xl mx-8">
                                     &quot;Coffee: The real MVP&quot;
                                 </span>
                                 <span className="text-black font-pixel text-4xl mx-8 uppercase">
                                     Link. Learn. Live.
                                 </span>
-                                <span className="text-gray-400 font-serif italic text-3xl mx-8">
+                                <span className="text-gray-400 font-hand italic text-3xl mx-8">
                                     &quot;Is it too late to drop out?&quot;
                                 </span>
                                 <span className="text-black font-pixel text-4xl mx-8 uppercase">
                                     Link. Learn. Live.
                                 </span>
-                                <span className="text-gray-400 font-serif italic text-3xl mx-8">
+                                <span className="text-gray-400 font-hand italic text-3xl mx-8">
                                     &quot;Due tomorrow? Do tomorrow.&quot;
                                 </span>
                             </Marquee>

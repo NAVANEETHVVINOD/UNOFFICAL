@@ -2,12 +2,77 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class MessagesService {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Create a direct conversation between two users.
+   * Returns existing conversation if one already exists.
+   * 
+   * **Validates: Requirements 29.1, 29.2**
+   */
+  async createDirectConversation(userId: string, participantId: string) {
+    // Prevent self-conversation
+    if (userId === participantId) {
+      throw new BadRequestException('Cannot start a conversation with yourself');
+    }
+
+    // Check if participant exists
+    const participant = await this.prisma.user.findUnique({
+      where: { id: participantId },
+    });
+
+    if (!participant) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check for existing direct conversation (no listing)
+    const existingConversation = await this.prisma.conversation.findFirst({
+      where: {
+        listingId: null, // Direct conversation (no listing)
+        AND: [
+          { participants: { some: { id: userId } } },
+          { participants: { some: { id: participantId } } },
+        ],
+      },
+      include: {
+        participants: {
+          include: { profile: true },
+        },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    if (existingConversation) {
+      return existingConversation;
+    }
+
+    // Create new direct conversation
+    return this.prisma.conversation.create({
+      data: {
+        participants: {
+          connect: [{ id: userId }, { id: participantId }],
+        },
+      },
+      include: {
+        participants: {
+          include: { profile: true },
+        },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+  }
 
   async sendMessage(
     senderId: string,
@@ -45,14 +110,14 @@ export class MessagesService {
       }
     }
 
-    if (!conversationId && !data.receiverId) {
-      throw new NotFoundException('Listing ID required to start conversation');
+    // Case 2: Direct message to a user
+    if (!conversationId && data.receiverId) {
+      const conversation = await this.createDirectConversation(senderId, data.receiverId);
+      conversationId = conversation.id;
     }
 
     if (!conversationId) {
-      throw new NotFoundException(
-        'Direct messaging not yet implemented. Please start from a listing.',
-      );
+      throw new BadRequestException('Either listingId or receiverId is required to start a conversation');
     }
 
     return this.prisma.message.create({
@@ -91,8 +156,14 @@ export class MessagesService {
     });
   }
 
+  /**
+   * Get all conversations for a user.
+   * Includes both direct and listing-based conversations.
+   * 
+   * **Validates: Requirements 29.4**
+   */
   async getConversations(userId: string) {
-    return this.prisma.conversation.findMany({
+    const conversations = await this.prisma.conversation.findMany({
       where: {
         participants: { some: { id: userId } },
       },
@@ -106,9 +177,26 @@ export class MessagesService {
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
+        _count: {
+          select: {
+            messages: {
+              where: {
+                senderId: { not: userId },
+                seen: false,
+              },
+            },
+          },
+        },
       },
       orderBy: { updatedAt: 'desc' },
     });
+
+    // Add type field to distinguish conversation types
+    return conversations.map((conv) => ({
+      ...conv,
+      type: conv.listingId ? 'listing' : 'direct',
+      unreadCount: conv._count?.messages || 0,
+    }));
   }
 
   async getMessages(userId: string, conversationId: string) {

@@ -11,13 +11,15 @@ import { api } from "../../../lib/api";
 import {
   User, MapPin, Calendar, Link as LinkIcon, Github, Instagram, Linkedin,
   MessageCircle, UserPlus, UserCheck, QrCode, Share2, ArrowLeft,
-  Briefcase, GraduationCap, Heart, Users, FileText, ShoppingBag, Loader2, Send
+  Briefcase, GraduationCap, Heart, Users, FileText, ShoppingBag, Loader2, Send,
+  BookOpen, Clock, CheckCircle
 } from "lucide-react";
 import Link from "next/link";
 
 interface UserProfile {
   id: string;
   email: string;
+  role?: string;
   profile?: {
     fullName: string;
     bio?: string;
@@ -35,6 +37,17 @@ interface UserProfile {
   };
 }
 
+interface AttendanceSummary {
+  classroomId: string;
+  classroomName: string;
+  subject: string;
+  totalDays: number;
+  presentDays: number;
+  absentDays: number;
+  lateDays: number;
+  percentage: number;
+}
+
 export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
@@ -43,8 +56,13 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [stats, setStats] = useState({ posts: 0, clubs: 0, events: 0 });
   const [isMessaging, setIsMessaging] = useState(false);
+  const [attendanceData, setAttendanceData] = useState<AttendanceSummary[]>([]);
+  const [showAcademicInfo, setShowAcademicInfo] = useState(false);
   const { toast } = useToast();
 
   const userId = params.id as string;
@@ -95,6 +113,62 @@ export default function UserProfilePage() {
         clubs: clubsRes.status === "fulfilled" ? clubsRes.value.length : 0,
         events: eventsRes.status === "fulfilled" ? eventsRes.value.length : 0,
       });
+
+      // Fetch follow status and counts
+      if (currentUser) {
+        try {
+          const [statusRes, countsRes] = await Promise.all([
+            api.getFollowStatus(userId),
+            api.getFollowCounts(userId),
+          ]);
+          setIsConnected(statusRes.isFollowing);
+          setFollowerCount(countsRes.followerCount);
+          setFollowingCount(countsRes.followingCount);
+          
+          // If current user is a teacher (FACULTY), fetch academic info
+          if (currentUser.role === 'FACULTY') {
+            setShowAcademicInfo(true);
+            // Fetch attendance data for this student
+            try {
+              const classrooms = await api.getClassrooms();
+              const attendanceSummaries: AttendanceSummary[] = [];
+              
+              for (const classroom of classrooms) {
+                try {
+                  const studentAttendance = await api.getStudentAttendance(classroom.id, userId);
+                  if (studentAttendance) {
+                    attendanceSummaries.push({
+                      classroomId: classroom.id,
+                      classroomName: classroom.name,
+                      subject: classroom.subject || 'General',
+                      totalDays: studentAttendance.totalDays || 0,
+                      presentDays: studentAttendance.presentDays || 0,
+                      absentDays: studentAttendance.absentDays || 0,
+                      lateDays: studentAttendance.lateDays || 0,
+                      percentage: studentAttendance.percentage || 0,
+                    });
+                  }
+                } catch (err) {
+                  // Student might not be in this classroom
+                }
+              }
+              setAttendanceData(attendanceSummaries);
+            } catch (err) {
+              console.error("Failed to fetch attendance data:", err);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch follow data:", err);
+        }
+      } else {
+        try {
+          const countsRes = await api.getFollowCounts(userId);
+          setFollowerCount(countsRes.followerCount);
+          setFollowingCount(countsRes.followingCount);
+        } catch (err) {
+          console.error("Failed to fetch follow counts:", err);
+        }
+      }
     } catch (err) {
       console.error("Failed to fetch profile:", err);
       setError("Failed to load profile");
@@ -103,9 +177,32 @@ export default function UserProfilePage() {
     }
   };
 
-  const handleConnect = () => {
-    // TODO: Implement connection/follow functionality
-    setIsConnected(!isConnected);
+  const handleConnect = async () => {
+    if (!currentUser) {
+      toast("Please log in to follow users", "error");
+      router.push("/login");
+      return;
+    }
+
+    setIsConnecting(true);
+    try {
+      if (isConnected) {
+        await api.unfollowUser(userId);
+        setIsConnected(false);
+        setFollowerCount(prev => Math.max(0, prev - 1));
+        toast("Unfollowed successfully", "success");
+      } else {
+        await api.followUser(userId);
+        setIsConnected(true);
+        setFollowerCount(prev => prev + 1);
+        toast(`Now following ${profile?.profile?.fullName || "user"}`, "success");
+      }
+    } catch (error: any) {
+      console.error("Failed to toggle follow:", error);
+      toast(error.message || "Failed to update follow status", "error");
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   const handleMessage = async () => {
@@ -256,22 +353,25 @@ export default function UserProfilePage() {
                 <div className="flex gap-2">
                   <motion.button
                     onClick={handleConnect}
-                    className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-ink shadow-neo-sm transition-all ${isConnected
+                    disabled={isConnecting}
+                    className={`flex items-center gap-2 px-4 py-2 font-bold text-sm border-2 border-ink shadow-neo-sm transition-all disabled:opacity-60 ${isConnected
                       ? "bg-neutral-100 text-ink"
                       : "bg-primary text-ink hover:bg-primary-600"
                       }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    {isConnected ? (
+                    {isConnecting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : isConnected ? (
                       <>
                         <UserCheck className="w-4 h-4" />
-                        Linked
+                        Following
                       </>
                     ) : (
                       <>
-                        <LinkIcon className="w-4 h-4" />
-                        Link
+                        <UserPlus className="w-4 h-4" />
+                        Follow
                       </>
                     )}
                   </motion.button>
@@ -308,7 +408,15 @@ export default function UserProfilePage() {
               )}
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-5 gap-4 mb-6">
+                <div className="text-center p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <div className="font-display text-2xl font-black">{followerCount}</div>
+                  <div className="text-sm text-neutral-500">Followers</div>
+                </div>
+                <div className="text-center p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                  <div className="font-display text-2xl font-black">{followingCount}</div>
+                  <div className="text-sm text-neutral-500">Following</div>
+                </div>
                 <div className="text-center p-4 bg-neutral-50 rounded-xl border border-neutral-200">
                   <div className="font-display text-2xl font-black">{stats.posts}</div>
                   <div className="text-sm text-neutral-500">Posts</div>
@@ -375,6 +483,82 @@ export default function UserProfilePage() {
                   </a>
                 )}
               </div>
+
+              {/* Academic Info Section - Only visible to teachers */}
+              {showAcademicInfo && attendanceData.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-8 pt-6 border-t-2 border-dashed border-neutral-200"
+                >
+                  <h3 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-primary" />
+                    Academic Information
+                  </h3>
+                  <p className="text-sm text-neutral-500 mb-4">
+                    This section is only visible to teachers
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {attendanceData.map((attendance) => (
+                      <div
+                        key={attendance.classroomId}
+                        className="p-4 bg-neutral-50 rounded-xl border border-neutral-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <h4 className="font-bold">{attendance.classroomName}</h4>
+                            <p className="text-sm text-neutral-500">{attendance.subject}</p>
+                          </div>
+                          <div className={`text-2xl font-display font-black ${
+                            attendance.percentage >= 75 ? 'text-green-600' :
+                            attendance.percentage >= 50 ? 'text-yellow-600' : 'text-red-600'
+                          }`}>
+                            {attendance.percentage.toFixed(1)}%
+                          </div>
+                        </div>
+                        
+                        {/* Attendance Progress Bar */}
+                        <div className="h-2 bg-neutral-200 rounded-full overflow-hidden mb-3">
+                          <div
+                            className={`h-full transition-all ${
+                              attendance.percentage >= 75 ? 'bg-green-500' :
+                              attendance.percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${Math.min(100, attendance.percentage)}%` }}
+                          />
+                        </div>
+                        
+                        {/* Attendance Stats */}
+                        <div className="grid grid-cols-4 gap-2 text-center text-sm">
+                          <div className="p-2 bg-white rounded-lg">
+                            <div className="font-bold text-neutral-700">{attendance.totalDays}</div>
+                            <div className="text-xs text-neutral-500">Total</div>
+                          </div>
+                          <div className="p-2 bg-green-50 rounded-lg">
+                            <div className="font-bold text-green-600 flex items-center justify-center gap-1">
+                              <CheckCircle className="w-3 h-3" />
+                              {attendance.presentDays}
+                            </div>
+                            <div className="text-xs text-green-600">Present</div>
+                          </div>
+                          <div className="p-2 bg-yellow-50 rounded-lg">
+                            <div className="font-bold text-yellow-600 flex items-center justify-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {attendance.lateDays}
+                            </div>
+                            <div className="text-xs text-yellow-600">Late</div>
+                          </div>
+                          <div className="p-2 bg-red-50 rounded-lg">
+                            <div className="font-bold text-red-600">{attendance.absentDays}</div>
+                            <div className="text-xs text-red-600">Absent</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         </div>

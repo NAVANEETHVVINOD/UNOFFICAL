@@ -31,6 +31,7 @@ export default function PostActions({
   const [isSaved, setIsSaved] = useState(initialIsSaved);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [isLiking, setIsLiking] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -65,10 +66,28 @@ export default function PostActions({
   }, [postId, isLiked, isLiking]);
 
   const handleSave = useCallback(async () => {
-    // Toggle saved state (API endpoint would be needed)
-    setIsSaved(!isSaved);
-    // TODO: Implement save API when available
-  }, [isSaved]);
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    const wasSaved = isSaved;
+    
+    // Optimistic update
+    setIsSaved(!wasSaved);
+
+    try {
+      if (wasSaved) {
+        await api.unsavePost(postId);
+      } else {
+        await api.savePost(postId);
+      }
+    } catch (error) {
+      // Revert on error
+      setIsSaved(wasSaved);
+      console.error("Failed to toggle save:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [postId, isSaved, isSaving]);
 
   const handleShare = useCallback(() => {
     setShowShareMenu(!showShareMenu);

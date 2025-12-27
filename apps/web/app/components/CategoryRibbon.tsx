@@ -2,17 +2,13 @@
 
 import { motion } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 import {
   Home,
+  GraduationCap, // College icon
   Compass, // Explore icon
   MessageCircle,
 } from "lucide-react";
-
-const CATEGORIES = [
-  { id: 'feed', label: 'Home', icon: Home, color: 'bg-primary', path: '/dashboard' },
-  { id: 'explore', label: 'Explore', icon: Compass, color: 'bg-accent-blue', path: '/explore' },
-  { id: 'messages', label: 'Chat', icon: MessageCircle, color: 'bg-accent-orange', path: '/messages' },
-];
 
 interface CategoryRibbonProps {
   className?: string;
@@ -21,9 +17,22 @@ interface CategoryRibbonProps {
 export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const collegeSlug = user?.profile?.college?.slug;
+  const collegeHref = collegeSlug ? `/colleges/${collegeSlug}` : '/my-college';
+
+  // Desktop Nav Box: 4 items - Home, College, Explore, Chat
+  const CATEGORIES = [
+    { id: 'feed', label: 'Home', icon: Home, color: 'bg-primary', path: '/dashboard' },
+    { id: 'college', label: 'College', icon: GraduationCap, color: 'bg-accent-coral', path: collegeHref },
+    { id: 'explore', label: 'Explore', icon: Compass, color: 'bg-accent-blue', path: '/explore' },
+    { id: 'messages', label: 'Chat', icon: MessageCircle, color: 'bg-accent-orange', path: '/messages' },
+  ];
 
   const getActiveCategory = () => {
     if (pathname === '/dashboard' || pathname === '/') return 'feed';
+    if (pathname.startsWith('/colleges') || pathname.startsWith('/my-college')) return 'college';
     if (pathname.startsWith('/explore') || pathname.startsWith('/events') || pathname.startsWith('/clubs') || pathname.startsWith('/resources') || pathname.startsWith('/marketplace')) return 'explore';
     if (pathname.startsWith('/messages')) return 'messages';
     return 'feed';
@@ -33,7 +42,7 @@ export default function CategoryRibbon({ className = "" }: CategoryRibbonProps) 
 
   return (
     <div className={`w-full hidden md:block ${className}`}>
-      {/* Desktop View - Hidden on mobile, ArcMenu handles navigation */}
+      {/* Desktop View - Hidden on mobile, BottomNav handles navigation */}
       <div
         className="flex items-center gap-2 p-1.5 bg-paper border-2 border-ink rounded-xl shadow-neo transform -rotate-1"
         style={{ transformOrigin: 'center left' }}

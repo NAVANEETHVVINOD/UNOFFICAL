@@ -193,6 +193,12 @@ export const api = {
   getFollowStatus: (userId: string) => apiRequest(`/follows/${userId}/status`),
   getFollowers: (userId: string) => apiRequest(`/follows/${userId}/followers`),
   getFollowing: (userId: string) => apiRequest(`/follows/${userId}/following`),
+  /**
+   * Get follower and following counts for a user.
+   * 
+   * **Validates: Requirements 28.3, 28.4**
+   */
+  getFollowCounts: (userId: string) => apiRequest(`/follows/${userId}/counts`),
 
   // Search
   search: (query: string) => apiRequest(`/search?q=${encodeURIComponent(query)}`),
@@ -315,10 +321,14 @@ export const api = {
     }),
 
   // Notes
-  getNotes: (search?: string, collegeSlug?: string) => {
+  getNotes: (search?: string, collegeSlug?: string, subject?: string, uploaderId?: string, startDate?: string, endDate?: string) => {
     const params = new URLSearchParams();
     if (search) params.append("search", search);
     if (collegeSlug) params.append("collegeSlug", collegeSlug);
+    if (subject) params.append("subject", subject);
+    if (uploaderId) params.append("uploader", uploaderId);
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
     return apiRequest(`/notes?${params.toString()}`);
   },
 
@@ -346,6 +356,28 @@ export const api = {
     return apiRequest(`/posts?${query.toString()}`);
   },
 
+  /**
+   * Cursor-based pagination for posts feed.
+   * More efficient than offset pagination for infinite scroll.
+   * 
+   * **Validates: Requirements 26.1, 26.2, 26.3**
+   */
+  getPostsCursor: (options: {
+    cursor?: string;
+    limit?: number;
+    collegeSlug?: string;
+    filter?: 'all' | 'college';
+    isOfficial?: boolean;
+  } = {}) => {
+    const query = new URLSearchParams();
+    if (options.cursor) query.append("cursor", options.cursor);
+    if (options.limit) query.append("limit", options.limit.toString());
+    if (options.collegeSlug) query.append("collegeSlug", options.collegeSlug);
+    if (options.filter) query.append("filter", options.filter);
+    if (options.isOfficial) query.append("isOfficial", "true");
+    return apiRequest(`/posts/feed/cursor?${query.toString()}`);
+  },
+
   getPost: (id: string) => apiRequest(`/posts/${id}`),
 
   createPost: (data: any) =>
@@ -365,6 +397,30 @@ export const api = {
       body: JSON.stringify({ optionId })
     }),
 
+  /**
+   * Save a post for the authenticated user.
+   * 
+   * **Validates: Requirements 27.1, 27.2**
+   */
+  savePost: (postId: string) =>
+    apiRequest(`/posts/${postId}/save`, { method: "POST" }),
+
+  /**
+   * Unsave a post for the authenticated user.
+   * 
+   * **Validates: Requirements 27.1, 27.2**
+   */
+  unsavePost: (postId: string) =>
+    apiRequest(`/posts/${postId}/save`, { method: "DELETE" }),
+
+  /**
+   * Check if a post is saved by the authenticated user.
+   * 
+   * **Validates: Requirements 27.3**
+   */
+  isPostSaved: (postId: string) =>
+    apiRequest(`/posts/${postId}/saved`),
+
   // Messages
   sendMessage: (data: {
     listingId?: string;
@@ -382,6 +438,17 @@ export const api = {
       body: JSON.stringify({ participantId, listingId }),
     }),
 
+  /**
+   * Create or get a direct conversation with another user.
+   * 
+   * **Validates: Requirements 29.1, 29.2**
+   */
+  createDirectConversation: (participantId: string, initialMessage?: string) =>
+    apiRequest("/messages/direct", {
+      method: "POST",
+      body: JSON.stringify({ participantId, initialMessage }),
+    }),
+
   replyToConversation: (conversationId: string, content: string) =>
     apiRequest(`/messages/${conversationId}/reply`, {
       method: "POST",
@@ -396,12 +463,33 @@ export const api = {
   markAsSeen: (conversationId: string) =>
     apiRequest(`/messages/${conversationId}/seen`, { method: "PATCH" }),
 
+  /**
+   * Search users by name or email.
+   * 
+   * **Validates: Requirements 29.1**
+   */
+  searchUsers: (query: string) =>
+    apiRequest(`/users/search?q=${encodeURIComponent(query)}`),
+
   // User Activity
   getUserPosts: (userId: string) => apiRequest(`/users/${userId}/posts`),
 
   getUserEvents: (userId: string) => apiRequest(`/users/${userId}/events`),
 
   getUserClubs: (userId: string) => apiRequest(`/users/${userId}/clubs`),
+
+  /**
+   * Get all saved items for the authenticated user.
+   * Supports filtering by type (POST, EVENT, LISTING, NOTE).
+   * 
+   * **Validates: Requirements 27.4**
+   */
+  getMySavedItems: (type?: 'POST' | 'EVENT' | 'LISTING' | 'NOTE') => {
+    const params = new URLSearchParams();
+    if (type) params.append('type', type);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return apiRequest(`/users/me/saved${queryString}`);
+  },
 
   // Notifications
   getNotifications: () => apiRequest("/notifications"),
@@ -561,4 +649,67 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ grade, feedback }),
     }),
+
+  /**
+   * Mark attendance for a classroom.
+   * 
+   * **Validates: Requirements 2.1, 2.2**
+   */
+  markAttendance: (classroomId: string, date: string, records: Record<string, string>) =>
+    apiRequest(`/classrooms/${classroomId}/attendance`, {
+      method: "POST",
+      body: JSON.stringify({ date, records }),
+    }),
+
+  /**
+   * Get attendance records for a classroom with optional date range.
+   * 
+   * **Validates: Requirements 2.4**
+   */
+  getAttendance: (classroomId: string, startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+    return apiRequest(`/classrooms/${classroomId}/attendance${queryString}`);
+  },
+
+  /**
+   * Get attendance for a specific date.
+   */
+  getAttendanceByDate: (classroomId: string, date: string) =>
+    apiRequest(`/classrooms/${classroomId}/attendance/${date}`),
+
+  /**
+   * Get attendance summary for all students in a classroom.
+   */
+  getAttendanceSummary: (classroomId: string) =>
+    apiRequest(`/classrooms/${classroomId}/attendance-summary`),
+
+  /**
+   * Get attendance percentage for a specific student.
+   * 
+   * **Validates: Requirements 2.3**
+   */
+  getStudentAttendance: (classroomId: string, studentId: string) =>
+    apiRequest(`/classrooms/${classroomId}/attendance/student/${studentId}`),
+
+  /**
+   * Verify assignment completion and award karma.
+   * 
+   * **Validates: Requirements 1.6, 1.7**
+   */
+  verifySubmission: (submissionId: string, verified: boolean, karmaPoints?: number) =>
+    apiRequest(`/classrooms/submissions/${submissionId}/verify`, {
+      method: "POST",
+      body: JSON.stringify({ verified, karmaPoints }),
+    }),
+
+  /**
+   * Get classroom analytics for teacher dashboard.
+   * 
+   * **Validates: Requirements 1.1**
+   */
+  getClassroomAnalytics: (classroomId: string) =>
+    apiRequest(`/classrooms/${classroomId}/analytics`),
 };

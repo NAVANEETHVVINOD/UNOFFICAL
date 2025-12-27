@@ -38,11 +38,21 @@ const EXPLORE_ITEMS = [
         rowSpan: 'row-span-1'
     },
     {
+        id: 'collabo',
+        label: 'Collaborations',
+        description: 'Find teammates for projects and hackathons.',
+        icon: Users,
+        color: 'bg-accent-mint',
+        path: '/collabo',
+        colSpan: 'col-span-6 md:col-span-4',
+        rowSpan: 'row-span-1'
+    },
+    {
         id: 'market',
         label: 'Marketplace',
         description: 'Buy, sell, and trade with other students.',
         icon: ShoppingBag,
-        color: 'bg-accent-mint',
+        color: 'bg-primary',
         path: '/marketplace',
         colSpan: 'col-span-6 md:col-span-4',
         rowSpan: 'row-span-1'
@@ -54,7 +64,7 @@ const EXPLORE_ITEMS = [
         icon: BookOpen,
         color: 'bg-accent-purple',
         path: '/resources',
-        colSpan: 'col-span-12 md:col-span-4',
+        colSpan: 'col-span-6 md:col-span-4',
         rowSpan: 'row-span-1'
     },
     {
@@ -62,9 +72,9 @@ const EXPLORE_ITEMS = [
         label: 'All Colleges',
         description: 'Browse other campuses on Linker.',
         icon: School,
-        color: 'bg-accent-yellow', // primary
+        color: 'bg-accent-yellow',
         path: '/colleges',
-        colSpan: 'col-span-12 md:col-span-8',
+        colSpan: 'col-span-12 md:col-span-4',
         rowSpan: 'row-span-1'
     }
 ];
