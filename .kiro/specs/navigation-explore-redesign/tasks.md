@@ -75,7 +75,7 @@ This plan implements the navigation redesign with consistent NavBox across pages
     - Verify 3 items: Home, College, Clubs
     - _Requirements: 1.2.1_
 
-- [-] 7. Final checkpoint - Ensure all tests pass
+- [x] 7. Final checkpoint - Ensure all tests pass
   - Build the project
   - Run property tests
   - Ensure all tests pass, ask the user if questions arise

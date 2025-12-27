@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import Container from "../components/ui/Container";
 import Navbar from "../components/Navbar";
 import CategoryRibbon from "../components/CategoryRibbon";
 import BottomNav from "../components/ui/BottomNav";
@@ -19,10 +18,15 @@ export default function ExploreClient() {
     return (
         <PageTransition>
             <div className="min-h-screen bg-paper dark:bg-dark-bg">
+                {/* Background Pattern */}
+                <div className="fixed inset-0 pointer-events-none z-0 top-16 md:top-20">
+                    <div className="absolute inset-0 opacity-40 bg-grid dark:opacity-20" />
+                </div>
+
                 <Navbar />
 
-                <Container>
-                    <div className="pt-20 pb-24">
+                <div className="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-6 pt-24 md:pt-36">
+                    <div className="pb-24">
                         {/* NavBox at top - Desktop only, global variant */}
                         <div className="hidden md:block mb-6">
                             <CategoryRibbon variant="global" />
@@ -100,7 +104,7 @@ export default function ExploreClient() {
                             })}
                         </div>
                     </div>
-                </Container>
+                </div>
 
                 <BottomNav />
             </div>
