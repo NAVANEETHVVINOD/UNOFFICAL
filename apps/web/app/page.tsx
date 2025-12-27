@@ -84,6 +84,9 @@ export default function Home() {
             {/* Landing Navbar */}
             <LandingNavbar />
             
+            {/* Spacer for fixed navbar */}
+            <div className="h-16" />
+            
             <div className="absolute top-0 left-0 w-full h-[80vh] overflow-hidden -z-10">
                 <img
                     src="/doodles/header-vangof.jpg"
