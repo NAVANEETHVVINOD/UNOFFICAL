@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../../lib/api";
 import { motion } from "framer-motion";
 import { School, AlertCircle } from "lucide-react";
 
@@ -22,26 +23,40 @@ export default function MyCollegeRedirect() {
             return;
         }
 
-        // Check if user has a college (check both college.slug and tempCollegeId in socials)
-        const collegeSlug = user?.profile?.college?.slug;
-        const tempCollegeId = (user?.profile?.socials as any)?.tempCollegeId;
-        const tempCollegeName = (user?.profile?.socials as any)?.tempCollegeName;
+        const handleRedirect = async () => {
+            // Check if user has a college (check both college.slug and tempCollegeId in socials)
+            const collegeSlug = user?.profile?.college?.slug;
+            const tempCollegeId = (user?.profile?.socials as any)?.tempCollegeId;
 
-        if (collegeSlug) {
-            setRedirecting(true);
-            router.replace(`/colleges/${collegeSlug}`);
-        } else if (tempCollegeId) {
-            // User has a fallback college (tempCollegeId) - redirect to dashboard
-            // since we can't navigate to a college page without a slug
-            setRedirecting(true);
-            router.replace("/dashboard");
-        } else {
-            // No college set - redirect to onboarding
-            setError("No campus selected");
-            setTimeout(() => {
-                router.replace("/onboarding?step=college");
-            }, 1500);
-        }
+            if (collegeSlug) {
+                setRedirecting(true);
+                router.replace(`/colleges/${collegeSlug}`);
+            } else if (tempCollegeId) {
+                // User has a fallback college (tempCollegeId) - fetch the college to get its slug
+                setRedirecting(true);
+                try {
+                    const college = await api.getCollege(tempCollegeId);
+                    if (college?.slug) {
+                        router.replace(`/colleges/${college.slug}`);
+                    } else {
+                        // College found but no slug, redirect to dashboard
+                        router.replace("/dashboard");
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch college:", err);
+                    // Fallback to dashboard if API fails
+                    router.replace("/dashboard");
+                }
+            } else {
+                // No college set - redirect to onboarding
+                setError("No campus selected");
+                setTimeout(() => {
+                    router.replace("/onboarding?step=college");
+                }, 1500);
+            }
+        };
+
+        handleRedirect();
     }, [user, loading, isAuthenticated, router]);
 
     return (
