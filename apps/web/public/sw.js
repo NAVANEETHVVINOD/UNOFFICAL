@@ -13,6 +13,8 @@ const PRECACHE_ASSETS = [
   '/explore',
   '/events',
   '/messages',
+  '/legal/privacy',
+  '/legal/terms',
 ];
 
 // Install event - cache essential assets

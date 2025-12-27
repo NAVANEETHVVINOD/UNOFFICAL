@@ -1,16 +1,14 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-
 /**
- * Feature Flags for LINKER
- * Controls feature availability for controlled rollout
+ * Feature Flags Configuration for LINKER
+ * 
+ * This module provides feature flag utilities that can be used
+ * both in React components and server-side code.
  * 
  * TWA Launch Configuration:
  * - Enabled: feed, eventsView, chat, marketplace (limited)
  * - Disabled: communities, classroom, collab, eventsCreate (non-admin)
  */
+
 export type FeatureFlags = {
     // Core features
     feed: boolean;
@@ -38,7 +36,7 @@ export const ADMIN_OVERRIDE_FEATURES: (keyof FeatureFlags)[] = [
 ];
 
 // Default launch configuration for TWA
-const defaultFlags: FeatureFlags = {
+export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
     // Enabled for launch
     feed: true,
     eventsView: true,
@@ -54,6 +52,9 @@ const defaultFlags: FeatureFlags = {
     classroom: false,
     collab: false,
 };
+
+// Admin roles that can override feature flags
+export const ADMIN_ROLES = ['COLLEGE_ADMIN', 'PLATFORM_ADMIN', 'CLUB_ADMIN'];
 
 /**
  * Check if a feature is enabled
@@ -84,32 +85,15 @@ export function hasAdminAccess(
     feature: keyof FeatureFlags,
     userRole?: string
 ): boolean {
-    const adminRoles = ['COLLEGE_ADMIN', 'PLATFORM_ADMIN', 'CLUB_ADMIN'];
-    return adminRoles.includes(userRole || '');
+    return ADMIN_ROLES.includes(userRole || '');
 }
 
-export function useFeatureFlags() {
-    const [flags, setFlags] = useState<FeatureFlags>(defaultFlags);
-    const { user } = useAuth();
-
-    useEffect(() => {
-        // In the future, this could fetch from a remote config or env vars
-        // const envFlags = process.env.NEXT_PUBLIC_FEATURE_FLAGS;
-        setFlags(defaultFlags);
-    }, []);
-
-    const userRole = user?.profile?.role;
-    const isAdmin = hasAdminAccess('eventsCreate', userRole);
-
-    // Helper to check if a specific feature is enabled for current user
-    const checkFeature = (feature: keyof FeatureFlags): boolean => {
-        return isFeatureEnabled(flags, feature, isAdmin);
-    };
-
-    return {
-        flags,
-        isAdmin,
-        checkFeature,
-        isFeatureEnabled: (feature: keyof FeatureFlags) => checkFeature(feature),
-    };
+/**
+ * Get feature flags from environment or defaults
+ * Can be extended to fetch from remote config
+ */
+export function getFeatureFlags(): FeatureFlags {
+    // In the future, this could fetch from environment variables
+    // or a remote configuration service
+    return DEFAULT_FEATURE_FLAGS;
 }

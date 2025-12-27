@@ -1,0 +1,56 @@
+{
+  "packageId": "app.vercel.linker_app.twa",
+  "host": "linker-app.vercel.app",
+  "name": "LINKER",
+  "launcherName": "LINKER",
+  "display": "standalone",
+  "themeColor": "#0D0D0D",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#FDF6E3",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://linker-app.vercel.app/logo512.png",
+  "maskableIconUrl": "",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "F:\\kannan\\projects\\unoffical\\android.keystore",
+    "alias": "linker"
+  },
+  "appVersionName": "2",
+  "appVersionCode": 2,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://linker-app.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://linker-app.vercel.app/",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [
+    {
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "value": "B7:E5:7E:06:EF:BF:37:80:A9:F5:67:AC:6E:04:39:21:B3:9B:7A:4E:BF:87:40:BE:CA:25:18:D1:74:48:03:91"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "2"
+}
