@@ -32,6 +32,16 @@ const nextConfig = {
       },
     ];
   },
+
+  // Rewrites to serve static files from public folder
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/:path*',
+        destination: '/.well-known/:path*',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
