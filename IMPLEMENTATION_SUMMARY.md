@@ -4,11 +4,15 @@
 
 The LINKER platform is production-ready with all spec tasks completed.
 
+> **For a comprehensive audit of all features, endpoints, and pages, see [PLATFORM_AUDIT.md](./PLATFORM_AUDIT.md)**
+
 ### Build & Test Status
 - **Frontend Build**: ✅ Passing
 - **Backend Build**: ✅ Passing  
-- **Frontend Tests**: ✅ 290 tests passing
+- **Frontend Tests**: ✅ 290+ tests passing
 - **Backend Tests**: ✅ 47 tests passing
+- **Total API Endpoints**: 80+
+- **Total Frontend Pages**: 35+
 
 ## How to Access Different Views
 

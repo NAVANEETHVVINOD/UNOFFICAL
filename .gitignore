@@ -87,3 +87,21 @@ prisma/migrations/
 
 # Uploads
 uploads/
+
+
+# Android TWA Build Artifacts
+*.apk
+*.aab
+*.idsig
+*.keystore
+.gradle/
+gradle/
+app/
+build.gradle
+settings.gradle
+gradle.properties
+gradlew
+gradlew.bat
+manifest-checksum.txt
+store_icon.png
+local.properties
