@@ -34,6 +34,7 @@ import { join } from 'path';
 import { FollowsModule } from './modules/follows/follows.module';
 import { SearchModule } from './modules/search/search.module';
 import { ClassroomsModule } from './modules/classrooms/classrooms.module';
+import { CorsConfig } from './config/cors.config';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { ClassroomsModule } from './modules/classrooms/classrooms.module';
   controllers: [AppController, HealthController],
   providers: [
     AppService,
+    CorsConfig,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
