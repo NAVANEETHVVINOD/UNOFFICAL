@@ -36,6 +36,17 @@ export class UsersController {
   }
 
   /**
+   * Get blocked users for the authenticated user.
+   * Returns empty array as blocking feature is not yet implemented.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('blocked')
+  async getBlockedUsers(@Request() req) {
+    // TODO: Implement blocking feature
+    return [];
+  }
+
+  /**
    * Search users by name or email.
    * 
    * **Validates: Requirements 29.1**

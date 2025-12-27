@@ -424,7 +424,7 @@ export default function MessagesClient() {
                 <div className="p-8 text-center text-neutral-500">
                   <Users className="w-12 h-12 mx-auto mb-2 opacity-20" />
                   <p className="text-sm">No conversations found</p>
-                  <Link href="/colleges/mec/feed" className="text-primary text-xs font-bold mt-2 block hover:underline">
+                  <Link href="/dashboard" className="text-primary text-xs font-bold mt-2 block hover:underline">
                     Find people in Feed
                   </Link>
                 </div>
