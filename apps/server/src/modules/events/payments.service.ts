@@ -39,7 +39,7 @@ export interface PaymentVerificationResult {
 @Injectable()
 export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
-  private razorpay: Razorpay;
+  private razorpay: Razorpay | null = null;
   private readonly razorpayCircuitBreaker = CircuitBreakerRegistry.get('razorpay', {
     failureThreshold: 5,
     successThreshold: 2,
@@ -51,10 +51,26 @@ export class PaymentsService {
   private readonly GATEWAY_FEE_BPS = 200; // 2%
 
   constructor(private prisma: PrismaService) {
-    this.razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID || '',
-      key_secret: process.env.RAZORPAY_KEY_SECRET || '',
-    });
+    // Only initialize Razorpay if credentials are provided
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    
+    if (keyId && keySecret) {
+      this.razorpay = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret,
+      });
+      this.logger.log('Razorpay initialized successfully');
+    } else {
+      this.logger.warn('Razorpay credentials not configured - payment features will be disabled');
+    }
+  }
+
+  /**
+   * Check if Razorpay is configured
+   */
+  isPaymentEnabled(): boolean {
+    return this.razorpay !== null;
   }
 
   /**
@@ -100,6 +116,10 @@ export class PaymentsService {
     registrationId: string,
     passFeesToBuyer: boolean,
   ): Promise<{ order: RazorpayOrder; feeBreakdown: FeeBreakdown }> {
+    if (!this.razorpay) {
+      throw new BadRequestException('Payment system is not configured');
+    }
+
     // Get registration with ticket info
     const registration = await this.prisma.eventRegistration.findUnique({
       where: { id: registrationId },
@@ -548,6 +568,10 @@ export class PaymentsService {
     registrationId: string,
     amount?: number,
   ): Promise<{ success: boolean; refundId?: string; error?: string }> {
+    if (!this.razorpay) {
+      return { success: false, error: 'Payment system is not configured' };
+    }
+
     const payment = await this.prisma.eventPayment.findUnique({
       where: { registrationId },
     });
@@ -599,6 +623,10 @@ export class PaymentsService {
    * Requirement 25.2
    */
   async manualVerifyPayment(orderId: string): Promise<PaymentVerificationResult> {
+    if (!this.razorpay) {
+      return { success: false, error: 'Payment system is not configured' };
+    }
+
     const payment = await this.prisma.eventPayment.findUnique({
       where: { razorpayOrderId: orderId },
       include: {
