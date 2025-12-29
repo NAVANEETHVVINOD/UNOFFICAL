@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Delete,
   UseGuards,
   Request,
   Query,
@@ -44,6 +45,18 @@ export class UsersController {
   async getBlockedUsers(@Request() req) {
     // TODO: Implement blocking feature
     return [];
+  }
+
+  /**
+   * Delete the authenticated user's account.
+   * This permanently removes the user and all associated data.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Delete('me')
+  async deleteAccount(@Request() req) {
+    const userId = req.user.userId;
+    await this.usersService.remove({ id: userId });
+    return { success: true, message: 'Account deleted successfully' };
   }
 
   /**

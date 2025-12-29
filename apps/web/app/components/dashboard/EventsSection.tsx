@@ -78,7 +78,8 @@ export default function EventsSection() {
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
-      const response = await api.getEvents(user?.profile?.college?.slug);
+      const collegeSlug = user?.profile?.college?.slug;
+      const response = await api.getEvents(collegeSlug ? { collegeSlug } : undefined);
       const allEvents = response.events || response || [];
       
       const now = new Date();

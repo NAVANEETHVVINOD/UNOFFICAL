@@ -1,5 +1,5 @@
 /**
- * QR Code utilities for event check-in
+ * QR Code utilities for event check-in and user connections
  */
 
 /**
@@ -9,6 +9,44 @@ export function generateEventQRData(eventId: string): string {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8);
   return `LINKER_EVENT:${eventId}:${timestamp}:${random}`;
+}
+
+/**
+ * Generate a QR code data string for a user profile
+ * Format: LINKER_USER:<userId>:<timestamp>:<random>
+ */
+export function generateUserQRData(userId: string): string {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `LINKER_USER:${userId}:${timestamp}:${random}`;
+}
+
+/**
+ * Parse user QR code data to extract user ID
+ */
+export function parseUserQRData(qrData: string): { userId: string; timestamp: number } | null {
+  const parts = qrData.split(":");
+  if (parts.length >= 3 && parts[0] === "LINKER_USER") {
+    return {
+      userId: parts[1],
+      timestamp: parseInt(parts[2], 10),
+    };
+  }
+  return null;
+}
+
+/**
+ * Check if QR data is a user QR code
+ */
+export function isUserQRCode(qrData: string): boolean {
+  return qrData.startsWith("LINKER_USER:");
+}
+
+/**
+ * Check if QR data is an event QR code
+ */
+export function isEventQRCode(qrData: string): boolean {
+  return qrData.startsWith("LINKER_EVENT:");
 }
 
 /**

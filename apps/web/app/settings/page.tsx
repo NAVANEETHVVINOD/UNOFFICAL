@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Shield, Eye, Moon, Smartphone, LogOut, Check, UserX, Trash2, Mail, ArrowLeft, User, Settings, AlertTriangle } from "lucide-react";
+import { api } from "../../lib/api";
 import {
   NotificationType,
   NOTIFICATION_CATEGORIES,
@@ -78,8 +79,7 @@ export default function SettingsPage() {
     
     setIsDeleting(true);
     try {
-      // TODO: Add API call for account deletion when backend supports it
-      // await api.deleteAccount();
+      await api.deleteAccount();
       logout();
       router.push("/");
     } catch (error) {

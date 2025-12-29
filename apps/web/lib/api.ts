@@ -205,6 +205,21 @@ export const api = {
    */
   getFollowCounts: (userId: string) => apiRequest(`/follows/${userId}/counts`),
 
+  /**
+   * Connect with a user via QR code scan.
+   * This follows the user and optionally starts a conversation.
+   */
+  connectViaQR: (userId: string, startConversation?: boolean) =>
+    apiRequest(`/follows/${userId}/connect`, {
+      method: "POST",
+      body: JSON.stringify({ startConversation }),
+    }),
+
+  /**
+   * Get user profile by ID (for QR scan result).
+   */
+  getUserById: (userId: string) => apiRequest(`/users/${userId}`),
+
   // Search
   search: (query: string) => apiRequest(`/search?q=${encodeURIComponent(query)}`),
 
@@ -263,13 +278,30 @@ export const api = {
     apiRequest(`/clubs/${clubId}/members/${userId}`, { method: "DELETE" }),
 
   // Events
-  getEvents: (collegeSlug?: string, cursor?: string, limit?: number) => {
-    const params = new URLSearchParams();
-    if (collegeSlug) params.append("collegeSlug", collegeSlug);
-    if (cursor) params.append("cursor", cursor);
-    if (limit) params.append("limit", limit.toString());
-    return apiRequest(`/events?${params.toString()}`);
+  getEvents: (params?: {
+    scope?: 'campus' | 'global';
+    dateRange?: 'today' | 'week' | 'month' | 'all';
+    priceType?: 'free' | 'paid' | 'all';
+    category?: string;
+    search?: string;
+    collegeSlug?: string;
+    cursor?: string;
+    limit?: number;
+  }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.scope) searchParams.append("scope", params.scope);
+    if (params?.dateRange) searchParams.append("dateRange", params.dateRange);
+    if (params?.priceType) searchParams.append("priceType", params.priceType);
+    if (params?.category) searchParams.append("category", params.category);
+    if (params?.search) searchParams.append("search", params.search);
+    if (params?.collegeSlug) searchParams.append("collegeSlug", params.collegeSlug);
+    if (params?.cursor) searchParams.append("cursor", params.cursor);
+    if (params?.limit) searchParams.append("limit", params.limit.toString());
+    return apiRequest(`/events?${searchParams.toString()}`);
   },
+
+  getEventsByScope: (scope: 'campus' | 'global') =>
+    apiRequest(`/events/scope/${scope}`),
 
   getEvent: (id: string) => apiRequest(`/events/${id}`),
 
@@ -278,6 +310,73 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  updateEvent: (id: string, data: any) =>
+    apiRequest(`/events/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  deleteEvent: (id: string) =>
+    apiRequest(`/events/${id}`, { method: "DELETE" }),
+
+  publishEvent: (id: string) =>
+    apiRequest(`/events/${id}/publish`, { method: "POST" }),
+
+  cancelEvent: (id: string, reason?: string) =>
+    apiRequest(`/events/${id}/cancel`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+
+  archiveEvent: (id: string) =>
+    apiRequest(`/events/${id}/archive`, { method: "POST" }),
+
+  // Ticket and Registration APIs
+  getTicketAvailability: (eventId: string) =>
+    apiRequest(`/events/${eventId}/tickets`),
+
+  registerForEvent: (eventId: string, data: {
+    ticketId: string;
+    formResponses?: Record<string, unknown>;
+    noRefundConsent?: boolean;
+  }) =>
+    apiRequest(`/events/${eventId}/register`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  getUserRegistration: (eventId: string) =>
+    apiRequest(`/events/${eventId}/my-registration`),
+
+  cancelRegistration: (eventId: string) =>
+    apiRequest(`/events/${eventId}/registration`, { method: "DELETE" }),
+
+  getEventRegistrations: (eventId: string, status?: string, cursor?: string) => {
+    const params = new URLSearchParams();
+    if (status) params.append("status", status);
+    if (cursor) params.append("cursor", cursor);
+    return apiRequest(`/events/${eventId}/registrations?${params.toString()}`);
+  },
+
+  getMyRegisteredEvents: () =>
+    apiRequest("/events/user/my-events"),
+
+  getFeaturedEvents: () => apiRequest("/events?featured=true&limit=5"),
+
+  getTrendingEvents: () => apiRequest("/events?trending=true&limit=5"),
+
+  saveEvent: (id: string) =>
+    apiRequest(`/saved`, {
+      method: "POST",
+      body: JSON.stringify({ type: "EVENT", eventId: id }),
+    }),
+
+  unsaveEvent: (id: string) =>
+    apiRequest(`/saved/event/${id}`, { method: "DELETE" }),
+
+  getMyEventRole: (id: string) =>
+    apiRequest(`/events/${id}/my-role`),
 
   rsvpEvent: (id: string, status: "GOING" | "INTERESTED" | "NOT_GOING") =>
     apiRequest(`/events/${id}/rsvp`, {
@@ -546,6 +645,13 @@ export const api = {
   unblockUser: (userId: string) =>
     apiRequest(`/users/${userId}/block`, { method: "DELETE" }),
 
+  /**
+   * Delete the authenticated user's account.
+   * This permanently removes the user and all associated data.
+   */
+  deleteAccount: () =>
+    apiRequest("/users/me", { method: "DELETE" }),
+
   // Admin - Platform Admin
   getAllUsers: () => apiRequest("/admin/users"),
 
@@ -717,4 +823,365 @@ export const api = {
    */
   getClassroomAnalytics: (classroomId: string) =>
     apiRequest(`/classrooms/${classroomId}/analytics`),
+
+  // Payment APIs (Razorpay Integration)
+  /**
+   * Calculate fee breakdown for a ticket price.
+   * 
+   * **Validates: Requirements 4.1, 4.2**
+   */
+  calculateFees: (price: number, passFeesToBuyer: boolean = true) =>
+    apiRequest("/events/payments/calculate-fees", {
+      method: "POST",
+      body: JSON.stringify({ price, passFeesToBuyer }),
+    }),
+
+  /**
+   * Create a Razorpay payment order for a registration.
+   * 
+   * **Validates: Requirements 4.3, 4.4**
+   */
+  createPaymentOrder: (registrationId: string, passFeesToBuyer: boolean = true) =>
+    apiRequest("/events/payments/create-order", {
+      method: "POST",
+      body: JSON.stringify({ registrationId, passFeesToBuyer }),
+    }),
+
+  /**
+   * Verify payment after Razorpay checkout completion.
+   * 
+   * **Validates: Requirements 4.5**
+   */
+  verifyPayment: (orderId: string, paymentId: string, signature: string) =>
+    apiRequest("/events/payments/verify", {
+      method: "POST",
+      body: JSON.stringify({ orderId, paymentId, signature }),
+    }),
+
+  /**
+   * Manual payment verification for failed frontend callbacks.
+   * 
+   * **Validates: Requirements 4.6**
+   */
+  manualVerifyPayment: (orderId: string) =>
+    apiRequest("/events/payments/manual-verify", {
+      method: "POST",
+      body: JSON.stringify({ orderId }),
+    }),
+
+  /**
+   * Get payment details for a registration.
+   */
+  getPaymentDetails: (registrationId: string) =>
+    apiRequest(`/events/payments/${registrationId}`),
+
+  // Role Management APIs
+  /**
+   * Get all roles for an event.
+   * 
+   * **Validates: Requirements 7.9**
+   */
+  getEventRoles: (eventId: string) =>
+    apiRequest(`/events/${eventId}/roles`),
+
+  /**
+   * Assign a role to a user for an event.
+   * 
+   * **Validates: Requirements 7.9, 7.10, 7.11**
+   */
+  assignEventRole: (eventId: string, userId: string, role: 'CO_ORGANIZER' | 'HEAD' | 'VOLUNTEER') =>
+    apiRequest(`/events/${eventId}/roles`, {
+      method: "POST",
+      body: JSON.stringify({ userId, role }),
+    }),
+
+  /**
+   * Remove a role from a user for an event.
+   * 
+   * **Validates: Requirements 19.2, 19.6**
+   */
+  removeEventRole: (eventId: string, userId: string, reason?: string) =>
+    apiRequest(`/events/${eventId}/roles/${userId}`, {
+      method: "DELETE",
+      body: JSON.stringify({ reason }),
+    }),
+
+  /**
+   * Transfer event ownership to another user.
+   * 
+   * **Validates: Requirement 19.6**
+   */
+  transferEventOwnership: (eventId: string, newOwnerId: string) =>
+    apiRequest(`/events/${eventId}/transfer-ownership`, {
+      method: "POST",
+      body: JSON.stringify({ newOwnerId }),
+    }),
+
+  /**
+   * Search users for role assignment.
+   * 
+   * **Validates: Requirement 7.9**
+   */
+  searchUsersForRole: (eventId: string, query: string) =>
+    apiRequest(`/events/${eventId}/roles/search?q=${encodeURIComponent(query)}`),
+
+  /**
+   * Check if user has permission for an action on an event.
+   */
+  checkEventPermission: (eventId: string, action: string) =>
+    apiRequest(`/events/${eventId}/permissions/${action}`),
+
+  // ============ Check-In APIs ============
+
+  /**
+   * Process QR code check-in scan.
+   * 
+   * **Validates: Requirements 6.2-6.5**
+   */
+  scanCheckIn: (eventId: string, token: string) =>
+    apiRequest(`/events/${eventId}/checkin/scan`, {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    }),
+
+  /**
+   * Manual check-in (for Heads when QR fails).
+   * 
+   * **Validates: Requirements 6.6, 6.7**
+   */
+  manualCheckIn: (eventId: string, registrationId: string, reason: string) =>
+    apiRequest(`/events/${eventId}/checkin/manual`, {
+      method: "POST",
+      body: JSON.stringify({ registrationId, reason }),
+    }),
+
+  /**
+   * Check out (for entry/exit mode).
+   * 
+   * **Validates: Requirements 17.1, 17.2**
+   */
+  checkOut: (eventId: string, registrationId: string) =>
+    apiRequest(`/events/${eventId}/checkin/checkout`, {
+      method: "POST",
+      body: JSON.stringify({ registrationId }),
+    }),
+
+  /**
+   * Get check-in statistics for an event.
+   */
+  getCheckInStats: (eventId: string) =>
+    apiRequest(`/events/${eventId}/checkin/stats`),
+
+  /**
+   * Get recent check-ins (scan history).
+   */
+  getCheckInHistory: (eventId: string, limit?: number) => {
+    const params = new URLSearchParams();
+    if (limit) params.append("limit", limit.toString());
+    return apiRequest(`/events/${eventId}/checkin/history?${params.toString()}`);
+  },
+
+  /**
+   * Search attendees for manual check-in.
+   */
+  searchAttendeesForCheckIn: (eventId: string, query: string) =>
+    apiRequest(`/events/${eventId}/checkin/search?q=${encodeURIComponent(query)}`),
+
+  /**
+   * Get QR code for a registration.
+   */
+  getRegistrationQr: (eventId: string, registrationId: string) =>
+    apiRequest(`/events/${eventId}/registration/${registrationId}/qr`),
+
+  // ============ Analytics APIs ============
+
+  /**
+   * Get comprehensive analytics summary for an event.
+   * 
+   * **Validates: Requirements 10.3-10.8**
+   */
+  getEventAnalytics: (eventId: string) =>
+    apiRequest(`/events/${eventId}/analytics`),
+
+  /**
+   * Get key metrics for an event.
+   */
+  getEventMetrics: (eventId: string) =>
+    apiRequest(`/events/${eventId}/analytics/metrics`),
+
+  /**
+   * Get registration timeline data.
+   */
+  getRegistrationTimeline: (eventId: string, days?: number) => {
+    const params = new URLSearchParams();
+    if (days) params.append("days", days.toString());
+    return apiRequest(`/events/${eventId}/analytics/timeline?${params.toString()}`);
+  },
+
+  /**
+   * Get ticket type breakdown.
+   */
+  getTicketBreakdown: (eventId: string) =>
+    apiRequest(`/events/${eventId}/analytics/tickets`),
+
+  /**
+   * Get drop-off funnel data.
+   */
+  getDropOffFunnel: (eventId: string) =>
+    apiRequest(`/events/${eventId}/analytics/funnel`),
+
+  // ============ Waitlist APIs ============
+
+  /**
+   * Join waitlist for a ticket.
+   * 
+   * **Validates: Requirements 15.1, 15.2**
+   */
+  joinWaitlist: (eventId: string, ticketId: string) =>
+    apiRequest(`/events/${eventId}/waitlist/${ticketId}/join`, {
+      method: "POST",
+    }),
+
+  /**
+   * Leave waitlist for a ticket.
+   * 
+   * **Validates: Requirements 15.1**
+   */
+  leaveWaitlist: (eventId: string, ticketId: string) =>
+    apiRequest(`/events/${eventId}/waitlist/${ticketId}/leave`, {
+      method: "DELETE",
+    }),
+
+  /**
+   * Get user's waitlist position for a ticket.
+   * 
+   * **Validates: Requirements 15.7**
+   */
+  getWaitlistPosition: (eventId: string, ticketId: string) =>
+    apiRequest(`/events/${eventId}/waitlist/${ticketId}/position`),
+
+  /**
+   * Get user's waitlist status for all tickets in an event.
+   * 
+   * **Validates: Requirements 15.7**
+   */
+  getMyWaitlistStatus: (eventId: string) =>
+    apiRequest(`/events/${eventId}/waitlist/my-status`),
+
+  /**
+   * Claim ticket from waitlist.
+   * 
+   * **Validates: Requirements 15.4, 15.5**
+   */
+  claimWaitlistTicket: (eventId: string, ticketId: string) =>
+    apiRequest(`/events/${eventId}/waitlist/${ticketId}/claim`, {
+      method: "POST",
+    }),
+
+  /**
+   * Get waitlist statistics for an event (organizer only).
+   */
+  getWaitlistStats: (eventId: string) =>
+    apiRequest(`/events/${eventId}/waitlist/stats`),
+
+  // ============ Form Schema APIs ============
+
+  /**
+   * Get form schema for an event.
+   * 
+   * **Validates: Requirements 9.6**
+   */
+  getEventFormSchema: (eventId: string) =>
+    apiRequest(`/events/${eventId}/form-schema`),
+
+  // ============ Export APIs ============
+
+  /**
+   * Export event attendees as CSV.
+   * 
+   * **Validates: Requirements 10.1, 10.2**
+   */
+  exportEventAttendees: async (eventId: string, format: 'csv' | 'xlsx' = 'csv'): Promise<Blob> => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/events/${eventId}/export?format=${format}`, {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || "Export failed");
+    }
+
+    return response.blob();
+  },
+
+  // ============ Certificate APIs ============
+
+  /**
+   * Get available certificate templates.
+   * 
+   * **Validates: Requirements 8.1**
+   */
+  getCertificateTemplates: () =>
+    apiRequest("/events/certificates/templates"),
+
+  /**
+   * Get all certificates for an event.
+   * 
+   * **Validates: Requirements 8.7**
+   */
+  getEventCertificates: (eventId: string) =>
+    apiRequest(`/events/${eventId}/certificates`),
+
+  /**
+   * Issue certificate to a specific attendee.
+   * 
+   * **Validates: Requirements 8.3, 8.4, 8.9**
+   */
+  issueCertificate: (eventId: string, userId: string, reason?: string) =>
+    apiRequest(`/events/${eventId}/certificates/issue`, {
+      method: "POST",
+      body: JSON.stringify({ userId, reason }),
+    }),
+
+  /**
+   * Batch issue certificates to all eligible attendees.
+   * 
+   * **Validates: Requirements 8.3, 8.7**
+   */
+  batchIssueCertificates: (eventId: string) =>
+    apiRequest(`/events/${eventId}/certificates/batch-issue`, {
+      method: "POST",
+    }),
+
+  /**
+   * Check if user is eligible for certificate.
+   * 
+   * **Validates: Requirements 8.3, 8.4**
+   */
+  checkCertificateEligibility: (eventId: string, userId: string) =>
+    apiRequest(`/events/${eventId}/certificates/eligibility/${userId}`),
+
+  /**
+   * Get user's certificate for an event.
+   * 
+   * **Validates: Requirements 8.6**
+   */
+  getMyCertificate: (eventId: string) =>
+    apiRequest(`/events/${eventId}/certificates/my-certificate`),
+
+  /**
+   * Get all certificates for the current user.
+   * 
+   * **Validates: Requirements 8.8**
+   */
+  getMyAllCertificates: () =>
+    apiRequest("/events/user/my-certificates"),
 };

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { X, Image as ImageIcon, Paperclip, Loader2, EyeOff, AlertTriangle, BarChart2, Calendar, Users, Flag, MapPin, Clock, ChevronDown, ChevronUp, Plus, Trash2, Globe, Lock, Building } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { X, Image as ImageIcon, Paperclip, Loader2, EyeOff, AlertTriangle, BarChart2, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { RetroButton } from "./ui/NewspaperUI";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -24,7 +24,7 @@ const postSchema = z.object({
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
-type FeatureType = 'poll' | 'event' | 'collab' | 'report';
+type FeatureType = 'poll';
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated, collegeSlug }: CreatePostModalProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,24 +40,10 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [showAnonWarning, setShowAnonWarning] = useState(false);
     const [activeFeatures, setActiveFeatures] = useState<Set<FeatureType>>(new Set());
-    const [visibility, setVisibility] = useState<'PUBLIC' | 'COLLEGE' | 'PRIVATE'>('PUBLIC');
 
     // Poll state
     const [pollQuestion, setPollQuestion] = useState("");
     const [pollOptions, setPollOptions] = useState(["", ""]);
-
-    // Event state
-    const [eventTitle, setEventTitle] = useState("");
-    const [eventDate, setEventDate] = useState("");
-    const [eventTime, setEventTime] = useState("");
-    const [eventLocation, setEventLocation] = useState("");
-
-    // Collab state
-    const [collabTitle, setCollabTitle] = useState("");
-    const [collabDescription, setCollabDescription] = useState("");
-
-    // Report state
-    const [reportCategory, setReportCategory] = useState("");
 
     const toggleFeature = (feature: FeatureType) => {
         const newFeatures = new Set(activeFeatures);
@@ -68,6 +54,18 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
         }
         setActiveFeatures(newFeatures);
     };
+
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -91,30 +89,27 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
                 imageUrl = uploadRes.url;
             }
 
+            // Determine post type based on content
+            let postType: 'TEXT' | 'POLL' | 'MEDIA' = 'TEXT';
+            if (activeFeatures.has('poll') && pollQuestion && pollOptions.filter(o => o.trim()).length >= 2) {
+                postType = 'POLL';
+            } else if (imageUrl) {
+                postType = 'MEDIA';
+            }
+
             const postData: any = {
-                content: data.content,
-                image: imageUrl,
-                type: activeFeatures.has('poll') ? 'poll' : 'post',
-                collegeSlug: collegeSlug || user?.profile?.college?.slug,
+                type: postType,
+                content: postType === 'POLL' ? pollQuestion : data.content,
+                imageUrl: imageUrl,
                 isAnonymous,
-                visibility,
             };
 
-            if (activeFeatures.has('poll') && pollQuestion) {
-                postData.pollOptions = pollOptions.filter(o => o.trim());
-                postData.content = pollQuestion || data.content;
-            }
-
-            if (activeFeatures.has('event')) {
-                postData.eventData = { title: eventTitle, date: eventDate, time: eventTime, location: eventLocation };
-            }
-
-            if (activeFeatures.has('collab')) {
-                postData.collabData = { title: collabTitle, description: collabDescription };
-            }
-
-            if (activeFeatures.has('report')) {
-                postData.reportData = { category: reportCategory };
+            // Add poll data if it's a poll
+            if (postType === 'POLL') {
+                postData.poll = {
+                    question: pollQuestion,
+                    options: pollOptions.filter(o => o.trim()),
+                };
             }
 
             await api.createPost(postData);
@@ -123,7 +118,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
             reset();
             setFile(null);
             setActiveFeatures(new Set());
-            setVisibility('PUBLIC');
+            setPollQuestion("");
+            setPollOptions(["", ""]);
             onClose();
         } catch (e: any) {
             toast(e.message || "Failed to post.", "error");
@@ -134,9 +130,6 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
 
     const featureButtons = [
         { id: 'poll' as FeatureType, icon: BarChart2, label: 'Poll', color: 'bg-accent-blue' },
-        { id: 'event' as FeatureType, icon: Calendar, label: 'Event', color: 'bg-accent-coral' },
-        { id: 'collab' as FeatureType, icon: Users, label: 'Collab', color: 'bg-accent-mint' },
-        { id: 'report' as FeatureType, icon: Flag, label: 'Report', color: 'bg-accent-purple' },
     ];
 
     return (
@@ -227,105 +220,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated, colleg
                         )}
                     </AnimatePresence>
 
-                    {/* Event Section */}
-                    <AnimatePresence>
-                        {activeFeatures.has('event') && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                <div className="mt-4 p-4 bg-accent-coral/10 border-2 border-accent-coral/30 rounded-card">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <Calendar className="w-4 h-4 text-accent-coral" />
-                                        <span className="font-bold text-sm">Event Details</span>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <input value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} className="w-full border-2 border-neutral-200 bg-paper p-2 rounded-lg focus:outline-none focus:border-ink" placeholder="Event title" />
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="flex items-center gap-2 border-2 border-neutral-200 bg-paper rounded-lg p-2">
-                                                <Calendar className="w-4 h-4 text-neutral-400" />
-                                                <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="flex-1 bg-transparent focus:outline-none text-sm" />
-                                            </div>
-                                            <div className="flex items-center gap-2 border-2 border-neutral-200 bg-paper rounded-lg p-2">
-                                                <Clock className="w-4 h-4 text-neutral-400" />
-                                                <input type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} className="flex-1 bg-transparent focus:outline-none text-sm" />
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 border-2 border-neutral-200 bg-paper rounded-lg p-2">
-                                            <MapPin className="w-4 h-4 text-neutral-400" />
-                                            <input value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} className="flex-1 bg-transparent focus:outline-none" placeholder="Location" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Collab Section */}
-                    <AnimatePresence>
-                        {activeFeatures.has('collab') && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                <div className="mt-4 p-4 bg-accent-mint/10 border-2 border-accent-mint/30 rounded-card">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <Users className="w-4 h-4 text-accent-mint" />
-                                        <span className="font-bold text-sm">Collaboration Request</span>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <input value={collabTitle} onChange={(e) => setCollabTitle(e.target.value)} className="w-full border-2 border-neutral-200 bg-paper p-2 rounded-lg focus:outline-none focus:border-ink" placeholder="Project title" />
-                                        <textarea value={collabDescription} onChange={(e) => setCollabDescription(e.target.value)} className="w-full border-2 border-neutral-200 bg-paper p-2 rounded-lg h-20 resize-none focus:outline-none focus:border-ink" placeholder="Describe your project..." />
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Report Section */}
-                    <AnimatePresence>
-                        {activeFeatures.has('report') && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                <div className="mt-4 p-4 bg-accent-purple/10 border-2 border-accent-purple/30 rounded-card">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <Flag className="w-4 h-4 text-accent-purple" />
-                                        <span className="font-bold text-sm">Report / Feedback</span>
-                                    </div>
-                                    <select value={reportCategory} onChange={(e) => setReportCategory(e.target.value)} className="w-full border-2 border-neutral-200 bg-paper p-2 rounded-lg focus:outline-none focus:border-ink">
-                                        <option value="">Select category...</option>
-                                        <option value="feedback">General Feedback</option>
-                                        <option value="issue">Report Issue</option>
-                                        <option value="suggestion">Suggestion</option>
-                                        <option value="safety">Safety Concern</option>
-                                    </select>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Visibility & Anonymous Controls */}
+                    {/* Anonymous Toggle */}
                     <div className="mt-4 flex flex-wrap gap-3 items-center">
-                        {/* Visibility Selector */}
-                        <div className="relative group">
-                            <button className="flex items-center gap-2 px-3 py-2 rounded-card border-2 border-neutral-200 hover:border-neutral-400 bg-paper transition-all">
-                                {visibility === 'PUBLIC' && <Globe className="w-4 h-4 text-accent-blue" />}
-                                {visibility === 'COLLEGE' && <Building className="w-4 h-4 text-accent-coral" />}
-                                {visibility === 'PRIVATE' && <Lock className="w-4 h-4 text-accent-purple" />}
-                                <span className="font-medium text-sm">
-                                    {visibility === 'PUBLIC' ? 'Everyone' : visibility === 'COLLEGE' ? 'My College' : 'Only Me'}
-                                </span>
-                                <ChevronDown className="w-3 h-3 text-neutral-400" />
-                            </button>
-
-                            {/* Dropdown Menu */}
-                            <div className="absolute top-full left-0 mt-2 w-48 bg-white border-2 border-ink rounded-lg shadow-neo-sm overflow-hidden hidden group-hover:block z-20">
-                                <button onClick={() => setVisibility('PUBLIC')} className="w-full text-left px-4 py-2 hover:bg-neutral-100 flex items-center gap-2">
-                                    <Globe className="w-4 h-4" /> Everyone
-                                </button>
-                                <button onClick={() => setVisibility('COLLEGE')} className="w-full text-left px-4 py-2 hover:bg-neutral-100 flex items-center gap-2">
-                                    <Building className="w-4 h-4" /> My College
-                                </button>
-                                <button onClick={() => setVisibility('PRIVATE')} className="w-full text-left px-4 py-2 hover:bg-neutral-100 flex items-center gap-2">
-                                    <Lock className="w-4 h-4" /> Only Me
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Anonymous Toggle */}
                         <button
                             type="button"
                             disabled={user?.role === 'FACULTY'}

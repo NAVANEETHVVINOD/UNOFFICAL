@@ -15,7 +15,6 @@ import {
     Sticker,
 } from "./components/ui/NewspaperUI";
 import Doodle from "./components/ui/Doodle";
-import BottomNav from "./components/ui/BottomNav";
 import Carousel from "./components/ui/Carousel";
 import Navbar from "./components/Navbar";
 import LandingNavbar from "./components/LandingNavbar";
@@ -157,8 +156,8 @@ export default function Home() {
                         </motion.div>
                     </div>
 
-                    {/* Left Card - Retro TV Style */}
-                    <div className="absolute top-12 -left-10 md:top-4 md:left-4 z-20 scale-[0.6] md:scale-100 origin-top-left">
+                    {/* Left Card - Retro TV Style - Hidden on mobile */}
+                    <div className="hidden md:block absolute top-4 left-4 z-20">
                         <HangingCard className="w-52 p-4 bg-gradient-to-br from-indigo-950 to-slate-900 text-white rotate-[-6deg] rounded-3xl shadow-xl border-2 border-indigo-800">
                             <Sticker
                                 className="top-2 right-2 bg-accent-pink text-white"
@@ -186,8 +185,8 @@ export default function Home() {
                         </HangingCard>
                     </div>
 
-                    {/* Right Card - CD Album Style */}
-                    <div className="absolute top-24 -right-10 md:top-32 md:right-4 z-20 scale-[0.6] md:scale-100 origin-top-right">
+                    {/* Right Card - CD Album Style - Hidden on mobile */}
+                    <div className="hidden md:block absolute top-32 right-4 z-20">
                         <HangingCard className="w-48 p-4 bg-gradient-to-br from-gray-800 to-black text-white rotate-[6deg] border-4 border-accent-yellow animate-border-color relative overflow-visible rounded-3xl shadow-xl">
                             <Sticker
                                 className="-bottom-3 -left-3 bg-accent-green text-black font-black"
@@ -854,9 +853,6 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-
-                {/* Mobile Bottom Navigation */}
-                <BottomNav />
             </Container>
         </Container>
     );

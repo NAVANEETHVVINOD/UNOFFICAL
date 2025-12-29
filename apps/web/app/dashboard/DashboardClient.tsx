@@ -9,11 +9,9 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 // Navigation & Layout
 import DashboardLayout from "../components/layouts/DashboardLayout";
 import CategoryRibbon from "../components/CategoryRibbon";
-import ArcMenu from "../components/navigation/ArcMenu";
 
 // Sidebars
 import ProfileSidebar from "../components/dashboard/ProfileSidebar";
-import QuickActions from "../components/dashboard/QuickActions";
 import UpcomingEventsWidget from "../components/dashboard/UpcomingEventsWidget";
 
 // Feed
@@ -50,7 +48,7 @@ const itemVariants: Variants = {
 function DashboardContent() {
   const { user, loading } = useAuth();
   const { isReady: onboardingComplete } = useOnboardingGuard();
-  const [filter, setFilter] = useState<'all' | 'college' | 'events' | 'market'>('college');
+  const [filter, setFilter] = useState<'all' | 'college'>('college');
   const { items, isLoading, loadMore, hasMore, error } = useInfiniteFeed({ category: 'feed', filter });
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -101,7 +99,6 @@ function DashboardContent() {
       leftSidebarContent={
         <>
           <ProfileSidebar />
-          <QuickActions />
         </>
       }
       rightSidebarContent={
@@ -126,35 +123,22 @@ function DashboardContent() {
         <CategoryRibbon variant="global" />
 
         {/* Sticky Feed Header & Filters */}
-        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md pt-4 pb-2 mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="sticky top-0 z-30 bg-paper/80 dark:bg-dark-bg/80 backdrop-blur-md pt-4 pb-2 mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <h1 className="font-display text-xl text-ink hidden sm:block">Feed</h1>
+            <h1 className="font-display text-xl text-ink dark:text-dark-text hidden sm:block">Feed</h1>
 
-            <div className="flex bg-paper p-1 rounded-full border-2 border-ink shadow-neo-sm overflow-x-auto max-w-full">
+            <div className="flex bg-paper dark:bg-dark-surface p-1 rounded-full border-2 border-ink dark:border-dark-border shadow-neo-sm dark:shadow-neo-dark-sm overflow-x-auto max-w-full">
               <button
                 onClick={() => setFilter('college')}
-                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'college' ? 'bg-primary text-ink shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'college' ? 'bg-ink text-white dark:bg-primary dark:text-ink shadow-sm' : 'text-neutral-500 dark:text-dark-text-muted hover:text-ink dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-dark-elevated'}`}
               >
                 My College
               </button>
               <button
                 onClick={() => setFilter('all')}
-                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-accent-blue text-white shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
+                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-ink text-white dark:bg-primary dark:text-ink shadow-sm' : 'text-neutral-500 dark:text-dark-text-muted hover:text-ink dark:hover:text-white hover:bg-neutral-200 dark:hover:bg-dark-elevated'}`}
               >
-                Everything
-              </button>
-              <div className="w-[1px] h-4 bg-neutral-300 mx-1 self-center" />
-              <button
-                onClick={() => setFilter('events')}
-                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'events' ? 'bg-accent-coral text-white shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
-              >
-                Events
-              </button>
-              <button
-                onClick={() => setFilter('market')}
-                className={`px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filter === 'market' ? 'bg-accent-mint text-ink shadow-sm' : 'text-neutral-500 hover:bg-neutral-200'}`}
-              >
-                Market
+                All Posts
               </button>
             </div>
           </div>
@@ -210,9 +194,9 @@ function DashboardContent() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-full">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-dark-elevated rounded-full">
               <span className="text-2xl">🎉</span>
-              <span className="font-mono text-sm text-neutral-600">
+              <span className="font-mono text-sm text-neutral-600 dark:text-dark-text-muted">
                 You're all caught up!
               </span>
             </div>
@@ -226,13 +210,13 @@ function DashboardContent() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-primary/20 border-2 border-dashed border-primary rounded-2xl flex items-center justify-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-primary/20 dark:bg-primary/10 border-2 border-dashed border-primary rounded-2xl flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
-            <h3 className="font-display text-xl text-ink mb-2">
+            <h3 className="font-display text-xl text-ink dark:text-dark-text mb-2">
               No posts yet
             </h3>
-            <p className="text-neutral-500 mb-6">
+            <p className="text-neutral-500 dark:text-dark-text-muted mb-6">
               Be the first to share something with your campus!
             </p>
             <button
@@ -254,13 +238,13 @@ function DashboardContent() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <div className="w-20 h-20 mx-auto mb-6 bg-accent-coral/20 border-2 border-dashed border-accent-coral rounded-2xl flex items-center justify-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-accent-coral/20 dark:bg-accent-coral/10 border-2 border-dashed border-accent-coral rounded-2xl flex items-center justify-center">
               <AlertTriangle className="w-10 h-10 text-accent-coral" />
             </div>
-            <h3 className="font-display text-xl text-ink mb-2">
+            <h3 className="font-display text-xl text-ink dark:text-dark-text mb-2">
               Connection Error
             </h3>
-            <p className="text-neutral-500 mb-6 max-w-md mx-auto">
+            <p className="text-neutral-500 dark:text-dark-text-muted mb-6 max-w-md mx-auto">
               Unable to connect to the server. This might be because the server is waking up (takes ~30 seconds) or there's a network issue.
             </p>
             <button
@@ -272,12 +256,6 @@ function DashboardContent() {
             </button>
           </motion.div>
         )}
-
-        {/* Mobile Bottom Navigation */}
-        <ArcMenu onCompose={() => {
-          setPostModalTab('TEXT');
-          setIsPostModalOpen(true);
-        }} />
 
         {/* Create Post Modal */}
         <CreatePostModal

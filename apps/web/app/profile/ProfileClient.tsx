@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ErrorBoundary, LoadingState } from "../components/ErrorBoundary";
 import Link from "next/link";
-import { Settings, MapPin, Github, Briefcase, GraduationCap, Heart, Star, Calendar, ArrowLeft } from "lucide-react";
+import { Settings, MapPin, Github, Briefcase, GraduationCap, Heart, Star, Calendar, ArrowLeft, Award, Bookmark } from "lucide-react";
 import { api } from "../../lib/api";
 import {
   ActivitiesTab,
@@ -14,6 +14,8 @@ import {
   EducationTab,
   ExperienceTab,
   VolunteeringTab,
+  CertificatesTab,
+  SavedEventsTab,
   GitHubContributions,
 } from "../components/profile";
 import ProfileSectionModal from "../components/profile/ProfileSectionModal";
@@ -26,13 +28,30 @@ interface UserActivity {
   clubsJoined: Array<{ id: string; club: { id: string; name: string; logoUrl?: string } }>;
 }
 
-type ProfileTabId = "activities" | "projects" | "experience" | "education" | "volunteering";
+interface Certificate {
+  id: string;
+  eventId: string;
+  userId: string;
+  templateId: string;
+  fileUrl: string;
+  issuedAt: string;
+  event?: {
+    id: string;
+    title: string;
+    startsAt: string;
+    club?: { name: string };
+  };
+}
+
+type ProfileTabId = "activities" | "projects" | "experience" | "education" | "volunteering" | "certificates" | "saved";
 
 function ProfileContent() {
   const { user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const [activity, setActivity] = useState<UserActivity | null>(null);
   const [activityLoading, setActivityLoading] = useState(false);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [certificatesLoading, setCertificatesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTabId>("activities");
 
   useEffect(() => {
@@ -116,12 +135,26 @@ function ProfileContent() {
 
   }, [user?.id]);
 
+  const fetchCertificates = useCallback(async () => {
+    setCertificatesLoading(true);
+    try {
+      const data = await api.getMyAllCertificates();
+      setCertificates(Array.isArray(data) ? data : data.certificates || []);
+    } catch (error) {
+      console.error("Failed to fetch certificates:", error);
+      setCertificates([]);
+    } finally {
+      setCertificatesLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (user?.id) {
       fetchUserActivity();
       fetchFullProfile();
+      fetchCertificates();
     }
-  }, [user?.id, fetchUserActivity, fetchFullProfile]);
+  }, [user?.id, fetchUserActivity, fetchFullProfile, fetchCertificates]);
 
 
 
@@ -157,6 +190,8 @@ function ProfileContent() {
     { id: "experience", label: "Experience", icon: Briefcase },
     { id: "education", label: "Education", icon: GraduationCap },
     { id: "volunteering", label: "Volunteering", icon: Heart },
+    { id: "certificates", label: "Certificates", icon: Award },
+    { id: "saved", label: "Saved", icon: Bookmark },
   ];
 
   return (
@@ -299,6 +334,16 @@ function ProfileContent() {
               onAddVolunteering={() => openModal("volunteering")}
               onRemoveVolunteering={(id) => handleRemoveItem("volunteering", id)}
             />
+          )}
+          {activeTab === "certificates" && (
+            <CertificatesTab
+              certificates={certificates}
+              isLoading={certificatesLoading}
+              isOwnProfile={true}
+            />
+          )}
+          {activeTab === "saved" && (
+            <SavedEventsTab isOwnProfile={true} />
           )}
         </motion.div>
 

@@ -38,6 +38,7 @@ describe('AllExceptionsFilter', () => {
     switchToHttp: () => ({
       getRequest: () => request,
       getResponse: () => response,
+      getNext: () => jest.fn(),
     }),
     getArgs: () => [],
     getArgByIndex: () => null,

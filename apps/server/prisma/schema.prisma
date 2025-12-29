@@ -44,6 +44,12 @@ model User {
   joinedClassrooms   ClassroomMember[]
   submissions        Submission[]
 
+  // Events System Relations
+  eventRegistrations EventRegistration[]
+  eventRoles         EventMemberRole[]
+  waitlistEntries    WaitlistEntry[]
+  eventMessages      EventMessage[]      @relation("EventMessageSender")
+
   @@index([supabaseId])
 }
 
@@ -189,30 +195,354 @@ model Event {
   id          String     @id @default(cuid())
   title       String
   description String?
+  coverUrl    String?
   startsAt    DateTime
   endsAt      DateTime
+  timezone    String     @default("Asia/Kolkata")
   venue       String?
+  onlineLink  String?
   clubId      String?
   collegeId   String?
   createdById String
   scope       EventScope @default(COLLEGE)
+  category    String?
 
-  // Approval
-  status          EventApprovalStatus @default(PENDING)
+  // Visibility
+  visibility EventVisibility @default(PUBLIC)
+
+  // Lifecycle Status (replaces approval status)
+  status          EventLifecycleStatus @default(DRAFT)
   rejectionReason String?
 
-  qrToken      String?
-  certificates CertificateIssue[]
-  club         Club?              @relation(fields: [clubId], references: [id])
-  college      College?           @relation(fields: [collegeId], references: [id])
-  createdBy    User               @relation(fields: [createdById], references: [id])
-  attendees    EventAttendance[]
-  savedBy      SavedItem[]
+  // Settings
+  waitlistEnabled  Boolean        @default(false)
+  attendanceMode   AttendanceMode @default(SINGLE_SCAN)
+  attendancePolicy String         @default("SINGLE_CHECKIN")
+  noRefundPolicy   Boolean        @default(true)
+
+  // Certificate
+  certificateEnabled    Boolean @default(false)
+  certificateTemplateId String?
+  autoIssueCertificate  Boolean @default(false)
+
+  // Soft delete
+  deletedAt DateTime?
+
+  // Legacy field for backward compatibility
+  qrToken String?
+
+  // Relations
+  certificates  CertificateIssue[]
+  club          Club?               @relation(fields: [clubId], references: [id])
+  college       College?            @relation(fields: [collegeId], references: [id])
+  createdBy     User                @relation(fields: [createdById], references: [id])
+  attendees     EventAttendance[]
+  savedBy       SavedItem[]
+  tickets       TicketType[]
+  registrations EventRegistration[]
+  roles         EventMemberRole[]
+  formSchema    EventForm?
+  waitlist      WaitlistEntry[]
+  messages      EventMessage[]
+  agendaBlocks  EventAgendaBlock[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Performance indexes for event queries
   @@index([collegeId])
   @@index([startsAt])
   @@index([collegeId, startsAt])
+  @@index([status, startsAt])
+  @@index([deletedAt])
+}
+
+enum EventLifecycleStatus {
+  DRAFT
+  PUBLISHED
+  REGISTRATION_CLOSED
+  ONGOING
+  COMPLETED
+  CANCELLED
+  ARCHIVED
+}
+
+enum EventVisibility {
+  PUBLIC
+  INVITE_ONLY
+}
+
+enum AttendanceMode {
+  SINGLE_SCAN
+  ENTRY_EXIT
+}
+
+model EventAgendaBlock {
+  id          String   @id @default(cuid())
+  eventId     String
+  day         Int // Day number (1, 2, 3...)
+  date        DateTime // Actual date
+  startTime   DateTime
+  endTime     DateTime
+  title       String
+  description String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, day])
+}
+
+model TicketType {
+  id           String    @id @default(cuid())
+  eventId      String
+  name         String
+  description  String?
+  price        Int       @default(0) // In paise (INR cents)
+  quantity     Int? // null = unlimited
+  quantitySold Int       @default(0)
+  perUserLimit Int       @default(1)
+  salesStart   DateTime?
+  salesEnd     DateTime?
+
+  event         Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registrations EventRegistration[]
+  waitlist      WaitlistEntry[]
+
+  @@index([eventId])
+}
+
+model EventRegistration {
+  id       String @id @default(cuid())
+  eventId  String
+  ticketId String
+  userId   String
+
+  // Status
+  status RegistrationStatus @default(PENDING)
+
+  // Payment (if paid)
+  paymentId   String?
+  amountPaid  Int?
+  platformFee Int?
+  gatewayFee  Int?
+
+  // Check-in
+  checkInTime   DateTime?
+  checkOutTime  DateTime?
+  checkInBy     String?
+  checkInMethod String?
+  checkInDay    Int? // For multi-day events
+
+  // QR
+  qrToken String  @unique
+  qrUsed  Boolean @default(false)
+
+  // Form Responses
+  formResponses Json?
+
+  // Certificate
+  certificateId String?
+
+  // Soft delete
+  deletedAt DateTime?
+
+  // No-refund consent
+  noRefundConsent Boolean @default(false)
+
+  event       Event             @relation(fields: [eventId], references: [id])
+  ticket      TicketType        @relation(fields: [ticketId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
+  payment     EventPayment?
+  certificate EventCertificate? @relation(fields: [certificateId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+  @@index([eventId, status])
+  @@index([deletedAt])
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+  ATTENDED
+}
+
+model EventPayment {
+  id                 String        @id @default(cuid())
+  registrationId     String        @unique
+  razorpayOrderId    String        @unique
+  razorpayPaymentId  String?
+  idempotencyKey     String        @unique // Prevent duplicate orders
+  amount             Int
+  platformFee        Int
+  gatewayFee         Int
+  status             PaymentStatus @default(PENDING)
+  webhookProcessedAt DateTime? // Track webhook processing
+
+  registration EventRegistration @relation(fields: [registrationId], references: [id])
+
+  createdAt  DateTime  @default(now())
+  capturedAt DateTime?
+
+  @@index([idempotencyKey])
+}
+
+model PaymentWebhookLog {
+  id                String   @id @default(cuid())
+  razorpayOrderId   String
+  razorpayPaymentId String?
+  eventType         String
+  payload           Json
+  processedAt       DateTime @default(now())
+
+  @@index([razorpayOrderId])
+}
+
+enum PaymentStatus {
+  PENDING
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model EventMemberRole {
+  id         String        @id @default(cuid())
+  eventId    String
+  userId     String
+  role       EventRoleType
+  assignedBy String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+enum EventRoleType {
+  CREATOR
+  CO_ORGANIZER
+  HEAD
+  VOLUNTEER
+}
+
+model WaitlistEntry {
+  id         String         @id @default(cuid())
+  eventId    String
+  ticketId   String
+  userId     String
+  position   Int
+  status     WaitlistStatus @default(WAITING)
+  notifiedAt DateTime?
+  expiresAt  DateTime?
+
+  event  Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticket TicketType @relation(fields: [ticketId], references: [id])
+  user   User       @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, ticketId, userId])
+  @@index([eventId, ticketId, position])
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  CLAIMED
+  EXPIRED
+}
+
+model EventForm {
+  id      String @id @default(cuid())
+  eventId String @unique
+  schema  Json // Array of FormField
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventCertificate {
+  id         String   @id @default(cuid())
+  eventId    String
+  userId     String
+  templateId String
+  fileUrl    String
+  issuedAt   DateTime @default(now())
+
+  registrations EventRegistration[]
+}
+
+model EventMessage {
+  id             String          @id @default(cuid())
+  eventId        String
+  senderId       String
+  targetAudience MessageAudience
+  subject        String
+  body           String
+
+  event  Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sender User  @relation("EventMessageSender", fields: [senderId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum MessageAudience {
+  ALL_REGISTRANTS
+  CHECKED_IN
+  VOLUNTEERS
+  HEADS
+}
+
+model BackgroundJob {
+  id           String    @id @default(cuid())
+  type         JobType
+  payload      Json
+  status       JobStatus @default(PENDING)
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3)
+  lastError    String?
+  scheduledFor DateTime  @default(now())
+  processedAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([type, status, scheduledFor])
+}
+
+enum JobType {
+  CERTIFICATE_GENERATION
+  NOTIFICATION_DISPATCH
+  REMINDER_SEND
+  DATA_CLEANUP
+  WAITLIST_NOTIFY
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  DEAD_LETTER
+}
+
+model AdminAuditLog {
+  id         String  @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String // 'event', 'user', etc.
+  targetId   String
+  reason     String?
+  metadata   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
 }
 
 model EventAttendance {
@@ -449,11 +779,8 @@ enum EventStatus {
   NOT_GOING
 }
 
-enum EventApprovalStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
+// Legacy enum - kept for backward compatibility with EventAttendance
+// New events use EventLifecycleStatus instead
 
 enum ListingStatus {
   ACTIVE
@@ -469,7 +796,7 @@ enum ListingType {
 
 enum EventScope {
   COLLEGE
-  STATE
+  GLOBAL
 }
 
 enum MarketplaceScope {

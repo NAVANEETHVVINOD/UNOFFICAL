@@ -56,7 +56,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-paper border-b-2 border-ink">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-paper dark:bg-[#121212] border-b-2 border-ink dark:border-[#333333]">
       <div className="max-w-[1400px] mx-auto">
         {/* Main Navbar */}
         <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-4 lg:px-6">
@@ -83,13 +83,13 @@ export default function Navbar() {
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="w-full flex items-center gap-3 px-4 py-2.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl hover:border-ink hover:bg-white transition-all group"
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-neutral-50 dark:bg-dark-surface border-2 border-neutral-200 dark:border-dark-border rounded-xl hover:border-ink dark:hover:border-primary hover:bg-white dark:hover:bg-dark-elevated transition-all group"
             >
-              <Search className="w-4 h-4 text-neutral-400 group-hover:text-ink" />
-              <span className="text-sm text-neutral-500 group-hover:text-neutral-700">
+              <Search className="w-4 h-4 text-neutral-400 dark:text-dark-text-muted group-hover:text-ink dark:group-hover:text-primary" />
+              <span className="text-sm text-neutral-500 dark:text-dark-text-muted group-hover:text-neutral-700 dark:group-hover:text-dark-text">
                 Search anything...
               </span>
-              <kbd className="ml-auto px-2 py-0.5 bg-white border border-neutral-200 rounded text-[10px] font-mono text-neutral-400">
+              <kbd className="ml-auto px-2 py-0.5 bg-white dark:bg-dark-elevated border border-neutral-200 dark:border-dark-border rounded text-[10px] font-mono text-neutral-400 dark:text-dark-text-muted">
                 ⌘K
               </kbd>
             </button>
@@ -101,12 +101,12 @@ export default function Navbar() {
 
             {/* Search - Always visible */}
             <motion.button
-              className="p-2 md:p-2.5 hover:bg-neutral-100 rounded-xl transition-colors md:hidden"
+              className="p-2 md:p-2.5 hover:bg-neutral-100 dark:hover:bg-dark-elevated rounded-xl transition-colors md:hidden"
               onClick={() => setIsSearchOpen(true)}
               whileTap={{ scale: 0.95 }}
               aria-label="Search"
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-5 h-5 dark:text-dark-text" />
             </motion.button>
 
             {/* QR Code Button - Prominent on mobile */}
@@ -116,7 +116,7 @@ export default function Navbar() {
               whileTap={{ scale: 0.95 }}
               aria-label="QR Code - Connect with others"
             >
-              <QrCode className="w-5 h-5" />
+              <QrCode className="w-5 h-5 dark:text-dark-text" />
             </motion.button>
 
 
@@ -129,10 +129,10 @@ export default function Navbar() {
                 whileTap={{ scale: 0.95 }}
                 aria-label="Notifications"
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="w-5 h-5 dark:text-dark-text" />
                 {unreadCount > 0 && (
                   <motion.span
-                    className="absolute top-0 right-0 min-w-[18px] h-[18px] bg-accent-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-paper"
+                    className="absolute top-0 right-0 min-w-[18px] h-[18px] bg-accent-coral text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-paper dark:border-dark-bg"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500 }}
@@ -146,19 +146,19 @@ export default function Navbar() {
               <AnimatePresence>
                 {isNotificationOpen && (
                   <motion.div
-                    className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 max-w-[380px] bg-paper border-2 border-ink shadow-neo-lg z-50 rounded-xl overflow-hidden"
+                    className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] sm:w-96 max-w-[380px] bg-paper dark:bg-dark-surface border-2 border-ink dark:border-dark-border shadow-neo-lg dark:shadow-neo-dark-lg z-50 rounded-xl overflow-hidden"
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
                     {/* Header */}
-                    <div className="p-4 border-b-2 border-ink bg-primary/10 flex justify-between items-center">
-                      <h4 className="font-display font-bold text-sm uppercase">
+                    <div className="p-4 border-b-2 border-ink dark:border-dark-border bg-primary/10 flex justify-between items-center">
+                      <h4 className="font-display font-bold text-sm uppercase dark:text-dark-text">
                         Notifications
                       </h4>
                       {unreadCount > 0 && (
-                        <span className="px-2 py-1 bg-ink text-white text-xs font-bold rounded-full">
+                        <span className="px-2 py-1 bg-ink dark:bg-primary text-white dark:text-ink text-xs font-bold rounded-full">
                           {unreadCount} New
                         </span>
                       )}
@@ -168,31 +168,31 @@ export default function Navbar() {
                     <div className="max-h-80 overflow-y-auto scrollbar-thin">
                       {filteredNotifications.length === 0 ? (
                         <div className="p-8 text-center">
-                          <div className="w-12 h-12 mx-auto mb-3 bg-neutral-100 rounded-xl flex items-center justify-center">
-                            <Bell className="w-6 h-6 text-neutral-400" />
+                          <div className="w-12 h-12 mx-auto mb-3 bg-neutral-100 dark:bg-dark-elevated rounded-xl flex items-center justify-center">
+                            <Bell className="w-6 h-6 text-neutral-400 dark:text-dark-text-muted" />
                           </div>
-                          <p className="text-sm text-neutral-500">No notifications yet</p>
+                          <p className="text-sm text-neutral-500 dark:text-dark-text-muted">No notifications yet</p>
                         </div>
                       ) : (
                         filteredNotifications.map((notification) => (
                           <motion.div
                             key={notification.id}
-                            className={`p-4 border-b border-neutral-100 hover:bg-primary/5 cursor-pointer flex gap-3 ${!notification.read ? "bg-accent-blue/5" : ""
+                            className={`p-4 border-b border-neutral-100 dark:border-dark-border hover:bg-primary/5 dark:hover:bg-dark-elevated cursor-pointer flex gap-3 ${!notification.read ? "bg-accent-blue/5 dark:bg-primary/5" : ""
                               }`}
                             onClick={() => handleNotificationClick(notification.id, notification.actionUrl)}
                             whileHover={{ x: 4 }}
                           >
-                            <div className="w-10 h-10 flex items-center justify-center text-xl flex-shrink-0 bg-neutral-100 rounded-lg">
+                            <div className="w-10 h-10 flex items-center justify-center text-xl flex-shrink-0 bg-neutral-100 dark:bg-dark-elevated rounded-lg">
                               {NOTIFICATION_ICONS[notification.type] || "🔔"}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium leading-tight text-ink">
+                              <p className="text-sm font-medium leading-tight text-ink dark:text-dark-text">
                                 {notification.title}
                               </p>
-                              <p className="text-sm text-neutral-600 leading-tight line-clamp-2 mt-0.5">
+                              <p className="text-sm text-neutral-600 dark:text-dark-text-muted leading-tight line-clamp-2 mt-0.5">
                                 {notification.message}
                               </p>
-                              <span className="text-[10px] text-neutral-400 font-mono mt-1 block">
+                              <span className="text-[10px] text-neutral-400 dark:text-dark-text-subtle font-mono mt-1 block">
                                 {formatNotificationTime(notification.createdAt)}
                               </span>
                             </div>
@@ -207,10 +207,10 @@ export default function Navbar() {
                     {/* Footer */}
                     {filteredNotifications.length > 0 && (
                       <button
-                        className="w-full p-3 text-center border-t-2 border-ink bg-neutral-50 hover:bg-neutral-100 transition-colors"
+                        className="w-full p-3 text-center border-t-2 border-ink dark:border-dark-border bg-neutral-50 dark:bg-dark-elevated hover:bg-neutral-100 dark:hover:bg-dark-border transition-colors"
                         onClick={markAllAsRead}
                       >
-                        <span className="text-xs font-bold uppercase tracking-wider">
+                        <span className="text-xs font-bold uppercase tracking-wider dark:text-dark-text">
                           Mark all as read
                         </span>
                       </button>
@@ -223,7 +223,7 @@ export default function Navbar() {
             {/* Profile */}
             <Link href="/profile">
               <motion.div
-                className="w-8 h-8 md:w-10 md:h-10 bg-neutral-100 rounded-xl border-2 border-ink overflow-hidden cursor-pointer shadow-neo-sm"
+                className="w-8 h-8 md:w-10 md:h-10 bg-neutral-100 dark:bg-dark-elevated rounded-xl border-2 border-ink dark:border-dark-border overflow-hidden cursor-pointer shadow-neo-sm dark:shadow-neo-dark-sm"
                 whileHover={{ scale: 1.05, rotate: -3 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -235,7 +235,7 @@ export default function Navbar() {
                   />
                 ) : (
                   <div className="w-full h-full bg-primary/20 flex items-center justify-center">
-                    <User className="w-4 h-4 md:w-5 md:h-5 text-ink/50" />
+                    <User className="w-4 h-4 md:w-5 md:h-5 text-ink/50 dark:text-dark-text-muted" />
                   </div>
                 )}
               </motion.div>
@@ -244,7 +244,7 @@ export default function Navbar() {
         </div>
 
         {/* Announcement Bar - Black/Yellow Theme with // decorators */}
-        <div className="hidden md:block bg-ink border-t-2 border-primary">
+        <div className="hidden md:block bg-ink dark:bg-dark-surface border-t-2 border-primary dark:border-primary/50">
           <div className="overflow-hidden">
             <motion.div
               className="flex items-center gap-6 py-2.5 px-4 whitespace-nowrap"

@@ -60,7 +60,8 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
 
             if (filter === 'events') {
                 // --- EVENTS ONLY ---
-                const { data } = await api.getEvents(undefined, undefined, 10);
+                const response = await api.getEvents({ limit: 10 });
+                const data = response?.events || response || [];
                 const mappedEvents = (data || []).map((e: any) => ({
                     id: `event-${e.id}`,
                     type: 'event' as const,
@@ -105,8 +106,8 @@ export function useInfiniteFeed({ initialItems = [], category = 'feed', filter =
                 let eventsData: any[] = [];
                 if (reset) {
                     try {
-                        const eventsRes = await api.getEvents(collegeSlug, undefined, 5);
-                        eventsData = eventsRes.data || [];
+                        const eventsRes = await api.getEvents(collegeSlug ? { collegeSlug, limit: 5 } : { limit: 5 });
+                        eventsData = eventsRes?.events || eventsRes || [];
                     } catch (e) {
                         console.error("Events fetch error", e);
                     }

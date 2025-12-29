@@ -41,7 +41,7 @@ export default function CollegeEventsPage({ params }: PageProps) {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const data = await api.getEvents(slug);
+        const data = await api.getEvents({ collegeSlug: slug });
         const now = new Date();
 
         const upcoming = data.filter((e: Event) => new Date(e.startsAt) >= now);

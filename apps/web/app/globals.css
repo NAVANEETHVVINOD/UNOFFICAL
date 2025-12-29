@@ -22,6 +22,23 @@
   --primary-dark: #FDD835;
   --primary-light: #FFF59D;
 
+  /* Light Mode Surfaces */
+  --light-bg: #FDF6E3;
+  --light-surface: #FFFFFF;
+  --light-elevated: #F5F5F5;
+  --light-border: #E0E0E0;
+  --light-border-dark: #BDBDBD;
+
+  /* Light Mode Text Colors - Grey when not hovered, black when hovered */
+  --light-text: #0a0a0a;
+  --light-text-muted: #757575;  /* Grey for not hovered/selected */
+  --light-text-subtle: #9E9E9E;
+  --light-text-hover: #0a0a0a;  /* Black when hovered */
+
+  /* Light Mode Selected state: black bg, white text */
+  --light-selected-bg: #0a0a0a;
+  --light-selected-text: #FFFFFF;
+
   /* Accessible Hover Colors - darker & warmer for vibe */
   --hover-primary: #EAB308;
   /* Yellow-500 equivalent */
@@ -72,10 +89,11 @@
   --dark-border: #333333;
   --dark-border-bright: #4D4D4D;
 
-  /* Text Colors */
+  /* Text Colors - Grey when not hovered, white when hovered */
   --dark-text: #E0E0E0;
-  --dark-text-muted: #A0A0A0;
+  --dark-text-muted: #9E9E9E;  /* Grey for not hovered/selected */
   --dark-text-subtle: #666666;
+  --dark-text-hover: #FFFFFF;  /* White when hovered */
 
   /* Card Colors - Lighter Grey for contrast against Dark BG */
   --card-bg: #1E1E1E;
@@ -84,6 +102,10 @@
   --primary: #FFEB3B;
   --primary-dark: #FBC02D;
   --primary-light: #FFF176;
+
+  /* Selected state: yellow bg, black text */
+  --selected-bg: #FFEB3B;
+  --selected-text: #121212;
 
   /* Hover Colors */
   --hover-primary: #FFF59D;
@@ -945,6 +967,75 @@ select:focus {
   background-color: var(--paper-light) !important;
 }
 
+/* ============================================
+   LIGHT MODE INTERACTIVE STATES
+   Grey text → Black on hover
+   Black bg + White text when selected
+   ============================================ */
+
+/* Default text state: grey */
+.nav-item,
+.menu-item,
+.list-item,
+.interactive-text {
+  color: var(--light-text-muted);
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+/* Hover state: black text */
+.nav-item:hover,
+.menu-item:hover,
+.list-item:hover,
+.interactive-text:hover {
+  color: var(--light-text-hover);
+}
+
+/* Selected state: black bg, white text */
+.nav-item.selected,
+.nav-item.active,
+.menu-item.selected,
+.menu-item.active,
+.list-item.selected,
+.list-item.active,
+.interactive-text.selected,
+.interactive-text.active {
+  background-color: var(--light-selected-bg);
+  color: var(--light-selected-text);
+}
+
+/* Button states in light mode */
+button:not(.btn-primary):not([class*="bg-"]) {
+  color: var(--light-text-muted);
+}
+
+button:not(.btn-primary):not([class*="bg-"]):hover {
+  color: var(--light-text-hover);
+}
+
+/* Link states in light mode */
+a:not([class*="bg-"]):not(.btn-primary) {
+  color: var(--light-text-muted);
+}
+
+a:not([class*="bg-"]):not(.btn-primary):hover {
+  color: var(--light-text-hover);
+}
+
+/* Tab/Nav selected states */
+[data-state="active"],
+[aria-selected="true"],
+.tab-active {
+  background-color: var(--light-selected-bg) !important;
+  color: var(--light-selected-text) !important;
+}
+
+/* Light Mode Transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
 
 /* ============================================
    DARK MODE COMPONENT STYLES
@@ -1255,6 +1346,68 @@ select:focus {
 .dark .focus\:ring-primary:focus {
   --tw-ring-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.3);
+}
+
+/* ============================================
+   DARK MODE INTERACTIVE STATES
+   Grey text → White on hover
+   Yellow bg + Black text when selected
+   ============================================ */
+
+/* Default text state: grey */
+.dark .nav-item,
+.dark .menu-item,
+.dark .list-item,
+.dark .interactive-text {
+  color: var(--dark-text-muted);
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+/* Hover state: white text */
+.dark .nav-item:hover,
+.dark .menu-item:hover,
+.dark .list-item:hover,
+.dark .interactive-text:hover {
+  color: var(--dark-text-hover);
+}
+
+/* Selected state: yellow bg, black text */
+.dark .nav-item.selected,
+.dark .nav-item.active,
+.dark .menu-item.selected,
+.dark .menu-item.active,
+.dark .list-item.selected,
+.dark .list-item.active,
+.dark .interactive-text.selected,
+.dark .interactive-text.active {
+  background-color: var(--selected-bg);
+  color: var(--selected-text);
+}
+
+/* Button states in dark mode */
+.dark button:not(.btn-primary):not([class*="bg-"]) {
+  color: var(--dark-text-muted);
+}
+
+.dark button:not(.btn-primary):not([class*="bg-"]):hover {
+  color: var(--dark-text-hover);
+}
+
+/* Link states in dark mode */
+.dark a:not([class*="bg-"]):not(.btn-primary) {
+  color: var(--dark-text-muted);
+}
+
+.dark a:not([class*="bg-"]):not(.btn-primary):hover {
+  color: var(--dark-text-hover);
+}
+
+/* Tab/Nav selected states */
+.dark [data-state="active"],
+.dark [aria-selected="true"],
+.dark .tab-active {
+  background-color: var(--selected-bg) !important;
+  color: var(--selected-text) !important;
 }
 
 /* Dark Mode Transitions */

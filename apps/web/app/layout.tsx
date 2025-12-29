@@ -48,12 +48,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Outfit:wght@300;400;700;900&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=VT323&display=swap"
           rel="stylesheet"
         />
-        {/* PWA Meta Tags */}
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="LINKER" />
         <link rel="apple-touch-icon" href="/icons/icon.svg" />
       </head>
       <body className="bg-paper dark:bg-dark-bg text-ink dark:text-dark-text transition-colors duration-300 bg-retro-pattern">

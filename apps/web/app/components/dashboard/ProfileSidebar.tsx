@@ -1,14 +1,60 @@
 "use client";
 
 import { useAuth } from "../../context/AuthContext";
-import { User, Settings, Zap, MapPin, ChevronRight, Star } from "lucide-react";
+import { User, Settings, Zap, MapPin, ChevronRight, Star, QrCode, Scan } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ProfileSidebarSkeleton } from "../ui/Skeleton";
 import { ThemeToggleInline } from "../ThemeToggle";
+import { useState } from "react";
+import QRScanner from "../ui/QRScanner";
+import QRDisplay from "../ui/QRDisplay";
+import { generateUserQRData, parseUserQRData, getQRCodeImageUrl } from "../../../lib/qrcode";
+import { api } from "../../../lib/api";
+import { useRouter } from "next/navigation";
 
 export default function ProfileSidebar() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+  const [showMyQR, setShowMyQR] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanResult, setScanResult] = useState<{ success: boolean; message: string; user?: any } | null>(null);
+
+  const handleScan = async (data: string) => {
+    const parsed = parseUserQRData(data);
+    if (!parsed) {
+      setScanResult({ success: false, message: "Invalid QR code. This doesn't appear to be a Linker user QR code." });
+      return;
+    }
+
+    if (parsed.userId === user?.id) {
+      setScanResult({ success: false, message: "You can't connect with yourself!" });
+      return;
+    }
+
+    try {
+      // Get user info and follow them
+      const [userData] = await Promise.all([
+        api.getUserById(parsed.userId),
+        api.followUser(parsed.userId).catch(() => null), // Ignore if already following
+      ]);
+
+      setScanResult({
+        success: true,
+        message: `Connected with ${userData.profile?.fullName || 'user'}!`,
+        user: userData,
+      });
+
+      // Navigate to their profile after a short delay
+      setTimeout(() => {
+        setShowScanner(false);
+        setScanResult(null);
+        router.push(`/profile/${parsed.userId}`);
+      }, 2000);
+    } catch (error: any) {
+      setScanResult({ success: false, message: error.message || "Failed to connect. Please try again." });
+    }
+  };
 
   if (loading) return <ProfileSidebarSkeleton />;
   if (!user) return null;
@@ -26,7 +72,7 @@ export default function ProfileSidebar() {
 
   return (
     <motion.div
-      className="bg-paper border-2 border-ink shadow-neo overflow-hidden rounded-card-lg"
+      className="bg-paper dark:bg-dark-surface border-2 border-ink dark:border-dark-border shadow-neo dark:shadow-neo-dark overflow-hidden rounded-card-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
@@ -51,9 +97,9 @@ export default function ProfileSidebar() {
         {/* Edit button */}
         <Link
           href="/profile/edit"
-          className="absolute top-2 right-2 w-8 h-8 bg-white border-2 border-ink rounded flex items-center justify-center hover:bg-neutral-100 transition-colors shadow-neo-sm z-20"
+          className="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-dark-surface border-2 border-ink dark:border-dark-border rounded flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-dark-elevated transition-colors shadow-neo-sm dark:shadow-neo-dark-sm z-20"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="w-4 h-4 dark:text-dark-text" />
         </Link>
       </div>
 
@@ -61,7 +107,7 @@ export default function ProfileSidebar() {
       <div className="px-4 -mt-10 relative z-10">
         <Link href="/profile" className="block">
           <motion.div
-            className="w-20 h-20 bg-white border-3 border-ink rounded-xl overflow-hidden shadow-neo"
+            className="w-20 h-20 bg-white dark:bg-dark-surface border-3 border-ink dark:border-dark-border rounded-xl overflow-hidden shadow-neo dark:shadow-neo-dark"
             whileHover={{ scale: 1.05, rotate: -2 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -72,8 +118,8 @@ export default function ProfileSidebar() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-                <User className="w-8 h-8 text-neutral-400" />
+              <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-dark-elevated">
+                <User className="w-8 h-8 text-neutral-400 dark:text-dark-text-muted" />
               </div>
             )}
           </motion.div>
@@ -83,42 +129,42 @@ export default function ProfileSidebar() {
       {/* User Info */}
       <div className="px-4 pt-3 pb-4">
         <Link href="/profile" className="block group">
-          <h3 className="font-display text-lg text-ink group-hover:text-primary transition-colors truncate">
+          <h3 className="font-display text-lg text-ink dark:text-dark-text group-hover:text-primary transition-colors truncate">
             {user.profile?.fullName || "Anonymous"}
           </h3>
         </Link>
 
-        <div className="flex items-center gap-1.5 text-neutral-500 mt-1">
+        <div className="flex items-center gap-1.5 text-neutral-500 dark:text-dark-text-muted mt-1">
           <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
           <p className="text-sm truncate">{collegeName}</p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-2 mt-4">
-          <div className="bg-primary/20 border border-ink/10 p-3 rounded-lg text-center">
+          <div className="bg-primary/20 dark:bg-primary/10 border border-ink/10 dark:border-primary/30 p-3 rounded-lg text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <Zap className="w-4 h-4 text-primary" />
-              <span className="font-display text-lg">{level}</span>
+              <span className="font-display text-lg dark:text-dark-text">{level}</span>
             </div>
-            <span className="text-xs text-neutral-600 uppercase tracking-wide">Level</span>
+            <span className="text-xs text-neutral-600 dark:text-dark-text-muted uppercase tracking-wide">Level</span>
           </div>
 
-          <div className="bg-accent-coral/10 border border-ink/10 p-3 rounded-lg text-center">
+          <div className="bg-accent-coral/10 border border-ink/10 dark:border-accent-coral/30 p-3 rounded-lg text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <Star className="w-4 h-4 text-accent-coral" />
-              <span className="font-display text-lg">{karma}</span>
+              <span className="font-display text-lg dark:text-dark-text">{karma}</span>
             </div>
-            <span className="text-xs text-neutral-600 uppercase tracking-wide">Karma</span>
+            <span className="text-xs text-neutral-600 dark:text-dark-text-muted uppercase tracking-wide">Karma</span>
           </div>
         </div>
 
         {/* Level Progress */}
         <div className="mt-4">
-          <div className="flex justify-between text-xs text-neutral-500 mb-1.5">
+          <div className="flex justify-between text-xs text-neutral-500 dark:text-dark-text-muted mb-1.5">
             <span>Level {level}</span>
             <span>{karma % 100}/{100} XP</span>
           </div>
-          <div className="h-2 bg-neutral-100 rounded-full overflow-hidden border border-ink/10">
+          <div className="h-2 bg-neutral-100 dark:bg-dark-elevated rounded-full overflow-hidden border border-ink/10 dark:border-dark-border">
             <motion.div
               className="h-full bg-primary"
               initial={{ width: 0 }}
@@ -132,7 +178,7 @@ export default function ProfileSidebar() {
         <div className="mt-4 space-y-2">
           <Link href="/my-college">
             <motion.div
-              className="flex items-center justify-between p-3 bg-ink text-white rounded-lg hover:bg-neutral-800 transition-colors"
+              className="flex items-center justify-between p-3 bg-ink dark:bg-primary text-white dark:text-ink rounded-lg hover:bg-neutral-800 dark:hover:bg-primary/80 transition-colors"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -143,21 +189,107 @@ export default function ProfileSidebar() {
 
           <Link href="/profile">
             <motion.div
-              className="flex items-center justify-between p-3 border-2 border-ink rounded-lg hover:bg-neutral-50 transition-colors"
+              className="flex items-center justify-between p-3 border-2 border-ink dark:border-dark-border rounded-lg hover:bg-neutral-50 dark:hover:bg-dark-elevated transition-colors"
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="font-medium text-sm">View Profile</span>
-              <ChevronRight className="w-4 h-4" />
+              <span className="font-medium text-sm dark:text-dark-text">View Profile</span>
+              <ChevronRight className="w-4 h-4 dark:text-dark-text" />
             </motion.div>
           </Link>
 
-          <div className="flex items-center justify-between p-3 border-2 border-ink rounded-lg bg-paper dark:bg-dark-surface hover:bg-neutral-50 dark:hover:bg-dark-elevated transition-colors">
+          <div className="flex items-center justify-between p-3 border-2 border-ink dark:border-dark-border rounded-lg bg-paper dark:bg-dark-surface hover:bg-neutral-50 dark:hover:bg-dark-elevated transition-colors">
             <span className="font-medium text-sm dark:text-dark-text">Dark Mode</span>
             <ThemeToggleInline />
           </div>
+
+          {/* QR Code Actions */}
+          <div className="grid grid-cols-2 gap-2 pt-2">
+            <motion.button
+              onClick={() => setShowMyQR(true)}
+              className="flex flex-col items-center justify-center p-3 border-2 border-ink dark:border-dark-border rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <QrCode className="w-5 h-5 text-primary mb-1" />
+              <span className="text-xs font-medium dark:text-dark-text">My QR</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setShowScanner(true)}
+              className="flex flex-col items-center justify-center p-3 border-2 border-ink dark:border-dark-border rounded-lg hover:bg-accent-blue/10 dark:hover:bg-accent-blue/20 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Scan className="w-5 h-5 text-accent-blue mb-1" />
+              <span className="text-xs font-medium dark:text-dark-text">Scan</span>
+            </motion.button>
+          </div>
         </div>
       </div>
+
+      {/* My QR Code Modal */}
+      {showMyQR && user.id && (
+        <QRDisplay
+          qrCodeUrl={getQRCodeImageUrl(generateUserQRData(user.id), 200)}
+          onClose={() => setShowMyQR(false)}
+        />
+      )}
+
+      {/* QR Scanner Modal */}
+      {showScanner && (
+        <div className="fixed inset-0 z-50">
+          <QRScanner
+            onScan={handleScan}
+            onClose={() => {
+              setShowScanner(false);
+              setScanResult(null);
+            }}
+            title="SCAN TO CONNECT"
+            subtitle="Point camera at another user's QR code"
+          />
+          
+          {/* Scan Result Overlay */}
+          {scanResult && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={`p-6 rounded-xl border-4 max-w-sm w-full text-center ${
+                  scanResult.success
+                    ? 'bg-green-50 border-green-500'
+                    : 'bg-red-50 border-red-500'
+                }`}
+              >
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                  scanResult.success ? 'bg-green-500' : 'bg-red-500'
+                }`}>
+                  {scanResult.success ? (
+                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+                <p className={`font-bold text-lg ${scanResult.success ? 'text-green-700' : 'text-red-700'}`}>
+                  {scanResult.message}
+                </p>
+                {!scanResult.success && (
+                  <button
+                    onClick={() => setScanResult(null)}
+                    className="mt-4 px-4 py-2 bg-ink text-white rounded-lg font-medium"
+                  >
+                    Try Again
+                  </button>
+                )}
+              </motion.div>
+            </div>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }

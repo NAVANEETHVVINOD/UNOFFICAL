@@ -195,7 +195,7 @@ export default function CollegeFeed({
             const postsPromise = api.getPosts(collegeSlug, currentPage, 10, 'college', isOfficial);
 
             const eventsPromise = reset && activeTab === 'feed' // Only show events in main feed for now
-                ? api.getEvents(collegeSlug)
+                ? api.getEvents({ collegeSlug })
                 : Promise.resolve([]);
 
             const statsPromise = reset

@@ -5,4 +5,6 @@ export { default as ProjectsTab } from "./ProjectsTab";
 export { default as EducationTab } from "./EducationTab";
 export { default as ExperienceTab } from "./ExperienceTab";
 export { default as VolunteeringTab } from "./VolunteeringTab";
+export { default as CertificatesTab } from "./CertificatesTab";
+export { default as SavedEventsTab } from "./SavedEventsTab";
 export { default as GitHubContributions } from "./GitHubContributions";

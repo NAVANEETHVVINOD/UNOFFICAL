@@ -23,9 +23,10 @@ export default function UpcomingEventsWidget({ collegeSlug }: { collegeSlug?: st
             try {
                 setLoading(true);
                 // Fetch valid upcoming events
-                const data = await api.getEvents(collegeSlug, undefined, 3);
-                const upcoming = Array.isArray(data)
-                    ? data
+                const data = await api.getEvents(collegeSlug ? { collegeSlug, limit: 3 } : { limit: 3 });
+                const eventsArray = data?.events || data || [];
+                const upcoming = Array.isArray(eventsArray)
+                    ? eventsArray
                         .filter((e: any) => new Date(e.startsAt) > new Date())
                         .sort((a: any, b: any) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
                         .slice(0, 3)
