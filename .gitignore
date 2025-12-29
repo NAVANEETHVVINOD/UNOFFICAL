@@ -96,7 +96,7 @@ uploads/
 *.keystore
 .gradle/
 gradle/
-app/
+/app/
 build.gradle
 settings.gradle
 gradle.properties
