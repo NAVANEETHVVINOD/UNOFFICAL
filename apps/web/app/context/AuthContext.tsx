@@ -30,6 +30,7 @@ interface User {
     socials?: any;
     isOnboarded?: boolean;
     onboardingStep?: number;
+    userType?: string | null; // UX personalization field (separate from role)
     college?: {
       id: string;
       name: string;

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useUserType } from "../context/UserTypeContext";
+import { UserType } from "../../lib/userTypes";
 import { useOnboardingGuard } from "../hooks/useOnboardingGuard";
 import Container from "../components/ui/Container";
 import { motion, AnimatePresence } from "framer-motion";
@@ -84,7 +86,54 @@ const CATEGORIES = [
 
 export default function EventsClient() {
   const { user } = useAuth();
+  const { userType } = useUserType();
   const { isReady: onboardingComplete } = useOnboardingGuard();
+
+  // Tab configuration based on userType
+  type EventTab = 'campus' | 'open' | 'myRsvps' | 'all' | 'myEvents' | 'verified';
+  
+  const getTabsForUserType = (ut: UserType | null): { id: EventTab; label: string }[] => {
+    switch (ut) {
+      case UserType.STUDENT:
+        return [
+          { id: 'campus', label: 'Campus' },
+          { id: 'open', label: 'Open Events' },
+          { id: 'myRsvps', label: 'My RSVPs' },
+        ];
+      case UserType.PROFESSIONAL:
+        return [
+          { id: 'all', label: 'All Events' },
+          { id: 'myRsvps', label: 'My RSVPs' },
+        ];
+      case UserType.ORGANIZER:
+        return [
+          { id: 'myEvents', label: 'My Events' },
+          { id: 'all', label: 'All Events' },
+        ];
+      case UserType.TEACHER:
+        return [
+          { id: 'verified', label: 'Verified Events' },
+          { id: 'campus', label: 'Campus Events' },
+          { id: 'myRsvps', label: 'My RSVPs' },
+        ];
+      default:
+        // Default to STUDENT tabs if userType not set
+        return [
+          { id: 'campus', label: 'Campus' },
+          { id: 'open', label: 'Open Events' },
+          { id: 'myRsvps', label: 'My RSVPs' },
+        ];
+    }
+  };
+
+  const tabs = useMemo(() => getTabsForUserType(userType), [userType]);
+  const [activeTab, setActiveTab] = useState<EventTab>(tabs[0]?.id || 'campus');
+
+  // Update activeTab when userType changes
+  useEffect(() => {
+    const newTabs = getTabsForUserType(userType);
+    setActiveTab(newTabs[0]?.id || 'campus');
+  }, [userType]);
 
   // State
   const [events, setEvents] = useState<Event[]>([]);
@@ -104,18 +153,78 @@ export default function EventsClient() {
   // Saved events
   const [savedEvents, setSavedEvents] = useState<Set<string>>(new Set());
 
-  // Fetch events when filters change
+  // Fetch events when filters or activeTab change
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getEvents({
-        scope,
-        dateRange,
-        priceType,
-        category: category || undefined,
-        search: search || undefined,
-      });
+      let data: Event[] = [];
+      
+      // Fetch based on active tab
+      switch (activeTab) {
+        case 'campus':
+          // Campus events
+          data = await api.getEvents({
+            scope: 'campus',
+            dateRange,
+            priceType,
+            category: category || undefined,
+            search: search || undefined,
+          });
+          break;
+        case 'open':
+        case 'all':
+          // All/Open events (global)
+          data = await api.getEvents({
+            scope: 'global',
+            dateRange,
+            priceType,
+            category: category || undefined,
+            search: search || undefined,
+          });
+          break;
+        case 'myRsvps':
+          // User's registered events
+          data = await api.getMyRegisteredEvents();
+          break;
+        case 'myEvents':
+          // Events created by the user (for organizers)
+          // TODO: Implement getMyCreatedEvents API endpoint
+          data = await api.getEvents({
+            // For now, fetch all events and filter client-side
+            // In production, this should be a dedicated endpoint
+            dateRange,
+            priceType,
+            category: category || undefined,
+            search: search || undefined,
+          });
+          // Filter to only show events created by current user
+          if (user?.id) {
+            data = data.filter(event => event.createdBy.id === user.id);
+          }
+          break;
+        case 'verified':
+          // Verified events (for teachers)
+          // TODO: Implement getVerifiedEvents API endpoint
+          data = await api.getEvents({
+            scope: 'campus',
+            dateRange,
+            priceType,
+            category: category || undefined,
+            search: search || undefined,
+          });
+          // In production, this should filter for verified events
+          break;
+        default:
+          data = await api.getEvents({
+            scope,
+            dateRange,
+            priceType,
+            category: category || undefined,
+            search: search || undefined,
+          });
+      }
+      
       setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch events:", err);
@@ -124,7 +233,7 @@ export default function EventsClient() {
     } finally {
       setLoading(false);
     }
-  }, [scope, dateRange, priceType, category, search]);
+  }, [activeTab, scope, dateRange, priceType, category, search, user?.id]);
 
   // Fetch featured and trending events on mount
   useEffect(() => {
@@ -224,31 +333,22 @@ export default function EventsClient() {
               </Link>
             </div>
 
-            {/* Scope Toggle (Global/Campus) */}
-            <div className="flex items-center gap-2 mb-4">
+            {/* Tabs based on UserType */}
+            <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
               <div className="inline-flex border-2 border-black dark:border-gray-700 bg-white dark:bg-gray-800">
-                <button
-                  onClick={() => setScope("campus")}
-                  className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all ${
-                    scope === "campus"
-                      ? "bg-black text-white dark:bg-yellow-400 dark:text-black"
-                      : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
-                  }`}
-                >
-                  <Building2 className="w-4 h-4" />
-                  Campus
-                </button>
-                <button
-                  onClick={() => setScope("global")}
-                  className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all ${
-                    scope === "global"
-                      ? "bg-black text-white dark:bg-yellow-400 dark:text-black"
-                      : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
-                  }`}
-                >
-                  <Globe className="w-4 h-4" />
-                  Global
-                </button>
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2 font-bold text-sm transition-all whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? "bg-black text-white dark:bg-yellow-400 dark:text-black"
+                        : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
             </div>
 

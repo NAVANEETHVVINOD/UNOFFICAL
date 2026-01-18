@@ -16,17 +16,21 @@ import {
 import Doodle from "../components/ui/Doodle";
 import { logEvent } from "../../lib/analytics";
 import { FALLBACK_COLLEGES } from "../../lib/college-data";
+import UserTypeSelector from "../components/onboarding/UserTypeSelector";
+import { useUserType } from "../context/UserTypeContext";
 
 // Steps
 // 1. Identity (Avatar + Name)
-// 2. Vibe (Bio)
-// 3. Socials
-// 4. Interests
-// 5. Campus (College + Location)
-// 6. Review
+// 2. User Type (Student, Professional, Organizer, Teacher)
+// 3. Vibe (Bio)
+// 4. Socials
+// 5. Interests
+// 6. Campus (College + Location)
+// 7. Review
 
 const STEPS = [
   { id: "identity", title: "WHO ARE YOU?", subtitle: "Let's see that face." },
+  { id: "usertype", title: "PICK YOUR VIBE", subtitle: "How do you roll?" },
   { id: "vibe", title: "VIBE CHECK", subtitle: "Tell us your story." },
   {
     id: "socials",
@@ -41,6 +45,7 @@ const STEPS = [
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, refreshUser, loading: authLoading } = useAuth();
+  const { userType } = useUserType();
   const [currentStep, setCurrentStep] = useState(0);
   const [initialStepSet, setInitialStepSet] = useState(false);
 
@@ -227,9 +232,11 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case 0: // Identity
         return !!formData.fullName.trim();
-      case 1: // Vibe
+      case 1: // User Type
+        return !!userType; // User type must be selected
+      case 2: // Vibe
         return !!formData.bio.trim();
-      case 4: // Campus
+      case 5: // Campus
         if (isCustomCollege) return !!customCollegeData.name.trim();
         // Require state/district if State is Kerala? Or generally?
         // Let's make State mandatory if we want data.
@@ -286,9 +293,13 @@ export default function OnboardingPage() {
           stepData.avatarUrl = formData.avatarUrl;
         }
       } else if (currentStep === 1) {
+        // User Type - handled by UserTypeSelector component
+        // The userType is already saved via the UserTypeContext
+        // Just proceed to next step
+      } else if (currentStep === 2) {
         // Vibe
         stepData.bio = formData.bio;
-      } else if (currentStep === 2) {
+      } else if (currentStep === 3) {
         // Socials
         const normalizeUrl = (url?: string) => {
           if (!url?.trim()) return undefined;
@@ -303,10 +314,10 @@ export default function OnboardingPage() {
         // For now, simpler:
         stepData.githubUrl = github;
         stepData.instagram = instagram;
-      } else if (currentStep === 3) {
+      } else if (currentStep === 4) {
         // Interests
         stepData.interests = formData.interests;
-      } else if (currentStep === 4) {
+      } else if (currentStep === 5) {
         // Campus + Location
         // Save collegeId to backend if it's a valid database ID (CUID format)
         // Also store location info in socials for additional context
@@ -324,7 +335,7 @@ export default function OnboardingPage() {
           tempCollegeId: formData.collegeId, // Keep for reference
           tempCollegeName: selectedCollege?.name || customCollegeData.name
         };
-      } else if (currentStep === 5) {
+      } else if (currentStep === 6) {
         // Review
         if (!formData.fullName?.trim()) {
           alert("Full name is required."); return;
@@ -437,7 +448,23 @@ export default function OnboardingPage() {
             </div>
           </div>
         );
-      case 1: // Vibe
+      case 1: // User Type
+        return (
+          <UserTypeSelector 
+            onComplete={() => {
+              // Log analytics event
+              logEvent("onboarding_step_completed", {
+                step: currentStep,
+                stepName: STEPS[currentStep].id,
+              });
+              
+              // UserTypeSelector handles the API call internally
+              // Just proceed to next step after selection
+              setCurrentStep((prev) => prev + 1);
+            }}
+          />
+        );
+      case 2: // Vibe
         return (
           <div>
             <label className="block font-bold mb-2 uppercase text-sm tracking-wider">
@@ -457,7 +484,7 @@ export default function OnboardingPage() {
             <p className="text-gray-400 text-xs mt-1">{formData.bio.length} characters</p>
           </div>
         );
-      case 2: // Socials
+      case 3: // Socials
         return (
           <div className="space-y-6">
             <div>
@@ -482,7 +509,7 @@ export default function OnboardingPage() {
             </div>
           </div>
         );
-      case 3: // Interests
+      case 4: // Interests
         const INTERESTS = ["Coding", "Design", "Music", "Sports", "Gaming", "Reading", "Travel", "Food", "Art", "Tech"];
         return (
           <div className="grid grid-cols-2 gap-4">
@@ -505,7 +532,7 @@ export default function OnboardingPage() {
             ))}
           </div>
         );
-      case 4: // Campus
+      case 5: // Campus
         // Dynamic City Extraction
         const availableCities = formData.state
           ? Array.from(new Set(
@@ -682,7 +709,7 @@ export default function OnboardingPage() {
             )}
           </div>
         );
-      case 5: // Review
+      case 6: // Review
         return (
           <div className="space-y-4 text-left">
 
@@ -744,10 +771,14 @@ export default function OnboardingPage() {
             </div>
             <div className="mt-6 flex-shrink-0 pt-2 bg-white sticky bottom-0 z-10">
               <div className="flex gap-4">
-                {currentStep > 0 && <RetroButton onClick={handleBack} variant="outline" className="flex-1" disabled={loading}>BACK</RetroButton>}
-                <RetroButton onClick={handleNext} className="flex-1 bg-black text-white hover:bg-neutral-800" disabled={loading}>
-                  {loading ? "SAVING..." : currentStep === STEPS.length - 1 ? "FINISH ->" : "NEXT ->"}
-                </RetroButton>
+                {currentStep > 0 && (
+                  <RetroButton onClick={handleBack} variant="outline" className="flex-1" disabled={loading}>BACK</RetroButton>
+                )}
+                {currentStep !== 1 && (
+                  <RetroButton onClick={handleNext} className="flex-1 bg-black text-white hover:bg-neutral-800" disabled={loading}>
+                    {loading ? "SAVING..." : currentStep === STEPS.length - 1 ? "FINISH ->" : "NEXT ->"}
+                  </RetroButton>
+                )}
               </div>
             </div>
           </NewspaperCard>

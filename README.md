@@ -12,11 +12,11 @@
   [![TailwindCSS](https://img.shields.io/badge/Tailwind-3.3-38B2AC.svg?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
   [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791.svg?style=flat&logo=postgresql)](https://www.postgresql.org/)
   [![PWA Ready](https://img.shields.io/badge/PWA-Ready-5A0FC8.svg?style=flat&logo=pwa)](https://web.dev/progressive-web-apps/)
-  [![Tests](https://img.shields.io/badge/Tests-499%20passing-brightgreen.svg)](./apps/web/__tests__)
+  [![Tests](https://img.shields.io/badge/Tests-806%20passing-brightgreen.svg)](./apps/web/__tests__)
 
   <p align="center">
     <b>Connect. Collaborate. Campus.</b><br />
-    A hyper-local, exclusive social network bridging the gap between students, events, and opportunities.
+    A hyper-local, exclusive Events OS for Students & Organizers with personalized experiences.
   </p>
 
 </div>
@@ -29,7 +29,7 @@
 |-----------|--------|---------|
 | Frontend Build | ✅ Passing | Next.js 16 on Vercel |
 | Backend Build | ✅ Passing | NestJS 10 on Render |
-| Frontend Tests | ✅ 499 tests | Property-based + unit |
+| Frontend Tests | ✅ 806 tests | Property-based + unit |
 | Backend Tests | ✅ 47 tests | Service + controller |
 | PWA | ✅ Installable | Offline support |
 | Android TWA | ✅ Ready | Play Store ready |
@@ -37,6 +37,14 @@
 ---
 
 ## ✨ Key Features
+
+### 🎯 Role-Based UX (NEW!)
+- **4 User Types** - Student, Professional, Organizer, Teacher
+- **Personalized Dashboards** - Unique experience for each user type
+- **Simplified Navigation** - 4 core items (Dashboard, Events, Messages, Profile)
+- **Smart Feature Gating** - Show only relevant features per user type
+- **Empty State UX** - Engaging empty states with clear CTAs
+- **Conditional FAB** - Quick event creation for organizers on mobile
 
 ### 📱 Core Platform
 - **Campus Dashboard** - Real-time feed with posts, events, and announcements
@@ -99,8 +107,17 @@
 
 ---
 
-## 👤 User Roles
+## 👤 User Types & Roles
 
+### User Types (UX Personalization)
+| Type | Dashboard | Navigation | Key Features |
+|------|-----------|------------|--------------|
+| STUDENT | Events-focused | 4 items | Event discovery, RSVP, campus events |
+| PROFESSIONAL | Global events | 4 items | Networking, global events |
+| ORGANIZER | Event management | 4 items + FAB | Create events, analytics, check-in |
+| TEACHER | Classroom-focused | 4 items | Classrooms, attendance, verified events |
+
+### Permission Roles (Access Control)
 | Role | Admin Panel | Key Features |
 |------|-------------|--------------|
 | STUDENT | None | Feed, events, messaging, marketplace, notes |
@@ -108,6 +125,8 @@
 | CLUB_ADMIN | `/clubs/[id]/manage` | Member management, event creation |
 | COLLEGE_ADMIN | `/admin/college` | Content moderation, event approvals |
 | PLATFORM_ADMIN | `/admin/platform` | System analytics, user management |
+
+**Note**: User Type and Permission Role are independent. A user can be a STUDENT (type) with CLUB_ADMIN (role).
 
 ---
 
@@ -237,9 +256,9 @@ cd apps/web && npm run test -- --testPathPattern="events"
 ```
 
 ### Test Coverage
-- **499 frontend tests** - Property-based tests using fast-check
+- **806 frontend tests** - Property-based tests using fast-check
 - **47 backend tests** - Unit tests for services and controllers
-- **15 correctness properties** - Events system validation
+- **18 correctness properties** - Role-based UX + Events system validation
 - **Security tests** - WebSocket auth, CORS, error sanitization
 
 ---
@@ -282,6 +301,7 @@ cat twa-manifest.json
 
 | Document | Description |
 |----------|-------------|
+| [docs/ROLE_BASED_UX_LAUNCH.md](./docs/ROLE_BASED_UX_LAUNCH.md) | Role-Based UX feature guide |
 | [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) | Detailed implementation status |
 | [PLATFORM_AUDIT.md](./PLATFORM_AUDIT.md) | Complete API & page inventory |
 | [ANDROID_BUILD.md](./ANDROID_BUILD.md) | TWA build instructions |

@@ -10,61 +10,550 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-model User {
-  id                 String               @id @default(cuid())
-  email              String?              @unique
-  password           String?
-  role               Role                 @default(STUDENT)
+model AdminAuditLog {
+  id         String   @id
+  adminId    String
+  action     String
+  targetType String
+  targetId   String
+  reason     String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+}
+
+model Assignment {
+  id          String       @id
+  title       String
+  description String?
+  dueDate     DateTime?
+  points      Int          @default(100)
+  classroomId String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime
+  Classroom   Classroom    @relation(fields: [classroomId], references: [id])
+  Submission  Submission[]
+}
+
+model AttendanceRecord {
+  id          String    @id
+  date        DateTime  @default(now())
+  classroomId String
+  records     Json
+  Classroom   Classroom @relation(fields: [classroomId], references: [id])
+
+  @@unique([classroomId, date])
+}
+
+model BackgroundJob {
+  id           String    @id
+  type         JobType
+  payload      Json
+  status       JobStatus @default(PENDING)
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3)
+  lastError    String?
+  scheduledFor DateTime  @default(now())
+  processedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([type, status, scheduledFor])
+}
+
+model CertificateIssue {
+  id                  String              @id
+  templateId          String
+  userId              String
+  eventId             String?
+  issuedAt            DateTime            @default(now())
+  fileUrl             String
+  Event               Event?              @relation(fields: [eventId], references: [id])
+  CertificateTemplate CertificateTemplate @relation(fields: [templateId], references: [id])
+  User                User                @relation(fields: [userId], references: [id])
+}
+
+model CertificateTemplate {
+  id               String             @id
+  name             String
+  fileUrl          String
+  fields           String[]
+  createdAt        DateTime           @default(now())
+  CertificateIssue CertificateIssue[]
+}
+
+model Classroom {
+  id               String             @id
+  name             String
+  subject          String?
+  description      String?
+  code             String             @unique
+  bannerUrl        String?
+  teacherId        String
+  collegeId        String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  Assignment       Assignment[]
+  AttendanceRecord AttendanceRecord[]
+  College          College            @relation(fields: [collegeId], references: [id])
+  User             User               @relation(fields: [teacherId], references: [id])
+  ClassroomMember  ClassroomMember[]
+}
+
+model ClassroomMember {
+  id          String        @id
+  classroomId String
+  userId      String
+  role        ClassroomRole @default(STUDENT)
+  joinedAt    DateTime      @default(now())
+  Classroom   Classroom     @relation(fields: [classroomId], references: [id])
+  User        User          @relation(fields: [userId], references: [id])
+
+  @@unique([classroomId, userId])
+}
+
+model Club {
+  id          String       @id
+  name        String
+  slug        String       @unique
+  description String?
+  collegeId   String?
+  createdAt   DateTime     @default(now())
+  type        GroupType    @default(CLUB)
+  College     College?     @relation(fields: [collegeId], references: [id])
+  ClubMember  ClubMember[]
+  Event       Event[]
+  Post        Post[]
+}
+
+model ClubMember {
+  id          String   @id
+  userId      String
+  clubId      String
+  role        ClubRole @default(MEMBER)
+  displayRole String?
+  joinedAt    DateTime @default(now())
+  Club        Club     @relation(fields: [clubId], references: [id])
+  User        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, clubId])
+}
+
+model College {
+  id                 String               @id
+  name               String
+  slug               String               @unique
+  city               String?
+  state              String?
   createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  hashedRefreshToken String?
-  supabaseId         String?              @unique
-  certificates       CertificateIssue[]
-  memberships        ClubMember[]
-  comments           Comment[]
-  createdEvents      Event[]
-  events             EventAttendance[]
-  listings           MarketplaceListing[] @relation("ListingOwner")
-  sentMessages       Message[]            @relation("SentMessages")
-  notes              Note[]               @relation("AuthorNotes")
-  likes              NoteLike[]
-  posts              Post[]
-  postLikes          PostLike[]
-  pollVotes          PollVote[]
-  profile            Profile?
-  conversations      Conversation[]       @relation("UserConversations")
-  savedItems         SavedItem[]
-  notifications      Notification[]
+  description        String?
+  Classroom          Classroom[]
+  Club               Club[]
+  Event              Event[]
+  MarketplaceListing MarketplaceListing[]
+  Note               Note[]
+  Post               Post[]
+  Profile            Profile[]
+}
 
-  followers Follows[] @relation("following")
-  following Follows[] @relation("follower")
+model Comment {
+  id        String   @id
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [authorId], references: [id])
+  Post      Post     @relation(fields: [postId], references: [id])
+}
 
-  // LMS Relations
-  teachingClassrooms Classroom[]       @relation("TeacherClassrooms")
-  joinedClassrooms   ClassroomMember[]
-  submissions        Submission[]
+model Conversation {
+  id                 String              @id
+  listingId          String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime
+  MarketplaceListing MarketplaceListing? @relation(fields: [listingId], references: [id])
+  Message            Message[]
+  User               User[]              @relation("UserConversations")
+}
 
-  // Events System Relations
-  eventRegistrations EventRegistration[]
-  eventRoles         EventMemberRole[]
-  waitlistEntries    WaitlistEntry[]
-  eventMessages      EventMessage[]      @relation("EventMessageSender")
+model Education {
+  id          String    @id
+  profileId   String
+  school      String
+  degree      String
+  field       String?
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  grade       String?
+  description String?
+  Profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
 
-  @@index([supabaseId])
+model Event {
+  id                    String               @id
+  title                 String
+  description           String?
+  startsAt              DateTime
+  endsAt                DateTime
+  venue                 String?
+  clubId                String?
+  collegeId             String?
+  createdById           String
+  scope                 EventScope           @default(COLLEGE)
+  qrToken               String?
+  rejectionReason       String?
+  attendanceMode        AttendanceMode       @default(SINGLE_SCAN)
+  attendancePolicy      String               @default("SINGLE_CHECKIN")
+  autoIssueCertificate  Boolean              @default(false)
+  category              String?
+  certificateEnabled    Boolean              @default(false)
+  certificateTemplateId String?
+  coverUrl              String?
+  createdAt             DateTime             @default(now())
+  deletedAt             DateTime?
+  noRefundPolicy        Boolean              @default(true)
+  onlineLink            String?
+  timezone              String               @default("Asia/Kolkata")
+  updatedAt             DateTime
+  visibility            EventVisibility      @default(PUBLIC)
+  waitlistEnabled       Boolean              @default(false)
+  status                EventLifecycleStatus @default(DRAFT)
+  CertificateIssue      CertificateIssue[]
+  Club                  Club?                @relation(fields: [clubId], references: [id])
+  College               College?             @relation(fields: [collegeId], references: [id])
+  User                  User                 @relation(fields: [createdById], references: [id])
+  EventAgendaBlock      EventAgendaBlock[]
+  EventAttendance       EventAttendance[]
+  EventForm             EventForm?
+  EventMemberRole       EventMemberRole[]
+  EventMessage          EventMessage[]
+  EventRegistration     EventRegistration[]
+  SavedItem             SavedItem[]
+  TicketType            TicketType[]
+  WaitlistEntry         WaitlistEntry[]
+
+  @@index([collegeId])
+  @@index([collegeId, startsAt])
+  @@index([deletedAt])
+  @@index([startsAt])
+  @@index([status, startsAt])
+}
+
+model EventAgendaBlock {
+  id          String   @id
+  eventId     String
+  day         Int
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  title       String
+  description String?
+  Event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, day])
+}
+
+model EventAttendance {
+  id            String         @id
+  eventId       String
+  userId        String
+  status        EventStatus    @default(GOING)
+  role          AttendanceRole @default(ATTENDEE)
+  checkInMethod String?
+  checkInTime   DateTime?
+  Event         Event          @relation(fields: [eventId], references: [id])
+  User          User           @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model EventCertificate {
+  id                String              @id
+  eventId           String
+  userId            String
+  templateId        String
+  fileUrl           String
+  issuedAt          DateTime            @default(now())
+  EventRegistration EventRegistration[]
+}
+
+model EventForm {
+  id      String @id
+  eventId String @unique
+  schema  Json
+  Event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventMemberRole {
+  id         String        @id
+  eventId    String
+  userId     String
+  role       EventRoleType
+  assignedBy String
+  createdAt  DateTime      @default(now())
+  Event      Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  User       User          @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model EventMessage {
+  id             String          @id
+  eventId        String
+  senderId       String
+  targetAudience MessageAudience
+  subject        String
+  body           String
+  createdAt      DateTime        @default(now())
+  Event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  User           User            @relation(fields: [senderId], references: [id])
+}
+
+model EventPayment {
+  id                 String            @id
+  registrationId     String            @unique
+  razorpayOrderId    String            @unique
+  razorpayPaymentId  String?
+  idempotencyKey     String            @unique
+  amount             Int
+  platformFee        Int
+  gatewayFee         Int
+  status             PaymentStatus     @default(PENDING)
+  webhookProcessedAt DateTime?
+  createdAt          DateTime          @default(now())
+  capturedAt         DateTime?
+  EventRegistration  EventRegistration @relation(fields: [registrationId], references: [id])
+
+  @@index([idempotencyKey])
+}
+
+model EventRegistration {
+  id               String             @id
+  eventId          String
+  ticketId         String
+  userId           String
+  status           RegistrationStatus @default(PENDING)
+  paymentId        String?
+  amountPaid       Int?
+  platformFee      Int?
+  gatewayFee       Int?
+  checkInTime      DateTime?
+  checkOutTime     DateTime?
+  checkInBy        String?
+  checkInMethod    String?
+  checkInDay       Int?
+  qrToken          String             @unique
+  qrUsed           Boolean            @default(false)
+  formResponses    Json?
+  certificateId    String?
+  deletedAt        DateTime?
+  noRefundConsent  Boolean            @default(false)
+  createdAt        DateTime           @default(now())
+  EventPayment     EventPayment?
+  EventCertificate EventCertificate?  @relation(fields: [certificateId], references: [id])
+  Event            Event              @relation(fields: [eventId], references: [id])
+  TicketType       TicketType         @relation(fields: [ticketId], references: [id])
+  User             User               @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@index([deletedAt])
+  @@index([eventId, status])
+}
+
+model Experience {
+  id          String    @id
+  profileId   String
+  title       String
+  company     String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  description String?
+  Profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id        String   @id
+  content   String
+  category  String
+  userId    String?
+  collegeId String?
+  createdAt DateTime @default(now())
 }
 
 model Follows {
-  follower    User     @relation("follower", fields: [followerId], references: [id])
-  followerId  String
-  following   User     @relation("following", fields: [followingId], references: [id])
-  followingId String
-  createdAt   DateTime @default(now())
+  followerId                     String
+  followingId                    String
+  createdAt                      DateTime @default(now())
+  User_Follows_followerIdToUser  User     @relation("Follows_followerIdToUser", fields: [followerId], references: [id])
+  User_Follows_followingIdToUser User     @relation("Follows_followingIdToUser", fields: [followingId], references: [id])
 
   @@id([followerId, followingId])
 }
 
+model MarketplaceListing {
+  id           String           @id
+  title        String
+  description  String?
+  price        Int
+  imageUrl     String?
+  ownerId      String
+  collegeId    String?
+  scope        MarketplaceScope @default(COLLEGE)
+  status       ListingStatus    @default(ACTIVE)
+  createdAt    DateTime         @default(now())
+  category     String           @default("OTHER")
+  type         ListingType      @default(PRODUCT)
+  Conversation Conversation[]
+  College      College?         @relation(fields: [collegeId], references: [id])
+  User         User             @relation(fields: [ownerId], references: [id])
+  SavedItem    SavedItem[]
+}
+
+model Message {
+  id             String       @id
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+  seen           Boolean      @default(false)
+  seenAt         DateTime?
+  Conversation   Conversation @relation(fields: [conversationId], references: [id])
+  User           User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+model Note {
+  id          String      @id
+  title       String
+  description String?
+  fileUrl     String
+  subject     String
+  semester    Int
+  authorId    String
+  collegeId   String?
+  createdAt   DateTime    @default(now())
+  User        User        @relation(fields: [authorId], references: [id])
+  College     College?    @relation(fields: [collegeId], references: [id])
+  NoteLike    NoteLike[]
+  SavedItem   SavedItem[]
+}
+
+model NoteLike {
+  id     String @id
+  noteId String
+  userId String
+  Note   Note   @relation(fields: [noteId], references: [id])
+  User   User   @relation(fields: [userId], references: [id])
+
+  @@unique([noteId, userId])
+}
+
+model Notification {
+  id        String           @id
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  actionUrl String?
+  actorId   String?
+  createdAt DateTime         @default(now())
+  User      User             @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([userId])
+  @@index([userId, read])
+}
+
+model PaymentWebhookLog {
+  id                String   @id
+  razorpayOrderId   String
+  razorpayPaymentId String?
+  eventType         String
+  payload           Json
+  processedAt       DateTime @default(now())
+
+  @@index([razorpayOrderId])
+}
+
+model Poll {
+  id         String       @id
+  question   String
+  endDate    DateTime?
+  createdAt  DateTime     @default(now())
+  PollOption PollOption[]
+  PollVote   PollVote[]
+  Post       Post[]
+}
+
+model PollOption {
+  id       String     @id
+  text     String
+  pollId   String
+  Poll     Poll       @relation(fields: [pollId], references: [id])
+  PollVote PollVote[]
+}
+
+model PollVote {
+  id         String     @id
+  userId     String
+  optionId   String
+  pollId     String
+  createdAt  DateTime   @default(now())
+  PollOption PollOption @relation(fields: [optionId], references: [id])
+  Poll       Poll       @relation(fields: [pollId], references: [id])
+  User       User       @relation(fields: [userId], references: [id])
+
+  @@unique([userId, pollId])
+}
+
+model Post {
+  id          String         @id
+  content     String
+  imageUrl    String?
+  authorId    String?
+  collegeId   String?
+  clubId      String?
+  isAnonymous Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime
+  pollId      String?
+  title       String?
+  type        PostType       @default(TEXT)
+  visibility  PostVisibility @default(PUBLIC)
+  Comment     Comment[]
+  User        User?          @relation(fields: [authorId], references: [id])
+  Club        Club?          @relation(fields: [clubId], references: [id])
+  College     College?       @relation(fields: [collegeId], references: [id])
+  Poll        Poll?          @relation(fields: [pollId], references: [id])
+  PostLike    PostLike[]
+  SavedItem   SavedItem[]
+
+  @@index([authorId])
+  @@index([collegeId, createdAt])
+  @@index([collegeId])
+  @@index([createdAt])
+}
+
+model PostLike {
+  id     String @id
+  postId String
+  userId String
+  Post   Post   @relation(fields: [postId], references: [id])
+  User   User   @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
 model Profile {
-  id             String         @id @default(cuid())
+  id             String         @id
   userId         String         @unique
   fullName       String
   collegeId      String?
@@ -78,46 +567,23 @@ model Profile {
   isOnboarded    Boolean        @default(false)
   onboardingStep Int            @default(0)
   createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  updatedAt      DateTime
   linkedin       String?
   points         Int            @default(0)
-  college        College?       @relation(fields: [collegeId], references: [id])
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  education      Education[]
-  experience     Experience[]
-  projects       Project[]
-  volunteering   Volunteering[]
-}
-
-model Education {
-  id          String    @id @default(cuid())
-  profileId   String
-  school      String
-  degree      String
-  field       String?
-  startDate   DateTime
-  endDate     DateTime?
-  current     Boolean   @default(false)
-  grade       String?
-  description String?
-  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
-
-model Experience {
-  id          String    @id @default(cuid())
-  profileId   String
-  title       String
-  company     String
-  location    String?
-  startDate   DateTime
-  endDate     DateTime?
-  current     Boolean   @default(false)
-  description String?
-  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // UX personalization field (separate from permission role)
+  userType       UserType?
+  
+  Education      Education[]
+  Experience     Experience[]
+  College        College?       @relation(fields: [collegeId], references: [id])
+  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Project        Project[]
+  Volunteering   Volunteering[]
 }
 
 model Project {
-  id          String    @id @default(cuid())
+  id          String    @id
   profileId   String
   title       String
   description String?
@@ -126,11 +592,104 @@ model Project {
   tags        String[]
   startDate   DateTime?
   endDate     DateTime?
-  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  Profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model SavedItem {
+  id                 String              @id
+  userId             String
+  type               SavedType
+  postId             String?
+  eventId            String?
+  listingId          String?
+  noteId             String?
+  createdAt          DateTime            @default(now())
+  Event              Event?              @relation(fields: [eventId], references: [id])
+  MarketplaceListing MarketplaceListing? @relation(fields: [listingId], references: [id])
+  Note               Note?               @relation(fields: [noteId], references: [id])
+  Post               Post?               @relation(fields: [postId], references: [id])
+  User               User                @relation(fields: [userId], references: [id])
+
+  @@unique([userId, eventId])
+  @@unique([userId, listingId])
+  @@unique([userId, noteId])
+  @@unique([userId, postId])
+}
+
+model Submission {
+  id           String           @id
+  assignmentId String
+  studentId    String
+  status       SubmissionStatus @default(PENDING)
+  fileUrl      String?
+  grade        Int?
+  feedback     String?
+  submittedAt  DateTime         @default(now())
+  updatedAt    DateTime
+  Assignment   Assignment       @relation(fields: [assignmentId], references: [id])
+  User         User             @relation(fields: [studentId], references: [id])
+
+  @@unique([assignmentId, studentId])
+}
+
+model TicketType {
+  id                String              @id
+  eventId           String
+  name              String
+  description       String?
+  price             Int                 @default(0)
+  quantity          Int?
+  quantitySold      Int                 @default(0)
+  perUserLimit      Int                 @default(1)
+  salesStart        DateTime?
+  salesEnd          DateTime?
+  EventRegistration EventRegistration[]
+  Event             Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  WaitlistEntry     WaitlistEntry[]
+
+  @@index([eventId])
+}
+
+model User {
+  id                                String               @id
+  email                             String?              @unique
+  password                          String?
+  role                              Role                 @default(STUDENT)
+  createdAt                         DateTime             @default(now())
+  updatedAt                         DateTime
+  hashedRefreshToken                String?
+  supabaseId                        String?              @unique
+  CertificateIssue                  CertificateIssue[]
+  Classroom                         Classroom[]
+  ClassroomMember                   ClassroomMember[]
+  ClubMember                        ClubMember[]
+  Comment                           Comment[]
+  Event                             Event[]
+  EventAttendance                   EventAttendance[]
+  EventMemberRole                   EventMemberRole[]
+  EventMessage                      EventMessage[]
+  EventRegistration                 EventRegistration[]
+  Follows_Follows_followerIdToUser  Follows[]            @relation("Follows_followerIdToUser")
+  Follows_Follows_followingIdToUser Follows[]            @relation("Follows_followingIdToUser")
+  MarketplaceListing                MarketplaceListing[]
+  Message                           Message[]
+  Note                              Note[]
+  NoteLike                          NoteLike[]
+  Notification                      Notification[]
+  PollVote                          PollVote[]
+  Post                              Post[]
+  PostLike                          PostLike[]
+  Profile                           Profile?
+  SavedItem                         SavedItem[]
+  Submission                        Submission[]
+  WaitlistEntry                     WaitlistEntry[]
+  Conversation                      Conversation[]       @relation("UserConversations")
+
+  @@index([supabaseId])
 }
 
 model Volunteering {
-  id           String    @id @default(cuid())
+  id           String    @id
   profileId    String
   role         String
   organization String
@@ -139,122 +698,47 @@ model Volunteering {
   current      Boolean   @default(false)
   description  String?
   link         String?
-  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  Profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
-model College {
-  id          String               @id @default(cuid())
-  name        String
-  slug        String               @unique
-  city        String?
-  state       String?
-  description String?              @db.Text
-  createdAt   DateTime             @default(now())
-  clubs       Club[]
-  events      Event[]
-  listings    MarketplaceListing[]
-  notes       Note[]
-  posts       Post[]
-  profiles    Profile[]
-  classrooms  Classroom[]
+model WaitlistEntry {
+  id         String         @id
+  eventId    String
+  ticketId   String
+  userId     String
+  position   Int
+  status     WaitlistStatus @default(WAITING)
+  notifiedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime       @default(now())
+  Event      Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  TicketType TicketType     @relation(fields: [ticketId], references: [id])
+  User       User           @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, ticketId, userId])
+  @@index([eventId, ticketId, position])
 }
 
-model Club {
-  id          String       @id @default(cuid())
-  name        String
-  slug        String       @unique
-  description String?
-  collegeId   String?
-  type        GroupType    @default(CLUB)
-  createdAt   DateTime     @default(now())
-  college     College?     @relation(fields: [collegeId], references: [id])
-  members     ClubMember[]
-  events      Event[]
-  posts       Post[]
+enum AttendanceMode {
+  SINGLE_SCAN
+  ENTRY_EXIT
 }
 
-enum GroupType {
-  CLUB
-  COMMUNITY
+enum AttendanceRole {
+  ATTENDEE
+  VOLUNTEER
+  SPEAKER
 }
 
-model ClubMember {
-  id          String   @id @default(cuid())
-  userId      String
-  clubId      String
-  role        ClubRole @default(MEMBER)
-  displayRole String?
-  joinedAt    DateTime @default(now())
-  club        Club     @relation(fields: [clubId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
-
-  @@unique([userId, clubId])
+enum ClassroomRole {
+  TEACHER
+  STUDENT
 }
 
-model Event {
-  id          String     @id @default(cuid())
-  title       String
-  description String?
-  coverUrl    String?
-  startsAt    DateTime
-  endsAt      DateTime
-  timezone    String     @default("Asia/Kolkata")
-  venue       String?
-  onlineLink  String?
-  clubId      String?
-  collegeId   String?
-  createdById String
-  scope       EventScope @default(COLLEGE)
-  category    String?
-
-  // Visibility
-  visibility EventVisibility @default(PUBLIC)
-
-  // Lifecycle Status (replaces approval status)
-  status          EventLifecycleStatus @default(DRAFT)
-  rejectionReason String?
-
-  // Settings
-  waitlistEnabled  Boolean        @default(false)
-  attendanceMode   AttendanceMode @default(SINGLE_SCAN)
-  attendancePolicy String         @default("SINGLE_CHECKIN")
-  noRefundPolicy   Boolean        @default(true)
-
-  // Certificate
-  certificateEnabled    Boolean @default(false)
-  certificateTemplateId String?
-  autoIssueCertificate  Boolean @default(false)
-
-  // Soft delete
-  deletedAt DateTime?
-
-  // Legacy field for backward compatibility
-  qrToken String?
-
-  // Relations
-  certificates  CertificateIssue[]
-  club          Club?               @relation(fields: [clubId], references: [id])
-  college       College?            @relation(fields: [collegeId], references: [id])
-  createdBy     User                @relation(fields: [createdById], references: [id])
-  attendees     EventAttendance[]
-  savedBy       SavedItem[]
-  tickets       TicketType[]
-  registrations EventRegistration[]
-  roles         EventMemberRole[]
-  formSchema    EventForm?
-  waitlist      WaitlistEntry[]
-  messages      EventMessage[]
-  agendaBlocks  EventAgendaBlock[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Performance indexes for event queries
-  @@index([collegeId])
-  @@index([startsAt])
-  @@index([collegeId, startsAt])
-  @@index([status, startsAt])
-  @@index([deletedAt])
+enum ClubRole {
+  MEMBER
+  LEAD
+  STAFF
 }
 
 enum EventLifecycleStatus {
@@ -267,163 +751,6 @@ enum EventLifecycleStatus {
   ARCHIVED
 }
 
-enum EventVisibility {
-  PUBLIC
-  INVITE_ONLY
-}
-
-enum AttendanceMode {
-  SINGLE_SCAN
-  ENTRY_EXIT
-}
-
-model EventAgendaBlock {
-  id          String   @id @default(cuid())
-  eventId     String
-  day         Int // Day number (1, 2, 3...)
-  date        DateTime // Actual date
-  startTime   DateTime
-  endTime     DateTime
-  title       String
-  description String?
-
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-  @@index([eventId, day])
-}
-
-model TicketType {
-  id           String    @id @default(cuid())
-  eventId      String
-  name         String
-  description  String?
-  price        Int       @default(0) // In paise (INR cents)
-  quantity     Int? // null = unlimited
-  quantitySold Int       @default(0)
-  perUserLimit Int       @default(1)
-  salesStart   DateTime?
-  salesEnd     DateTime?
-
-  event         Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registrations EventRegistration[]
-  waitlist      WaitlistEntry[]
-
-  @@index([eventId])
-}
-
-model EventRegistration {
-  id       String @id @default(cuid())
-  eventId  String
-  ticketId String
-  userId   String
-
-  // Status
-  status RegistrationStatus @default(PENDING)
-
-  // Payment (if paid)
-  paymentId   String?
-  amountPaid  Int?
-  platformFee Int?
-  gatewayFee  Int?
-
-  // Check-in
-  checkInTime   DateTime?
-  checkOutTime  DateTime?
-  checkInBy     String?
-  checkInMethod String?
-  checkInDay    Int? // For multi-day events
-
-  // QR
-  qrToken String  @unique
-  qrUsed  Boolean @default(false)
-
-  // Form Responses
-  formResponses Json?
-
-  // Certificate
-  certificateId String?
-
-  // Soft delete
-  deletedAt DateTime?
-
-  // No-refund consent
-  noRefundConsent Boolean @default(false)
-
-  event       Event             @relation(fields: [eventId], references: [id])
-  ticket      TicketType        @relation(fields: [ticketId], references: [id])
-  user        User              @relation(fields: [userId], references: [id])
-  payment     EventPayment?
-  certificate EventCertificate? @relation(fields: [certificateId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([eventId, userId])
-  @@index([eventId, status])
-  @@index([deletedAt])
-}
-
-enum RegistrationStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  REFUNDED
-  ATTENDED
-}
-
-model EventPayment {
-  id                 String        @id @default(cuid())
-  registrationId     String        @unique
-  razorpayOrderId    String        @unique
-  razorpayPaymentId  String?
-  idempotencyKey     String        @unique // Prevent duplicate orders
-  amount             Int
-  platformFee        Int
-  gatewayFee         Int
-  status             PaymentStatus @default(PENDING)
-  webhookProcessedAt DateTime? // Track webhook processing
-
-  registration EventRegistration @relation(fields: [registrationId], references: [id])
-
-  createdAt  DateTime  @default(now())
-  capturedAt DateTime?
-
-  @@index([idempotencyKey])
-}
-
-model PaymentWebhookLog {
-  id                String   @id @default(cuid())
-  razorpayOrderId   String
-  razorpayPaymentId String?
-  eventType         String
-  payload           Json
-  processedAt       DateTime @default(now())
-
-  @@index([razorpayOrderId])
-}
-
-enum PaymentStatus {
-  PENDING
-  CAPTURED
-  FAILED
-  REFUNDED
-  PARTIALLY_REFUNDED
-}
-
-model EventMemberRole {
-  id         String        @id @default(cuid())
-  eventId    String
-  userId     String
-  role       EventRoleType
-  assignedBy String
-
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([eventId, userId])
-}
-
 enum EventRoleType {
   CREATOR
   CO_ORGANIZER
@@ -431,95 +758,25 @@ enum EventRoleType {
   VOLUNTEER
 }
 
-model WaitlistEntry {
-  id         String         @id @default(cuid())
-  eventId    String
-  ticketId   String
-  userId     String
-  position   Int
-  status     WaitlistStatus @default(WAITING)
-  notifiedAt DateTime?
-  expiresAt  DateTime?
-
-  event  Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ticket TicketType @relation(fields: [ticketId], references: [id])
-  user   User       @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([eventId, ticketId, userId])
-  @@index([eventId, ticketId, position])
+enum EventScope {
+  COLLEGE
+  GLOBAL
 }
 
-enum WaitlistStatus {
-  WAITING
-  NOTIFIED
-  CLAIMED
-  EXPIRED
+enum EventStatus {
+  GOING
+  INTERESTED
+  NOT_GOING
 }
 
-model EventForm {
-  id      String @id @default(cuid())
-  eventId String @unique
-  schema  Json // Array of FormField
-
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+enum EventVisibility {
+  PUBLIC
+  INVITE_ONLY
 }
 
-model EventCertificate {
-  id         String   @id @default(cuid())
-  eventId    String
-  userId     String
-  templateId String
-  fileUrl    String
-  issuedAt   DateTime @default(now())
-
-  registrations EventRegistration[]
-}
-
-model EventMessage {
-  id             String          @id @default(cuid())
-  eventId        String
-  senderId       String
-  targetAudience MessageAudience
-  subject        String
-  body           String
-
-  event  Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  sender User  @relation("EventMessageSender", fields: [senderId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-enum MessageAudience {
-  ALL_REGISTRANTS
-  CHECKED_IN
-  VOLUNTEERS
-  HEADS
-}
-
-model BackgroundJob {
-  id           String    @id @default(cuid())
-  type         JobType
-  payload      Json
-  status       JobStatus @default(PENDING)
-  attempts     Int       @default(0)
-  maxAttempts  Int       @default(3)
-  lastError    String?
-  scheduledFor DateTime  @default(now())
-  processedAt  DateTime?
-
-  createdAt DateTime @default(now())
-
-  @@index([type, status, scheduledFor])
-}
-
-enum JobType {
-  CERTIFICATE_GENERATION
-  NOTIFICATION_DISPATCH
-  REMINDER_SEND
-  DATA_CLEANUP
-  WAITLIST_NOTIFY
+enum GroupType {
+  CLUB
+  COMMUNITY
 }
 
 enum JobStatus {
@@ -530,78 +787,54 @@ enum JobStatus {
   DEAD_LETTER
 }
 
-model AdminAuditLog {
-  id         String  @id @default(cuid())
-  adminId    String
-  action     String
-  targetType String // 'event', 'user', etc.
-  targetId   String
-  reason     String?
-  metadata   Json?
-
-  createdAt DateTime @default(now())
-
-  @@index([adminId])
-  @@index([targetType, targetId])
+enum JobType {
+  CERTIFICATE_GENERATION
+  NOTIFICATION_DISPATCH
+  REMINDER_SEND
+  DATA_CLEANUP
+  WAITLIST_NOTIFY
 }
 
-model EventAttendance {
-  id            String         @id @default(cuid())
-  eventId       String
-  userId        String
-  status        EventStatus    @default(GOING)
-  role          AttendanceRole @default(ATTENDEE)
-  checkInMethod String?
-  checkInTime   DateTime?
-  event         Event          @relation(fields: [eventId], references: [id])
-  user          User           @relation(fields: [userId], references: [id])
-
-  @@unique([eventId, userId])
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  HIDDEN
 }
 
-model MarketplaceListing {
-  id            String           @id @default(cuid())
-  title         String
-  description   String?
-  price         Int
-  imageUrl      String?
-  ownerId       String
-  collegeId     String?
-  scope         MarketplaceScope @default(COLLEGE)
-  status        ListingStatus    @default(ACTIVE)
-  type          ListingType      @default(PRODUCT)
-  createdAt     DateTime         @default(now())
-  category      String           @default("OTHER")
-  conversations Conversation[]
-  college       College?         @relation(fields: [collegeId], references: [id])
-  owner         User             @relation("ListingOwner", fields: [ownerId], references: [id])
-  savedBy       SavedItem[]
+enum ListingType {
+  PRODUCT
+  SERVICE
+  JOB
 }
 
-model Note {
-  id          String      @id @default(cuid())
-  title       String
-  description String?
-  fileUrl     String
-  subject     String
-  semester    Int
-  authorId    String
-  collegeId   String?
-  createdAt   DateTime    @default(now())
-  author      User        @relation("AuthorNotes", fields: [authorId], references: [id])
-  college     College?    @relation(fields: [collegeId], references: [id])
-  likes       NoteLike[]
-  savedBy     SavedItem[]
+enum MarketplaceScope {
+  COLLEGE
+  STATE
 }
 
-model NoteLike {
-  id     String @id @default(cuid())
-  noteId String
-  userId String
-  note   Note   @relation(fields: [noteId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
+enum MessageAudience {
+  ALL_REGISTRANTS
+  CHECKED_IN
+  VOLUNTEERS
+  HEADS
+}
 
-  @@unique([noteId, userId])
+enum NotificationType {
+  LIKE
+  COMMENT
+  EVENT
+  MESSAGE
+  SYSTEM
+  FOLLOW
+  CLASSROOM
+}
+
+enum PaymentStatus {
+  PENDING
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
 }
 
 enum PostType {
@@ -617,224 +850,28 @@ enum PostVisibility {
   COLLEGE
 }
 
-model Post {
-  id         String         @id @default(cuid())
-  type       PostType       @default(TEXT)
-  visibility PostVisibility @default(PUBLIC)
-  title      String? // for collab posts
-  content    String
-  imageUrl   String?
-
-  pollId      String?
-  isAnonymous Boolean @default(false)
-
-  authorId  String?
-  collegeId String?
-  clubId    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  comments Comment[]
-  author   User?       @relation(fields: [authorId], references: [id])
-  club     Club?       @relation(fields: [clubId], references: [id])
-  college  College?    @relation(fields: [collegeId], references: [id])
-  likes    PostLike[]
-  poll     Poll?       @relation(fields: [pollId], references: [id])
-  savedBy  SavedItem[]
-
-  // Performance indexes for feed queries
-  @@index([authorId])
-  @@index([collegeId])
-  @@index([createdAt])
-  @@index([collegeId, createdAt])
-}
-
-model Poll {
-  id        String       @id @default(cuid())
-  question  String
-  endDate   DateTime?
-  createdAt DateTime     @default(now())
-  options   PollOption[]
-  votes     PollVote[]
-  posts     Post[]
-}
-
-model PollOption {
-  id     String     @id @default(cuid())
-  text   String
-  pollId String
-  poll   Poll       @relation(fields: [pollId], references: [id])
-  votes  PollVote[]
-}
-
-model PollVote {
-  id        String   @id @default(cuid())
-  userId    String
-  optionId  String
-  pollId    String
-  createdAt DateTime @default(now())
-
-  poll   Poll       @relation(fields: [pollId], references: [id])
-  option PollOption @relation(fields: [optionId], references: [id])
-  user   User       @relation(fields: [userId], references: [id])
-
-  @@unique([userId, pollId])
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  postId    String
-  authorId  String
-  createdAt DateTime @default(now())
-  author    User     @relation(fields: [authorId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
-}
-
-model PostLike {
-  id     String @id @default(cuid())
-  postId String
-  userId String
-  post   Post   @relation(fields: [postId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
-
-  @@unique([postId, userId])
-}
-
-model Feedback {
-  id        String   @id @default(cuid())
-  content   String
-  category  String
-  userId    String?
-  collegeId String?
-  createdAt DateTime @default(now())
-}
-
-model CertificateTemplate {
-  id        String             @id @default(cuid())
-  name      String
-  fileUrl   String
-  fields    String[]
-  createdAt DateTime           @default(now())
-  issues    CertificateIssue[]
-}
-
-model CertificateIssue {
-  id         String              @id @default(cuid())
-  templateId String
-  userId     String
-  eventId    String?
-  issuedAt   DateTime            @default(now())
-  fileUrl    String
-  event      Event?              @relation(fields: [eventId], references: [id])
-  template   CertificateTemplate @relation(fields: [templateId], references: [id])
-  user       User                @relation(fields: [userId], references: [id])
-}
-
-model Conversation {
-  id           String              @id @default(cuid())
-  listingId    String?
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  listing      MarketplaceListing? @relation(fields: [listingId], references: [id])
-  messages     Message[]
-  participants User[]              @relation("UserConversations")
-}
-
-model Message {
-  id             String       @id @default(cuid())
-  conversationId String
-  senderId       String
-  content        String
-  createdAt      DateTime     @default(now())
-  seen           Boolean      @default(false)
-  seenAt         DateTime?
-  conversation   Conversation @relation(fields: [conversationId], references: [id])
-  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
-
-  // Performance indexes for message queries
-  @@index([conversationId])
-  @@index([createdAt])
-  @@index([conversationId, createdAt])
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+  ATTENDED
 }
 
 enum Role {
   STUDENT
-  FACULTY
   CLUB_ADMIN
   COLLEGE_ADMIN
   PLATFORM_ADMIN
+  FACULTY
 }
 
-enum ClubRole {
-  MEMBER
-  LEAD
-  STAFF
-}
-
-enum EventStatus {
-  GOING
-  INTERESTED
-  NOT_GOING
-}
-
-// Legacy enum - kept for backward compatibility with EventAttendance
-// New events use EventLifecycleStatus instead
-
-enum ListingStatus {
-  ACTIVE
-  SOLD
-  HIDDEN
-}
-
-enum ListingType {
-  PRODUCT
-  SERVICE
-  JOB
-}
-
-enum EventScope {
-  COLLEGE
-  GLOBAL
-}
-
-enum MarketplaceScope {
-  COLLEGE
-  STATE
-}
-
-enum AttendanceRole {
-  ATTENDEE
-  VOLUNTEER
-  SPEAKER
-}
-
-model SavedItem {
-  id     String @id @default(cuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  type SavedType
-
-  postId String?
-  post   Post?   @relation(fields: [postId], references: [id])
-
-  eventId String?
-  event   Event?  @relation(fields: [eventId], references: [id])
-
-  listingId String?
-  listing   MarketplaceListing? @relation(fields: [listingId], references: [id])
-
-  noteId String?
-  note   Note?   @relation(fields: [noteId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([userId, postId])
-  @@unique([userId, eventId])
-  @@unique([userId, listingId])
-  @@unique([userId, noteId])
+// UX personalization type (separate from permission Role)
+enum UserType {
+  STUDENT
+  PROFESSIONAL
+  ORGANIZER
+  TEACHER
 }
 
 enum SavedType {
@@ -844,127 +881,17 @@ enum SavedType {
   NOTE
 }
 
-model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  user      User             @relation(fields: [userId], references: [id])
-  type      NotificationType
-  title     String
-  message   String
-  read      Boolean          @default(false)
-  actionUrl String?
-  actorId   String? // User who triggered the notification
-  createdAt DateTime         @default(now())
-
-  // Performance indexes for notification queries
-  @@index([userId])
-  @@index([userId, read])
-  @@index([createdAt])
-}
-
-enum NotificationType {
-  LIKE
-  COMMENT
-  EVENT
-  MESSAGE
-  SYSTEM
-  FOLLOW
-  CLASSROOM
-}
-
-// -------------------- LMS (Learning Management System) --------------------
-
-model Classroom {
-  id          String  @id @default(cuid())
-  name        String
-  subject     String?
-  description String? @db.Text
-  code        String  @unique // Unique join code
-  bannerUrl   String?
-
-  teacherId String
-  collegeId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  teacher User    @relation("TeacherClassrooms", fields: [teacherId], references: [id])
-  college College @relation(fields: [collegeId], references: [id])
-
-  members     ClassroomMember[]
-  assignments Assignment[]
-  attendance  AttendanceRecord[]
-}
-
-model ClassroomMember {
-  id          String        @id @default(cuid())
-  classroomId String
-  userId      String
-  role        ClassroomRole @default(STUDENT)
-  joinedAt    DateTime      @default(now())
-
-  classroom Classroom @relation(fields: [classroomId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
-
-  @@unique([classroomId, userId])
-}
-
-model Assignment {
-  id          String    @id @default(cuid())
-  title       String
-  description String?   @db.Text
-  dueDate     DateTime?
-  points      Int       @default(100)
-
-  classroomId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  classroom   Classroom    @relation(fields: [classroomId], references: [id])
-  submissions Submission[]
-}
-
-model Submission {
-  id           String @id @default(cuid())
-  assignmentId String
-  studentId    String
-
-  status      SubmissionStatus @default(PENDING)
-  fileUrl     String?
-  grade       Int?
-  feedback    String?          @db.Text
-  submittedAt DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  assignment Assignment @relation(fields: [assignmentId], references: [id])
-  student    User       @relation(fields: [studentId], references: [id])
-
-  @@unique([assignmentId, studentId])
-}
-
-model AttendanceRecord {
-  id          String   @id @default(cuid())
-  date        DateTime @default(now()) // Can be just date part
-  classroomId String
-
-  // JSON structure: { "userId": "status", "userId2": "status" }
-  // Status: PRESENT, ABSENT, LATE, EXCUSED
-  records Json
-
-  classroom Classroom @relation(fields: [classroomId], references: [id])
-
-  @@unique([classroomId, date])
-}
-
-enum ClassroomRole {
-  TEACHER
-  STUDENT
-}
-
 enum SubmissionStatus {
   PENDING
   SUBMITTED
   LATE
   GRADED
   MISSING
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  CLAIMED
+  EXPIRED
 }

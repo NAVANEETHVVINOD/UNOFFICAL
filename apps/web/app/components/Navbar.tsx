@@ -79,29 +79,39 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Center - Search (Desktop only) */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="w-full flex items-center gap-3 px-4 py-2.5 bg-neutral-50 dark:bg-dark-surface border-2 border-neutral-200 dark:border-dark-border rounded-xl hover:border-ink dark:hover:border-primary hover:bg-white dark:hover:bg-dark-elevated transition-all group"
+          {/* Center - Desktop Navigation (4 items) */}
+          <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+            <Link
+              href="/dashboard"
+              className="text-sm font-bold text-ink dark:text-dark-text hover:text-primary dark:hover:text-primary transition-colors"
             >
-              <Search className="w-4 h-4 text-neutral-400 dark:text-dark-text-muted group-hover:text-ink dark:group-hover:text-primary" />
-              <span className="text-sm text-neutral-500 dark:text-dark-text-muted group-hover:text-neutral-700 dark:group-hover:text-dark-text">
-                Search anything...
-              </span>
-              <kbd className="ml-auto px-2 py-0.5 bg-white dark:bg-dark-elevated border border-neutral-200 dark:border-dark-border rounded text-[10px] font-mono text-neutral-400 dark:text-dark-text-muted">
-                ⌘K
-              </kbd>
-            </button>
+              Dashboard
+            </Link>
+            <Link
+              href="/events"
+              className="text-sm font-bold text-ink dark:text-dark-text hover:text-primary dark:hover:text-primary transition-colors"
+            >
+              Events
+            </Link>
+            <Link
+              href="/messages"
+              className="text-sm font-bold text-ink dark:text-dark-text hover:text-primary dark:hover:text-primary transition-colors"
+            >
+              Messages
+            </Link>
+            <Link
+              href="/profile"
+              className="text-sm font-bold text-ink dark:text-dark-text hover:text-primary dark:hover:text-primary transition-colors"
+            >
+              Profile
+            </Link>
           </div>
 
-          {/* Right Actions - Mobile: Search, QR, Notifications, Profile only */}
+          {/* Right Actions - Search, QR, Notifications, Profile */}
           <div className="flex items-center gap-1 md:gap-2">
-
-
             {/* Search - Always visible */}
             <motion.button
-              className="p-2 md:p-2.5 hover:bg-neutral-100 dark:hover:bg-dark-elevated rounded-xl transition-colors md:hidden"
+              className="p-2 md:p-2.5 hover:bg-neutral-100 dark:hover:bg-dark-elevated rounded-xl transition-colors"
               onClick={() => setIsSearchOpen(true)}
               whileTap={{ scale: 0.95 }}
               aria-label="Search"

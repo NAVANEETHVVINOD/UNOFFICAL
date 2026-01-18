@@ -9,8 +9,10 @@ import {
   Matches,
   IsDateString,
   ValidateNested,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { UserType } from '@prisma/client';
 
 export class CreateEducationDto {
   @IsString()
@@ -177,4 +179,10 @@ export class UpdateProfileDto {
   @IsString()
   @IsOptional()
   collegeId?: string;
+
+  @IsEnum(UserType, {
+    message: 'userType must be one of: STUDENT, PROFESSIONAL, ORGANIZER, TEACHER',
+  })
+  @IsOptional()
+  userType?: UserType;
 }

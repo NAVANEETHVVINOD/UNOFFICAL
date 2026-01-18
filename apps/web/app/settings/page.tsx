@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useUserType } from "../context/UserTypeContext";
+import { UserType, USER_TYPE_CONFIGS } from "../../lib/userTypes";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Shield, Eye, Moon, Smartphone, LogOut, Check, UserX, Trash2, Mail, ArrowLeft, User, Settings, AlertTriangle } from "lucide-react";
+import { Bell, Shield, Eye, Moon, Smartphone, LogOut, Check, UserX, Trash2, Mail, ArrowLeft, User, Settings, AlertTriangle, Briefcase } from "lucide-react";
 import { api } from "../../lib/api";
 import {
   NotificationType,
@@ -25,6 +27,7 @@ function getNotificationIcon(type: NotificationType): string {
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const { userType, setUserType } = useUserType();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"notifications" | "privacy" | "appearance">("notifications");
   const [isSaving, setIsSaving] = useState(false);
@@ -33,6 +36,7 @@ export default function SettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isChangingUserType, setIsChangingUserType] = useState(false);
 
   const { preferences, updatePreferences } = useNotifications();
   const [localPreferences, setLocalPreferences] = useState<NotificationPreferences>(preferences);
@@ -88,6 +92,22 @@ export default function SettingsPage() {
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
+    }
+  };
+
+  const handleChangeUserType = async (newUserType: UserType) => {
+    if (newUserType === userType) return;
+    
+    setIsChangingUserType(true);
+    try {
+      await setUserType(newUserType);
+      // Redirect to dashboard after changing userType
+      router.push('/dashboard');
+    } catch (error) {
+      console.error("Failed to change user type:", error);
+      alert("Failed to change user type. Please try again.");
+    } finally {
+      setIsChangingUserType(false);
     }
   };
 
@@ -295,6 +315,63 @@ export default function SettingsPage() {
 
             {activeTab === "privacy" && (
               <div className="space-y-6">
+                {/* User Type Section */}
+                <div className="card-paper p-6 rounded-xl">
+                  <h2 className="font-display text-2xl font-bold mb-2 flex items-center gap-2">
+                    <Briefcase className="w-6 h-6" />
+                    User Type
+                  </h2>
+                  <p className="text-neutral-600 mb-6 text-sm">
+                    User Type controls how LINKER looks — not what you're allowed to do.
+                  </p>
+
+                  {/* Current User Type */}
+                  {userType && (
+                    <div className="mb-6 p-4 bg-primary/10 border-2 border-primary rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{USER_TYPE_CONFIGS[userType].icon}</span>
+                        <div>
+                          <p className="font-bold text-lg">{USER_TYPE_CONFIGS[userType].label}</p>
+                          <p className="text-sm text-neutral-600">{USER_TYPE_CONFIGS[userType].description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* User Type Options */}
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-sm uppercase text-neutral-500 mb-3">Change User Type</h3>
+                    {Object.values(UserType).map((type) => {
+                      const config = USER_TYPE_CONFIGS[type];
+                      const isActive = userType === type;
+                      
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => handleChangeUserType(type)}
+                          disabled={isChangingUserType || isActive}
+                          className={`w-full flex items-center justify-between p-4 border-2 rounded-xl transition-all ${
+                            isActive
+                              ? "border-primary bg-primary/5 cursor-default"
+                              : "border-neutral-200 hover:border-ink hover:bg-neutral-50"
+                          } ${isChangingUserType ? "opacity-50 cursor-not-allowed" : ""}`}
+                        >
+                          <div className="flex items-center gap-3 text-left">
+                            <span className="text-2xl">{config.icon}</span>
+                            <div>
+                              <p className="font-bold">{config.label}</p>
+                              <p className="text-sm text-neutral-600">{config.description}</p>
+                            </div>
+                          </div>
+                          {isActive && (
+                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="card-paper p-6 rounded-xl">
                   <h2 className="font-display text-2xl font-bold mb-6">Privacy Settings</h2>
                   <div className="space-y-4">

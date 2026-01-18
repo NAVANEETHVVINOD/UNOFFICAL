@@ -7,7 +7,14 @@
  * TWA Launch Configuration:
  * - Enabled: feed, eventsView, chat, marketplace (limited)
  * - Disabled: communities, classroom, collab, eventsCreate (non-admin)
+ * 
+ * Role-Based UX Launch:
+ * - Adds userType-based feature gating
+ * - New flags: feedComposer, socialFeed, eventCreation, marketplaceWrite, notesWrite
+ * - Requirements: 15.1, 15.2, 15.3, 15.4
  */
+
+import { UserType, USER_TYPE_CONFIGS } from './userTypes';
 
 export type FeatureFlags = {
     // Core features
@@ -26,6 +33,13 @@ export type FeatureFlags = {
     polls: boolean;
     crtMode: boolean;
     newFeed: boolean;
+    
+    // UserType-specific features (Role-Based UX Launch)
+    feedComposer: boolean;
+    socialFeed: boolean;
+    eventCreation: boolean;
+    marketplaceWrite: boolean;
+    notesWrite: boolean;
 };
 
 // Features that admins can always access regardless of flags
@@ -51,6 +65,13 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
     communities: false,
     classroom: false,
     collab: false,
+    
+    // UserType-specific features (default disabled, controlled by userType)
+    feedComposer: false,
+    socialFeed: false,
+    eventCreation: false,
+    marketplaceWrite: false,
+    notesWrite: false,
 };
 
 // Admin roles that can override feature flags
@@ -96,4 +117,95 @@ export function getFeatureFlags(): FeatureFlags {
     // In the future, this could fetch from environment variables
     // or a remote configuration service
     return DEFAULT_FEATURE_FLAGS;
+}
+
+/**
+ * Check if a feature is enabled for a specific user type
+ * This function integrates userType-based feature gating with role-based permissions
+ * 
+ * @param feature Feature to check
+ * @param userType User's UX personalization type (STUDENT, PROFESSIONAL, ORGANIZER, TEACHER)
+ * @param permissionRole User's permission role (STUDENT, CLUB_ADMIN, COLLEGE_ADMIN, PLATFORM_ADMIN)
+ * @returns Whether the feature is enabled for this user
+ * 
+ * Requirements: 15.1, 15.2, 15.3, 15.4
+ * 
+ * Feature Gating Rules (Requirement 10):
+ * - feedComposer: Disabled for STUDENT and PROFESSIONAL userTypes
+ * - socialFeed: Disabled for STUDENT and PROFESSIONAL userTypes
+ * - eventCreation: Enabled only for ORGANIZER userType (or admins via role override)
+ * - communities: Disabled for all userTypes at launch
+ * - collab: Disabled for all userTypes at launch
+ * - marketplaceWrite: Disabled for all userTypes at launch (read-only)
+ * - notesWrite: Disabled for all userTypes at launch (read-only)
+ */
+export function isFeatureEnabledForUserType(
+    feature: keyof FeatureFlags | string,
+    userType: UserType | null,
+    permissionRole?: string
+): boolean {
+    const flags = getFeatureFlags();
+    const isAdmin = hasAdminAccess(feature as keyof FeatureFlags, permissionRole);
+    
+    // Admin override check (maintains backward compatibility)
+    if (isAdmin && ADMIN_OVERRIDE_FEATURES.includes(feature as keyof FeatureFlags)) {
+        return true;
+    }
+    
+    // UserType-specific feature gating
+    switch (feature) {
+        case 'feedComposer':
+        case 'socialFeed':
+            // Disabled for STUDENT and PROFESSIONAL (Requirement 10.3)
+            if (userType === UserType.STUDENT || userType === UserType.PROFESSIONAL) {
+                return false;
+            }
+            // Enabled for ORGANIZER and TEACHER
+            return userType === UserType.ORGANIZER || userType === UserType.TEACHER;
+        
+        case 'eventCreation':
+        case 'eventsCreate':
+            // Enabled only for ORGANIZER userType (Requirement 10.2)
+            // Admins can override via role check above
+            return userType === UserType.ORGANIZER;
+        
+        case 'communities':
+            // Disabled for all userTypes at launch (Requirement 10.4)
+            return false;
+        
+        case 'collab':
+            // Disabled for all userTypes at launch (Requirement 10.5)
+            return false;
+        
+        case 'marketplaceWrite':
+            // Read-only for all userTypes at launch (Requirement 10.6)
+            return false;
+        
+        case 'notesWrite':
+            // Read-only for all userTypes at launch (Requirement 10.7)
+            return false;
+        
+        case 'classroom':
+            // Enabled only for TEACHER userType
+            return userType === UserType.TEACHER;
+        
+        default:
+            // For features not in FeatureFlags (like 'rsvp', 'qrCheckin', 'analytics'),
+            // check the USER_TYPE_CONFIGS
+            if (userType && typeof feature === 'string') {
+                const config = USER_TYPE_CONFIGS[userType];
+                if (config) {
+                    return config.enabledFeatures.includes(feature);
+                }
+            }
+            
+            // For features in FeatureFlags, use the default flag value
+            // This maintains backward compatibility (Requirement 15.4)
+            if (feature in flags) {
+                return flags[feature as keyof FeatureFlags];
+            }
+            
+            // Unknown features default to disabled
+            return false;
+    }
 }

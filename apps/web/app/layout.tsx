@@ -1,6 +1,7 @@
 import "./globals.css";
 import BottomNav from "./components/ui/BottomNav";
 import { AuthProvider } from "./context/AuthContext";
+import { UserTypeProvider } from "./context/UserTypeContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { SocketProvider } from "./context/SocketContext";
 import { RBACProvider } from "./context/RBACContext";
@@ -52,23 +53,25 @@ export default function RootLayout({
       </head>
       <body className="bg-paper dark:bg-dark-bg text-ink dark:text-dark-text transition-colors duration-300 bg-retro-pattern">
         <AuthProvider>
-          <ThemeProvider>
-            <RBACProvider>
-              <SocketProvider>
-                <RetroToastProvider>
-                  <NotificationProvider>
-                    <ClientLoader />
-                    <ScrollRestoration />
-                    <div className="min-h-screen pb-16 md:pb-0 relative z-10">
-                      {children}
-                      <SpeedInsights />
-                    </div>
-                    <BottomNav />
-                  </NotificationProvider>
-                </RetroToastProvider>
-              </SocketProvider>
-            </RBACProvider>
-          </ThemeProvider>
+          <UserTypeProvider>
+            <ThemeProvider>
+              <RBACProvider>
+                <SocketProvider>
+                  <RetroToastProvider>
+                    <NotificationProvider>
+                      <ClientLoader />
+                      <ScrollRestoration />
+                      <div className="min-h-screen pb-16 md:pb-0 relative z-10">
+                        {children}
+                        <SpeedInsights />
+                      </div>
+                      <BottomNav />
+                    </NotificationProvider>
+                  </RetroToastProvider>
+                </SocketProvider>
+              </RBACProvider>
+            </ThemeProvider>
+          </UserTypeProvider>
         </AuthProvider>
         {/* Service Worker Registration with Update Handling */}
         <Script id="sw-register" strategy="afterInteractive">
