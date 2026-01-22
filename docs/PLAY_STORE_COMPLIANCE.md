@@ -1,5 +1,8 @@
 # Play Store Policy Compliance Review
 
+**Version:** 2.0.1  
+**Last Updated:** January 22, 2026
+
 ## Google Play User Data Policy Compliance
 
 ### Data Collection Transparency

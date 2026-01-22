@@ -1,5 +1,8 @@
 # LINKER Android Build Guide
 
+**Version:** 2.0.1  
+**Last Updated:** January 22, 2026
+
 This guide covers building the LINKER Android app using Trusted Web Activity (TWA).
 
 ## Prerequisites
@@ -19,7 +22,7 @@ npm install -g @anthropic/bubblewrap-cli
 
 ```bash
 # From project root
-bubblewrap init --manifest=https://linker-inky.vercel.app/manifest.json
+bubblewrap init --manifest=https://unoffical.vercel.app/manifest.json
 ```
 
 Or use the existing twa-manifest.json:
@@ -126,8 +129,8 @@ adb install app-release-signed.apk
 - **Full Description**: [See PLAY_STORE_LISTING.md]
 - **Category**: Education > Social
 - **Content Rating**: 13+
-- **Privacy Policy**: https://linker-inky.vercel.app/legal/privacy
-- **Terms of Service**: https://linker-inky.vercel.app/legal/terms
+- **Privacy Policy**: https://unoffical.vercel.app/legal/privacy
+- **Terms of Service**: https://unoffical.vercel.app/legal/terms
 
 ### Release Tracks
 

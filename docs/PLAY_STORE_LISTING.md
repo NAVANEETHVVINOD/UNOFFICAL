@@ -1,5 +1,8 @@
 # LINKER Play Store Listing
 
+**Version:** 2.0.1  
+**Last Updated:** January 22, 2026
+
 ## App Information
 
 **App Name:** LINKER – Campus OS
@@ -106,8 +109,8 @@ Same screens as phone, optimized for tablet layout.
 ## Contact Information
 
 **Email:** support@linker.app
-**Website:** https://linker-inky.vercel.app
-**Privacy Policy:** https://linker-inky.vercel.app/legal/privacy
+**Website:** https://unoffical.vercel.app
+**Privacy Policy:** https://unoffical.vercel.app/legal/privacy
 
 ## Content Rating Questionnaire
 

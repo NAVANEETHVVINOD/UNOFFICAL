@@ -1,5 +1,8 @@
 # PostgreSQL Installation and Setup Guide
 
+**Version:** 2.0.1  
+**Last Updated:** January 22, 2026
+
 ## Windows Installation
 
 1. Download PostgreSQL:

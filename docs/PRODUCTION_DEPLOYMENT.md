@@ -3,7 +3,9 @@
 ## Pre-Deployment Checklist
 
 ### Code Quality
-- [x] All tests passing (806/806)
+- [x] All tests passing (1033 total: 806 frontend, 227 backend)
+- [x] Frontend: 99.1% pass rate (799/806)
+- [x] Backend: 96.9% pass rate (220/227)
 - [x] Build successful (Next.js + NestJS)
 - [x] TypeScript compilation clean
 - [x] No console errors in production build
@@ -67,7 +69,7 @@ git push origin main
 # 3. Click "Manual Deploy" > "Deploy latest commit"
 ```
 
-**Health Check**: https://your-backend.onrender.com/health
+**Health Check**: https://linker-g0lw.onrender.com/health
 
 ### 3. Frontend Deployment (Vercel)
 
@@ -80,19 +82,19 @@ cd apps/web
 vercel --prod
 ```
 
-**Live URL**: https://your-app.vercel.app
+**Live URL**: https://unoffical.vercel.app
 
 ### 4. Post-Deployment Verification
 
 #### Backend Health
 ```bash
-curl https://your-backend.onrender.com/health
+curl https://linker-g0lw.onrender.com/health
 # Expected: {"status":"ok","timestamp":"..."}
 ```
 
 #### Frontend Health
 ```bash
-curl https://your-app.vercel.app/api/health
+curl https://unoffical.vercel.app/api/health
 # Expected: 200 OK
 ```
 
@@ -106,7 +108,7 @@ npx prisma studio
 #### WebSocket Connection
 ```javascript
 // Test in browser console
-const socket = io('https://your-backend.onrender.com');
+const socket = io('https://linker-g0lw.onrender.com');
 socket.on('connect', () => console.log('Connected!'));
 ```
 
@@ -414,11 +416,12 @@ vercel --force
 
 | Date | Version | Deployed By | Notes |
 |------|---------|-------------|-------|
+| 2026-01-22 | 2.0.1 | System | Dashboard fix & documentation |
 | 2026-01-18 | 2.0.0 | System | Role-Based UX Launch |
 | 2025-12-15 | 1.5.0 | System | Android TWA Support |
 | 2025-11-20 | 1.4.0 | System | Events System |
 
 ---
 
-*Last Updated: January 18, 2026*
-*Version: 2.0.0*
+*Last Updated: January 22, 2026*
+*Version: 2.0.1*

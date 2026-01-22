@@ -1,7 +1,7 @@
 # LINKER Project Status
 
-**Last Updated**: January 18, 2026  
-**Current Version**: 2.0.0  
+**Last Updated**: January 22, 2026  
+**Current Version**: 2.0.1  
 **Status**: ✅ PRODUCTION READY
 
 ---
@@ -11,7 +11,13 @@
 ### Platform Overview
 LINKER is a fully functional Events OS for Students & Organizers with role-based personalized experiences. The platform is production-ready with comprehensive testing, documentation, and deployment infrastructure.
 
-### Recent Major Release
+### Recent Major Releases
+**v2.0.1 - Dashboard Fix & Documentation** (January 22, 2026)
+- Fixed dashboard redirect loop for ORGANIZER users
+- Improved onboarding check logic
+- Organized all documentation into docs/ folder
+- Updated comprehensive status documents
+
 **v2.0.0 - Role-Based UX Launch** (January 18, 2026)
 - Transformed platform into focused Events OS
 - Added 4 user types with personalized dashboards
@@ -81,12 +87,13 @@ LINKER is a fully functional Events OS for Students & Organizers with role-based
 - [x] System analytics
 
 ### Testing & Quality ✅
-- [x] 806 frontend tests (property-based + unit)
-- [x] 47 backend tests
+- [x] 806 frontend tests (99.1% passing - 799/806)
+- [x] 227 backend tests (96.9% passing - 220/227)
 - [x] 18 correctness properties
 - [x] Security tests
 - [x] Integration tests
 - [x] E2E test infrastructure
+- [x] Dashboard redirect loop fixed (v2.0.1)
 
 ### Documentation ✅
 - [x] Comprehensive README
@@ -308,11 +315,11 @@ LINKER/
 ## 🚀 Deployment Status
 
 ### Production Environment
-- **Frontend**: https://your-app.vercel.app
-- **Backend**: https://your-backend.onrender.com
+- **Frontend**: https://unoffical.vercel.app
+- **Backend**: https://linker-g0lw.onrender.com
 - **Status**: ✅ LIVE
-- **Version**: 2.0.0
-- **Last Deploy**: January 18, 2026
+- **Version**: 2.0.1
+- **Last Deploy**: January 22, 2026
 
 ### Staging Environment
 - **Frontend**: https://staging-your-app.vercel.app
@@ -467,7 +474,7 @@ LINKER/
 
 ---
 
-**🚀 LINKER v2.0.0 - Production Ready & Deployed**
+**🚀 LINKER v2.0.1 - Production Ready & Deployed**
 
 *Status: All systems operational*  
-*Next Review: January 25, 2026*
+*Next Review: January 29, 2026*

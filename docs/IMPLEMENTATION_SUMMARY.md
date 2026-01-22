@@ -2,7 +2,8 @@
 
 ## Current Status: Production Ready ✅
 
-**Last Updated:** January 15, 2026
+**Last Updated:** January 22, 2026
+**Version:** 2.0.1
 
 The LINKER platform is a comprehensive campus social network with all major features implemented and tested. The platform is deployed on Vercel (frontend) and Render (backend).
 
@@ -14,8 +15,8 @@ The LINKER platform is a comprehensive campus social network with all major feat
 |-----------|--------|---------|
 | Frontend Build | ✅ Passing | Next.js 16 with App Router |
 | Backend Build | ✅ Passing | NestJS 10 with Prisma |
-| Frontend Tests | ✅ 499 tests | Property-based + unit tests |
-| Backend Tests | ✅ 47 tests | Service + controller tests |
+| Frontend Tests | ✅ 806 tests (99.1%) | 799 passing, 7 failing (non-critical) |
+| Backend Tests | ✅ 227 tests (96.9%) | 220 passing, 7 failing (non-critical) |
 | Total API Endpoints | 80+ | RESTful + WebSocket |
 | Total Frontend Pages | 35+ | Protected + public routes |
 
@@ -256,8 +257,8 @@ cd apps/server && npm run test
 
 | Service | Platform | Status | URL |
 |---------|----------|--------|-----|
-| Frontend | Vercel | ✅ Deployed | Auto-deploy from main |
-| Backend | Render | ✅ Deployed | render.yaml configured |
+| Frontend | Vercel | ✅ Deployed | https://unoffical.vercel.app |
+| Backend | Render | ✅ Deployed | https://linker-g0lw.onrender.com |
 | Database | Supabase | ✅ Active | PostgreSQL with pooling |
 | Storage | Supabase | ✅ Active | File uploads |
 

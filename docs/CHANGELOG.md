@@ -5,6 +5,23 @@ All notable changes to LINKER will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-01-22
+
+### Fixed
+- **Dashboard Redirect Loop**: Fixed issue where ORGANIZER users couldn't access dashboard after onboarding
+- **Onboarding Check**: Improved dashboard page to check `isOnboarded` flag before redirecting
+- **User Experience**: All user types can now successfully complete onboarding and access their dashboards
+
+### Changed
+- **Documentation**: Organized all MD files into `docs/` folder
+- **Documentation**: Updated all documentation files with current status
+- **README**: Added categorized documentation links
+
+### Improved
+- **Code Organization**: Removed deprecated CRT mode toggle component
+- **Backend Services**: Fixed Prisma relation names for consistency
+- **Environment Configuration**: Updated frontend environment with API and WebSocket URLs
+
 ## [2.0.0] - 2026-01-18
 
 ### 🎯 Major Release: Role-Based UX Launch

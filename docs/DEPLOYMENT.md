@@ -1,5 +1,8 @@
 # Deployment Configuration Guide
 
+**Version:** 2.0.1  
+**Last Updated:** January 22, 2026
+
 ## 🚨 Critical Requirements (Read First)
 
 ### 1. Supabase Connection Pooling (Mandatory for Render)
@@ -22,7 +25,7 @@ Go to **Vercel Dashboard → Project → Settings → Environment Variables** an
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://xyz...supabase.co` | Your Supabase Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGci...` | Your Supabase Anon Key (Public) |
-| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` | URL of your deployed backend |
+| `NEXT_PUBLIC_API_URL` | `https://linker-g0lw.onrender.com` | URL of your deployed backend |
 
 > **Note**: After setting these, you must **Redeploy** for them to take effect.
 
@@ -40,7 +43,7 @@ Go to **Render Dashboard → LINKER Service → Environment** and set:
 | `SUPABASE_URL` | `https://xyz...supabase.co` | Same as frontend URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | **Secret** Service Role Key (NOT Anon Key) |
 | `SUPABASE_JWT_SECRET` | `super-secret...` | From Supabase API Settings |
-| `CORS_ORIGIN` | `https://your-frontend.vercel.app` | Your Vercel URL (no trailing slash) |
+| `CORS_ORIGIN` | `https://unoffical.vercel.app` | Your Vercel URL (no trailing slash) |
 | `PORT` | `4000` | Standard port |
 
 ### Render Build Command
