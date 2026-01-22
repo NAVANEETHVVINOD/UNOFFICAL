@@ -16,11 +16,17 @@ export default async function DashboardPage() {
       redirect("/login");
     }
 
-    // Check if user has completed onboarding (has college selected)
-    const hasCollege = user.profile?.collegeId || user.profile?.college?.id || (user.profile?.socials as any)?.tempCollegeId;
+    // Check if user has completed onboarding
+    // User must have fullName and either collegeId OR tempCollegeId in socials
+    const hasCollege = user.profile?.collegeId || 
+                       user.profile?.college?.id || 
+                       (user.profile?.socials as any)?.tempCollegeId;
     const hasFullName = user.profile?.fullName && user.profile.fullName.trim().length > 0;
+    const isOnboarded = user.profile?.isOnboarded;
     
-    if (!hasCollege || !hasFullName) {
+    // Only redirect to onboarding if user hasn't completed it
+    // Check isOnboarded flag first, then fallback to checking required fields
+    if (!isOnboarded && (!hasCollege || !hasFullName)) {
       redirect("/onboarding");
     }
 
