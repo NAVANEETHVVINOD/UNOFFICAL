@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Club, Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ClubsService {
@@ -28,7 +29,7 @@ export class ClubsService {
   ): Promise<Club | null> {
     return this.prisma.club.findUnique({
       where: clubWhereUniqueInput,
-      include: { members: true, events: true },
+      include: { ClubMember: true, Event: true },
     });
   }
 
@@ -41,6 +42,7 @@ export class ClubsService {
   async joinClub(userId: string, clubId: string) {
     return this.prisma.clubMember.create({
       data: {
+        id: randomUUID(),
         userId,
         clubId,
       },

@@ -76,7 +76,7 @@ export class AnalyticsService {
       this.prisma.event.findUnique({
         where: { id: eventId },
         select: {
-          tickets: {
+          TicketType: {
             select: { quantity: true },
           },
         },
@@ -93,7 +93,7 @@ export class AnalyticsService {
       .reduce((sum, r) => sum + (r.amountPaid || 0), 0);
 
     // Calculate total capacity
-    const totalCapacity = event?.tickets.reduce((sum, t) => sum + (t.quantity || 0), 0) || 0;
+    const totalCapacity = event?.TicketType.reduce((sum, t) => sum + (t.quantity || 0), 0) || 0;
 
     // Conversion rate: confirmed / total registrations
     const conversionRate = totalRegistrations > 0
@@ -178,7 +178,7 @@ export class AnalyticsService {
     const tickets = await this.prisma.ticketType.findMany({
       where: { eventId },
       include: {
-        registrations: {
+        EventRegistration: {
           where: {
             status: { in: [RegistrationStatus.CONFIRMED, RegistrationStatus.ATTENDED] },
             deletedAt: null,
@@ -188,16 +188,16 @@ export class AnalyticsService {
       },
     });
 
-    const totalSold = tickets.reduce((sum, t) => sum + t.registrations.length, 0);
+    const totalSold = tickets.reduce((sum, t) => sum + t.EventRegistration.length, 0);
 
     return tickets.map((ticket) => ({
       ticketId: ticket.id,
       ticketName: ticket.name,
-      sold: ticket.registrations.length,
+      sold: ticket.EventRegistration.length,
       total: ticket.quantity,
-      revenue: ticket.registrations.reduce((sum, r) => sum + (r.amountPaid || 0), 0),
+      revenue: ticket.EventRegistration.reduce((sum, r) => sum + (r.amountPaid || 0), 0),
       percentage: totalSold > 0
-        ? Math.round((ticket.registrations.length / totalSold) * 100 * 100) / 100
+        ? Math.round((ticket.EventRegistration.length / totalSold) * 100 * 100) / 100
         : 0,
     }));
   }
@@ -299,7 +299,7 @@ export class AnalyticsService {
       select: {
         startsAt: true,
         endsAt: true,
-        registrations: {
+        EventRegistration: {
           where: {
             status: RegistrationStatus.ATTENDED,
             checkInTime: { not: null },
@@ -321,14 +321,14 @@ export class AnalyticsService {
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const numDays = Math.max(1, daysDiff);
 
-    const totalRegistrations = event.registrations.length;
+    const totalRegistrations = event.EventRegistration.length;
     const dailyData: DailyAttendance[] = [];
 
     for (let day = 1; day <= numDays; day++) {
       const dayDate = new Date(startDate);
       dayDate.setDate(dayDate.getDate() + day - 1);
 
-      const checkedInOnDay = event.registrations.filter((r) => {
+      const checkedInOnDay = event.EventRegistration.filter((r) => {
         if (r.checkInDay === day) return true;
         if (r.checkInTime) {
           const checkInDate = new Date(r.checkInTime);

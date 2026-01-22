@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EventRoleType, NotificationType } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 /**
  * Event actions that can be performed by users with roles
@@ -128,7 +129,7 @@ export class RolesService {
     // Verify target user exists
     const targetUser = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, profile: { select: { fullName: true } } },
+      select: { id: true, email: true, Profile: { select: { fullName: true } } },
     });
 
     if (!targetUser) {
@@ -155,6 +156,7 @@ export class RolesService {
       // Create new role assignment
       await this.prisma.eventMemberRole.create({
         data: {
+          id: randomUUID(),
           eventId,
           userId,
           role,
@@ -169,6 +171,7 @@ export class RolesService {
     // Send notification to user (Requirement 7.10)
     await this.prisma.notification.create({
       data: {
+        id: randomUUID(),
         userId,
         type: NotificationType.EVENT,
         title: 'Role Assigned',
@@ -237,6 +240,7 @@ export class RolesService {
     // Send notification to user
     await this.prisma.notification.create({
       data: {
+        id: randomUUID(),
         userId,
         type: NotificationType.EVENT,
         title: 'Role Removed',
@@ -255,11 +259,11 @@ export class RolesService {
     const roles = await this.prisma.eventMemberRole.findMany({
       where: { eventId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
@@ -278,9 +282,9 @@ export class RolesService {
       assignedBy: r.assignedBy,
       createdAt: r.createdAt,
       user: {
-        id: r.user.id,
-        fullName: r.user.profile?.fullName || 'Unknown',
-        email: r.user.email || '',
+        id: r.User.id,
+        fullName: r.User.Profile?.fullName || 'Unknown',
+        email: r.User.email || '',
       },
     }));
   }
@@ -390,17 +394,17 @@ export class RolesService {
     const users = await this.prisma.user.findMany({
       where: {
         OR: [
-          { profile: { fullName: { contains: query, mode: 'insensitive' } } },
+          { Profile: { fullName: { contains: query, mode: 'insensitive' } } },
           { email: { contains: query, mode: 'insensitive' } },
         ],
       },
       select: {
         id: true,
         email: true,
-        profile: {
+        Profile: {
           select: { fullName: true },
         },
-        eventRoles: {
+        EventMemberRole: {
           where: { eventId },
           select: { id: true },
         },
@@ -410,9 +414,9 @@ export class RolesService {
 
     return users.map((u) => ({
       id: u.id,
-      fullName: u.profile?.fullName || 'Unknown',
+      fullName: u.Profile?.fullName || 'Unknown',
       email: u.email || '',
-      hasRole: u.eventRoles.length > 0,
+      hasRole: u.EventMemberRole.length > 0,
     }));
   }
 
@@ -493,7 +497,7 @@ export class RolesService {
     // Verify new owner exists
     const newOwner = await this.prisma.user.findUnique({
       where: { id: newOwnerId },
-      select: { id: true, profile: { select: { fullName: true } } },
+      select: { id: true, Profile: { select: { fullName: true } } },
     });
 
     if (!newOwner) {
@@ -520,6 +524,7 @@ export class RolesService {
       // Optionally assign old owner as co-organizer
       await tx.eventMemberRole.create({
         data: {
+          id: randomUUID(),
           eventId,
           userId: currentOwnerId,
           role: EventRoleType.CO_ORGANIZER,
@@ -537,6 +542,7 @@ export class RolesService {
     await this.prisma.notification.createMany({
       data: [
         {
+          id: randomUUID(),
           userId: newOwnerId,
           type: NotificationType.EVENT,
           title: 'Ownership Transferred',
@@ -544,6 +550,7 @@ export class RolesService {
           actionUrl: `/events/${eventId}`,
         },
         {
+          id: randomUUID(),
           userId: currentOwnerId,
           type: NotificationType.EVENT,
           title: 'Ownership Transferred',

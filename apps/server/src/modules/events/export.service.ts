@@ -95,16 +95,16 @@ export class ExportService {
         deletedAt: null,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             name: true,
             price: true,
@@ -117,11 +117,11 @@ export class ExportService {
     // Transform to export data
     const attendees: AttendeeExportData[] = registrations.map((r) => ({
       registrationId: r.id,
-      userId: r.user.id,
-      fullName: r.user.profile?.fullName || 'Unknown',
-      email: r.user.email || '',
-      ticketType: r.ticket.name,
-      ticketPrice: r.ticket.price / 100, // Convert from paise to rupees
+      userId: r.User.id,
+      fullName: r.User.Profile?.fullName || 'Unknown',
+      email: r.User.email || '',
+      ticketType: r.TicketType.name,
+      ticketPrice: r.TicketType.price / 100, // Convert from paise to rupees
       status: r.status,
       registeredAt: r.createdAt,
       checkedIn: r.qrUsed,

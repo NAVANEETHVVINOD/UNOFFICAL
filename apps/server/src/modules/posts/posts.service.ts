@@ -4,10 +4,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 import sanitizeHtml from 'sanitize-html';
-import { PostType, Poll, PollOption, NotificationType } from '@prisma/client';
+import { PostType, NotificationType } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 import {
   CursorPaginationParams,
@@ -16,6 +14,7 @@ import {
   buildPaginatedResponse,
   normalizeLimit,
 } from '../../common/utils/pagination';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class PostsService {
@@ -27,10 +26,10 @@ export class PostsService {
   async create(createPostDto: any, userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { profile: true },
+      include: { Profile: true },
     });
 
-    if (!user || !user.profile?.collegeId) {
+    if (!user || !user.Profile?.collegeId) {
       throw new NotFoundException('User or College not found');
     }
 
@@ -51,7 +50,7 @@ export class PostsService {
     const postData: any = {
       content: sanitizedContent,
       authorId: userId,
-      collegeId: user.profile.collegeId,
+      collegeId: user.Profile.collegeId,
       type: type,
       title: createPostDto.title, // For Collabs
       isAnonymous: createPostDto.isAnonymous || false,
@@ -61,12 +60,14 @@ export class PostsService {
 
     // If Poll, create nested Poll + Options
     if (type === PostType.POLL && createPostDto.poll) {
-      postData.poll = {
+      postData.Poll = {
         create: {
+          id: randomUUID(),
           question: createPostDto.poll.question,
           endDate: createPostDto.poll.endDate || null,
-          options: {
+          PollOption: {
             create: createPostDto.poll.options.map((opt: string) => ({
+              id: randomUUID(),
               text: opt,
             })),
           },
@@ -77,14 +78,14 @@ export class PostsService {
     return this.prisma.post.create({
       data: postData,
       include: {
-        author: {
-          include: { profile: true },
+        User: {
+          include: { Profile: true },
         },
-        poll: {
-          include: { options: true },
+        Poll: {
+          include: { PollOption: true },
         },
         _count: {
-          select: { likes: true, comments: true },
+          select: { PostLike: true, Comment: true },
         },
       },
     });
@@ -107,7 +108,7 @@ export class PostsService {
     // If 'collegeSlug' is passed, we filter posts from that college ONLY.
     // If no collegeSlug, global feed.
     if (collegeSlug) {
-      andConditions.push({ college: { slug: collegeSlug } });
+      andConditions.push({ College: { slug: collegeSlug } });
     }
 
     // New Filter: "My College" vs "All"
@@ -122,7 +123,7 @@ export class PostsService {
 
     // Official Filter
     if (isOfficial) {
-      andConditions.push({ author: { role: 'COLLEGE_ADMIN' } });
+      andConditions.push({ User: { role: 'COLLEGE_ADMIN' } });
     }
 
     // 3. Visibility Logic (Complex OR)
@@ -157,21 +158,21 @@ export class PostsService {
         skip,
         take: limit,
         include: {
-          author: {
-            include: { profile: true },
+          User: {
+            include: { Profile: true },
           },
-          poll: {
+          Poll: {
             include: {
-              options: {
+              PollOption: {
                 include: {
-                  _count: { select: { votes: true } },
+                  _count: { select: { PollVote: true } },
                 },
               },
-              _count: { select: { votes: true } },
+              _count: { select: { PollVote: true } },
             },
           },
           _count: {
-            select: { likes: true, comments: true },
+            select: { PostLike: true, Comment: true },
           },
         },
         orderBy: { createdAt: 'desc' },
@@ -210,7 +211,7 @@ export class PostsService {
     const andConditions: any[] = [];
 
     if (collegeSlug) {
-      andConditions.push({ college: { slug: collegeSlug } });
+      andConditions.push({ College: { slug: collegeSlug } });
     }
 
     if (filter === 'college' && currentUser.collegeId) {
@@ -222,7 +223,7 @@ export class PostsService {
     }
 
     if (isOfficial) {
-      andConditions.push({ author: { role: 'COLLEGE_ADMIN' } });
+      andConditions.push({ User: { role: 'COLLEGE_ADMIN' } });
     }
 
     // Visibility logic
@@ -251,21 +252,21 @@ export class PostsService {
       take,
       skip,
       include: {
-        author: {
-          include: { profile: true },
+        User: {
+          include: { Profile: true },
         },
-        poll: {
+        Poll: {
           include: {
-            options: {
+            PollOption: {
               include: {
-                _count: { select: { votes: true } },
+                _count: { select: { PollVote: true } },
               },
             },
-            _count: { select: { votes: true } },
+            _count: { select: { PollVote: true } },
           },
         },
         _count: {
-          select: { likes: true, comments: true },
+          select: { PostLike: true, Comment: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -278,26 +279,26 @@ export class PostsService {
     const post = await this.prisma.post.findUnique({
       where: { id },
       include: {
-        author: {
-          include: { profile: true },
+        User: {
+          include: { Profile: true },
         },
-        comments: {
+        Comment: {
           include: {
-            author: { include: { profile: true } },
+            User: { include: { Profile: true } },
           },
           orderBy: { createdAt: 'asc' },
         },
-        poll: {
+        Poll: {
           include: {
-            options: {
+            PollOption: {
               include: {
-                _count: { select: { votes: true } },
+                _count: { select: { PollVote: true } },
               },
             },
           },
         },
         _count: {
-          select: { likes: true, comments: true },
+          select: { PostLike: true, Comment: true },
         },
       },
     });
@@ -313,22 +314,23 @@ export class PostsService {
     try {
       const like = await this.prisma.postLike.create({
         data: {
+          id: randomUUID(),
           postId: id,
           userId,
         },
         include: {
-          post: true,
-          user: { include: { profile: true } },
+          Post: true,
+          User: { include: { Profile: true } },
         },
       });
 
       // Send Notification
-      if (like.post.authorId && like.post.authorId !== userId) {
+      if (like.Post.authorId && like.Post.authorId !== userId) {
         await this.notificationsService.createNotification({
-          userId: like.post.authorId,
+          userId: like.Post.authorId,
           type: NotificationType.LIKE,
           title: 'New Like',
-          message: `${like.user.profile?.fullName || 'Someone'} liked your post`,
+          message: `${like.User.Profile?.fullName || 'Someone'} liked your post`,
           actionUrl: `/feed?post=${id}`,
           actorId: userId,
         });
@@ -370,6 +372,7 @@ export class PostsService {
 
     return this.prisma.pollVote.create({
       data: {
+        id: randomUUID(),
         userId,
         pollId,
         optionId,
@@ -406,6 +409,7 @@ export class PostsService {
 
     await this.prisma.savedItem.create({
       data: {
+        id: randomUUID(),
         userId,
         postId,
         type: 'POST',

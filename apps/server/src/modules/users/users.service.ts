@@ -12,9 +12,9 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: userWhereUniqueInput,
       include: {
-        profile: {
+        Profile: {
           include: {
-            college: true,
+            College: true,
           },
         },
       },
@@ -30,7 +30,7 @@ export class UsersService {
       where: {
         OR: [
           {
-            profile: {
+            Profile: {
               fullName: {
                 contains: query,
                 mode: 'insensitive',
@@ -46,9 +46,9 @@ export class UsersService {
         ],
       },
       include: {
-        profile: {
+        Profile: {
           include: {
-            college: true,
+            College: true,
           },
         },
       },
@@ -60,7 +60,7 @@ export class UsersService {
     return users.map((user) => ({
       id: user.id,
       email: user.email,
-      profile: user.profile,
+      profile: user.Profile,
       mutualConnections: 0, // Placeholder - can be calculated based on shared clubs/events
     }));
   }
@@ -90,11 +90,11 @@ export class UsersService {
     const memberships = await this.prisma.clubMember.findMany({
       where: { userId },
       include: {
-        club: {
+        Club: {
           include: {
-            college: true,
+            College: true,
             _count: {
-              select: { members: true },
+              select: { ClubMember: true },
             },
           },
         },
@@ -102,12 +102,12 @@ export class UsersService {
     });
 
     return memberships.map((membership) => ({
-      id: membership.club.id,
-      name: membership.club.name,
-      slug: membership.club.slug,
-      description: membership.club.description,
-      college: membership.club.college,
-      memberCount: membership.club._count.members,
+      id: membership.Club.id,
+      name: membership.Club.name,
+      slug: membership.Club.slug,
+      description: membership.Club.description,
+      college: membership.Club.College,
+      memberCount: membership.Club._count.ClubMember,
       role: membership.role,
       displayRole: membership.displayRole,
       joinedAt: membership.joinedAt,
@@ -122,33 +122,33 @@ export class UsersService {
     const attendances = await this.prisma.eventAttendance.findMany({
       where: { userId },
       include: {
-        event: {
+        Event: {
           include: {
-            club: true,
-            college: true,
+            Club: true,
+            College: true,
             _count: {
-              select: { attendees: true },
+              select: { EventAttendance: true },
             },
           },
         },
       },
       orderBy: {
-        event: {
+        Event: {
           startsAt: 'desc',
         },
       },
     });
 
     return attendances.map((attendance) => ({
-      id: attendance.event.id,
-      title: attendance.event.title,
-      description: attendance.event.description,
-      startsAt: attendance.event.startsAt,
-      endsAt: attendance.event.endsAt,
-      venue: attendance.event.venue,
-      club: attendance.event.club,
-      college: attendance.event.college,
-      participantCount: attendance.event._count.attendees,
+      id: attendance.Event.id,
+      title: attendance.Event.title,
+      description: attendance.Event.description,
+      startsAt: attendance.Event.startsAt,
+      endsAt: attendance.Event.endsAt,
+      venue: attendance.Event.venue,
+      club: attendance.Event.Club,
+      college: attendance.Event.College,
+      participantCount: attendance.Event._count.EventAttendance,
       status: attendance.status,
       role: attendance.role,
       checkedIn: attendance.checkInTime !== null,
@@ -167,17 +167,17 @@ export class UsersService {
         isAnonymous: false,
       },
       include: {
-        author: {
+        User: {
           include: {
-            profile: true,
+            Profile: true,
           },
         },
-        club: true,
-        college: true,
+        Club: true,
+        College: true,
         _count: {
           select: {
-            likes: true,
-            comments: true,
+            PostLike: true,
+            Comment: true,
           },
         },
       },
@@ -192,16 +192,16 @@ export class UsersService {
       title: post.title,
       content: post.content,
       imageUrl: post.imageUrl,
-      author: post.author
+      author: post.User
         ? {
-            id: post.author.id,
-            profile: post.author.profile,
+            id: post.User.id,
+            profile: post.User.Profile,
           }
         : null,
-      club: post.club,
-      college: post.college,
-      likeCount: post._count.likes,
-      commentCount: post._count.comments,
+      club: post.Club,
+      college: post.College,
+      likeCount: post._count.PostLike,
+      commentCount: post._count.Comment,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
     }));
@@ -222,50 +222,50 @@ export class UsersService {
     const savedItems = await this.prisma.savedItem.findMany({
       where,
       include: {
-        post: {
+        Post: {
           include: {
-            author: {
+            User: {
               include: {
-                profile: true,
+                Profile: true,
               },
             },
             _count: {
               select: {
-                likes: true,
-                comments: true,
+                PostLike: true,
+                Comment: true,
               },
             },
           },
         },
-        event: {
+        Event: {
           include: {
-            club: true,
-            college: true,
+            Club: true,
+            College: true,
             _count: {
-              select: { attendees: true },
+              select: { EventAttendance: true },
             },
           },
         },
-        listing: {
+        MarketplaceListing: {
           include: {
-            owner: {
+            User: {
               include: {
-                profile: true,
+                Profile: true,
               },
             },
-            college: true,
+            College: true,
           },
         },
-        note: {
+        Note: {
           include: {
-            author: {
+            User: {
               include: {
-                profile: true,
+                Profile: true,
               },
             },
-            college: true,
+            College: true,
             _count: {
-              select: { likes: true },
+              select: { NoteLike: true },
             },
           },
         },
@@ -279,57 +279,57 @@ export class UsersService {
       id: item.id,
       type: item.type,
       createdAt: item.createdAt,
-      post: item.post ? {
-        id: item.post.id,
-        type: item.post.type,
-        content: item.post.content,
-        imageUrl: item.post.imageUrl,
-        author: item.post.author ? {
-          id: item.post.author.id,
-          profile: item.post.author.profile,
+      post: item.Post ? {
+        id: item.Post.id,
+        type: item.Post.type,
+        content: item.Post.content,
+        imageUrl: item.Post.imageUrl,
+        author: item.Post.User ? {
+          id: item.Post.User.id,
+          profile: item.Post.User.Profile,
         } : null,
-        likeCount: item.post._count.likes,
-        commentCount: item.post._count.comments,
-        createdAt: item.post.createdAt,
+        likeCount: item.Post._count.PostLike,
+        commentCount: item.Post._count.Comment,
+        createdAt: item.Post.createdAt,
       } : null,
-      event: item.event ? {
-        id: item.event.id,
-        title: item.event.title,
-        description: item.event.description,
-        startsAt: item.event.startsAt,
-        endsAt: item.event.endsAt,
-        venue: item.event.venue,
-        club: item.event.club,
-        college: item.event.college,
-        attendeeCount: item.event._count.attendees,
+      event: item.Event ? {
+        id: item.Event.id,
+        title: item.Event.title,
+        description: item.Event.description,
+        startsAt: item.Event.startsAt,
+        endsAt: item.Event.endsAt,
+        venue: item.Event.venue,
+        club: item.Event.Club,
+        college: item.Event.College,
+        attendeeCount: item.Event._count.EventAttendance,
       } : null,
-      listing: item.listing ? {
-        id: item.listing.id,
-        title: item.listing.title,
-        description: item.listing.description,
-        price: item.listing.price,
-        imageUrl: item.listing.imageUrl,
-        status: item.listing.status,
-        type: item.listing.type,
-        owner: item.listing.owner ? {
-          id: item.listing.owner.id,
-          profile: item.listing.owner.profile,
+      listing: item.MarketplaceListing ? {
+        id: item.MarketplaceListing.id,
+        title: item.MarketplaceListing.title,
+        description: item.MarketplaceListing.description,
+        price: item.MarketplaceListing.price,
+        imageUrl: item.MarketplaceListing.imageUrl,
+        status: item.MarketplaceListing.status,
+        type: item.MarketplaceListing.type,
+        owner: item.MarketplaceListing.User ? {
+          id: item.MarketplaceListing.User.id,
+          profile: item.MarketplaceListing.User.Profile,
         } : null,
-        college: item.listing.college,
+        college: item.MarketplaceListing.College,
       } : null,
-      note: item.note ? {
-        id: item.note.id,
-        title: item.note.title,
-        description: item.note.description,
-        subject: item.note.subject,
-        semester: item.note.semester,
-        fileUrl: item.note.fileUrl,
-        author: item.note.author ? {
-          id: item.note.author.id,
-          profile: item.note.author.profile,
+      note: item.Note ? {
+        id: item.Note.id,
+        title: item.Note.title,
+        description: item.Note.description,
+        subject: item.Note.subject,
+        semester: item.Note.semester,
+        fileUrl: item.Note.fileUrl,
+        author: item.Note.User ? {
+          id: item.Note.User.id,
+          profile: item.Note.User.Profile,
         } : null,
-        college: item.note.college,
-        likeCount: item.note._count.likes,
+        college: item.Note.College,
+        likeCount: item.Note._count.NoteLike,
       } : null,
     }));
   }

@@ -302,11 +302,20 @@ cat twa-manifest.json
 | Document | Description |
 |----------|-------------|
 | [docs/ROLE_BASED_UX_LAUNCH.md](./docs/ROLE_BASED_UX_LAUNCH.md) | Role-Based UX feature guide |
-| [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) | Detailed implementation status |
-| [PLATFORM_AUDIT.md](./PLATFORM_AUDIT.md) | Complete API & page inventory |
-| [ANDROID_BUILD.md](./ANDROID_BUILD.md) | TWA build instructions |
-| [PLAY_STORE_LISTING.md](./PLAY_STORE_LISTING.md) | Play Store content |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Deployment guide |
+| [docs/IMPLEMENTATION_SUMMARY.md](./docs/IMPLEMENTATION_SUMMARY.md) | Detailed implementation status |
+| [docs/PLATFORM_AUDIT.md](./docs/PLATFORM_AUDIT.md) | Complete API & page inventory |
+| [docs/ANDROID_BUILD.md](./docs/ANDROID_BUILD.md) | TWA build instructions |
+| [docs/PLAY_STORE_LISTING.md](./docs/PLAY_STORE_LISTING.md) | Play Store content |
+| [docs/PLAY_STORE_COMPLIANCE.md](./docs/PLAY_STORE_COMPLIANCE.md) | Play Store compliance checklist |
+| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Deployment guide |
+| [docs/PRE-DEPLOYMENT.md](./docs/PRE-DEPLOYMENT.md) | Pre-deployment checklist |
+| [docs/CHANGELOG.md](./docs/CHANGELOG.md) | Version history |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture |
+| [docs/DATABASE.md](./docs/DATABASE.md) | Database schema |
+| [docs/POSTGRESQL_SETUP.md](./docs/POSTGRESQL_SETUP.md) | PostgreSQL setup guide |
+| [docs/PRODUCTION_DEPLOYMENT.md](./docs/PRODUCTION_DEPLOYMENT.md) | Production deployment guide |
+| [docs/PROJECT_STATUS.md](./docs/PROJECT_STATUS.md) | Current project status |
+| [docs/DEPLOYMENT_SUMMARY.md](./docs/DEPLOYMENT_SUMMARY.md) | Deployment summary |
 
 ---
 

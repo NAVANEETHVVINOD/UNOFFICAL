@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSavedDto, SavedType } from './dto/create-saved.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class SavedService {
@@ -23,6 +24,7 @@ export class SavedService {
     try {
       return await this.prisma.savedItem.create({
         data: {
+          id: randomUUID(),
           userId,
           type: type as any, // Cast to Prisma enum if needed or ensure match
           postId,
@@ -31,10 +33,10 @@ export class SavedService {
           noteId,
         },
         include: {
-          post: true,
-          event: true,
-          listing: true,
-          note: true,
+          Post: true,
+          Event: true,
+          MarketplaceListing: true,
+          Note: true,
         },
       });
     } catch (error) {
@@ -50,10 +52,10 @@ export class SavedService {
     return this.prisma.savedItem.findMany({
       where: { userId },
       include: {
-        post: { include: { author: true } },
-        event: true,
-        listing: true,
-        note: true,
+        Post: { include: { User: true } },
+        Event: true,
+        MarketplaceListing: true,
+        Note: true,
       },
       orderBy: { createdAt: 'desc' },
     });

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EventForm } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 /**
  * Form field types supported by the registration form builder
@@ -102,6 +103,7 @@ export class FormService {
     const form = await this.prisma.eventForm.upsert({
       where: { eventId },
       create: {
+        id: randomUUID(),
         eventId,
         schema: schema as any,
       },
@@ -444,10 +446,10 @@ export class FormService {
         id: true,
         userId: true,
         formResponses: true,
-        user: {
+        User: {
           select: {
             email: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
@@ -458,8 +460,8 @@ export class FormService {
     return registrations.map((r) => ({
       registrationId: r.id,
       userId: r.userId,
-      userName: r.user.profile?.fullName || 'Unknown',
-      userEmail: r.user.email || '',
+      userName: r.User.Profile?.fullName || 'Unknown',
+      userEmail: r.User.email || '',
       responses: r.formResponses as unknown as FormResponse,
     }));
   }

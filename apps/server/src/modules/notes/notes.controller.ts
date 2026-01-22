@@ -12,6 +12,7 @@ import {
 import { NotesService } from './notes.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 interface CreateNoteDto {
   title: string;
@@ -93,10 +94,10 @@ export class NotesController {
     // Get user profile for username
     const user = await this.notesService['prisma'].user.findUnique({
       where: { id: req.user.userId },
-      include: { profile: true },
+      include: { Profile: true },
     });
     
-    const username = user?.profile?.fullName || user?.email?.split('@')[0] || 'user';
+    const username = user?.Profile?.fullName || user?.email?.split('@')[0] || 'user';
     
     // Format the filename according to naming convention
     let formattedFileUrl = createNoteDto.fileUrl;
@@ -113,12 +114,13 @@ export class NotesController {
     }
     
     return this.notesService.create({
+      id: randomUUID(),
       title: createNoteDto.title,
       description: createNoteDto.description,
       fileUrl: formattedFileUrl,
       subject: createNoteDto.subject,
       semester: createNoteDto.semester,
-      author: { connect: { id: req.user.userId } },
+      User: { connect: { id: req.user.userId } },
     });
   }
 

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class MessagingService {
@@ -15,26 +16,28 @@ export class MessagingService {
     // For now, create new
     return this.prisma.conversation.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         listingId,
-        participants: {
+        User: {
           connect: [{ id: userId }, { id: participantId }],
         },
       },
-      include: { participants: true, listing: true },
+      include: { User: true, MarketplaceListing: true },
     });
   }
 
   async getUserConversations(userId: string) {
     return this.prisma.conversation.findMany({
       where: {
-        participants: {
+        User: {
           some: { id: userId },
         },
       },
       include: {
-        participants: true,
-        listing: true,
-        messages: {
+        User: true,
+        MarketplaceListing: true,
+        Message: {
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
@@ -47,9 +50,9 @@ export class MessagingService {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id },
       include: {
-        participants: true,
-        listing: true,
-        messages: {
+        User: true,
+        MarketplaceListing: true,
+        Message: {
           orderBy: { createdAt: 'asc' },
         },
       },
@@ -57,7 +60,7 @@ export class MessagingService {
 
     if (
       !conversation ||
-      !conversation.participants.some((p) => p.id === userId)
+      !conversation.User.some((p) => p.id === userId)
     ) {
       throw new NotFoundException('Conversation not found or access denied');
     }
@@ -68,6 +71,7 @@ export class MessagingService {
   async sendMessage(conversationId: string, senderId: string, content: string) {
     const message = await this.prisma.message.create({
       data: {
+        id: randomUUID(),
         conversationId,
         senderId,
         content,

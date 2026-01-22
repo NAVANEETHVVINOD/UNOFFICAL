@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Prisma, Role } from '@prisma/client';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { randomUUID } from 'crypto';
 
 @Controller('clubs')
 export class ClubsController {
@@ -64,10 +65,11 @@ export class ClubsController {
     const { collegeSlug, ...rest } = createClubDto;
     return this.clubsService.create({
       ...rest,
-      ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
+      ...(collegeSlug ? { College: { connect: { slug: collegeSlug } } } : {}),
       // Add the creator as the first member/admin
-      members: {
+      ClubMember: {
         create: {
+          id: randomUUID(),
           userId: req.user.userId,
           role: 'LEAD',
           displayRole: 'Founder',

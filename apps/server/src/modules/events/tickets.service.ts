@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { TicketType, EventRegistration, RegistrationStatus, NotificationType } from '@prisma/client';
 import { randomBytes, createHmac } from 'crypto';
+import { randomUUID } from 'crypto';
 
 export interface TicketAvailability {
   ticketId: string;
@@ -42,7 +43,7 @@ export class TicketsService {
     const tickets = await this.prisma.ticketType.findMany({
       where: { eventId },
       include: {
-        registrations: userId
+        EventRegistration: userId
           ? {
               where: {
                 userId,
@@ -57,7 +58,7 @@ export class TicketsService {
 
     return tickets.map((ticket) => {
       const available = ticket.quantity !== null ? ticket.quantity - ticket.quantitySold : null;
-      const userPurchased = userId && ticket.registrations ? ticket.registrations.length : 0;
+      const userPurchased = userId && ticket.EventRegistration ? ticket.EventRegistration.length : 0;
 
       let status: TicketAvailability['status'] = 'AVAILABLE';
       if (ticket.salesStart && ticket.salesStart > now) {
@@ -101,7 +102,7 @@ export class TicketsService {
         const ticket = await tx.ticketType.findUnique({
           where: { id: ticketId },
           include: {
-            event: {
+            Event: {
               select: { title: true },
             },
           },
@@ -155,6 +156,7 @@ export class TicketsService {
         // Create registration
         const registration = await tx.eventRegistration.create({
           data: {
+            id: randomUUID(),
             eventId,
             ticketId,
             userId,
@@ -176,7 +178,7 @@ export class TicketsService {
           registrationId: registration.id,
           qrToken: registration.qrToken,
           isFree,
-          eventTitle: ticket.event.title,
+          eventTitle: ticket.Event.title,
           ticketName: ticket.name,
         };
       }, {
@@ -278,9 +280,9 @@ export class TicketsService {
     return this.prisma.eventRegistration.findUnique({
       where: { eventId_userId: { eventId, userId } },
       include: {
-        ticket: true,
-        payment: true,
-        certificate: true,
+        TicketType: true,
+        EventPayment: true,
+        EventCertificate: true,
       },
     });
   }
@@ -305,11 +307,11 @@ export class TicketsService {
       cursor: cursor ? { id: cursor } : undefined,
       orderBy: { createdAt: 'desc' },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
-            profile: {
+            Profile: {
               select: {
                 fullName: true,
                 avatarUrl: true,
@@ -317,7 +319,7 @@ export class TicketsService {
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             id: true,
             name: true,
@@ -363,6 +365,7 @@ export class TicketsService {
     // Create new
     return this.prisma.ticketType.create({
       data: {
+        id: randomUUID(),
         eventId,
         name: ticketData.name,
         description: ticketData.description,
@@ -440,7 +443,7 @@ export class TicketsService {
         deletedAt: null,
       },
       include: {
-        event: {
+        Event: {
           select: {
             id: true,
             title: true,
@@ -452,7 +455,7 @@ export class TicketsService {
             status: true,
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             id: true,
             name: true,
@@ -475,6 +478,7 @@ export class TicketsService {
   ): Promise<void> {
     await this.prisma.notification.create({
       data: {
+        id: randomUUID(),
         userId,
         type: NotificationType.EVENT,
         title: 'Registration Confirmed',

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JobType, JobStatus, RegistrationStatus, Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 /**
  * DataRetentionService handles data cleanup and retention policies
@@ -28,6 +29,7 @@ export class DataRetentionService {
     // Create a background job record
     const job = await this.prisma.backgroundJob.create({
       data: {
+        id: randomUUID(),
         type: JobType.DATA_CLEANUP,
         payload: { startedAt: new Date().toISOString() },
         status: JobStatus.PROCESSING,
@@ -124,7 +126,7 @@ export class DataRetentionService {
       where: {
         userId,
         deletedAt: null,
-        event: {
+        Event: {
           endsAt: { lt: new Date() }, // Only completed events
         },
       },

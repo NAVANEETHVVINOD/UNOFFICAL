@@ -21,6 +21,7 @@ import {
   DateRangeFilter,
   PriceTypeFilter,
 } from './dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class EventsService {
@@ -57,7 +58,7 @@ export class EventsService {
     } else if (filters.scope === EventScopeFilter.GLOBAL) {
       where.visibility = EventVisibility.PUBLIC;
     } else if (filters.collegeSlug) {
-      where.college = { slug: filters.collegeSlug };
+      where.College = { slug: filters.collegeSlug };
     } else if (filters.collegeId) {
       where.collegeId = filters.collegeId;
     }
@@ -83,11 +84,11 @@ export class EventsService {
 
     // Price type filter
     if (filters.priceType === PriceTypeFilter.FREE) {
-      where.tickets = {
+      where.TicketType = {
         some: { price: 0 },
       };
     } else if (filters.priceType === PriceTypeFilter.PAID) {
-      where.tickets = {
+      where.TicketType = {
         some: { price: { gt: 0 } },
       };
     }
@@ -113,12 +114,12 @@ export class EventsService {
       where,
       orderBy: { startsAt: 'asc' },
       include: {
-        club: true,
-        college: true,
-        createdBy: {
+        Club: true,
+        College: true,
+        User: {
           select: {
             id: true,
-            profile: {
+            Profile: {
               select: {
                 fullName: true,
                 avatarUrl: true,
@@ -126,7 +127,7 @@ export class EventsService {
             },
           },
         },
-        tickets: {
+        TicketType: {
           select: {
             id: true,
             name: true,
@@ -137,7 +138,7 @@ export class EventsService {
         },
         _count: {
           select: {
-            registrations: {
+            EventRegistration: {
               where: { status: 'CONFIRMED' },
             },
           },
@@ -169,9 +170,9 @@ export class EventsService {
       where,
       orderBy: { startsAt: 'asc' },
       include: {
-        club: true,
-        college: true,
-        tickets: true,
+        Club: true,
+        College: true,
+        TicketType: true,
       },
     });
   }
@@ -183,12 +184,12 @@ export class EventsService {
     return this.prisma.event.findFirst({
       where: { id, deletedAt: null },
       include: {
-        club: true,
-        college: true,
-        createdBy: {
+        Club: true,
+        College: true,
+        User: {
           select: {
             id: true,
-            profile: {
+            Profile: {
               select: {
                 fullName: true,
                 avatarUrl: true,
@@ -196,17 +197,17 @@ export class EventsService {
             },
           },
         },
-        tickets: true,
-        agendaBlocks: {
+        TicketType: true,
+        EventAgendaBlock: {
           orderBy: [{ day: 'asc' }, { startTime: 'asc' }],
         },
-        formSchema: true,
-        roles: {
+        EventForm: true,
+        EventMemberRole: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
-                profile: {
+                Profile: {
                   select: {
                     fullName: true,
                     avatarUrl: true,
@@ -218,7 +219,7 @@ export class EventsService {
         },
         _count: {
           select: {
-            registrations: {
+            EventRegistration: {
               where: { status: 'CONFIRMED' },
             },
           },
@@ -237,7 +238,7 @@ export class EventsService {
     const { tickets, agendaBlocks, collegeSlug, ...eventData } = data;
 
     // Determine college connection
-    let collegeConnect: Prisma.CollegeCreateNestedOneWithoutEventsInput | undefined;
+    let collegeConnect: Prisma.CollegeCreateNestedOneWithoutEventInput | undefined;
     if (collegeSlug) {
       collegeConnect = { connect: { slug: collegeSlug } };
     } else if (data.collegeId) {
@@ -248,6 +249,8 @@ export class EventsService {
 
     const event = await this.prisma.event.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         title: eventData.title,
         description: eventData.description,
         coverUrl: eventData.coverUrl,
@@ -265,14 +268,15 @@ export class EventsService {
         certificateEnabled: eventData.certificateEnabled || false,
         certificateTemplateId: eventData.certificateTemplateId,
         autoIssueCertificate: eventData.autoIssueCertificate || false,
-        createdBy: { connect: { id: user.id } },
-        ...(collegeConnect ? { college: collegeConnect } : {}),
-        ...(eventData.clubId ? { club: { connect: { id: eventData.clubId } } } : {}),
+        User: { connect: { id: user.id } },
+        ...(collegeConnect ? { College: collegeConnect } : {}),
+        ...(eventData.clubId ? { Club: { connect: { id: eventData.clubId } } } : {}),
         // Create tickets if provided
         ...(tickets && tickets.length > 0
           ? {
-              tickets: {
+              TicketType: {
                 create: tickets.map((t) => ({
+                  id: randomUUID(),
                   name: t.name,
                   description: t.description,
                   price: t.price || 0,
@@ -287,8 +291,9 @@ export class EventsService {
         // Create agenda blocks if provided
         ...(agendaBlocks && agendaBlocks.length > 0
           ? {
-              agendaBlocks: {
+              EventAgendaBlock: {
                 create: agendaBlocks.map((a) => ({
+                  id: randomUUID(),
                   day: a.day,
                   date: new Date(a.date),
                   startTime: new Date(a.startTime),
@@ -301,16 +306,17 @@ export class EventsService {
           : {}),
       },
       include: {
-        tickets: true,
-        agendaBlocks: true,
-        college: true,
-        club: true,
+        TicketType: true,
+        EventAgendaBlock: true,
+        College: true,
+        Club: true,
       },
     });
 
     // Assign creator role
     await this.prisma.eventMemberRole.create({
       data: {
+        id: randomUUID(),
         eventId: event.id,
         userId: user.id,
         role: 'CREATOR',
@@ -374,10 +380,10 @@ export class EventsService {
         ...(eventData.autoIssueCertificate !== undefined && { autoIssueCertificate: eventData.autoIssueCertificate }),
       },
       include: {
-        tickets: true,
-        agendaBlocks: true,
-        college: true,
-        club: true,
+        TicketType: true,
+        EventAgendaBlock: true,
+        College: true,
+        Club: true,
       },
     });
   }
@@ -422,7 +428,7 @@ export class EventsService {
     return this.prisma.event.update({
       where: { id: eventId },
       data: { status: EventLifecycleStatus.PUBLISHED },
-      include: { tickets: true, college: true, club: true },
+      include: { TicketType: true, College: true, Club: true },
     });
   }
 
@@ -458,7 +464,7 @@ export class EventsService {
         status: EventLifecycleStatus.CANCELLED,
         rejectionReason: reason,
       },
-      include: { tickets: true, college: true, club: true },
+      include: { TicketType: true, College: true, Club: true },
     });
   }
 
@@ -486,7 +492,7 @@ export class EventsService {
     return this.prisma.event.update({
       where: { id: eventId },
       data: { status: EventLifecycleStatus.ARCHIVED },
-      include: { tickets: true, college: true, club: true },
+      include: { TicketType: true, College: true, Club: true },
     });
   }
 
@@ -573,6 +579,7 @@ export class EventsService {
         status,
       },
       create: {
+        id: randomUUID(),
         userId,
         eventId,
         status,
@@ -619,6 +626,7 @@ export class EventsService {
         status: 'GOING',
       },
       create: {
+        id: randomUUID(),
         userId,
         eventId,
         status: 'GOING',

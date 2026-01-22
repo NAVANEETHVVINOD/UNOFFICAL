@@ -195,21 +195,21 @@ export class CheckInService {
     const registration = await this.prisma.eventRegistration.findUnique({
       where: { id: payload.registrationId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             name: true,
           },
         },
-        event: {
+        Event: {
           select: {
             startsAt: true,
             endsAt: true,
@@ -238,8 +238,8 @@ export class CheckInService {
       return {
         success: false,
         registrationId: registration.id,
-        attendeeName: registration.user.profile?.fullName || 'Unknown',
-        ticketType: registration.ticket.name,
+        attendeeName: registration.User.Profile?.fullName || 'Unknown',
+        ticketType: registration.TicketType.name,
         checkInTime: new Date(),
         isFirstScan: false,
         error: 'Registration is not confirmed',
@@ -253,8 +253,8 @@ export class CheckInService {
       return {
         success: false,
         registrationId: registration.id,
-        attendeeName: registration.user.profile?.fullName || 'Unknown',
-        ticketType: registration.ticket.name,
+        attendeeName: registration.User.Profile?.fullName || 'Unknown',
+        ticketType: registration.TicketType.name,
         checkInTime: registration.checkInTime || new Date(),
         isFirstScan: false,
         error: 'QR code has already been used',
@@ -283,8 +283,8 @@ export class CheckInService {
     return {
       success: true,
       registrationId: registration.id,
-      attendeeName: registration.user.profile?.fullName || 'Unknown',
-      ticketType: registration.ticket.name,
+      attendeeName: registration.User.Profile?.fullName || 'Unknown',
+      ticketType: registration.TicketType.name,
       checkInTime: now,
       isFirstScan: true,
     };
@@ -307,15 +307,15 @@ export class CheckInService {
     const registration = await this.prisma.eventRegistration.findUnique({
       where: { id: registrationId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             name: true,
           },
@@ -357,8 +357,8 @@ export class CheckInService {
     return {
       success: true,
       registrationId: registration.id,
-      attendeeName: registration.user.profile?.fullName || 'Unknown',
-      ticketType: registration.ticket.name,
+      attendeeName: registration.User.Profile?.fullName || 'Unknown',
+      ticketType: registration.TicketType.name,
       checkInTime: now,
       isFirstScan,
     };
@@ -463,14 +463,14 @@ export class CheckInService {
       orderBy: { checkInTime: 'desc' },
       take: limit,
       include: {
-        user: {
+        User: {
           select: {
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             name: true,
           },
@@ -480,8 +480,8 @@ export class CheckInService {
 
     return registrations.map((r) => ({
       registrationId: r.id,
-      attendeeName: r.user.profile?.fullName || 'Unknown',
-      ticketType: r.ticket.name,
+      attendeeName: r.User.Profile?.fullName || 'Unknown',
+      ticketType: r.TicketType.name,
       checkInTime: r.checkInTime!,
       checkInMethod: r.checkInMethod || 'QR_SCAN',
     }));
@@ -518,25 +518,25 @@ export class CheckInService {
         eventId,
         status: { in: [RegistrationStatus.CONFIRMED, RegistrationStatus.ATTENDED] },
         deletedAt: null,
-        user: {
+        User: {
           OR: [
-            { profile: { fullName: { contains: query, mode: 'insensitive' } } },
+            { Profile: { fullName: { contains: query, mode: 'insensitive' } } },
             { email: { contains: query, mode: 'insensitive' } },
           ],
         },
       },
       take: limit,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             name: true,
           },
@@ -546,10 +546,10 @@ export class CheckInService {
 
     return registrations.map((r) => ({
       registrationId: r.id,
-      userId: r.user.id,
-      fullName: r.user.profile?.fullName || 'Unknown',
-      email: r.user.email || '',
-      ticketType: r.ticket.name,
+      userId: r.User.id,
+      fullName: r.User.Profile?.fullName || 'Unknown',
+      email: r.User.email || '',
+      ticketType: r.TicketType.name,
       status: r.status,
       checkedIn: r.qrUsed,
     }));

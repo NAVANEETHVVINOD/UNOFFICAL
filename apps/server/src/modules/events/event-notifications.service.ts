@@ -3,6 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType, EventLifecycleStatus, RegistrationStatus } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 /**
  * EventNotificationService handles all event-related notifications
@@ -37,11 +38,11 @@ export class EventNotificationService {
     const registration = await this.prisma.eventRegistration.findUnique({
       where: { id: registrationId },
       include: {
-        ticket: { select: { price: true } },
+        TicketType: { select: { price: true } },
       },
     });
 
-    const isPaidTicket = registration?.ticket?.price && registration.ticket.price > 0;
+    const isPaidTicket = registration?.TicketType?.price && registration.TicketType.price > 0;
 
     const formattedDate = event.startsAt.toLocaleDateString('en-IN', {
       weekday: 'long',
@@ -85,7 +86,7 @@ export class EventNotificationService {
         deletedAt: null,
       },
       include: {
-        registrations: {
+        EventRegistration: {
           where: {
             status: { in: [RegistrationStatus.CONFIRMED, RegistrationStatus.ATTENDED] },
             deletedAt: null,
@@ -101,7 +102,7 @@ export class EventNotificationService {
         minute: '2-digit',
       });
 
-      for (const registration of event.registrations) {
+      for (const registration of event.EventRegistration) {
         try {
           await this.notificationsService.createNotification({
             userId: registration.userId,
@@ -115,7 +116,7 @@ export class EventNotificationService {
         }
       }
 
-      this.logger.log(`Sent ${event.registrations.length} reminders for event ${event.id}`);
+      this.logger.log(`Sent ${event.EventRegistration.length} reminders for event ${event.id}`);
     }
   }
 
@@ -132,7 +133,7 @@ export class EventNotificationService {
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
       include: {
-        registrations: {
+        EventRegistration: {
           where: {
             status: { in: [RegistrationStatus.CONFIRMED, RegistrationStatus.ATTENDED] },
             deletedAt: null,
@@ -151,7 +152,7 @@ export class EventNotificationService {
     };
 
     let sentCount = 0;
-    for (const registration of event.registrations) {
+    for (const registration of event.EventRegistration) {
       try {
         await this.notificationsService.createNotification({
           userId: registration.userId,
@@ -180,7 +181,7 @@ export class EventNotificationService {
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
       include: {
-        registrations: {
+        EventRegistration: {
           where: {
             status: { in: [RegistrationStatus.PENDING, RegistrationStatus.CONFIRMED] },
             deletedAt: null,
@@ -193,7 +194,7 @@ export class EventNotificationService {
     if (!event) return 0;
 
     let sentCount = 0;
-    for (const registration of event.registrations) {
+    for (const registration of event.EventRegistration) {
       try {
         await this.notificationsService.createNotification({
           userId: registration.userId,
@@ -361,6 +362,7 @@ export class EventNotificationService {
     // Log the message
     await this.prisma.eventMessage.create({
       data: {
+        id: randomUUID(),
         eventId,
         senderId,
         targetAudience,
@@ -399,10 +401,10 @@ export class EventNotificationService {
       where: { eventId },
       orderBy: { createdAt: 'desc' },
       include: {
-        sender: {
+        User: {
           select: {
             id: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },

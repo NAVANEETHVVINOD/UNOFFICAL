@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { EventLifecycleStatus, Event, NotificationType, RegistrationStatus } from '@prisma/client';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { randomUUID } from 'crypto';
 
 /**
  * Valid state transitions for the Event Lifecycle State Machine
@@ -118,9 +119,9 @@ export class LifecycleService {
           : {}),
       },
       include: {
-        tickets: true,
-        college: true,
-        club: true,
+        TicketType: true,
+        College: true,
+        Club: true,
       },
     });
 
@@ -240,6 +241,7 @@ export class LifecycleService {
 
     // Create notifications for all registrants
     const notifications = registrations.map((reg) => ({
+      id: randomUUID(),
       userId: reg.userId,
       type: NotificationType.EVENT,
       title: 'Event Cancelled',
@@ -307,7 +309,7 @@ export class LifecycleService {
         deletedAt: null,
         // Event hasn't started yet but registration should close
         startsAt: { gt: now },
-        tickets: {
+        TicketType: {
           every: {
             OR: [
               { salesEnd: { lt: now } },
@@ -317,7 +319,7 @@ export class LifecycleService {
         },
       },
       include: {
-        tickets: {
+        TicketType: {
           select: { salesEnd: true },
         },
       },

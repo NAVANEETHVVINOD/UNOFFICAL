@@ -7,12 +7,15 @@
  * with correct illustrations, messages, and CTA buttons.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import StudentDashboard from '../../app/components/dashboard/StudentDashboard';
 import ProfessionalDashboard from '../../app/components/dashboard/ProfessionalDashboard';
 import OrganizerDashboard from '../../app/components/dashboard/OrganizerDashboard';
 import TeacherDashboard from '../../app/components/dashboard/TeacherDashboard';
+import { NotificationProvider } from '../../app/context/NotificationContext';
+import { RetroToastProvider } from '../../app/context/ToastContext';
+import { SocketProvider } from '../../app/context/SocketContext';
 
 // Mock AuthContext
 const mockUser = {
@@ -32,6 +35,17 @@ vi.mock('../../app/context/AuthContext', () => ({
   }),
 }));
 
+// Mock socket.io-client
+vi.mock('socket.io-client', () => ({
+  io: vi.fn(() => ({
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+    disconnect: vi.fn(),
+    connected: false,
+  })),
+}));
+
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -43,15 +57,16 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-// Mock API
+// Mock API - Return empty arrays immediately
 vi.mock('../../../lib/api', () => ({
   api: {
-    getEvents: vi.fn().mockResolvedValue([]),
-    getUserEvents: vi.fn().mockResolvedValue([]),
-    getClassrooms: vi.fn().mockResolvedValue([]),
-    getVerifiedEvents: vi.fn().mockResolvedValue([]),
-    getAttendanceRequests: vi.fn().mockResolvedValue([]),
+    getEvents: vi.fn().mockImplementation(() => Promise.resolve({ events: [] })),
+    getUserEvents: vi.fn().mockImplementation(() => Promise.resolve({ events: [] })),
+    getClassrooms: vi.fn().mockImplementation(() => Promise.resolve([])),
+    getVerifiedEvents: vi.fn().mockImplementation(() => Promise.resolve([])),
+    getAttendanceRequests: vi.fn().mockImplementation(() => Promise.resolve([])),
   },
+  API_URL: 'http://localhost:3001',
 }));
 
 // Mock Next.js Link
@@ -66,17 +81,74 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     section: ({ children, ...props }: any) => <section {...props}>{children}</section>,
+    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+    header: ({ children, ...props }: any) => <header {...props}>{children}</header>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
+// Mock GlobalSearch component
+vi.mock('../../app/components/GlobalSearch', () => ({
+  default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    return isOpen ? <div data-testid="global-search">Global Search</div> : null;
+  },
+}));
+
+// Mock QRCodeModal component
+vi.mock('../../app/components/QRCodeModal', () => ({
+  default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    return isOpen ? <div data-testid="qr-modal">QR Code Modal</div> : null;
+  },
+}));
+
+// Mock Navbar component
+vi.mock('../../app/components/Navbar', () => ({
+  default: () => <nav data-testid="navbar">Navbar</nav>,
+}));
+
+// Mock DashboardLayout
+vi.mock('../../app/components/layouts/DashboardLayout', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+// Mock ProfileSidebar
+vi.mock('../../app/components/dashboard/ProfileSidebar', () => ({
+  default: () => <div data-testid="profile-sidebar">Profile Sidebar</div>,
+}));
+
+// Mock UpcomingEventsWidget
+vi.mock('../../app/components/dashboard/UpcomingEventsWidget', () => ({
+  default: () => <div data-testid="upcoming-events">Upcoming Events</div>,
+}));
+
+// Mock Skeleton components
+vi.mock('../../app/components/ui/Skeleton', () => ({
+  FeedSkeleton: () => <div data-testid="feed-skeleton">Loading...</div>,
+  ProfileSkeleton: () => <div data-testid="profile-skeleton">Loading...</div>,
+}));
+
+// Helper to wrap components with all required providers
+const renderWithProviders = (component: React.ReactElement) => {
+  return render(
+    <SocketProvider>
+      <RetroToastProvider>
+        <NotificationProvider>
+          {component}
+        </NotificationProvider>
+      </RetroToastProvider>
+    </SocketProvider>
+  );
+};
+
 describe('Dashboard Empty States', () => {
   describe('StudentDashboard', () => {
     it('should render empty state with calendar illustration', async () => {
-      render(<StudentDashboard />);
+      renderWithProviders(<StudentDashboard />);
       
-      // Wait for component to load
-      await screen.findByText(/No events yet — explore what's happening around you/i);
+      // Wait for loading to complete and empty state to appear
+      await waitFor(() => {
+        expect(screen.queryByText(/No events yet — explore what's happening around you/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       
       // Check for illustration
       const illustration = screen.getByAltText('Calendar illustration');
@@ -98,10 +170,12 @@ describe('Dashboard Empty States', () => {
 
   describe('ProfessionalDashboard', () => {
     it('should render empty state with globe/network illustration', async () => {
-      render(<ProfessionalDashboard />);
+      renderWithProviders(<ProfessionalDashboard />);
       
-      // Wait for component to load
-      await screen.findByText(/No events in your area yet — discover global opportunities/i);
+      // Wait for loading to complete and empty state to appear
+      await waitFor(() => {
+        expect(screen.queryByText(/No events in your area yet — discover global opportunities/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       
       // Check for illustration
       const illustration = screen.getByAltText('Globe and network illustration');
@@ -123,7 +197,7 @@ describe('Dashboard Empty States', () => {
 
   describe('OrganizerDashboard', () => {
     it('should render empty state with megaphone illustration', async () => {
-      render(<OrganizerDashboard />);
+      renderWithProviders(<OrganizerDashboard />);
       
       // Wait for component to load
       await screen.findByText(/You haven't hosted any events yet/i);
@@ -148,7 +222,7 @@ describe('Dashboard Empty States', () => {
 
   describe('TeacherDashboard', () => {
     it('should render empty state with classroom illustration', async () => {
-      render(<TeacherDashboard />);
+      renderWithProviders(<TeacherDashboard />);
       
       // Wait for component to load
       await screen.findByText(/No classrooms created yet/i);
@@ -173,10 +247,12 @@ describe('Dashboard Empty States', () => {
 
   describe('Empty State Styling', () => {
     it('should use neo-brutalist styling with dashed borders', async () => {
-      const { container } = render(<StudentDashboard />);
+      const { container } = renderWithProviders(<StudentDashboard />);
       
-      // Wait for component to load
-      await screen.findByText(/No events yet — explore what's happening around you/i);
+      // Wait for loading to complete and empty state to appear
+      await waitFor(() => {
+        expect(screen.queryByText(/No events yet — explore what's happening around you/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       
       // Check for neo-brutalist styling classes
       const emptyStateContainer = container.querySelector('.border-dashed');
@@ -185,10 +261,12 @@ describe('Dashboard Empty States', () => {
     });
 
     it('should have proper button styling', async () => {
-      render(<StudentDashboard />);
+      renderWithProviders(<StudentDashboard />);
       
-      // Wait for component to load
-      await screen.findByText(/No events yet — explore what's happening around you/i);
+      // Wait for loading to complete and empty state to appear
+      await waitFor(() => {
+        expect(screen.queryByText(/No events yet — explore what's happening around you/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       
       const ctaButton = screen.getByRole('button', { name: /Browse Events/i });
       expect(ctaButton).toHaveClass('btn-neo', 'btn-primary');
@@ -198,52 +276,68 @@ describe('Dashboard Empty States', () => {
   describe('Empty State Messages', () => {
     it('should have unique messages for each dashboard type', async () => {
       // Student message
-      const { unmount: unmountStudent } = render(<StudentDashboard />);
-      await screen.findByText(/No events yet — explore what's happening around you/i);
+      const { unmount: unmountStudent } = renderWithProviders(<StudentDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/No events yet — explore what's happening around you/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       unmountStudent();
 
       // Professional message
-      const { unmount: unmountProfessional } = render(<ProfessionalDashboard />);
-      await screen.findByText(/No events in your area yet — discover global opportunities/i);
+      const { unmount: unmountProfessional } = renderWithProviders(<ProfessionalDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/No events in your area yet — discover global opportunities/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       unmountProfessional();
 
       // Organizer message
-      const { unmount: unmountOrganizer } = render(<OrganizerDashboard />);
-      await screen.findByText(/You haven't hosted any events yet/i);
+      const { unmount: unmountOrganizer } = renderWithProviders(<OrganizerDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/You haven't hosted any events yet/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       unmountOrganizer();
 
       // Teacher message
-      render(<TeacherDashboard />);
-      await screen.findByText(/No classrooms created yet/i);
+      renderWithProviders(<TeacherDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/No classrooms created yet/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
     });
   });
 
   describe('CTA Button Navigation', () => {
     it('should have correct navigation targets for each dashboard', async () => {
       // Student - Browse Events
-      const { unmount: unmountStudent } = render(<StudentDashboard />);
-      await screen.findByText(/Browse Events/i);
+      const { unmount: unmountStudent } = renderWithProviders(<StudentDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/Browse Events/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       let link = screen.getByRole('button', { name: /Browse Events/i }).closest('a');
       expect(link).toHaveAttribute('href', '/events');
       unmountStudent();
 
       // Professional - Explore Events
-      const { unmount: unmountProfessional } = render(<ProfessionalDashboard />);
-      await screen.findByText(/Explore Events/i);
+      const { unmount: unmountProfessional } = renderWithProviders(<ProfessionalDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/Explore Events/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       link = screen.getByRole('button', { name: /Explore Events/i }).closest('a');
       expect(link).toHaveAttribute('href', '/events');
       unmountProfessional();
 
       // Organizer - Create Your First Event
-      const { unmount: unmountOrganizer } = render(<OrganizerDashboard />);
-      await screen.findByText(/Create Your First Event/i);
+      const { unmount: unmountOrganizer } = renderWithProviders(<OrganizerDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/Create Your First Event/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       link = screen.getByRole('button', { name: /Create Your First Event/i }).closest('a');
       expect(link).toHaveAttribute('href', '/events/create');
       unmountOrganizer();
 
       // Teacher - Create Classroom
-      render(<TeacherDashboard />);
-      await screen.findByText(/Create Classroom/i);
+      renderWithProviders(<TeacherDashboard />);
+      await waitFor(() => {
+        expect(screen.queryByText(/Create Classroom/i)).toBeInTheDocument();
+      }, { timeout: 5000 });
       link = screen.getByRole('button', { name: /Create Classroom/i }).closest('a');
       expect(link).toHaveAttribute('href', '/classrooms/create');
     });

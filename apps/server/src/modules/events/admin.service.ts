@@ -1,6 +1,7 @@
 import { Injectable, Logger, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EventLifecycleStatus } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 /**
  * AdminService handles platform admin controls for events
@@ -82,7 +83,7 @@ export class AdminService {
 
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
-      include: { createdBy: { select: { id: true, email: true } } },
+      include: { User: { select: { id: true, email: true } } },
     });
 
     if (!event) {
@@ -223,11 +224,11 @@ export class AdminService {
         deletedAt: null,
       },
       include: {
-        createdBy: {
-          select: { id: true, profile: { select: { fullName: true } } },
+        User: {
+          select: { id: true, Profile: { select: { fullName: true } } },
         },
         _count: {
-          select: { registrations: true },
+          select: { EventRegistration: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -248,8 +249,8 @@ export class AdminService {
         // Add flagging criteria here
       },
       include: {
-        createdBy: {
-          select: { id: true, profile: { select: { fullName: true } } },
+        User: {
+          select: { id: true, Profile: { select: { fullName: true } } },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -285,6 +286,7 @@ export class AdminService {
   ): Promise<void> {
     await this.prisma.adminAuditLog.create({
       data: {
+        id: randomUUID(),
         adminId,
         action,
         targetType,

@@ -18,6 +18,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -47,16 +48,20 @@ export class AuthService {
     try {
       user = await this.prisma.user.create({
         data: {
+          id: randomUUID(),
+          updatedAt: new Date(),
           email: registerDto.email,
           password: hashedPassword,
-          profile: {
+          Profile: {
             create: {
+              id: randomUUID(),
+              updatedAt: new Date(),
               fullName: registerDto.fullName,
               collegeId: collegeId || null,
             },
           },
         },
-        include: { profile: true },
+        include: { Profile: true },
       });
     } catch (error) {
       if (error.code === 'P2002') {
@@ -85,9 +90,9 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
       include: {
-        profile: {
+        Profile: {
           include: {
-            college: true,
+            College: true,
           },
         },
       },
@@ -114,7 +119,7 @@ export class AuthService {
       user.id,
       user.email,
       user.role,
-      user.profile?.collegeId,
+      user.Profile?.collegeId,
     );
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
@@ -129,7 +134,7 @@ export class AuthService {
       user.id,
       user.email,
       user.role,
-      user.profile?.collegeId,
+      user.Profile?.collegeId,
     );
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
@@ -156,7 +161,7 @@ export class AuthService {
 
       const user = await this.prisma.user.findUnique({
         where: { id: decoded.sub },
-        include: { profile: true },
+        include: { Profile: true },
       });
 
       if (!user || !user.hashedRefreshToken) {
@@ -176,7 +181,7 @@ export class AuthService {
         decoded.sub,
         decoded.email,
         decoded.role,
-        user.profile?.collegeId,
+        user.Profile?.collegeId,
       );
       await this.updateRefreshToken(decoded.sub, tokens.refreshToken);
 
@@ -231,9 +236,9 @@ export class AuthService {
     let user = await this.prisma.user.findUnique({
       where: { supabaseId: sub } as any,
       include: {
-        profile: {
+        Profile: {
           include: {
-            college: true,
+            College: true,
           },
         },
       },
@@ -251,9 +256,9 @@ export class AuthService {
             where: { id: existingUser.id },
             data: { supabaseId: sub } as any,
             include: {
-              profile: {
+              Profile: {
                 include: {
-                  college: true,
+                  College: true,
                 },
               },
             },
@@ -268,8 +273,10 @@ export class AuthService {
             supabaseId: sub,
             email,
             role: 'STUDENT',
-            profile: {
+            Profile: {
               create: {
+                id: randomUUID(),
+                updatedAt: new Date(),
                 fullName: '', // Profile will be updated in onboarding
                 onboardingStep: 0,
                 isOnboarded: false,
@@ -277,9 +284,9 @@ export class AuthService {
             },
           } as any,
           include: {
-            profile: {
+            Profile: {
               include: {
-                college: true,
+                College: true,
               },
             },
           },
@@ -295,9 +302,9 @@ export class AuthService {
               where: { id: existingUser.id },
               data: { supabaseId: sub } as any,
               include: {
-                profile: {
+                Profile: {
                   include: {
-                    college: true,
+                    College: true,
                   },
                 },
               },

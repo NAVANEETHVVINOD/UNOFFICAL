@@ -124,9 +124,9 @@ export class PaymentsService {
     const registration = await this.prisma.eventRegistration.findUnique({
       where: { id: registrationId },
       include: {
-        ticket: true,
-        event: { select: { title: true } },
-        payment: true,
+        TicketType: true,
+        Event: { select: { title: true } },
+        EventPayment: true,
       },
     });
 
@@ -139,9 +139,9 @@ export class PaymentsService {
     }
 
     // Check if payment already exists (idempotency)
-    if (registration.payment) {
-      const existingPayment = registration.payment;
-      const feeBreakdown = this.calculateFees(registration.ticket.price, passFeesToBuyer);
+    if (registration.EventPayment) {
+      const existingPayment = registration.EventPayment;
+      const feeBreakdown = this.calculateFees(registration.TicketType.price, passFeesToBuyer);
       
       return {
         order: {
@@ -155,7 +155,7 @@ export class PaymentsService {
       };
     }
 
-    const ticketPrice = registration.ticket.price;
+    const ticketPrice = registration.TicketType.price;
     const feeBreakdown = this.calculateFees(ticketPrice, passFeesToBuyer);
 
     // Generate idempotency key
@@ -169,14 +169,15 @@ export class PaymentsService {
         receipt: registrationId,
         notes: {
           registrationId,
-          eventTitle: registration.event.title,
-          ticketName: registration.ticket.name,
+          eventTitle: registration.Event.title,
+          ticketName: registration.TicketType.name,
         },
       });
 
       // Store payment record
       await this.prisma.eventPayment.create({
         data: {
+          id: randomUUID(),
           registrationId,
           razorpayOrderId: razorpayOrder.id,
           idempotencyKey,
@@ -229,11 +230,11 @@ export class PaymentsService {
     const payment = await this.prisma.eventPayment.findUnique({
       where: { razorpayOrderId: orderId },
       include: {
-        registration: {
+        EventRegistration: {
           include: {
-            event: { select: { id: true, title: true } },
-            ticket: { select: { name: true } },
-            user: { select: { id: true } },
+            Event: { select: { id: true, title: true } },
+            TicketType: { select: { name: true } },
+            User: { select: { id: true } },
           },
         },
       },
@@ -296,10 +297,10 @@ export class PaymentsService {
 
     // Send confirmation notification
     await this.createPaymentNotification(
-      payment.registration.user.id,
-      payment.registration.event.id,
-      payment.registration.event.title,
-      payment.registration.ticket.name,
+      payment.EventRegistration.User.id,
+      payment.EventRegistration.Event.id,
+      payment.EventRegistration.Event.title,
+      payment.EventRegistration.TicketType.name,
     );
 
     this.logger.log(`Payment verified for order ${orderId}, registration ${payment.registrationId}`);
@@ -361,6 +362,7 @@ export class PaymentsService {
     // Log webhook
     await this.prisma.paymentWebhookLog.create({
       data: {
+        id: randomUUID(),
         razorpayOrderId: orderId,
         razorpayPaymentId: paymentId,
         eventType: event,
@@ -372,11 +374,11 @@ export class PaymentsService {
     const paymentRecord = await this.prisma.eventPayment.findUnique({
       where: { razorpayOrderId: orderId },
       include: {
-        registration: {
+        EventRegistration: {
           include: {
-            event: { select: { id: true, title: true } },
-            ticket: { select: { name: true } },
-            user: { select: { id: true } },
+            Event: { select: { id: true, title: true } },
+            TicketType: { select: { name: true } },
+            User: { select: { id: true } },
           },
         },
       },
@@ -408,7 +410,7 @@ export class PaymentsService {
 
   private async handlePaymentCaptured(
     paymentRecord: Awaited<ReturnType<typeof this.prisma.eventPayment.findUnique>> & {
-      registration: { event: { id: string; title: string }; ticket: { name: string }; user: { id: string } };
+      EventRegistration: { Event: { id: string; title: string }; TicketType: { name: string }; User: { id: string } };
     },
     paymentId: string,
   ): Promise<void> {
@@ -451,10 +453,10 @@ export class PaymentsService {
 
     // Send notification
     await this.createPaymentNotification(
-      paymentRecord.registration.user.id,
-      paymentRecord.registration.event.id,
-      paymentRecord.registration.event.title,
-      paymentRecord.registration.ticket.name,
+      paymentRecord.EventRegistration.User.id,
+      paymentRecord.EventRegistration.Event.id,
+      paymentRecord.EventRegistration.Event.title,
+      paymentRecord.EventRegistration.TicketType.name,
     );
   }
 
@@ -630,11 +632,11 @@ export class PaymentsService {
     const payment = await this.prisma.eventPayment.findUnique({
       where: { razorpayOrderId: orderId },
       include: {
-        registration: {
+        EventRegistration: {
           include: {
-            event: { select: { id: true, title: true } },
-            ticket: { select: { name: true } },
-            user: { select: { id: true } },
+            Event: { select: { id: true, title: true } },
+            TicketType: { select: { name: true } },
+            User: { select: { id: true } },
           },
         },
       },
@@ -690,10 +692,10 @@ export class PaymentsService {
 
           // Send notification
           await this.createPaymentNotification(
-            payment.registration.user.id,
-            payment.registration.event.id,
-            payment.registration.event.title,
-            payment.registration.ticket.name,
+            payment.EventRegistration.User.id,
+            payment.EventRegistration.Event.id,
+            payment.EventRegistration.Event.title,
+            payment.EventRegistration.TicketType.name,
           );
 
           return { success: true, registrationId: payment.registrationId };
@@ -749,6 +751,7 @@ export class PaymentsService {
   ): Promise<void> {
     await this.prisma.notification.create({
       data: {
+        id: randomUUID(),
         userId,
         type: NotificationType.EVENT,
         title: 'Payment Confirmed',

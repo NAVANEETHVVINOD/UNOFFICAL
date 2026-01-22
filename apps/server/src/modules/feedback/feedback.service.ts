@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class FeedbackService {
@@ -12,7 +13,10 @@ export class FeedbackService {
     collegeId?: string;
   }) {
     return this.prisma.feedback.create({
-      data,
+      data: {
+        id: randomUUID(),
+        ...data,
+      },
     });
   }
 }

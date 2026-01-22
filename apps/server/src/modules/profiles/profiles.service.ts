@@ -7,6 +7,7 @@ import {
   CreateProjectDto,
   CreateVolunteeringDto,
 } from './dto/update-profile.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ProfilesService {
@@ -18,12 +19,12 @@ export class ProfilesService {
     return this.prisma.profile.findUnique({
       where: profileWhereUniqueInput,
       include: {
-        user: true,
-        college: true,
-        education: { orderBy: { startDate: 'desc' } },
-        experience: { orderBy: { startDate: 'desc' } },
-        projects: { orderBy: { startDate: 'desc' } },
-        volunteering: { orderBy: { startDate: 'desc' } },
+        User: true,
+        College: true,
+        Education: { orderBy: { startDate: 'desc' } },
+        Experience: { orderBy: { startDate: 'desc' } },
+        Project: { orderBy: { startDate: 'desc' } },
+        Volunteering: { orderBy: { startDate: 'desc' } },
       },
     });
   }
@@ -100,6 +101,7 @@ export class ProfilesService {
 
     return this.prisma.education.create({
       data: {
+        id: randomUUID(),
         ...dto,
         profileId: profile.id,
       },
@@ -126,6 +128,7 @@ export class ProfilesService {
 
     return this.prisma.experience.create({
       data: {
+        id: randomUUID(),
         ...dto,
         profileId: profile.id,
       },
@@ -151,6 +154,7 @@ export class ProfilesService {
 
     return this.prisma.project.create({
       data: {
+        id: randomUUID(),
         ...dto,
         profileId: profile.id,
       },
@@ -176,6 +180,7 @@ export class ProfilesService {
 
     return this.prisma.volunteering.create({
       data: {
+        id: randomUUID(),
         ...dto,
         profileId: profile.id,
       },
@@ -200,7 +205,7 @@ export class ProfilesService {
       orderBy: { points: 'desc' },
       take: limit,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             role: true,

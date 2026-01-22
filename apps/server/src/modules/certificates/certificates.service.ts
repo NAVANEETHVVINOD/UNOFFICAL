@@ -10,7 +10,7 @@ export class CertificatesService {
     // 1. Fetch user and event details
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { profile: true },
+      include: { Profile: true },
     });
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
@@ -33,7 +33,7 @@ export class CertificatesService {
     doc.moveDown();
     doc
       .fontSize(30)
-      .text(user.profile?.fullName || user.email || 'Unknown User', {
+      .text(user.Profile?.fullName || user.email || 'Unknown User', {
         align: 'center',
       });
     doc.moveDown();

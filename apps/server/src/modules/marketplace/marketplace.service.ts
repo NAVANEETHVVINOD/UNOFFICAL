@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MarketplaceListing, Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class MarketplaceService {
@@ -20,7 +21,7 @@ export class MarketplaceService {
       cursor,
       where,
       orderBy,
-      include: { owner: { include: { profile: true } } },
+      include: { User: { include: { Profile: true } } },
     });
   }
 
@@ -29,7 +30,7 @@ export class MarketplaceService {
   ): Promise<MarketplaceListing | null> {
     return this.prisma.marketplaceListing.findUnique({
       where: marketplaceListingWhereUniqueInput,
-      include: { owner: { include: { profile: true } } },
+      include: { User: { include: { Profile: true } } },
     });
   }
 

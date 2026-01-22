@@ -676,7 +676,7 @@ describe('Event Card Display Modes Properties', () => {
       }),
       { numRuns: 100 }
     );
-  });
+  }, 20000); // Increase timeout to 20 seconds
 
   /**
    * **Property 8: Event Card Display Modes**

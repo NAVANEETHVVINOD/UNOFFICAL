@@ -12,6 +12,7 @@ import {
   RegistrationStatus,
 } from '@prisma/client';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { randomUUID } from 'crypto';
 
 /**
  * Waitlist claim expiry time in hours
@@ -104,6 +105,7 @@ export class WaitlistService {
     // Create waitlist entry
     const entry = await this.prisma.waitlistEntry.create({
       data: {
+        id: randomUUID(),
         eventId,
         ticketId,
         userId,
@@ -180,16 +182,16 @@ export class WaitlistService {
       where: { eventId, ticketId },
       orderBy: { position: 'asc' },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
         },
-        ticket: {
+        TicketType: {
           select: {
             name: true,
             price: true,
@@ -202,9 +204,13 @@ export class WaitlistService {
     return entries.map(e => ({
       ...e,
       user: {
-        id: e.user.id,
-        fullName: e.user.profile?.fullName || 'Unknown',
-        email: e.user.email || '',
+        id: e.User.id,
+        fullName: e.User.Profile?.fullName || 'Unknown',
+        email: e.User.email || '',
+      },
+      ticket: {
+        name: e.TicketType.name,
+        price: e.TicketType.price,
       },
     })) as WaitlistEntryWithUser[];
   }
@@ -224,8 +230,8 @@ export class WaitlistService {
       },
       orderBy: { position: 'asc' },
       include: {
-        event: { select: { title: true } },
-        ticket: { select: { name: true } },
+        Event: { select: { title: true } },
+        TicketType: { select: { name: true } },
       },
     });
 
@@ -250,10 +256,11 @@ export class WaitlistService {
     // Create notification
     await this.prisma.notification.create({
       data: {
+        id: randomUUID(),
         userId: nextEntry.userId,
         type: NotificationType.EVENT,
         title: 'Ticket Available!',
-        message: `A ticket for "${nextEntry.event.title}" (${nextEntry.ticket.name}) is now available. Claim it within ${CLAIM_EXPIRY_HOURS} hours before it expires.`,
+        message: `A ticket for "${nextEntry.Event.title}" (${nextEntry.TicketType.name}) is now available. Claim it within ${CLAIM_EXPIRY_HOURS} hours before it expires.`,
         actionUrl: `/events/${eventId}`,
       },
     });

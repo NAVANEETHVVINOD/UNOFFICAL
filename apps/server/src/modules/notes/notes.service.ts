@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Note, Prisma } from '@prisma/client';
 import { formatResourceFilename } from '../../common/utils/resource-filename';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class NotesService {
@@ -32,8 +33,8 @@ export class NotesService {
       where,
       orderBy,
       include: {
-        author: { include: { profile: true } },
-        _count: { select: { likes: true } },
+        User: { include: { Profile: true } },
+        _count: { select: { NoteLike: true } },
       },
     });
   }
@@ -44,8 +45,8 @@ export class NotesService {
     return this.prisma.note.findUnique({
       where: noteWhereUniqueInput,
       include: {
-        author: { include: { profile: true } },
-        _count: { select: { likes: true } },
+        User: { include: { Profile: true } },
+        _count: { select: { NoteLike: true } },
       },
     });
   }
@@ -59,6 +60,7 @@ export class NotesService {
   async likeNote(userId: string, noteId: string) {
     return this.prisma.noteLike.create({
       data: {
+        id: randomUUID(),
         userId,
         noteId,
       },

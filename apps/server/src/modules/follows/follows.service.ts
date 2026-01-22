@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class FollowsService {
@@ -39,14 +40,14 @@ export class FollowsService {
         followingId,
       },
       include: {
-        follower: {
-          include: { profile: true },
+        User_Follows_followerIdToUser: {
+          include: { Profile: true },
         },
       },
     });
 
     // Send follow notification
-    const followerName = follow.follower.profile?.fullName || 'Someone';
+    const followerName = follow.User_Follows_followerIdToUser.Profile?.fullName || 'Someone';
     await this.notificationsService.createNotification({
       userId: followingId,
       type: NotificationType.FOLLOW,
@@ -86,8 +87,8 @@ export class FollowsService {
     return this.prisma.follows.findMany({
       where: { followingId: userId },
       include: {
-        follower: {
-          include: { profile: true },
+        User_Follows_followerIdToUser: {
+          include: { Profile: true },
         },
       },
     });
@@ -97,8 +98,8 @@ export class FollowsService {
     return this.prisma.follows.findMany({
       where: { followerId: userId },
       include: {
-        following: {
-          include: { profile: true },
+        User_Follows_followingIdToUser: {
+          include: { Profile: true },
         },
       },
     });

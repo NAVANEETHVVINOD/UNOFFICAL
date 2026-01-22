@@ -15,7 +15,7 @@ export class CollegesService {
   ): Promise<College | null> {
     return this.prisma.college.findUnique({
       where: collegeWhereUniqueInput,
-      include: { clubs: true },
+      include: { Club: true },
     });
   }
 

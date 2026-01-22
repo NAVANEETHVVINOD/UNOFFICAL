@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RegistrationStatus, NotificationType } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 /**
  * Certificate template definition
@@ -117,9 +118,9 @@ export class CertificateService {
         startsAt: true,
         certificateEnabled: true,
         certificateTemplateId: true,
-        createdBy: {
+        User: {
           select: {
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
@@ -143,9 +144,9 @@ export class CertificateService {
         deletedAt: null,
       },
       include: {
-        user: {
+        User: {
           select: {
-            profile: {
+            Profile: {
               select: { fullName: true },
             },
           },
@@ -176,10 +177,10 @@ export class CertificateService {
     // Generate certificate
     const templateId = event.certificateTemplateId || 'default';
     const certificateData: CertificateData = {
-      attendeeName: registration.user.profile?.fullName || 'Attendee',
+      attendeeName: registration.User.Profile?.fullName || 'Attendee',
       eventTitle: event.title,
       eventDate: this.formatDate(event.startsAt),
-      organizerName: event.createdBy.profile?.fullName || 'Event Organizer',
+      organizerName: event.User.Profile?.fullName || 'Event Organizer',
       certificateId: this.generateCertificateId(),
       issuedAt: this.formatDate(new Date()),
     };
@@ -190,6 +191,7 @@ export class CertificateService {
     // Create certificate record
     const certificate = await this.prisma.eventCertificate.create({
       data: {
+        id: randomUUID(),
         eventId,
         userId,
         templateId,
@@ -206,6 +208,7 @@ export class CertificateService {
     // Send notification
     await this.prisma.notification.create({
       data: {
+        id: randomUUID(),
         userId,
         type: NotificationType.EVENT,
         title: 'Certificate Issued',
@@ -377,7 +380,7 @@ export class CertificateService {
           where: { id: c.userId },
           select: {
             email: true,
-            profile: { select: { fullName: true } },
+            Profile: { select: { fullName: true } },
           },
         });
         return {
@@ -389,7 +392,7 @@ export class CertificateService {
             fileUrl: c.fileUrl,
             issuedAt: c.issuedAt,
           },
-          userName: user?.profile?.fullName || 'Unknown',
+          userName: user?.Profile?.fullName || 'Unknown',
           userEmail: user?.email || '',
         };
       }),

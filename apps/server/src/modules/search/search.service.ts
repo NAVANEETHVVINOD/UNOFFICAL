@@ -25,18 +25,18 @@ export class SearchService {
         where: {
           OR: [
             {
-              profile: {
+              Profile: {
                 fullName: { contains: searchTerm, mode: 'insensitive' },
               },
             },
             { email: { contains: searchTerm, mode: 'insensitive' } },
-            { profile: { bio: { contains: searchTerm, mode: 'insensitive' } } },
+            { Profile: { bio: { contains: searchTerm, mode: 'insensitive' } } },
           ],
         },
         select: {
           id: true,
           email: true,
-          profile: {
+          Profile: {
             select: {
               fullName: true,
               avatarUrl: true,
@@ -57,7 +57,7 @@ export class SearchService {
             { title: { contains: searchTerm, mode: 'insensitive' } },
           ],
         },
-        include: { author: { include: { profile: true } } },
+        include: { User: { include: { Profile: true } } },
         take: 5,
       }),
 
@@ -69,7 +69,7 @@ export class SearchService {
             { subject: { contains: searchTerm, mode: 'insensitive' } },
           ],
         },
-        include: { author: { include: { profile: true } } },
+        include: { User: { include: { Profile: true } } },
         take: 5,
       }),
 

@@ -41,7 +41,7 @@ export class MarketplaceController {
     }
 
     if (collegeSlug) {
-      andConditions.push({ college: { slug: collegeSlug } });
+      andConditions.push({ College: { slug: collegeSlug } });
     }
 
     if (andConditions.length > 0) {
@@ -97,8 +97,8 @@ export class MarketplaceController {
 
     return this.marketplaceService.create({
       ...rest,
-      owner: { connect: { id: req.user.userId } },
-      ...(collegeSlug ? { college: { connect: { slug: collegeSlug } } } : {}),
+      User: { connect: { id: req.user.userId } },
+      ...(collegeSlug ? { College: { connect: { slug: collegeSlug } } } : {}),
     });
   }
 

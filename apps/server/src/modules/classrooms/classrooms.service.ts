@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { randomUUID } from 'crypto';
 
 type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
 
@@ -27,21 +28,24 @@ export class ClassroomsService {
 
     return this.prisma.classroom.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         name: data.name,
         description: data.description,
         subject: data.subject,
         code,
         collegeId: data.collegeId,
         teacherId: userId,
-        members: {
+        ClassroomMember: {
           create: {
+            id: randomUUID(),
             userId,
             role: 'TEACHER', // Creator is automatically the teacher
           },
         },
       },
       include: {
-        teacher: { select: { id: true, email: true } }, // Minimal teacher info
+        User: { select: { id: true, email: true } }, // Minimal teacher info
       },
     });
   }
@@ -50,18 +54,18 @@ export class ClassroomsService {
     // Find all classrooms where user is a member (either student or teacher)
     return this.prisma.classroom.findMany({
       where: {
-        members: {
+        ClassroomMember: {
           some: {
             userId: userId,
           },
         },
       },
       include: {
-        teacher: {
-          include: { profile: true },
+        User: {
+          include: { Profile: true },
         },
         _count: {
-          select: { members: true, assignments: true },
+          select: { ClassroomMember: true, Assignment: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -72,11 +76,11 @@ export class ClassroomsService {
     const classroom = await this.prisma.classroom.findUnique({
       where: { id },
       include: {
-        teacher: { include: { profile: true } },
-        members: {
-          include: { user: { include: { profile: true } } },
+        User: { include: { Profile: true } },
+        ClassroomMember: {
+          include: { User: { include: { Profile: true } } },
         },
-        assignments: {
+        Assignment: {
           orderBy: { createdAt: 'desc' },
         },
       },
@@ -111,6 +115,7 @@ export class ClassroomsService {
 
     return this.prisma.classroomMember.create({
       data: {
+        id: randomUUID(),
         classroomId: classroom.id,
         userId,
         role: 'STUDENT',
@@ -121,6 +126,8 @@ export class ClassroomsService {
   async createAssignment(classroomId: string, data: any) {
     return this.prisma.assignment.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         title: data.title,
         description: data.description,
         points: data.points ? Number(data.points) : 100,
@@ -136,7 +143,7 @@ export class ClassroomsService {
       orderBy: { createdAt: 'desc' },
       include: {
         _count: {
-          select: { submissions: true },
+          select: { Submission: true },
         },
       },
     });
@@ -170,6 +177,8 @@ export class ClassroomsService {
 
     return this.prisma.submission.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         assignmentId,
         studentId: userId,
         fileUrl,
@@ -182,8 +191,8 @@ export class ClassroomsService {
     return this.prisma.submission.findMany({
       where: { assignmentId },
       include: {
-        student: {
-          include: { profile: true },
+        User: {
+          include: { Profile: true },
         },
       },
       orderBy: { submittedAt: 'asc' },
@@ -248,6 +257,7 @@ export class ClassroomsService {
         records: records as any,
       },
       create: {
+        id: randomUUID(),
         classroomId,
         date: normalizedDate,
         records: records as any,
@@ -336,7 +346,7 @@ export class ClassroomsService {
   async getClassroomAttendanceSummary(classroomId: string) {
     const members = await this.prisma.classroomMember.findMany({
       where: { classroomId, role: 'STUDENT' },
-      include: { user: { include: { profile: true } } },
+      include: { User: { include: { Profile: true } } },
     });
 
     const summaries = await Promise.all(
@@ -347,8 +357,8 @@ export class ClassroomsService {
         );
         return {
           userId: member.userId,
-          fullName: member.user.profile?.fullName || 'Unknown',
-          avatarUrl: member.user.profile?.avatarUrl,
+          fullName: member.User.Profile?.fullName || 'Unknown',
+          avatarUrl: member.User.Profile?.avatarUrl,
           ...stats,
         };
       }),
@@ -371,8 +381,8 @@ export class ClassroomsService {
     const submission = await this.prisma.submission.findUnique({
       where: { id: submissionId },
       include: {
-        assignment: {
-          include: { classroom: true },
+        Assignment: {
+          include: { Classroom: true },
         },
       },
     });
@@ -381,7 +391,7 @@ export class ClassroomsService {
       throw new NotFoundException('Submission not found');
     }
 
-    if (submission.assignment.classroom.teacherId !== teacherId) {
+    if (submission.Assignment.Classroom.teacherId !== teacherId) {
       throw new ForbiddenException('Only the teacher can verify submissions');
     }
 
@@ -417,9 +427,9 @@ export class ClassroomsService {
       include: {
         _count: {
           select: {
-            members: true,
-            assignments: true,
-            attendance: true,
+            ClassroomMember: true,
+            Assignment: true,
+            AttendanceRecord: true,
           },
         },
       },
@@ -434,20 +444,20 @@ export class ClassroomsService {
       where: { classroomId },
       include: {
         _count: {
-          select: { submissions: true },
+          select: { Submission: true },
         },
-        submissions: {
+        Submission: {
           where: { status: 'GRADED' },
         },
       },
     });
 
     const totalSubmissions = assignments.reduce(
-      (acc, a) => acc + a._count.submissions,
+      (acc, a) => acc + a._count.Submission,
       0,
     );
     const gradedSubmissions = assignments.reduce(
-      (acc, a) => acc + a.submissions.length,
+      (acc, a) => acc + a.Submission.length,
       0,
     );
 
@@ -462,13 +472,13 @@ export class ClassroomsService {
         : 0;
 
     return {
-      studentCount: classroom._count.members - 1, // Exclude teacher
-      assignmentCount: classroom._count.assignments,
+      studentCount: classroom._count.ClassroomMember - 1, // Exclude teacher
+      assignmentCount: classroom._count.Assignment,
       totalSubmissions,
       gradedSubmissions,
       pendingSubmissions: totalSubmissions - gradedSubmissions,
       averageAttendance: avgAttendance,
-      attendanceDays: classroom._count.attendance,
+      attendanceDays: classroom._count.AttendanceRecord,
     };
   }
 }
